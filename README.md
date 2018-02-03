@@ -8,27 +8,36 @@ Clone the Github page and modify the following values in the vw_carnet.py script
 ```
 CARNET_USERNAME = ''
 CARNET_PASSWORD = ''
+CARNET_SPIN = ''
 ```
 
 # Usage
 
 Run the script with a argument. The following are supported:
 ```
-python vw_carnet.py retrieveCarNetInfo
+python vw_carnet_web.py retrieveCarNetInfo
 ```
 
 ```
-python vw_carnet.py startClimat
+python vw_carnet_web.py startClimat
 ```
 
 ```
-python vw_carnet.py stopClimat
+python vw_carnet_web.py stopClimat
 ```
 
 ```
-python vw_carnet.py startWindowMelt
+python vw_carnet_web.py startWindowMelt
 ```
 
 ```
-python vw_carnet.py stopWindowMelt
+python vw_carnet_web.py stopWindowMelt
+```
+
+...
+(see code for more options)
+
+Send all data to the MQTT broker configured in lib_mqtt:
+```
+python vw_carnet.py mqtt
 ```
