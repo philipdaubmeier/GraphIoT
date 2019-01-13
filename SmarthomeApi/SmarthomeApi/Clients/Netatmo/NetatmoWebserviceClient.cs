@@ -26,6 +26,10 @@ namespace SmarthomeApi.Clients.Netatmo
             _authData = authData;
         }
 
+        /// <summary>
+        /// Returns a tuple containing the 
+        /// </summary>
+        /// <returns></returns>
         public async Task<Tuple<string, string>> GetCameraPicture()
         {
             await Authenticate();
@@ -177,10 +181,15 @@ namespace SmarthomeApi.Clients.Netatmo
             var rawData = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
             
             var home = rawData.body.homes.First(x => x.name.Equals("Karlskron", StringComparison.InvariantCultureIgnoreCase));
-            var cameraId = home.cameras.First(x => x.name.Equals("Phils Presence", StringComparison.InvariantCultureIgnoreCase)).id;
-            var events = home.events.First(x => x.camera_id == cameraId).event_list.Where(x => !string.IsNullOrWhiteSpace(x.snapshot.id) && !string.IsNullOrWhiteSpace(x.snapshot.key));
+            var camera = home.cameras.First(x => x.name.Equals("Phils Presence", StringComparison.InvariantCultureIgnoreCase));
+
+            var events = home.events.First(x => x.camera_id == camera.id).event_list.Where(x => !string.IsNullOrWhiteSpace(x.snapshot.id) && !string.IsNullOrWhiteSpace(x.snapshot.key));
             var newestSnapshot = events.OrderByDescending(x => x.time).First().snapshot;
-            return new Tuple<string, string>(newestSnapshot.id, newestSnapshot.key);
+            var newestSnapshotUrl = "https://api.netatmo.com/api/getcamerapicture?image_id=" + newestSnapshot.id + "&key=" + newestSnapshot.key;
+
+            var currentSnapshotUrl = camera.vpn_url + "/live/snapshot_720.jpg";
+
+            return new Tuple<string, string>(newestSnapshotUrl, currentSnapshotUrl);
         }
     }
 }

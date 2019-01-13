@@ -6,20 +6,24 @@ namespace SmarthomeApi.Clients.Netatmo
 {
     public class NetatmoCameraImage
     {
-        public static async Task<string> GetCurrent()
+        private static NetatmoAuth netatmoAuthData = new NetatmoAuth()
         {
-            var netatmoAuthData = new NetatmoAuth()
-            {
-                NetatmoAppId = "***REMOVED***",
-                NetatmoAppSecret = "***REMOVED***",
-                Username = "***REMOVED***",
-                UserPassword = "***REMOVED***"
-            };
+            NetatmoAppId = "***REMOVED***",
+            NetatmoAppSecret = "***REMOVED***",
+            Username = "***REMOVED***",
+            UserPassword = "***REMOVED***"
+        };
 
-            var netatmoApiClient = new NetatmoWebserviceClient(new Uri("https://api.netatmo.net"), netatmoAuthData);
-            var pictureId = await netatmoApiClient.GetCameraPicture();
+        private static NetatmoWebserviceClient netatmoApiClient = new NetatmoWebserviceClient(new Uri("https://api.netatmo.net"), netatmoAuthData);
 
-            return "https://api.netatmo.com/api/getcamerapicture?image_id=" + pictureId.Item1 + "&key=" + pictureId.Item2;
+        public static async Task<string> GetLastEventSnapshot()
+        {
+            return (await netatmoApiClient.GetCameraPicture()).Item1;
+        }
+
+        public static async Task<string> GetCurrentSnapshot()
+        {
+            return (await netatmoApiClient.GetCameraPicture()).Item2;
         }
     }
 }
