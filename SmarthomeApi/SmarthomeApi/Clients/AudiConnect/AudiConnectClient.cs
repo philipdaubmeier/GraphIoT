@@ -32,6 +32,30 @@ namespace SmarthomeApi.Clients.AudiConnect
             return await ParseVehicleDetailResponse(await SendAsync(HttpMethod.Get,
                 new Uri("https://msg.audi.de/fs-car/myaudi/carservice/v2/Audi/DE/vehicle/" + csid)));
         }
+        
+        public async Task<string> GetPairingStatus(string vin)
+        {
+            await Authenticate();
+            return await (await SendAsync(HttpMethod.Get,
+                new Uri("https://msg.audi.de/fs-car/usermanagement/users/v1/Audi/DE/vehicles/" + vin + "/pairing")))
+                .Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetVsrStoredData(string vin)
+        {
+            await Authenticate();
+            return await (await SendAsync(HttpMethod.Get,
+                new Uri("https://msg.audi.de/fs-car/bs/vsr/v1/Audi/DE/vehicles/" + vin + "/status")))
+                .Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetOperationList(string vin)
+        {
+            await Authenticate();
+            return await (await SendAsync(HttpMethod.Get,
+                new Uri("https://msg.audi.de/fs-car/rolesrights/operationlist/v2/Audi/DE/vehicles/" + vin + "/operations")))
+                .Content.ReadAsStringAsync();
+        }
 
         private async Task Authenticate()
         {

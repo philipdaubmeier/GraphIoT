@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using SmarthomeApi.Clients.AudiConnect;
 
 namespace SmarthomeApi.Controllers
@@ -30,6 +31,63 @@ namespace SmarthomeApi.Controllers
                     modelcode = vehicle.Item2.Item2,
                     color = vehicle.Item2.Item3,
                     pr_numbers = vehicle.Item2.Item4
+                })
+            });
+        }
+
+        // GET: api/audiconnect/vehicles/pairing
+        [HttpGet("vehicles/pairing")]
+        public async Task<JsonResult> vehiclesPairing()
+        {
+            AudiConnectClient client = new AudiConnectClient();
+            var vehicles = await client.GetVehicles();
+            var pairings = (await Task.WhenAll(vehicles.Select(async x => await client.GetPairingStatus(x.Value)).ToList()))
+                .Zip(vehicles, (x1, x2) => new Tuple<string, string>(x2.Value, x1));
+
+            return Json(new
+            {
+                vehicles = pairings.Select(vehicle => new
+                {
+                    vin = vehicle.Item1,
+                    pairing = JsonConvert.DeserializeObject(vehicle.Item2)
+                })
+            });
+        }
+
+        // GET: api/audiconnect/vehicles/vsr
+        [HttpGet("vehicles/vsr")]
+        public async Task<JsonResult> vehiclesVsr()
+        {
+            AudiConnectClient client = new AudiConnectClient();
+            var vehicles = await client.GetVehicles();
+            var pairings = (await Task.WhenAll(vehicles.Select(async x => await client.GetVsrStoredData(x.Value)).ToList()))
+                .Zip(vehicles, (x1, x2) => new Tuple<string, string>(x2.Value, x1));
+
+            return Json(new
+            {
+                vehicles = pairings.Select(vehicle => new
+                {
+                    vin = vehicle.Item1,
+                    vsr = JsonConvert.DeserializeObject(vehicle.Item2)
+                })
+            });
+        }
+
+        // GET: api/audiconnect/vehicles/operations
+        [HttpGet("vehicles/operations")]
+        public async Task<JsonResult> vehiclesOperations()
+        {
+            AudiConnectClient client = new AudiConnectClient();
+            var vehicles = await client.GetVehicles();
+            var pairings = (await Task.WhenAll(vehicles.Select(async x => await client.GetOperationList(x.Value)).ToList()))
+                .Zip(vehicles, (x1, x2) => new Tuple<string, string>(x2.Value, x1));
+
+            return Json(new
+            {
+                vehicles = pairings.Select(vehicle => new
+                {
+                    vin = vehicle.Item1,
+                    operation_list = JsonConvert.DeserializeObject(vehicle.Item2)
                 })
             });
         }
