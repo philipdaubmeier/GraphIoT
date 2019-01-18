@@ -16,20 +16,47 @@ namespace SmarthomeApi.Clients.Withings
         private const string _clientSecret = "***REMOVED***";
         public string ClientId { get { return _clientId; } }
 
-        private string _refreshToken = "09af37ef1b0328ecb4ec77df2bcb3464ec40c102";
+        private string _refreshToken = "39579ce662539e4cfee516ce9c58620dcf923110";
 
         private string _token = null;
         private DateTime _tokenValidTo = DateTime.MinValue;
 
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        public async Task<Dictionary<DateTime, int>> GetMeasures(int category)
+        public enum MeasureType
+        {
+            Weight      = 1,  /// <summery>Weight (kg)</summary>
+            Height      = 4,  /// <summary>Height (meter)</summary>
+            FatFreeMass = 5,  /// <summary>Fat Free Mass (kg)</summary>
+            FatRatio    = 6,  /// <summary>Fat Ratio (%)</summary>
+            FatMass     = 8,  /// <summary>Fat Mass Weight (kg)</summary>
+            Diastolic   = 9,  /// <summary>Diastolic Blood Pressure (mmHg)</summary>
+            Systolic    = 10, /// <summary>Systolic Blood Pressure (mmHg)</summary>
+            HeartPulse  = 11, /// <summary>Heart Pulse (bpm)</summary>
+            Temperature = 12, /// <summary>Temperature</summary>
+            SP02        = 54, /// <summary>SP02 (%)</summary>
+            BodyTemp    = 71, /// <summary>Body Temperature</summary>
+            SkinTemp    = 73, /// <summary>Skin Temperature</summary>
+            MuscleMass  = 76, /// <summary>Muscle Mass</summary>
+            Hydration   = 77, /// <summary>Hydration</summary>
+            BoneMass    = 88, /// <summary>Bone Mass</summary>
+            PulseWave   = 91  /// <summary>Pulse Wave Velocity</summary>
+        }
+
+        public async Task<Dictionary<DateTime, int>> GetMeasures(MeasureType type)
         {
             await AuthenticateRefresh();
             return await ParseMeasuresResponse(await httpClient.GetAsync(
-                new Uri("https://wbsapi.withings.net/measure?access_token=" + _token + "&action=getmeas&meastype=" + category.ToString())));
+                new Uri("https://wbsapi.withings.net/measure?access_token=" + _token + "&action=getmeas&meastype=" + ((int)type).ToString())));
         }
-        
+
+        public async Task<List<Tuple<string, string>>> GetDevices()
+        {
+            await AuthenticateRefresh();
+            return await ParseDevicesResponse(await httpClient.GetAsync(
+                new Uri("https://wbsapi.withings.net/v2/user?action=getdevice&access_token=" + _token)));
+        }
+
         /// <summary>
         /// Authenticate via authorization code. Sets the access token and returns the refresh token.
         /// </summary>
@@ -88,7 +115,8 @@ namespace SmarthomeApi.Clients.Withings
                 refresh_token = "",
                 userid = ""
             };
-            var authRaw = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var authRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return new Tuple<string, DateTime, string>(authRaw.access_token, DateTime.Now.AddSeconds(int.Parse(authRaw.expires_in)), authRaw.refresh_token);
         }
 
@@ -124,6 +152,27 @@ namespace SmarthomeApi.Clients.Withings
             };
             var measuresRaw = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
             return measuresRaw.body.measuregrps.Select(x => new KeyValuePair<DateTime, int>(UnixEpoch.AddSeconds(x.date), x.measures.First().value)).ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        private async Task<List<Tuple<string, string>>> ParseDevicesResponse(HttpResponseMessage response)
+        {
+            var definition = new
+            {
+                status = 0,
+                body = new
+                {
+                    devices = new[] { new
+                    {
+                        type = "",
+                        battery = "",
+                        model = "",
+                        deviceid = "",
+                        timezone = ""
+                    } }
+                }
+            };
+            var devicesRaw = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
+            return devicesRaw.body.devices.Select(x => new Tuple<string, string>(x.model, x.battery)).ToList();
         }
     }
 }

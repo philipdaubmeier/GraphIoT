@@ -38,7 +38,7 @@ namespace SmarthomeApi.Controllers
                 return StatusCode(403);
 
             var authorization_code = code;
-            var refresh_token = withingsClient.AuthenticateLogin(code);
+            var refresh_token = await withingsClient.AuthenticateLogin(code);
 
             Func<string, Task> sendTelegramMessage = async message => await (new HttpClient()).GetStringAsync("https://api.telegram.org/***REMOVED***/sendMessage?chat_id=***REMOVED***&text=" + WebUtility.UrlEncode(message));
             await sendTelegramMessage("Refresh token: " + refresh_token);
@@ -57,11 +57,27 @@ namespace SmarthomeApi.Controllers
         [HttpGet("measures")]
         public async Task<JsonResult> Measures()
         {
-            var measures = await withingsClient.GetMeasures(1);
+            var measures = await withingsClient.GetMeasures(WithingsClient.MeasureType.Weight);
 
             return Json(new
             {
                 measures = measures.OrderBy(x => x.Key).TakeLast(37).Select(x => Math.Round(((decimal)x.Value) / 1000, 2).ToString() + " kg")
+            });
+        }
+
+        // GET: api/withings/devices
+        [HttpGet("devices")]
+        public async Task<JsonResult> Devices()
+        {
+            var devices = await withingsClient.GetDevices();
+
+            return Json(new
+            {
+                devices = devices.Select(x => new
+                {
+                    model = x.Item1,
+                    battery = x.Item2
+                })
             });
         }
     }
