@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmarthomeApi.Clients.Withings;
+using SmarthomeApi.Database.Model;
 
 namespace SmarthomeApi.Controllers
 {
@@ -17,7 +18,11 @@ namespace SmarthomeApi.Controllers
     [Route("api/withings")]
     public class WithingsController : Controller
     {
-        private static readonly WithingsClient withingsClient = new WithingsClient();
+        private readonly WithingsClient withingsClient;
+        public WithingsController(PersistenceContext databaseContext)
+        {
+            withingsClient = new WithingsClient(databaseContext);
+        }
 
         // GET: api/withings/login
         [HttpGet("login")]

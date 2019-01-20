@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +13,13 @@ namespace SmarthomeApi.Clients.Withings
     {
         private static readonly HttpClient httpClient = new HttpClient();
 
+        private const string _baseUri = "https://wbsapi.withings.net";
+
         private const string _clientId = "***REMOVED***";
         private const string _clientSecret = "***REMOVED***";
         public string ClientId { get { return _clientId; } }
 
-        private string _refreshToken = "39579ce662539e4cfee516ce9c58620dcf923110";
-
-        private string _token = null;
-        private DateTime _tokenValidTo = DateTime.MinValue;
+        private TokenStore _tokenStore;
 
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -43,18 +43,23 @@ namespace SmarthomeApi.Clients.Withings
             PulseWave   = 91  /// <summary>Pulse Wave Velocity</summary>
         }
 
+        public WithingsClient(PersistenceContext databaseContext)
+        {
+            _tokenStore = new TokenStore(databaseContext, "withings");
+        }
+
         public async Task<Dictionary<DateTime, int>> GetMeasures(MeasureType type)
         {
             await AuthenticateRefresh();
             return await ParseMeasuresResponse(await httpClient.GetAsync(
-                new Uri("https://wbsapi.withings.net/measure?access_token=" + _token + "&action=getmeas&meastype=" + ((int)type).ToString())));
+                new Uri($"{_baseUri}/measure?access_token={_tokenStore.AccessToken}&action=getmeas&meastype={((int)type).ToString()}")));
         }
 
         public async Task<List<Tuple<string, string>>> GetDevices()
         {
             await AuthenticateRefresh();
             return await ParseDevicesResponse(await httpClient.GetAsync(
-                new Uri("https://wbsapi.withings.net/v2/user?action=getdevice&access_token=" + _token)));
+                new Uri($"{_baseUri}/v2/user?action=getdevice&access_token={_tokenStore.AccessToken}")));
         }
 
         /// <summary>
@@ -73,10 +78,8 @@ namespace SmarthomeApi.Clients.Withings
                     new KeyValuePair<string, string>("redirect_uri", "https://your.domain/smarthome/api/withings/callback")
                 })));
 
-            _token = loadedToken.Item1;
-            _tokenValidTo = loadedToken.Item2;
-            _refreshToken = loadedToken.Item3;
-            return _refreshToken;
+            await _tokenStore.UpdateToken(loadedToken.Item1, loadedToken.Item2, loadedToken.Item3);
+            return loadedToken.Item3;
         }
 
         /// <summary>
@@ -84,7 +87,7 @@ namespace SmarthomeApi.Clients.Withings
         /// </summary>
         private async Task AuthenticateRefresh()
         {
-            if (_tokenValidTo > DateTime.Now && !string.IsNullOrEmpty(_token))
+            if (_tokenStore.IsAccessTokenValid())
                 return;
             
             Tuple<string, DateTime, string> loadedToken = await ParseTokenResponse(await httpClient.PostAsync(
@@ -93,12 +96,10 @@ namespace SmarthomeApi.Clients.Withings
                     new KeyValuePair<string, string>("grant_type", "refresh_token"),
                     new KeyValuePair<string, string>("client_id", _clientId),
                     new KeyValuePair<string, string>("client_secret", _clientSecret),
-                    new KeyValuePair<string, string>("refresh_token", _refreshToken)
+                    new KeyValuePair<string, string>("refresh_token", _tokenStore.RefreshToken)
                 })));
 
-            _token = loadedToken.Item1;
-            _tokenValidTo = loadedToken.Item2;
-            _refreshToken = loadedToken.Item3;
+            await _tokenStore.UpdateToken(loadedToken.Item1, loadedToken.Item2, loadedToken.Item3);
         }
 
         /// <summary>
