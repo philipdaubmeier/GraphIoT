@@ -15,6 +15,14 @@
   <PropertyGroup>
     <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="readme_setup_production_db.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="readme_setup_production_db.md" />
+  </ItemGroup>
   
   <ItemGroup>
     <Folder Include="wwwroot\" />

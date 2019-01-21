@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SmarthomeApi.Database;
 using SmarthomeApi.Database.Model;
 
 namespace SmarthomeApi
@@ -41,6 +42,7 @@ namespace SmarthomeApi
             }
 
             app.UseMvc();
+            app.AutoMigrate();
         }
     }
 }
