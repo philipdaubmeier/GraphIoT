@@ -18,7 +18,7 @@ namespace SmarthomeApi.Controllers
 
         // GET api/database/authdatasets
         [HttpGet("authdatasets")]
-        public async Task<ActionResult> Get(string password)
+        public ActionResult Get(string password)
         {
             if (password != "9bb04cf87b69e851")
                 return StatusCode(403);

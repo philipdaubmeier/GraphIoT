@@ -85,5 +85,43 @@ namespace SmarthomeApi.Controllers
                 })
             });
         }
+
+        // GET: api/withings/lametric
+        [HttpGet("lametric")]
+        public async Task<JsonResult> LaMetric()
+        {
+            var measures = (await withingsClient.GetMeasures(WithingsClient.MeasureType.Weight)).OrderBy(x => x.Key).ToList();
+
+            var minMeasure = measures.TakeLast(37).Select(x => x.Value).Min();
+            var chartMeasures = measures.TakeLast(37).Select(x => (int)(Math.Round(((decimal)(x.Value - minMeasure)) / 1000, 1) * 10));
+            var lastMeasure = Math.Round(((decimal)measures.Last().Value) / 1000, 1);
+            var prevLastMeasure = Math.Round(((decimal)measures.SkipLast(1).Last().Value) / 1000, 1);
+
+            return Json(new
+            {
+                frames = new List<object>() {
+                    new
+                    {
+                        text = "Philip",
+                        icon = "i173"
+                    },
+                    new
+                    {
+                        text = $"{lastMeasure} kg",
+                        icon = "i173"
+                    },
+                    new
+                    {
+                        index = 2,
+                        chartData = chartMeasures
+                    },
+                    new
+                    {
+                        text = (prevLastMeasure < lastMeasure ? "+" : "-") + $" {Math.Abs(prevLastMeasure - lastMeasure)} kg",
+                        icon = prevLastMeasure < lastMeasure ? "i4103" : "i402"
+                    }
+                }
+            });
+        }
     }
 }
