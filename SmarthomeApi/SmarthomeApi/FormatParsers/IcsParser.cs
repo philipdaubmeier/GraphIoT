@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients
+namespace SmarthomeApi.FormatParsers
 {
     public class IcsParser
     {
