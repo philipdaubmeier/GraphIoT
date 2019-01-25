@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SmarthomeApi.Database.Model
+﻿namespace SmarthomeApi.Database.Model
 {
     public class AuthData
     {

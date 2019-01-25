@@ -18,7 +18,7 @@ namespace SmarthomeApi.Controllers
 
         // POST: api/calendars/{calendarid}/update
         [HttpPost("{calendarid}/update")]
-        public async Task<ActionResult> Post([FromBody]string value)
+        public async Task<ActionResult> Post()
         {
             var parser = new IcsParser(_dbContext, "philip.daubmeier@audi.de");
             using (var reader = new StreamReader(Request.Body))

@@ -225,48 +225,63 @@ namespace SmarthomeApi.FormatParsers
 
         private void StoreCalendarEntries(PersistenceContext db, IEnumerable<Tuple<TokenGroup, IDictionary<Token, string>>> groupedTokens)
         {
-            var metadata = groupedTokens.First();
-            if (metadata.Item1 != TokenGroup.Metadata || metadata.Item2.Count == 0)
-                return;
-
-            if (!metadata.Item2.TryGetValue(Token.X_WR_RELCALID, out string calendarUuid) || string.IsNullOrWhiteSpace(calendarUuid))
-                return;
-
-            if (!metadata.Item2.TryGetValue(Token.X_OWNER, out string owner) || owner == null || !owner.ToLowerInvariant().EndsWith($"mailto:{_owner.ToLowerInvariant()}"))
-                return;
-
-            var dbCalendar = db.Calendars.Where(x => x.UUID == calendarUuid).FirstOrDefault();
-            if (dbCalendar == null)
-                db.Calendars.Add(dbCalendar = new Calendar() { UUID = calendarUuid, Owner = owner });
-
-            foreach (var entry in groupedTokens.Where(x => x.Item1 == TokenGroup.CalendarEntry))
+            string calendarUuid, owner;
+            Calendar dbCalendar = null;
+            foreach (var entry in groupedTokens)
             {
-                var uid = entry.Item2[Token.UID];
-                var isPrivate = !entry.Item2[Token.CLASS].Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase);
-                var isFullDay = entry.Item2[Token.DTSTART].ToUpperInvariant().StartsWith("VALUE=DATE:");
-                var startTime = ToDateTime(entry.Item2[Token.DTSTART]);
-                var endTime = ToDateTime(entry.Item2[Token.DTEND]);
-                var modified = ToDateTime(entry.Item2[Token.DTSTAMP]);
-                var recurranceRule = entry.Item2[Token.RRULE];
-                var summary = entry.Item2[Token.SUMMARY];
-                var busyState = ToBusyState(entry.Item2[Token.X_MICROSOFT_CDO_BUSYSTATUS]);
+                if (entry.Item1 == TokenGroup.Metadata && dbCalendar == null)
+                {
+                    var metadata = entry;
+                    if (metadata.Item2.Count == 0)
+                        return;
 
-                var dbEntry = dbCalendar.Entries.Where(x => x.UID == uid).FirstOrDefault();
-                if (dbEntry == null)
-                    dbCalendar.Entries.Add(dbEntry = new CalendarEntry());
+                    if (!metadata.Item2.TryGetValue(Token.X_WR_RELCALID, out calendarUuid) || string.IsNullOrWhiteSpace(calendarUuid))
+                        return;
 
-                dbEntry.UID = uid;
-                dbEntry.IsPrivate = isPrivate;
-                dbEntry.IsFullDay = isFullDay;
-                dbEntry.StartTime = startTime;
-                dbEntry.EndTime = endTime;
-                dbEntry.Modified = modified;
-                dbEntry.RecurranceRule = recurranceRule;
-                dbEntry.Summary = summary;
-                dbEntry.BusyState = busyState;
+                    if (!metadata.Item2.TryGetValue(Token.X_OWNER, out owner) || owner == null || !owner.ToLowerInvariant().EndsWith($"mailto:{_owner.ToLowerInvariant()}"))
+                        return;
+
+                    dbCalendar = db.Calendars.Where(x => x.UUID == calendarUuid).FirstOrDefault();
+                    if (dbCalendar == null)
+                        db.Calendars.Add(dbCalendar = new Calendar() { UUID = calendarUuid, Owner = owner });
+
+                    continue;
+                }
+
+                ParseCalendarEntry(dbCalendar, entry);
             }
 
             db.SaveChanges();
+        }
+
+        private void ParseCalendarEntry(Calendar dbCalendar, Tuple<TokenGroup, IDictionary<Token, string>> entry)
+        {
+            if (entry.Item1 != TokenGroup.CalendarEntry)
+                return;
+
+            var uid = entry.Item2[Token.UID];
+            var isPrivate = !entry.Item2[Token.CLASS].Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase);
+            var isFullDay = entry.Item2[Token.DTSTART].ToUpperInvariant().StartsWith("VALUE=DATE:");
+            var startTime = ToDateTime(entry.Item2[Token.DTSTART]);
+            var endTime = ToDateTime(entry.Item2[Token.DTEND]);
+            var modified = ToDateTime(entry.Item2[Token.DTSTAMP]);
+            var recurranceRule = entry.Item2[Token.RRULE];
+            var summary = entry.Item2[Token.SUMMARY];
+            var busyState = ToBusyState(entry.Item2[Token.X_MICROSOFT_CDO_BUSYSTATUS]);
+
+            var dbEntry = dbCalendar.Entries.Where(x => x.UID == uid).FirstOrDefault();
+            if (dbEntry == null)
+                dbCalendar.Entries.Add(dbEntry = new CalendarEntry());
+
+            dbEntry.UID = uid;
+            dbEntry.IsPrivate = isPrivate;
+            dbEntry.IsFullDay = isFullDay;
+            dbEntry.StartTime = startTime;
+            dbEntry.EndTime = endTime;
+            dbEntry.Modified = modified;
+            dbEntry.RecurranceRule = recurranceRule;
+            dbEntry.Summary = summary;
+            dbEntry.BusyState = busyState;
         }
     }
 }
