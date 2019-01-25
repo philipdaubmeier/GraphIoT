@@ -33,11 +33,10 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.Calendar", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<string>("Owner");
-
-                    b.Property<string>("UUID");
 
                     b.HasKey("Id");
 
@@ -46,11 +45,12 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarEntry", b =>
                 {
-                    b.Property<int>("Id");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
 
                     b.Property<int>("BusyState");
 
-                    b.Property<int?>("CalendarId");
+                    b.Property<Guid>("CalendarId");
 
                     b.Property<DateTime>("EndTime");
 
@@ -68,10 +68,6 @@ namespace SmarthomeApi.Migrations
 
                     b.Property<string>("Summary");
 
-                    b.Property<string>("UID")
-                        .IsRequired()
-                        .HasMaxLength(120);
-
                     b.HasKey("Id");
 
                     b.HasIndex("CalendarId");
@@ -81,9 +77,10 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarEntry", b =>
                 {
-                    b.HasOne("SmarthomeApi.Database.Model.Calendar")
+                    b.HasOne("SmarthomeApi.Database.Model.Calendar", "Calendar")
                         .WithMany("Entries")
-                        .HasForeignKey("CalendarId");
+                        .HasForeignKey("CalendarId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

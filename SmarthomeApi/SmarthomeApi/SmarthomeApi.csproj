@@ -17,6 +17,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="readme_setup_production_db.md" />
   </ItemGroup>
 

@@ -1,8 +1,11 @@
-﻿using SmarthomeApi.Database.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using SmarthomeApi.Database.Model;
+using SmarthomeApi.FormatParsers.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -210,11 +213,28 @@ namespace SmarthomeApi.FormatParsers
 
         private DateTime ToDateTime(string icsTimeString)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(icsTimeString))
+                return DateTime.MinValue;
+
+            var timestring = icsTimeString.Split(':').LastOrDefault();
+            if (string.IsNullOrEmpty(timestring))
+                return DateTime.MinValue;
+
+            DateTime datetime;
+            if (!(DateTime.TryParseExact(timestring, "yyyyMMdd'T'HHmmss'Z'",
+                    System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out datetime)
+                || DateTime.TryParseExact(timestring, new string[] { "yyyyMMdd", "yyyyMMdd'T'HHmmss" },
+                    System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.AssumeLocal, out datetime)))
+                return DateTime.MinValue;
+
+            return datetime;
         }
 
         private int ToBusyState(string icsBusyString)
         {
+            if (string.IsNullOrEmpty(icsBusyString))
+                return 0;
+
             switch (icsBusyString.Trim().ToUpperInvariant())
             {
                 case "TENTATIVE": return 1;
@@ -225,7 +245,7 @@ namespace SmarthomeApi.FormatParsers
 
         private void StoreCalendarEntries(PersistenceContext db, IEnumerable<Tuple<TokenGroup, IDictionary<Token, string>>> groupedTokens)
         {
-            string calendarUuid, owner;
+            string calendarIdStr, owner;
             Calendar dbCalendar = null;
             foreach (var entry in groupedTokens)
             {
@@ -235,51 +255,72 @@ namespace SmarthomeApi.FormatParsers
                     if (metadata.Item2.Count == 0)
                         return;
 
-                    if (!metadata.Item2.TryGetValue(Token.X_WR_RELCALID, out calendarUuid) || string.IsNullOrWhiteSpace(calendarUuid))
+                    if (!metadata.Item2.TryGetValue(Token.X_WR_RELCALID, out calendarIdStr) || string.IsNullOrWhiteSpace(calendarIdStr))
                         return;
 
                     if (!metadata.Item2.TryGetValue(Token.X_OWNER, out owner) || owner == null || !owner.ToLowerInvariant().EndsWith($"mailto:{_owner.ToLowerInvariant()}"))
                         return;
 
-                    dbCalendar = db.Calendars.Where(x => x.UUID == calendarUuid).FirstOrDefault();
+                    if (!Guid.TryParse(calendarIdStr, out Guid calendarGuid))
+                        return;
+
+                    dbCalendar = db.Calendars.Where(x => x.Id == calendarGuid).FirstOrDefault();
                     if (dbCalendar == null)
-                        db.Calendars.Add(dbCalendar = new Calendar() { UUID = calendarUuid, Owner = owner });
+                        db.Calendars.Add(dbCalendar = new Calendar() { Id = calendarGuid, Owner = owner });
 
                     continue;
                 }
 
-                ParseCalendarEntry(dbCalendar, entry);
+                ParseCalendarEntry(db, dbCalendar, entry);
             }
 
             db.SaveChanges();
         }
 
-        private void ParseCalendarEntry(Calendar dbCalendar, Tuple<TokenGroup, IDictionary<Token, string>> entry)
+        private void ParseCalendarEntry(PersistenceContext db, Calendar dbCalendar, Tuple<TokenGroup, IDictionary<Token, string>> entry)
         {
             if (entry.Item1 != TokenGroup.CalendarEntry)
                 return;
+            
+            entry.Item2.TryGetValue(Token.UID, out string uidStr);
+            entry.Item2.TryGetValue(Token.CLASS, out string classStr);
+            entry.Item2.TryGetValue(Token.DTSTART, out string startTimeStr);
+            entry.Item2.TryGetValue(Token.DTEND, out string endTimeStr);
+            entry.Item2.TryGetValue(Token.DTSTAMP, out string modifiedStr);
+            entry.Item2.TryGetValue(Token.RRULE, out string recurranceRule);
+            entry.Item2.TryGetValue(Token.SUMMARY, out string summary);
+            entry.Item2.TryGetValue(Token.X_MICROSOFT_CDO_BUSYSTATUS, out string busyStr);
 
-            var uid = entry.Item2[Token.UID];
-            var isPrivate = !entry.Item2[Token.CLASS].Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase);
-            var isFullDay = entry.Item2[Token.DTSTART].ToUpperInvariant().StartsWith("VALUE=DATE:");
-            var startTime = ToDateTime(entry.Item2[Token.DTSTART]);
-            var endTime = ToDateTime(entry.Item2[Token.DTEND]);
-            var modified = ToDateTime(entry.Item2[Token.DTSTAMP]);
-            var recurranceRule = entry.Item2[Token.RRULE];
-            var summary = entry.Item2[Token.SUMMARY];
-            var busyState = ToBusyState(entry.Item2[Token.X_MICROSOFT_CDO_BUSYSTATUS]);
+            var guid = GuidUtility.FromIcsUID(uidStr);
+            var isPrivate = classStr == null ? false : !classStr.Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase);
+            var isFullDay = startTimeStr == null ? false : startTimeStr.ToUpperInvariant().StartsWith("VALUE=DATE:");
+            var busyState = ToBusyState(busyStr);
+            var startTime = ToDateTime(startTimeStr);
+            var endTime = ToDateTime(endTimeStr);
+            var modified = ToDateTime(modifiedStr);
 
-            var dbEntry = dbCalendar.Entries.Where(x => x.UID == uid).FirstOrDefault();
+            if (startTime == DateTime.MinValue || endTime == DateTime.MinValue)
+                return;
+
+            if (dbCalendar.Entries == null)
+                dbCalendar.Entries = new List<CalendarEntry>();
+            
+            var dbEntry = db.CalendarEntry.Where(x => x.Id == guid).FirstOrDefault();
             if (dbEntry == null)
-                dbCalendar.Entries.Add(dbEntry = new CalendarEntry());
+            {
+                dbEntry = new CalendarEntry();
+                db.CalendarEntry.Add(dbEntry);
+                dbCalendar.Entries.Add(dbEntry);
+            }
 
-            dbEntry.UID = uid;
+            dbEntry.Id = guid;
+            dbEntry.Calendar = dbCalendar;
             dbEntry.IsPrivate = isPrivate;
             dbEntry.IsFullDay = isFullDay;
             dbEntry.StartTime = startTime;
             dbEntry.EndTime = endTime;
             dbEntry.Modified = modified;
-            dbEntry.RecurranceRule = recurranceRule;
+            dbEntry.RecurranceRule = recurranceRule ?? string.Empty;
             dbEntry.Summary = summary;
             dbEntry.BusyState = busyState;
         }

@@ -1,16 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmarthomeApi.Database.Model
 {
     public class Calendar
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; }
 
-        public string UUID { get; set; }
         public string Owner { get; set; }
-        public DbSet<CalendarEntry> Entries { get; set; }
+        public ICollection<CalendarEntry> Entries { get; set; }
     }
 }

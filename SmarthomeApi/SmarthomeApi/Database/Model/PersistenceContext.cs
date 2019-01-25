@@ -12,6 +12,8 @@ namespace SmarthomeApi.Database.Model
 
         public DbSet<Calendar> Calendars { get; set; }
 
+        public DbSet<CalendarEntry> CalendarEntry { get; set; }
+
         public PersistenceContext(DbContextOptions<PersistenceContext> options)
             : base(options)
         { }

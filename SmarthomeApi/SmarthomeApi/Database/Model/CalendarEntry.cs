@@ -6,11 +6,13 @@ namespace SmarthomeApi.Database.Model
 {
     public class CalendarEntry
     {
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+        [Key]
+        public Guid Id { get; set; }
 
-        [Required, MaxLength(120)]
-        public string UID { get; set; }
+        public Guid CalendarId { get; set; }
+
+        [ForeignKey("CalendarId")]
+        public Calendar Calendar { get; set; }
 
         public bool IsPrivate { get; set; }
         public bool IsFullDay { get; set; }
