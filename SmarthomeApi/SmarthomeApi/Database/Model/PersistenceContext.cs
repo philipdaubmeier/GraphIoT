@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SmarthomeApi.Database.Model
 {
@@ -12,7 +8,9 @@ namespace SmarthomeApi.Database.Model
 
         public DbSet<Calendar> Calendars { get; set; }
 
-        public DbSet<CalendarEntry> CalendarEntry { get; set; }
+        public DbSet<CalendarAppointment> CalendarAppointments { get; set; }
+
+        public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
 
         public PersistenceContext(DbContextOptions<PersistenceContext> options)
             : base(options)

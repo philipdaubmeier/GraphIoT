@@ -10,6 +10,6 @@ namespace SmarthomeApi.Database.Model
         public Guid Id { get; set; }
 
         public string Owner { get; set; }
-        public ICollection<CalendarEntry> Entries { get; set; }
+        public ICollection<CalendarAppointment> Appointments { get; set; }
     }
 }

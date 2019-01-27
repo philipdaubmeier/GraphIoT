@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmarthomeApi.Database.Model
 {
-    public class CalendarEntry
+    public class CalendarAppointment
     {
         [Key]
         public Guid Id { get; set; }
@@ -14,22 +15,18 @@ namespace SmarthomeApi.Database.Model
         [ForeignKey("CalendarId")]
         public Calendar Calendar { get; set; }
 
+        public ICollection<CalendarOccurence> Occurences { get; set; }
+
+        [Required]
         public bool IsPrivate { get; set; }
-        public bool IsFullDay { get; set; }
-
-        public DateTime StartTime { get; set; }
-        public DateTime EndTime { get; set; }
-
-        public DateTime Modified { get; set; }
-
-        [Required, MaxLength(255)]
-        public string RecurranceRule { get; set; }
         
+        [Required, MaxLength(120)]
         public string Summary { get; set; }
 
         /// <summary>
         /// BusyStates: 0 = BUSY, 1 = TENTATIVE, 2 = OOF
         /// </summary>
+        [Required]
         public int BusyState { get; set; }
     }
 }

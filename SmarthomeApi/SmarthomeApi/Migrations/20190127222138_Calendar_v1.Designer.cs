@@ -10,7 +10,7 @@ using SmarthomeApi.Database.Model;
 namespace SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
-    [Migration("20190126120725_Calendar_v1")]
+    [Migration("20190127222138_Calendar_v1")]
     partial class Calendar_v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,7 +45,7 @@ namespace SmarthomeApi.Migrations
                     b.ToTable("Calendars");
                 });
 
-            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarEntry", b =>
+            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarAppointment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -54,34 +54,54 @@ namespace SmarthomeApi.Migrations
 
                     b.Property<Guid>("CalendarId");
 
-                    b.Property<DateTime>("EndTime");
-
-                    b.Property<bool>("IsFullDay");
-
                     b.Property<bool>("IsPrivate");
 
-                    b.Property<DateTime>("Modified");
-
-                    b.Property<string>("RecurranceRule")
+                    b.Property<string>("Summary")
                         .IsRequired()
-                        .HasMaxLength(255);
-
-                    b.Property<DateTime>("StartTime");
-
-                    b.Property<string>("Summary");
+                        .HasMaxLength(120);
 
                     b.HasKey("Id");
 
                     b.HasIndex("CalendarId");
 
-                    b.ToTable("CalendarEntry");
+                    b.ToTable("CalendarAppointments");
                 });
 
-            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarEntry", b =>
+            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarOccurence", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<Guid>("AppointmentId");
+
+                    b.Property<Guid>("CalendarAppointmentId");
+
+                    b.Property<DateTime>("EndTime");
+
+                    b.Property<bool>("IsFullDay");
+
+                    b.Property<DateTime>("StartTime");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
+
+                    b.ToTable("CalendarOccurances");
+                });
+
+            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarAppointment", b =>
                 {
                     b.HasOne("SmarthomeApi.Database.Model.Calendar", "Calendar")
-                        .WithMany("Entries")
+                        .WithMany("Appointments")
                         .HasForeignKey("CalendarId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("SmarthomeApi.Database.Model.CalendarOccurence", b =>
+                {
+                    b.HasOne("SmarthomeApi.Database.Model.CalendarAppointment", "CalendarAppointment")
+                        .WithMany("Occurences")
+                        .HasForeignKey("AppointmentId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
