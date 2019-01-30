@@ -21,13 +21,10 @@ namespace SmarthomeApi.FormatParsers
             _owner = ownerEmail;
         }
         
-        public async Task Parse(TextReader reader, int daysBefore, int daysAfter)
+        public void Parse(TextReader reader)
         {
-            await Task.Factory.StartNew(() =>
-            {
-                var calendar = Ical.Net.Calendar.Load(reader);
-                StoreCalendarEntries(_dbContext, calendar, daysBefore, daysAfter);
-            });
+            var calendar = Ical.Net.Calendar.Load(reader);
+            StoreCalendarEntries(_dbContext, calendar);
         }
 
         private int ToBusyState(string icsBusyString)
@@ -43,7 +40,7 @@ namespace SmarthomeApi.FormatParsers
             }
         }
 
-        private void StoreCalendarEntries(PersistenceContext db, Ical.Net.Calendar calendar, int daysBefore, int daysAfter)
+        private void StoreCalendarEntries(PersistenceContext db, Ical.Net.Calendar calendar)
         {
             var calendarIdStr = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-WR-RELCALID"))?.Value as string;
             var owner = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-OWNER"))?.Value as string;
@@ -55,21 +52,36 @@ namespace SmarthomeApi.FormatParsers
             if (dbCalendar == null)
                 db.Calendars.Add(dbCalendar = new Calendar() { Id = calendarGuid, Owner = owner });
 
-            var dateFrom = DateTime.Now.Date.AddDays(-1 * daysBefore);
-            var dateTo = DateTime.Now.Date.AddDays(daysAfter);
+            if (!DateTime.TryParseExact(calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-CLIPSTART"))?.Value as string, "yyyyMMdd'T'HHmmss'Z'",
+                System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime dateFrom))
+                return;
+
+            if (!DateTime.TryParseExact(calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-CLIPEND"))?.Value as string, "yyyyMMdd'T'HHmmss'Z'",
+                System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal, out DateTime dateTo))
+                return;
+
             var entries = calendar.GetOccurrences(dateFrom, dateTo)
-                .Select(o => o.Source).Cast<CalendarEvent>().Distinct().ToList();
+            .Select(o => o.Source).Cast<CalendarEvent>().Distinct().ToList();
 
             // Load and delete all occurences in the given date range
             var oldOccurences = db.CalendarOccurances.Where(x => x.StartTime < dateTo && x.EndTime > dateFrom).ToList();
             db.CalendarOccurances.RemoveRange(oldOccurences);
 
-            foreach (var entry in entries)
+            foreach (var entryGrouping in entries.GroupBy(o => GuidUtility.FromIcsUID(o.Uid)))
             {
+                var entry = entryGrouping.FirstOrDefault(x => x.RecurrenceId == null);
+                if (entry == null)
+                    continue;
+
+                var baseOccurences = entryGrouping.Where(e => e.RecurrenceId == null).SelectMany(e => e.GetOccurrences(dateFrom, dateTo));
+                var exceptOccurences = entryGrouping.Where(e => e.RecurrenceId != null).ToDictionary(e => e.RecurrenceId.AsUtc);
+                var allOccurences = baseOccurences.Where(o => !exceptOccurences.ContainsKey(o.Period.StartTime.AsUtc))
+                        .Union(exceptOccurences.SelectMany(e => e.Value.GetOccurrences(dateFrom, dateTo)));
+                
                 var dbAppointment = CreateOrUpdateAppointment(db, dbCalendar, entry);
 
                 // Create new occurences
-                foreach (var occurence in entry.GetOccurrences(dateFrom, dateTo))
+                foreach (var occurence in allOccurences)
                     CreateOccurence(db, dbAppointment, occurence);
             }
 
