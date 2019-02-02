@@ -19,14 +19,20 @@ namespace SmarthomeApi.Database.Model
 
         [Required]
         public bool IsPrivate { get; set; }
-        
-        [Required, MaxLength(120)]
-        public string Summary { get; set; }
 
         /// <summary>
         /// BusyStates: 0 = BUSY, 1 = TENTATIVE, 2 = OOF
         /// </summary>
         [Required]
         public int BusyState { get; set; }
+
+        [Required, MaxLength(120)]
+        public string Summary { get; set; }
+
+        [Required, MaxLength(80)]
+        public string LocationLong { get; set; }
+
+        [Required, MaxLength(32)]
+        public string LocationShort { get; set; }
     }
 }

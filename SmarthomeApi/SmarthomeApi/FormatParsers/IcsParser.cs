@@ -14,6 +14,7 @@ namespace SmarthomeApi.FormatParsers
     {
         private PersistenceContext _dbContext;
         private string _owner;
+        private AudiLocationParser _location = new AudiLocationParser();
 
         public IcsParser(PersistenceContext databaseContext, string ownerEmail)
         {
@@ -74,7 +75,8 @@ namespace SmarthomeApi.FormatParsers
                     continue;
 
                 var baseOccurences = entryGrouping.Where(e => e.RecurrenceId == null).SelectMany(e => e.GetOccurrences(dateFrom, dateTo));
-                var exceptOccurences = entryGrouping.Where(e => e.RecurrenceId != null).ToDictionary(e => e.RecurrenceId.AsUtc);
+                var exceptOccurences = entryGrouping.Where(e => e.RecurrenceId != null).GroupBy(e => e.RecurrenceId.AsUtc)
+                        .ToDictionary(e => e.Key, e => e.First());
                 var allOccurences = baseOccurences.Where(o => !exceptOccurences.ContainsKey(o.Period.StartTime.AsUtc))
                         .Union(exceptOccurences.SelectMany(e => e.Value.GetOccurrences(dateFrom, dateTo)));
                 
@@ -90,36 +92,37 @@ namespace SmarthomeApi.FormatParsers
 
         private CalendarAppointment CreateOrUpdateAppointment(PersistenceContext db, Calendar dbCalendar, CalendarEvent entry)
         {
-            var summary = string.IsNullOrEmpty(entry.Summary) ? "" : entry.Summary.Length <= 120 ? entry.Summary : entry.Summary.Substring(0, 117) + "...";
-            var busyStr = entry.Properties.FirstOrDefault(p => p.Name.Equals("X-MICROSOFT-CDO-BUSYSTATUS"))?.Value as string;
-            
             var guid = GuidUtility.FromIcsUID(entry.Uid);
-            var isPrivate = entry.Class == null ? false : !entry.Class.Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase);
-            var busyState = ToBusyState(busyStr);
             
             if (dbCalendar.Appointments == null)
                 dbCalendar.Appointments = new List<CalendarAppointment>();
             
             var dbEntry = db.CalendarAppointments.Where(x => x.Id == guid).FirstOrDefault();
-            if (dbEntry == null)
-            {
-                dbEntry = new CalendarAppointment();
-                dbEntry.Id = guid;
-                dbEntry.Calendar = dbCalendar;
+            if (dbEntry != null)
+                return dbEntry;
+            
+            dbEntry = new CalendarAppointment();
+            dbEntry.Id = guid;
+            dbEntry.Calendar = dbCalendar;
 
-                db.CalendarAppointments.Add(dbEntry);
-                dbCalendar.Appointments.Add(dbEntry);
-            }
+            dbEntry.IsPrivate = entry.Class == null ? false : !entry.Class.Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase); ;
+            dbEntry.Summary = GetSummary(entry);
+            dbEntry.BusyState = GetBusyState(entry);
+            dbEntry.LocationLong = GetLocation(entry);
+            dbEntry.LocationShort = _location.ToShortLocation(dbEntry.LocationLong);
 
-            dbEntry.IsPrivate = isPrivate;
-            dbEntry.Summary = summary;
-            dbEntry.BusyState = busyState;
+            db.CalendarAppointments.Add(dbEntry);
+            dbCalendar.Appointments.Add(dbEntry);
 
             return dbEntry;
         }
 
         private void CreateOccurence(PersistenceContext db, CalendarAppointment dbAppointment, Occurrence occurence)
         {
+            var summary = GetSummary(occurence.Source as CalendarEvent);
+            var location = GetLocation(occurence.Source as CalendarEvent);
+            var busyState = GetBusyState(occurence.Source as CalendarEvent);
+
             if (dbAppointment.Occurences == null)
                 dbAppointment.Occurences = new List<CalendarOccurence>();
             
@@ -130,6 +133,29 @@ namespace SmarthomeApi.FormatParsers
             dbOccurence.IsFullDay = (occurence.Source as CalendarEvent)?.IsAllDay ?? false;
             dbOccurence.StartTime = occurence.Period.StartTime?.Value ?? DateTime.MinValue;
             dbOccurence.EndTime = occurence.Period.EndTime?.Value ?? DateTime.MinValue;
+
+            dbOccurence.ExSummary = dbAppointment.Summary == summary ? null : summary;
+            dbOccurence.ExBusyState = dbAppointment.BusyState == busyState ? null : (int?)busyState;
+            dbOccurence.ExLocationLong = dbAppointment.LocationLong == location ? null : location;
+            dbOccurence.ExLocationShort = _location.ToShortLocation(dbOccurence.ExLocationLong);
+        }
+
+        private string GetSummary(CalendarEvent entry)
+        {
+            return string.IsNullOrEmpty(entry?.Summary) ? "" : 
+                entry.Summary.Length <= 120 ? entry.Summary : entry.Summary.Substring(0, 117) + "...";
+        }
+
+        private string GetLocation(CalendarEvent entry)
+        {
+            return string.IsNullOrEmpty(entry?.Location) ? "" : 
+                entry.Location.Length <= 80 ? entry.Location : entry.Location.Substring(0, 80);
+        }
+
+        private int GetBusyState(CalendarEvent entry)
+        {
+            return ToBusyState(entry.Properties.FirstOrDefault(p => 
+                p.Name.Equals("X-MICROSOFT-CDO-BUSYSTATUS"))?.Value as string);
         }
     }
 }

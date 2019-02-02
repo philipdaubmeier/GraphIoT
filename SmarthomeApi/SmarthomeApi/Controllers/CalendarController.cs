@@ -92,7 +92,9 @@ namespace SmarthomeApi.Controllers
                 .Where(occur => occur.StartTime < endTime)
                 .ToList().GroupBy(x => x.CalendarAppointment)
                 .Where(group => group.Count() > 0);
-            
+
+            Func<int?, string> toBusy = b => b == 1 ? "tentative" : b == 2 ? "out_of_office" : "busy";
+
             return Json(new
             {
                 result = new
@@ -111,13 +113,15 @@ namespace SmarthomeApi.Controllers
                     {
                         id = x.Key?.Id,
                         summary = x.Key?.Summary,
-                        busy = x.Key?.BusyState == 1 ? "tentative" : x.Key?.BusyState == 2 ? "out_of_office" : "busy",
                         @private = x.Key?.IsPrivate,
                         occurences = x.Select(o => new
                         {
                             start = o.StartTime,
                             end = o.EndTime,
-                            allday = o.IsFullDay
+                            allday = o.IsFullDay,
+                            busy = toBusy(o.ExBusyState ?? x.Key?.BusyState),
+                            location = o.ExLocationLong ?? x.Key?.LocationLong,
+                            location_short = o.ExLocationShort ?? x.Key?.LocationShort
                         })
                     })
                 }
