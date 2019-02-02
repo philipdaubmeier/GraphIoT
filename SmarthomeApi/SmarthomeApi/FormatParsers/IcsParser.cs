@@ -28,10 +28,10 @@ namespace SmarthomeApi.FormatParsers
             StoreCalendarEntries(_dbContext, calendar);
         }
 
-        private int ToBusyState(string icsBusyString)
+        private int? ToBusyState(string icsBusyString)
         {
             if (string.IsNullOrEmpty(icsBusyString))
-                return 0;
+                return null;
 
             switch (icsBusyString.Trim().ToUpperInvariant())
             {
@@ -107,7 +107,7 @@ namespace SmarthomeApi.FormatParsers
 
             dbEntry.IsPrivate = entry.Class == null ? false : !entry.Class.Equals("PUBLIC", StringComparison.InvariantCultureIgnoreCase); ;
             dbEntry.Summary = GetSummary(entry);
-            dbEntry.BusyState = GetBusyState(entry);
+            dbEntry.BusyState = GetBusyState(entry) ?? 1;
             dbEntry.LocationLong = GetLocation(entry);
             dbEntry.LocationShort = _location.ToShortLocation(dbEntry.LocationLong);
 
@@ -131,12 +131,12 @@ namespace SmarthomeApi.FormatParsers
             dbAppointment.Occurences.Add(dbOccurence);
 
             dbOccurence.IsFullDay = (occurence.Source as CalendarEvent)?.IsAllDay ?? false;
-            dbOccurence.StartTime = occurence.Period.StartTime?.Value ?? DateTime.MinValue;
-            dbOccurence.EndTime = occurence.Period.EndTime?.Value ?? DateTime.MinValue;
+            dbOccurence.StartTime = occurence.Period.StartTime?.Value.ToUniversalTime() ?? DateTime.MinValue;
+            dbOccurence.EndTime = occurence.Period.EndTime?.Value.ToUniversalTime() ?? DateTime.MinValue;
 
-            dbOccurence.ExSummary = dbAppointment.Summary == summary ? null : summary;
-            dbOccurence.ExBusyState = dbAppointment.BusyState == busyState ? null : (int?)busyState;
-            dbOccurence.ExLocationLong = dbAppointment.LocationLong == location ? null : location;
+            dbOccurence.ExSummary = string.IsNullOrWhiteSpace(summary) || dbAppointment.Summary == summary ? null : summary;
+            dbOccurence.ExBusyState = !busyState.HasValue || dbAppointment.BusyState == busyState ? null : busyState;
+            dbOccurence.ExLocationLong = string.IsNullOrWhiteSpace(location) || dbAppointment.LocationLong == location ? null : location;
             dbOccurence.ExLocationShort = _location.ToShortLocation(dbOccurence.ExLocationLong);
         }
 
@@ -152,7 +152,7 @@ namespace SmarthomeApi.FormatParsers
                 entry.Location.Length <= 80 ? entry.Location : entry.Location.Substring(0, 80);
         }
 
-        private int GetBusyState(CalendarEvent entry)
+        private int? GetBusyState(CalendarEvent entry)
         {
             return ToBusyState(entry.Properties.FirstOrDefault(p => 
                 p.Name.Equals("X-MICROSOFT-CDO-BUSYSTATUS"))?.Value as string);
