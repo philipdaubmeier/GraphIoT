@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SmarthomeApi.Clients.Viessmann;
+using SmarthomeApi.Database.Model;
 
 namespace SmarthomeApi.Controllers
 {
@@ -12,7 +13,16 @@ namespace SmarthomeApi.Controllers
     [Route("api/viessmann")]
     public class ViessmannController : Controller
     {
-        private readonly ViessmannEstrellaClient estrellaClient = new ViessmannEstrellaClient();
+        private readonly ViessmannEstrellaClient estrellaClient;
+        private readonly ViessmannPlatformClient platformClient;
+
+        private readonly PersistenceContext db;
+        public ViessmannController(PersistenceContext databaseContext)
+        {
+            db = databaseContext;
+            estrellaClient = new ViessmannEstrellaClient();
+            platformClient = new ViessmannPlatformClient(db);
+        }
 
         // GET: api/viessmann/installations/names
         [HttpGet("installations/names")]
@@ -35,6 +45,18 @@ namespace SmarthomeApi.Controllers
                         name = c.Item2
                     })
                 })
+            });
+        }
+
+        // GET: api/viessmann/installations
+        [HttpGet("installations")]
+        public async Task<JsonResult> GetInstallations()
+        {
+            var res = await platformClient.GetInstallations();
+
+            return Json(new
+            {
+                result = res
             });
         }
     }
