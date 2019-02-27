@@ -1,6 +1,7 @@
 ﻿using SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -37,6 +38,15 @@ namespace SmarthomeApi.Clients.Viessmann
 
             var body = $"<GeraetId>{_deviceId}</GeraetId><AnlageId>{_installationId}</AnlageId>";
             return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _tokenStore.AccessToken));
+        }
+
+        public async Task<List<Tuple<string, string, DateTime>>> GetData(IEnumerable<int> datapoints)
+        {
+            await Authenticate();
+
+            var datapointList = string.Join("</int><int>", datapoints.Select(x => x.ToString()));
+            var body = $"<UseCache>false</UseCache><GeraetId>{_deviceId}</GeraetId><AnlageId>{_installationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
+            return await ParseData(await SendSoap("GetData", body, _tokenStore.AccessToken));
         }
 
         private async Task Authenticate()
@@ -79,6 +89,22 @@ namespace SmarthomeApi.Clients.Viessmann
                     d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktName", StringComparison.InvariantCultureIgnoreCase)).Value
                 );
             }).ToList();
+        }
+
+        public async Task<List<Tuple<string, string, DateTime>>> ParseData(HttpResponseMessage response)
+        {
+            var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
+            return elem.Descendants().First(x => x.Name.LocalName.Equals("DatenwerteListe", StringComparison.InvariantCultureIgnoreCase))
+                .Descendants().Where(x => x.Name.LocalName.Equals("WerteListe", StringComparison.InvariantCultureIgnoreCase)).Select(d =>
+                {
+                    return new Tuple<string, string, DateTime>(
+                        d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktId", StringComparison.InvariantCultureIgnoreCase)).Value,
+                        d.Descendants().First(x => x.Name.LocalName.Equals("Wert", StringComparison.InvariantCultureIgnoreCase)).Value,
+                        DateTime.ParseExact(
+                            d.Descendants().First(x => x.Name.LocalName.Equals("Zeitstempel", StringComparison.InvariantCultureIgnoreCase)).Value,
+                            "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToLocalTime()
+                    );
+                }).ToList();
         }
     }
 }

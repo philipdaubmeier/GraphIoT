@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Services;
 using System;
 
 namespace SmarthomeApi
@@ -25,6 +26,8 @@ namespace SmarthomeApi
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
             });
+
+            services.AddHostedService<ViessmannTimedHostedService>();
 
             return services.BuildServiceProvider();
         }

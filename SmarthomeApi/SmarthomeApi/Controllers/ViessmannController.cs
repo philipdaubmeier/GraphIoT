@@ -77,5 +77,22 @@ namespace SmarthomeApi.Controllers
                 })
             });
         }
+
+        // GET: api/viessmann/solar
+        [HttpGet("solar")]
+        public async Task<JsonResult> GetSolar()
+        {
+            var data = await vitotrolClient.GetData(new List<int>() { 7895 });
+
+            return Json(new
+            {
+                datapoints = data.Select(x => new
+                {
+                    id = x.Item1,
+                    value = x.Item2,
+                    timestamp = x.Item3
+                })
+            });
+        }
     }
 }
