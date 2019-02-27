@@ -15,6 +15,7 @@ namespace SmarthomeApi.Controllers
     {
         private readonly ViessmannEstrellaClient estrellaClient;
         private readonly ViessmannPlatformClient platformClient;
+        private readonly ViessmannVitotrolClient vitotrolClient;
 
         private readonly PersistenceContext db;
         public ViessmannController(PersistenceContext databaseContext)
@@ -22,6 +23,7 @@ namespace SmarthomeApi.Controllers
             db = databaseContext;
             estrellaClient = new ViessmannEstrellaClient();
             platformClient = new ViessmannPlatformClient(db);
+            vitotrolClient = new ViessmannVitotrolClient(db);
         }
 
         // GET: api/viessmann/installations/names
@@ -57,6 +59,22 @@ namespace SmarthomeApi.Controllers
             return Json(new
             {
                 result = res
+            });
+        }
+
+        // GET: api/viessmann/datapoints
+        [HttpGet("datapoints")]
+        public async Task<JsonResult> GetDatapoints()
+        {
+            var datapoints = await vitotrolClient.GetTypeInfo();
+
+            return Json(new
+            {
+                datapoints = datapoints.Select(x => new
+                {
+                    id = x.Key,
+                    name = x.Value
+                })
             });
         }
     }

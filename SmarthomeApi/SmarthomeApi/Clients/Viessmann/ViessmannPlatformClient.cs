@@ -29,7 +29,7 @@ namespace SmarthomeApi.Clients.Viessmann
         
         public ViessmannPlatformClient(PersistenceContext databaseContext)
         {
-            _tokenStore = new TokenStore(databaseContext, "viessmann");
+            _tokenStore = new TokenStore(databaseContext, "viessmann_platform");
         }
 
         public async Task<string> GetInstallations()
