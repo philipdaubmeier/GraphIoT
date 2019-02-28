@@ -152,7 +152,7 @@ namespace SmarthomeApi.FormatParsers
 
         public static string ToBase64(this TimeSeries<int> timeseries)
         {
-            return ToBase64(timeseries);
+            return ToBase64(timeseries.Select(d => d.Value));
         }
 
         public static string ToBase64(this TimeSeries<bool> timeseries)

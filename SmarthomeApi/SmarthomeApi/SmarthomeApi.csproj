@@ -25,6 +25,8 @@
     <Compile Remove="Migrations\20190126093820_Calendar_v1.Designer.cs" />
     <Compile Remove="Migrations\20190126094343_Calendar_v1.cs" />
     <Compile Remove="Migrations\20190126094343_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
