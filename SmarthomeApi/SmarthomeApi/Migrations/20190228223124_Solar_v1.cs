@@ -21,7 +21,7 @@ namespace SmarthomeApi.Migrations
                 name: "ViessmannSolarTimeseries",
                 columns: table => new
                 {
-                    Id = table.Column<DateTime>(nullable: false),
+                    Id = table.Column<Guid>(nullable: false),
                     Day = table.Column<DateTime>(nullable: false),
                     SolarWhTotal = table.Column<int>(nullable: true),
                     SolarWhCurve = table.Column<string>(maxLength: 800, nullable: true),

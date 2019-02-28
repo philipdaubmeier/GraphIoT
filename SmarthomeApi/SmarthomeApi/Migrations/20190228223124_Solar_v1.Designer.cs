@@ -10,7 +10,7 @@ using SmarthomeApi.Database.Model;
 namespace SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
-    [Migration("20190228214644_Solar_v1")]
+    [Migration("20190228223124_Solar_v1")]
     partial class Solar_v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,7 +110,7 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.ViessmannSolarData", b =>
                 {
-                    b.Property<DateTime>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("Day");

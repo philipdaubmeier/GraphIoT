@@ -108,7 +108,7 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.ViessmannSolarData", b =>
                 {
-                    b.Property<DateTime>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<DateTime>("Day");

@@ -10,7 +10,7 @@ namespace SmarthomeApi.Database.Model
         private const int interval5min = 60 / 5 * 24;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public DateTime Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         public DateTime Day { get; set; }
