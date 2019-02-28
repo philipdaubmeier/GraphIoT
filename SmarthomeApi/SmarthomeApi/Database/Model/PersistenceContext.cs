@@ -12,8 +12,17 @@ namespace SmarthomeApi.Database.Model
 
         public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
 
+        public DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
+
         public PersistenceContext(DbContextOptions<PersistenceContext> options)
             : base(options)
         { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ViessmannSolarData>()
+                .HasIndex(d => d.Day)
+                .IsUnique();
+        }
     }
 }

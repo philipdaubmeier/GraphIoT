@@ -78,7 +78,7 @@ namespace SmarthomeApi.Clients.Viessmann
             return await _client.SendAsync(request);
         }
 
-        public async Task<List<KeyValuePair<string, string>>> ParseTypeInfo(HttpResponseMessage response)
+        private async Task<List<KeyValuePair<string, string>>> ParseTypeInfo(HttpResponseMessage response)
         {
             var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
             return elem.Descendants().First(x=>x.Name.LocalName.Equals("TypeInfoListe", StringComparison.InvariantCultureIgnoreCase))
@@ -91,7 +91,7 @@ namespace SmarthomeApi.Clients.Viessmann
             }).ToList();
         }
 
-        public async Task<List<Tuple<string, string, DateTime>>> ParseData(HttpResponseMessage response)
+        private async Task<List<Tuple<string, string, DateTime>>> ParseData(HttpResponseMessage response)
         {
             var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
             return elem.Descendants().First(x => x.Name.LocalName.Equals("DatenwerteListe", StringComparison.InvariantCultureIgnoreCase))
