@@ -27,7 +27,7 @@ namespace SmarthomeApi.FormatParsers
 
             var duration = end.Subtract(begin).Divide(count);
             _list = Enumerable.Range(0, count).Select(t => 
-                new KeyValuePair<DateTime, T?>(begin.Add(duration), default(T?))).ToList();
+                new KeyValuePair<DateTime, T?>(begin.Add(duration * t), default(T?))).ToList();
         }
 
         /// <summary>
@@ -71,8 +71,9 @@ namespace SmarthomeApi.FormatParsers
         private bool TryFindIndex(DateTime time, out DateTime timeBucket, out int index)
         {
             var bucket = timeBucket = _list.SkipWhile(d => d.Key < time).FirstOrDefault().Key;
-            index = _list.FindIndex(li => li.Key == bucket);
-            return index >= 0;
+            var foundIndex = _list.FindIndex(li => li.Key == bucket);
+            index = Math.Max(0, foundIndex - 1);
+            return foundIndex >= 0;
         }
 
         /// <summary>
@@ -123,22 +124,23 @@ namespace SmarthomeApi.FormatParsers
             if (typeof(T) == typeof(bool))
             {
                 int i = 0;
-                foreach (var b in bytes.SelectMany(d => new byte[] { (byte)((d >> 6) & 0x3),
+                var boolValues = bytes.SelectMany(d => new byte[] { (byte)((d >> 6) & 0x3),
                     (byte)((d >> 4) & 0x3), (byte)((d >> 2) & 0x3), (byte)(d & 0x3) })
-                    .Select(d => d > 0x01 ? null : (bool?)(d == 0x01)).Take(count))
+                    .Select(d => d > 0x01 ? null : (bool?)(d == 0x01)).Take(count).ToList();
+                foreach (var b in boolValues)
                 {
                     (timeseries as TimeSeries<bool>)[i++] = b;
                 }
                 return timeseries;
             }
             
-            for (int i = 0; i < bytes.Length - 1 && i * 2 < count; i += 2)
+            for (int i = 0; i < bytes.Length - 1 && i < count * 2; i += 2)
             {
-                var value = (short)(bytes[i] << 8 & bytes[i + 1]);
+                var value = (short)(bytes[i] << 8 | bytes[i + 1]);
                 if (typeof(T) == typeof(int))
                     (timeseries as TimeSeries<int>)[i / 2] = value == short.MinValue ? null : (short?)value;
                 else if (typeof(T) == typeof(double))
-                    (timeseries as TimeSeries<double>)[i / 2] = value == short.MinValue ? null : (double?)value / decimalPlaces;
+                    (timeseries as TimeSeries<double>)[i / 2] = value == short.MinValue ? null : (double?)value / Math.Pow(10d, decimalPlaces);
             }
 
             return timeseries;
@@ -147,7 +149,7 @@ namespace SmarthomeApi.FormatParsers
         public static string ToBase64(this TimeSeries<double> timeseries)
         {
             return ToBase64(timeseries.Select(d => d.Value.HasValue ? 
-                (int)(d.Value.Value * (10 ^ (decimalPlaces))) : (int?)null));
+                (int)(d.Value.Value * Math.Pow(10d, decimalPlaces)) : (int?)null));
         }
 
         public static string ToBase64(this TimeSeries<int> timeseries)
@@ -157,14 +159,13 @@ namespace SmarthomeApi.FormatParsers
 
         public static string ToBase64(this TimeSeries<bool> timeseries)
         {
-            var array = new byte[timeseries.Count / 4];
+            var array = new byte[timeseries.Count / 4 + (timeseries.Count % 4 != 0 ? 1 : 0)];
+            Func<bool?, int, byte> packNullableBool = (b, shift) => (byte)((!b.HasValue ? 0x03 : b.Value ? 0x01 : 0x00) << shift);
+            Func<int, bool?> tryGetTsBool = tsIndex => tsIndex < timeseries.Count ? timeseries[tsIndex] : null;
+            Func<int, int, byte> pack = (index, offset) => packNullableBool(tryGetTsBool(index * 4 + offset), 8 - ((offset + 1) * 2));
             for (int i = 0; i < array.Length; i++)
-            {
-                array[i] = (byte)((byte)(!timeseries[i * 4].HasValue ? 0x03 : timeseries[i * 4].Value ? 0x01 : 0x00 << 6) &
-                                  (byte)(!timeseries[i * 4 + 1].HasValue ? 0x03 : timeseries[i * 4 + 1].Value ? 0x01 : 0x00 << 4) &
-                                  (byte)(!timeseries[i * 4 + 2].HasValue ? 0x03 : timeseries[i * 4 + 2].Value ? 0x01 : 0x00 << 2) &
-                                  (byte)(!timeseries[i * 4 + 3].HasValue ? 0x03 : timeseries[i * 4 + 3].Value ? 0x01 : 0x00));
-            }
+                array[i] = (byte)(pack(i, 0) | pack(i, 1) | pack(i, 2) | pack(i, 3));
+
             return Convert.ToBase64String(array);
         }
 

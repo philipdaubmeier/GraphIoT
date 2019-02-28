@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -68,18 +69,21 @@ namespace SmarthomeApi.Services
                     _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarData() { Day = day });
 
                 var item = data.First(d => d.Item1 == 7895.ToString());
+                var newValue = int.Parse(item.Item2);
+                var oldValue = dbSolarSeries.SolarWhTotal.HasValue ? dbSolarSeries.SolarWhTotal.Value : 0;
                 var series1 = dbSolarSeries.SolarWhSeries;
-                series1.Accumulate(time, int.Parse(item.Item2));
+                series1.Accumulate(time, newValue - oldValue);
                 dbSolarSeries.SolarWhSeries = series1;
+                dbSolarSeries.SolarWhTotal = newValue;
 
                 item = data.First(d => d.Item1 == 5272.ToString());
                 var series2 = dbSolarSeries.SolarCollectorTempSeries;
-                series2[time] = double.Parse(item.Item2);
+                series2[time] = double.Parse(item.Item2, CultureInfo.InvariantCulture);
                 dbSolarSeries.SolarCollectorTempSeries = series2;
 
                 item = data.First(d => d.Item1 == 5276.ToString());
                 var series3 = dbSolarSeries.SolarHotwaterTempSeries;
-                series3[time] = double.Parse(item.Item2);
+                series3[time] = double.Parse(item.Item2, CultureInfo.InvariantCulture);
                 dbSolarSeries.SolarHotwaterTempSeries = series3;
 
                 item = data.First(d => d.Item1 == 5274.ToString());
