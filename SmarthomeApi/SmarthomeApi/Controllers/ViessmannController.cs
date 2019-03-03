@@ -57,9 +57,18 @@ namespace SmarthomeApi.Controllers
         {
             var res = await platformClient.GetInstallations();
 
+            return Json(Newtonsoft.Json.JsonConvert.DeserializeObject(res));
+        }
+
+        // GET: api/viessmann/heating
+        [HttpGet("heating")]
+        public async Task<JsonResult> GetHeating()
+        {
+            var res = await platformClient.GetBoilerTemperature();
+
             return Json(new
             {
-                result = res
+                boiler_temperature = res
             });
         }
 

@@ -14,6 +14,8 @@ namespace SmarthomeApi.Clients.Viessmann
     {
         private const string _username = "***REMOVED***";
         private const string _password = "***REMOVED***";
+        private const string _installationId = "***REMOVED***";
+        private const string _gatewayId = "***REMOVED***";
 
         private static readonly HttpClientHandler _authClientHandler = new HttpClientHandler() { AllowAutoRedirect = false };
         private static readonly HttpClient _authClient = new HttpClient(_authClientHandler);
@@ -44,6 +46,26 @@ namespace SmarthomeApi.Clients.Viessmann
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenStore.AccessToken);
 
             return await (await _authClient.SendAsync(request)).Content.ReadAsStringAsync();
+        }
+
+        public async Task<double> GetBoilerTemperature()
+        {
+            return await ParseFeatureResponse(await GetFeature("heating.boiler.temperature"));
+        }
+
+        private async Task<HttpResponseMessage> GetFeature(string featureName)
+        {
+            await Authenticate();
+
+            string baseUrl = "https://api.viessmann-platform.io/operational-data/v1/";
+            var request = new HttpRequestMessage()
+            {
+                RequestUri = new Uri($"{baseUrl}installations/{_installationId}/gateways/{_gatewayId}/devices/0/features/{featureName}"),
+                Method = HttpMethod.Get
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenStore.AccessToken);
+
+            return await _authClient.SendAsync(request);
         }
 
         private async Task Authenticate()
@@ -93,6 +115,43 @@ namespace SmarthomeApi.Clients.Viessmann
             var responseStr = await response.Content.ReadAsStringAsync();
             var authRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return new Tuple<string, DateTime>(authRaw.access_token, DateTime.Now.AddSeconds(int.Parse(authRaw.expires_in)));
+        }
+
+        private async Task<double> ParseFeatureResponse(HttpResponseMessage response)
+        {
+            var definition = new
+            {
+                links = new[] { new
+                {
+                    rel = new List<string>(),
+                    href = ""
+                } },
+                @class = new List<string>(),
+                properties = new {
+                    value = new {
+                        type = "",
+                        value = 0d
+                    }
+                },
+                entities = new[] { new
+                {
+                    rel = new List<string>(),
+                    properties = new {
+                        apiVersion = 0,
+                        isEnabled = true,
+                        isReady = true,
+                        gatewayId = "",
+                        feature = "",
+                        uri = "",
+                        deviceId = "",
+                        timestamp = ""
+                    }
+                } },
+                actions = new List<object>()
+            };
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var featureRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
+            return featureRaw.properties.value.value;
         }
     }
 }
