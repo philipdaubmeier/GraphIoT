@@ -60,6 +60,22 @@ namespace SmarthomeApi.Controllers
             return Json(Newtonsoft.Json.JsonConvert.DeserializeObject(res));
         }
 
+        // GET: api/viessmann/features
+        [HttpGet("features")]
+        public async Task<JsonResult> GetFeatures()
+        {
+            var res = await platformClient.GetFeatures();
+
+            return Json(new
+            {
+                features = res.Select(x => new
+                {
+                    name = x.Key,
+                    body = x.Value
+                })
+            });
+        }
+
         // GET: api/viessmann/heating
         [HttpGet("heating")]
         public async Task<JsonResult> GetHeating()
