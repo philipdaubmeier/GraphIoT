@@ -62,29 +62,79 @@ namespace SmarthomeApi.Controllers
 
         // GET: api/viessmann/features
         [HttpGet("features")]
-        public async Task<JsonResult> GetFeatures()
+        public async Task<JsonResult> GetAllFeatures()
         {
-            var res = await platformClient.GetFeatures();
+            var outsideTemp = await platformClient.GetOutsideTemperature();
+            var boilerTemp = await platformClient.GetBoilerTemperature();
+            var burnerActive = await platformClient.GetBurnerActiveStatus();
+            var burnerStats = await platformClient.GetBurnerStatistics();
+            var circuit0Mode = await platformClient.GetCircuitOperatingMode(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Program = await platformClient.GetCircuitActiveProgram(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Normal = await platformClient.GetCircuitProgramNormal(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Reduced = await platformClient.GetCircuitProgramReduced(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Comfort = await platformClient.GetCircuitProgramComfort(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Temp = await platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit0Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit1Mode = await platformClient.GetCircuitOperatingMode(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Program = await platformClient.GetCircuitActiveProgram(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Normal = await platformClient.GetCircuitProgramNormal(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Reduced = await platformClient.GetCircuitProgramReduced(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Comfort = await platformClient.GetCircuitProgramComfort(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Temp = await platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit1);
+            var circuit1Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit1);
+            var dhwTemp = await platformClient.GetDhwStorageTemperature();
+            var dhwPrimPump = await platformClient.GetDhwPrimaryPump();
+            var dhwCircPump = await platformClient.GetDhwCirculationPump();
+            var boilerTempMain = await platformClient.GetBoilerTemperatureMain();
+            var burnerModulation = await platformClient.GetBurnerModulation();
 
             return Json(new
             {
-                features = res.Select(x => new
-                {
-                    name = x.Key,
-                    body = x.Value
-                })
+                outside_temp = new { status = outsideTemp.Item1, value = outsideTemp.Item2 },
+                boiler_temp = boilerTemp,
+                burner_active = burnerActive,
+                burner_stats = new { hours = burnerStats.Item1, starts = burnerStats.Item2 },
+                circuit_0_mode = circuit0Mode,
+                circuit_0_program = circuit0Program,
+                circuit_0_normal = new { active = circuit0Normal.Item1, temperature = circuit0Normal.Item2 },
+                circuit_0_reduced = new { active = circuit0Reduced.Item1, temperature = circuit0Reduced.Item2 },
+                circuit_0_comfort = new { active = circuit0Comfort.Item1, temperature = circuit0Comfort.Item2 },
+                circuit_0_temp = new { status = circuit0Temp.Item1, value = circuit0Temp.Item2 },
+                circuit_0_pump = circuit0Pump,
+                circuit_1_mode = circuit1Mode,
+                circuit_1_program = circuit1Program,
+                circuit_1_normal = new { active = circuit1Normal.Item1, temperature = circuit1Normal.Item2 },
+                circuit_1_reduced = new { active = circuit1Reduced.Item1, temperature = circuit1Reduced.Item2 },
+                circuit_1_comfort = new { active = circuit1Comfort.Item1, temperature = circuit1Comfort.Item2 },
+                circuit_1_temp = new { status = circuit1Temp.Item1, value = circuit1Temp.Item2 },
+                circuit_1_pump = circuit1Pump,
+                dhw_temp = new { status = dhwTemp.Item1, value = dhwTemp.Item2 },
+                dhw_prim_pump = dhwPrimPump,
+                dhw_circ_pump = dhwCircPump,
+                boiler_temp_main = new { status = boilerTempMain.Item1, value = boilerTempMain.Item2 },
+                burner_modulation = burnerModulation
             });
         }
 
-        // GET: api/viessmann/heating
-        [HttpGet("heating")]
-        public async Task<JsonResult> GetHeating()
+        // GET: api/viessmann/pumps
+        [HttpGet("pumps")]
+        public async Task<JsonResult> GetPumpStates()
         {
-            var res = await platformClient.GetBoilerTemperature();
+            var burnerActive = await platformClient.GetBurnerActiveStatus();
+            var circuit0Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit1Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit1);
+            var dhwPrimPump = await platformClient.GetDhwPrimaryPump();
+            var dhwCircPump = await platformClient.GetDhwCirculationPump();
+            var solarCircPump = (await vitotrolClient.GetData(new List<int>() { 5274 })).FirstOrDefault().Item2?.Trim() != "0";
 
             return Json(new
             {
-                boiler_temperature = res
+                burner_active = burnerActive,
+                circuit_0_pump = circuit0Pump,
+                circuit_1_pump = circuit1Pump,
+                dhw_prim_pump = dhwPrimPump,
+                dhw_circ_pump = dhwCircPump,
+                solar_circ_pump = solarCircPump
             });
         }
 
