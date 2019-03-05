@@ -31,6 +31,19 @@ namespace SmarthomeApi.FormatParsers
         }
 
         /// <summary>
+        /// Extracts the maximum filled list, i.e. removes all items with
+        /// null value from both the front and back of the enumeration of
+        /// this time series. If any null values should be present between
+        /// values, it will be set to the given defaultValue.
+        /// </summary>
+        public List<T> ToList(T defaultValue)
+        {
+            return this.SkipWhile(x => !x.Value.HasValue)
+                .Reverse().SkipWhile(x => !x.Value.HasValue).Reverse()
+                .Select(x => x.Value ?? defaultValue).ToList();
+        }
+
+        /// <summary>
         /// Sets the given value in the matching time bucket or sums the
         /// value up with the already existing value.
         /// </summary>

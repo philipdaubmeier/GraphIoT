@@ -116,6 +116,47 @@ namespace SmarthomeApi.Controllers
             });
         }
 
+        // GET: api/viessmann/features/selected
+        [HttpGet("features/selected")]
+        public async Task<JsonResult> GetSelectedFeatures()
+        {
+            var burnerStatistics = await platformClient.GetBurnerStatistics();
+            var burnerHoursTotal = burnerStatistics.Item1;
+            var burnerStartsTotal = burnerStatistics.Item2;
+            var burnerModulation = await platformClient.GetBurnerModulation();
+
+            var outsideTemp = (await platformClient.GetOutsideTemperature()).Item2;
+            var boilerTemp = await platformClient.GetBoilerTemperature();
+            var boilerTempMain = (await platformClient.GetBoilerTemperatureMain()).Item2;
+            var circuit0Temp = (await platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit0)).Item2;
+            var circuit1Temp = (await platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit1)).Item2;
+            var dhwTemp = (await platformClient.GetDhwStorageTemperature()).Item2;
+
+            var burnerActive = await platformClient.GetBurnerActiveStatus();
+            var circuit0Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit0);
+            var circuit1Pump = await platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit1);
+            var dhwPrimPump = await platformClient.GetDhwPrimaryPump();
+            var dhwCircPump = await platformClient.GetDhwCirculationPump();
+
+            return Json(new
+            {
+                burner_hours_total = burnerHoursTotal,
+                burner_starts_total = burnerStartsTotal,
+                burner_modulation = burnerModulation,
+                outside_temp = outsideTemp,
+                boiler_temp = boilerTemp,
+                boiler_temp_main = boilerTempMain,
+                circuit_0_temp = circuit0Temp,
+                circuit_1_temp = circuit1Temp,
+                dhw_temp = dhwTemp,
+                burner_active = burnerActive,
+                circuit_0_pump = circuit0Pump,
+                circuit_1_pump = circuit1Pump,
+                dhw_prim_pump = dhwPrimPump,
+                dhw_circ_pump = dhwCircPump,
+            });
+        }
+
         // GET: api/viessmann/pumps
         [HttpGet("pumps")]
         public async Task<JsonResult> GetPumpStates()
@@ -154,6 +195,39 @@ namespace SmarthomeApi.Controllers
             });
         }
 
+        // GET: api/viessmann/heating/curves/days/{day}
+        [HttpGet("heating/curves/days/{day}")]
+        public ActionResult GetHeatingCurves([FromRoute] string day)
+        {
+            if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal, out DateTime dayDate))
+                return StatusCode(404);
+
+            var dbHeatingSeries = db.ViessmannHeatingTimeseries.Where(x => x.Day == dayDate.Date).FirstOrDefault();
+            if (dbHeatingSeries == null)
+                return StatusCode(404);
+
+            return Json(new
+            {
+                burner_hours_total = dbHeatingSeries.BurnerHoursTotal,
+                burner_starts_total = dbHeatingSeries.BurnerStartsTotal,
+                burner_minutes = dbHeatingSeries.BurnerMinutesSeries.ToList(0d),
+                burner_starts = dbHeatingSeries.BurnerStartsSeries.ToList(0),
+                burner_modulation = dbHeatingSeries.BurnerModulationSeries.ToList(0),
+                outside_temp = dbHeatingSeries.OutsideTempSeries.ToList(0d),
+                boiler_temp = dbHeatingSeries.BoilerTempSeries.ToList(0d),
+                boiler_temp_main = dbHeatingSeries.BoilerTempMainSeries.ToList(0d),
+                circuit_0_temp = dbHeatingSeries.Circuit0TempSeries.ToList(0d),
+                circuit_1_temp = dbHeatingSeries.Circuit1TempSeries.ToList(0d),
+                dhw_temp = dbHeatingSeries.DhwTempSeries.ToList(0d),
+                burner_active = dbHeatingSeries.BurnerActiveSeries.ToList(false),
+                circuit_0_pump = dbHeatingSeries.Circuit0PumpSeries.ToList(false),
+                circuit_1_pump = dbHeatingSeries.Circuit1PumpSeries.ToList(false),
+                dhw_prim_pump = dbHeatingSeries.DhwPrimaryPumpSeries.ToList(false),
+                dhw_circ_pump = dbHeatingSeries.DhwCirculationPumpSeries.ToList(false),
+            });
+        }
+
         // GET: api/viessmann/solar/lametric
         [HttpGet("solar/lametric")]
         public ActionResult GetSolarLaMetric()
@@ -163,9 +237,7 @@ namespace SmarthomeApi.Controllers
                 return StatusCode(404);
 
             var totalYieldToday = (double)dbSolarSeries.SolarWhTotal / 1000d;
-            var chartSolarYield = dbSolarSeries.SolarWhSeries.SkipWhile(x => !x.Value.HasValue)
-                .Reverse().SkipWhile(x => !x.Value.HasValue).Reverse()
-                .Select(x => x.Value ?? 0).TakeLast(37).ToList();
+            var chartSolarYield = dbSolarSeries.SolarWhSeries.ToList(0);
             var currentCollectorTemp = dbSolarSeries.SolarCollectorTempSeries.Reverse()
                 .SkipWhile(x => !x.Value.HasValue).FirstOrDefault().Value;
 
