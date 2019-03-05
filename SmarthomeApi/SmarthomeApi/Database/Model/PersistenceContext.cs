@@ -12,6 +12,8 @@ namespace SmarthomeApi.Database.Model
 
         public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
 
+        public DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }
+        
         public DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
 
         public PersistenceContext(DbContextOptions<PersistenceContext> options)
