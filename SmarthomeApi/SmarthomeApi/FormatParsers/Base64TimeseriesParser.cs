@@ -125,9 +125,9 @@ namespace SmarthomeApi.FormatParsers
 
     public static class Base64TimeseriesParser
     {
-        private const int decimalPlaces = 1;
+        private const int defaultDecimalPlaces = 1;
         
-        public static TimeSeries<T> ToTimeseries<T>(this string base64, DateTime begin, DateTime end, int count) where T : struct
+        public static TimeSeries<T> ToTimeseries<T>(this string base64, DateTime begin, DateTime end, int count, int decimalPlaces = defaultDecimalPlaces) where T : struct
         {
             var timeseries = new TimeSeries<T>(begin, end, count);
             if (string.IsNullOrWhiteSpace(base64))
@@ -159,7 +159,7 @@ namespace SmarthomeApi.FormatParsers
             return timeseries;
         }
 
-        public static string ToBase64(this TimeSeries<double> timeseries)
+        public static string ToBase64(this TimeSeries<double> timeseries, int decimalPlaces = defaultDecimalPlaces)
         {
             return ToBase64(timeseries.Select(d => d.Value.HasValue ? 
                 (int)(d.Value.Value * Math.Pow(10d, decimalPlaces)) : (int?)null));
