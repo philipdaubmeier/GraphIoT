@@ -27,6 +27,7 @@ namespace SmarthomeApi
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
             });
 
+            services.AddHostedService<DigitalstromTimedHostedService>();
             services.AddHostedService<ViessmannTimedHostedService>();
 
             return services.BuildServiceProvider();
