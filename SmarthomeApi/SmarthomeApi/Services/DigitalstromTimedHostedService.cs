@@ -50,8 +50,7 @@ namespace SmarthomeApi.Services
         private async void PollAll(object state)
         {
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Background Service is polling new sensor values...");
-
-            _dbContext.Semaphore.WaitOne();
+            
             try
             {
                 await PollSensorValues();
@@ -60,20 +59,25 @@ namespace SmarthomeApi.Services
             {
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom sensor background worker: {ex.Message}");
             }
-            finally
-            {
-                _dbContext.Semaphore.Release();
-            }
         }
 
         private async Task PollSensorValues()
         {
             var sensorValues = (await _dsClient.GetSensorValues()).GroupBy(x => x.Key.Item1);
-            
-            foreach (var zoneGrouping in sensorValues)
-                SaveZoneSensorValues(zoneGrouping.Key, zoneGrouping.ToDictionary(x => x.Key.Item2, x => x.Value.Item2));
 
-            await _dbContext.SaveChangesAsync();
+            _dbContext.Semaphore.WaitOne();
+            try
+            {
+                foreach (var zoneGrouping in sensorValues)
+                    SaveZoneSensorValues(zoneGrouping.Key, zoneGrouping.ToDictionary(x => x.Key.Item2, x => x.Value.Item2));
+
+                _dbContext.SaveChanges();
+            }
+            catch { throw; }
+            finally
+            {
+                _dbContext.Semaphore.Release();
+            }
         }
 
         private void SaveZoneSensorValues(int zoneId, Dictionary<int, double> sensorValues)

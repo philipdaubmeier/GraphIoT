@@ -20,16 +20,63 @@ namespace SmarthomeApi.Clients
         private string _accessTokenExpiryId => $"{_serviceName}.access_token_expiry";
         private string _refreshTokenId => $"{_serviceName}.refresh_token";
 
-        public string AccessToken => _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
-        public DateTime AccessTokenExpiry => FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
-        public string RefreshToken => _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
-        
+        public string AccessToken
+        {
+            get
+            {
+                _dbContext.Semaphore.WaitOne();
+                try
+                {
+                    return _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
+                }
+                catch { throw; }
+                finally
+                {
+                    _dbContext.Semaphore.Release();
+                }
+            }
+        }
+
+        public DateTime AccessTokenExpiry
+        {
+            get
+            {
+                _dbContext.Semaphore.WaitOne();
+                try
+                {
+                    return FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
+                }
+                catch { throw; }
+                finally { _dbContext.Semaphore.Release(); }
+            }
+        }
+
+        public string RefreshToken
+        {
+            get
+            {
+                _dbContext.Semaphore.WaitOne();
+                try
+                {
+                    return _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
+                }
+                catch { throw; }
+                finally { _dbContext.Semaphore.Release(); }
+            }
+        }
+
         public async Task UpdateToken(string accessToken, DateTime accessTokenExpiry, string refreshToken)
         {
-            UpdateValue(_accessTokenId, AccessToken, accessToken);
-            UpdateValue(_accessTokenExpiryId, AccessTokenExpiry.ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
-            UpdateValue(_refreshTokenId, RefreshToken, refreshToken);
-            await _dbContext.SaveChangesAsync();
+            _dbContext.Semaphore.WaitOne();
+            try
+            {
+                UpdateValue(_accessTokenId, AccessToken, accessToken);
+                UpdateValue(_accessTokenExpiryId, AccessTokenExpiry.ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
+                UpdateValue(_refreshTokenId, RefreshToken, refreshToken);
+                await _dbContext.SaveChangesAsync();
+            }
+            catch { throw; }
+            finally { _dbContext.Semaphore.Release(); }
         }
 
         public bool IsAccessTokenValid()
