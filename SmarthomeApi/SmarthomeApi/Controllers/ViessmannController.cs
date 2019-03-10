@@ -237,7 +237,7 @@ namespace SmarthomeApi.Controllers
                 return StatusCode(404);
 
             var totalYieldToday = (double)dbSolarSeries.SolarWhTotal / 1000d;
-            var chartSolarYield = dbSolarSeries.SolarWhSeries.ToList(0);
+            var chartSolarYield = dbSolarSeries.SolarWhSeries.ToList(0).TakeLast(37);
             var currentCollectorTemp = dbSolarSeries.SolarCollectorTempSeries.Reverse()
                 .SkipWhile(x => !x.Value.HasValue).FirstOrDefault().Value;
 
