@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -39,6 +40,33 @@ namespace SmarthomeApi.Controllers
                         temperature = temperatureVals.Count > 0 ? (double?)temperatureVals.First().Value.Item2 : null,
                         humidity = humidityVals.Count > 0 ? (double?)humidityVals.First().Value.Item2 : null
                     };
+                })
+            });
+        }
+
+        // GET: api/digitalstrom/sensors/curves/days/{day}
+        [HttpGet("sensors/curves/days/{day}")]
+        public ActionResult GetSensorsCurves([FromRoute] string day)
+        {
+            if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal, out DateTime dayDate))
+                return StatusCode(404);
+
+            List<DigitalstromZoneSensorData> sensorData = null; 
+            db.Semaphore.WaitOne();
+            try { sensorData = db.DsSensorDataSet.Where(x => x.Day == dayDate.Date).ToList(); }
+            catch { throw; }
+            finally { db.Semaphore.Release(); }
+            if (sensorData == null)
+                return StatusCode(404);
+
+            return Json(new
+            {
+                zones = sensorData.Select(zone => new
+                {
+                    id = zone.ZoneId,
+                    temperature_curve = zone.TemperatureSeries.ToList(0d),
+                    humidity_curve = zone.HumiditySeries.ToList(0d)
                 })
             });
         }
