@@ -10,7 +10,7 @@ using SmarthomeApi.Database.Model;
 namespace SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
-    [Migration("20190309231108_Digitalstrom_Sensors_v1")]
+    [Migration("20190309234932_Digitalstrom_Sensors_v1")]
     partial class Digitalstrom_Sensors_v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -110,9 +110,7 @@ namespace SmarthomeApi.Migrations
 
             modelBuilder.Entity("SmarthomeApi.Database.Model.DigitalstromZone", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<int>("Id");
 
                     b.Property<int>("Name")
                         .HasMaxLength(40);

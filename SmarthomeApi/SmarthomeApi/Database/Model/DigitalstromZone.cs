@@ -1,13 +1,11 @@
-﻿using SmarthomeApi.FormatParsers;
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmarthomeApi.Database.Model
 {
     public class DigitalstromZone
     {
-        [Key, Required]
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int Id { get; set; }
 
         [MaxLength(40)]

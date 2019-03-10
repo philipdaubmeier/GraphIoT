@@ -1,5 +1,4 @@
 ﻿using System;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SmarthomeApi.Migrations
@@ -12,8 +11,7 @@ namespace SmarthomeApi.Migrations
                 name: "DsZones",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Id = table.Column<int>(nullable: false),
                     Name = table.Column<int>(maxLength: 40, nullable: false)
                 },
                 constraints: table =>
@@ -41,7 +39,7 @@ namespace SmarthomeApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-
+            
             migrationBuilder.CreateIndex(
                 name: "IX_DsSensorDataSet_ZoneId_Day",
                 table: "DsSensorDataSet",
