@@ -54,6 +54,7 @@ namespace SmarthomeApi.Services
         {
             _logger.LogInformation($"{DateTime.Now} Viessmann Background Service is polling new heating values...");
 
+            _dbContext.Semaphore.WaitOne();
             try
             {
                 await PollHeatingValues();
@@ -62,9 +63,14 @@ namespace SmarthomeApi.Services
             {
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in viessmann heating background worker: {ex.Message}");
             }
+            finally
+            {
+                _dbContext.Semaphore.Release();
+            }
 
             _logger.LogInformation($"{DateTime.Now} Viessmann Background Service is polling new solar values...");
 
+            _dbContext.Semaphore.WaitOne();
             try
             {
                 await PollSolarValues();
@@ -72,6 +78,10 @@ namespace SmarthomeApi.Services
             catch (Exception ex)
             {
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in viessmann solar background worker: {ex.Message}");
+            }
+            finally
+            {
+                _dbContext.Semaphore.Release();
             }
         }
 
