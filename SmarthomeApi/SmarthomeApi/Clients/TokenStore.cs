@@ -20,48 +20,31 @@ namespace SmarthomeApi.Clients
         private string _accessTokenExpiryId => $"{_serviceName}.access_token_expiry";
         private string _refreshTokenId => $"{_serviceName}.refresh_token";
 
-        public string AccessToken
-        {
-            get
-            {
-                _dbContext.Semaphore.WaitOne();
-                try
-                {
-                    return _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
-                }
-                catch { throw; }
-                finally
-                {
-                    _dbContext.Semaphore.Release();
-                }
-            }
-        }
+        private string _accessToken = null;
+        private DateTime? _accessTokenExpiry = null;
+        private string _refreshToken = null;
+        
+        public string AccessToken => LoadTokenIfNull() ? _accessToken : null;
+        public DateTime AccessTokenExpiry => LoadTokenIfNull() ? _accessTokenExpiry.Value : DateTime.MinValue;
+        public string RefreshToken => LoadTokenIfNull() ? _refreshToken : null;
 
-        public DateTime AccessTokenExpiry
+        private bool LoadTokenIfNull()
         {
-            get
-            {
-                _dbContext.Semaphore.WaitOne();
-                try
-                {
-                    return FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
-                }
-                catch { throw; }
-                finally { _dbContext.Semaphore.Release(); }
-            }
-        }
+            if (_accessToken != null && _accessTokenExpiry.HasValue)
+                return true;
 
-        public string RefreshToken
-        {
-            get
+            _dbContext.Semaphore.WaitOne();
+            try
             {
-                _dbContext.Semaphore.WaitOne();
-                try
-                {
-                    return _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
-                }
-                catch { throw; }
-                finally { _dbContext.Semaphore.Release(); }
+                _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
+                _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
+                _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
+                return true;
+            }
+            catch { return false; }
+            finally
+            {
+                _dbContext.Semaphore.Release();
             }
         }
 
@@ -70,9 +53,14 @@ namespace SmarthomeApi.Clients
             _dbContext.Semaphore.WaitOne();
             try
             {
-                UpdateValue(_accessTokenId, AccessToken, accessToken);
-                UpdateValue(_accessTokenExpiryId, AccessTokenExpiry.ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
-                UpdateValue(_refreshTokenId, RefreshToken, refreshToken);
+                UpdateValue(_accessTokenId, _accessToken, accessToken);
+                UpdateValue(_accessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
+                UpdateValue(_refreshTokenId, _refreshToken, refreshToken);
+
+                _accessToken = accessToken;
+                _accessTokenExpiry = accessTokenExpiry;
+                _refreshToken = refreshToken;
+
                 await _dbContext.SaveChangesAsync();
             }
             catch { throw; }
