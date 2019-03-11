@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.FormatParsers;
 
 namespace SmarthomeApi.Services
 {
@@ -59,6 +60,17 @@ namespace SmarthomeApi.Services
             {
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom sensor background worker: {ex.Message}");
             }
+
+            _logger.LogInformation($"{DateTime.Now} Digitalstrom Background Service is polling new energy values...");
+
+            try
+            {
+                await PollEnergyValues();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom energy background worker: {ex.Message}");
+            }
         }
 
         private async Task PollSensorValues()
@@ -72,6 +84,43 @@ namespace SmarthomeApi.Services
                     SaveZoneSensorValues(zoneGrouping.Key, zoneGrouping.ToDictionary(x => x.Key.Item2, x => x.Value.Item2));
 
                 _dbContext.SaveChanges();
+            }
+            catch { throw; }
+            finally
+            {
+                _dbContext.Semaphore.Release();
+            }
+        }
+
+        private async Task PollEnergyValues()
+        {
+            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).ToList();
+            var energyCurves = new Dictionary<DSUID, TimeSeries<int>>();
+            foreach (var dsuid in dsuids)
+            {
+                var rawSeries = await _dsClient.GetEnergy(dsuid, 1, 10 * 60);
+                var timeseries = new TimeSeries<int>(rawSeries.First().Key, rawSeries.Last().Key, rawSeries.Count);
+                foreach (var rawValue in rawSeries)
+                    timeseries[rawValue.Key] = (int)rawValue.Value;
+                energyCurves.Add(new DSUID(dsuid), timeseries);
+            }
+
+            var energyCurvesAllDay = new Dictionary<DSUID, TimeSeries<int>>();
+            foreach (var dsuid in energyCurves.Keys)
+            {
+                var timeseries = new TimeSeries<int>(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 60 * 60 * 24);
+                foreach (var value in energyCurves[dsuid])
+                    timeseries[value.Key] = value.Value;
+                energyCurvesAllDay.Add(dsuid, timeseries);
+            }
+
+            byte[] blob = energyCurves.ToCompressedBlob();
+            byte[] blob2 = energyCurvesAllDay.ToCompressedBlob();
+
+            _dbContext.Semaphore.WaitOne();
+            try
+            {
+                // TODO: save the blob
             }
             catch { throw; }
             finally

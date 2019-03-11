@@ -125,6 +125,35 @@ namespace SmarthomeApi.FormatParsers
         }
     }
 
+    public class DSUID : IComparable, IComparable<DSUID>, IEquatable<DSUID>
+    {
+        public static int Size => 17;
+
+        private string _hex;
+
+        public DSUID(string hex)
+        {
+            _hex = hex.ToLowerInvariant().Substring(0, Size * 2).PadRight(Size * 2, '0');
+        }
+        
+        public void WriteTo(Stream stream)
+        {
+            for (int i = 0; i < _hex.Length >> 1; ++i)
+                stream.WriteByte((byte)((GetHexVal(_hex[i << 1]) << 4) + GetHexVal(_hex[(i << 1) + 1])));
+        }
+
+        private int GetHexVal(char hex) => hex - (hex < 58 ? 48 : 87);
+
+        public static implicit operator string(DSUID dsuid) => dsuid._hex;
+        public int CompareTo(DSUID value) => _hex.CompareTo(value._hex);
+        public int CompareTo(object value) => _hex.CompareTo((value as DSUID)?._hex ?? value);
+        public override bool Equals(object o) => this == (o as DSUID);
+        public bool Equals(DSUID g) => this == g;
+        public override int GetHashCode() => _hex.GetHashCode();
+        public static bool operator ==(DSUID a, DSUID b) => a._hex == b._hex;
+        public static bool operator !=(DSUID a, DSUID b) => !(a == b);
+    }
+
     public static class Base64TimeseriesParser
     {
         private const int defaultDecimalPlaces = 1;
@@ -205,37 +234,24 @@ namespace SmarthomeApi.FormatParsers
             return timeseries;
         }
         
-        public static byte[] ToCompressedBlob(this Dictionary<string, TimeSeries<int>> timeseries)
+        public static byte[] ToCompressedBlob(this Dictionary<DSUID, TimeSeries<int>> timeseries)
         {
-            Func<char, int> getHexVal = hex => (int)hex - ((int)hex < 58 ? 48 : 87);
-            Func<string, byte[]> toByteArray = hex =>
+            var uncompressedSize = (timeseries.Count * (timeseries.FirstOrDefault().Value.Count * 2 + sizeof(int))) + DSUID.Size;
+            var compressionEstimate = 0.2d;
+            using (var compressedStream = new MemoryStream((int)(uncompressedSize * compressionEstimate)))
+            using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
+            using (var writer = new BinaryWriter(compressionStream))
             {
-                byte[] arr = new byte[hex.Length >> 1];
-                for (int i = 0; i < hex.Length >> 1; ++i)
-                    arr[i] = (byte)((getHexVal(hex[i << 1]) << 4) + (getHexVal(hex[(i << 1) + 1])));
-                return arr;
-            };
-            Func<string, byte[]> dsuidToByteArray = dsuid =>
-                toByteArray(dsuid.ToLowerInvariant().Substring(0, 17 * 2).PadRight(17 * 2, '0'));
-
-            using (var uncompressedStream = new MemoryStream(timeseries.Count * 2 * 60 * 60 * 24))
-            {
-                using (var writer = new BinaryWriter(uncompressedStream))
+                writer.Write(timeseries.Count);
+                foreach (var series in timeseries)
                 {
-                    writer.Write(timeseries.Count);
-                    foreach (var series in timeseries)
-                    {
-                        writer.Write(dsuidToByteArray(series.Key));
-                        uncompressedStream.WriteTimeseries(series.Value);
-                    }
+                    series.Key.WriteTo(compressionStream);
+                    compressionStream.WriteTimeseries(series.Value);
                 }
 
-                using (var compressedStream = new MemoryStream())
-                using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
-                {
-                    uncompressedStream.CopyTo(compressionStream);
-                    return compressedStream.ToArray();
-                }
+                compressionStream.Flush();
+                compressedStream.Position = 0;
+                return compressedStream.ToArray();
             }
         }
 
