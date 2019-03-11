@@ -204,15 +204,49 @@ namespace SmarthomeApi.FormatParsers
 
             return timeseries;
         }
+        
+        public static byte[] ToCompressedBlob(this Dictionary<string, TimeSeries<int>> timeseries)
+        {
+            Func<char, int> getHexVal = hex => (int)hex - ((int)hex < 58 ? 48 : 87);
+            Func<string, byte[]> toByteArray = hex =>
+            {
+                byte[] arr = new byte[hex.Length >> 1];
+                for (int i = 0; i < hex.Length >> 1; ++i)
+                    arr[i] = (byte)((getHexVal(hex[i << 1]) << 4) + (getHexVal(hex[(i << 1) + 1])));
+                return arr;
+            };
+            Func<string, byte[]> dsuidToByteArray = dsuid =>
+                toByteArray(dsuid.ToLowerInvariant().Substring(0, 17 * 2).PadRight(17 * 2, '0'));
+
+            using (var uncompressedStream = new MemoryStream(timeseries.Count * 2 * 60 * 60 * 24))
+            {
+                using (var writer = new BinaryWriter(uncompressedStream))
+                {
+                    writer.Write(timeseries.Count);
+                    foreach (var series in timeseries)
+                    {
+                        writer.Write(dsuidToByteArray(series.Key));
+                        uncompressedStream.WriteTimeseries(series.Value);
+                    }
+                }
+
+                using (var compressedStream = new MemoryStream())
+                using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
+                {
+                    uncompressedStream.CopyTo(compressionStream);
+                    return compressedStream.ToArray();
+                }
+            }
+        }
 
         public static byte[] ToCompressedBlob(this TimeSeries<int> timeseries)
         {
-            using (MemoryStream uncompressedStream = new MemoryStream(2 * 60 * 60 * 24))
+            using (var uncompressedStream = new MemoryStream(2 * 60 * 60 * 24))
             {
                 uncompressedStream.WriteTimeseries(timeseries);
 
-                using (MemoryStream compressedStream = new MemoryStream())
-                using (GZipStream compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
+                using (var compressedStream = new MemoryStream())
+                using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
                 {
                     uncompressedStream.CopyTo(compressionStream);
                     return compressedStream.ToArray();
