@@ -31,8 +31,25 @@ namespace SmarthomeApi.Clients.Digitalstrom
 
         public async Task<List<KeyValuePair<DateTime, double>>> GetTotalEnergy(int resolution, int count)
         {
-            var path = $"/json/metering/getValues?dsuid=.meters(all)&type=consumption&resolution={resolution}&valueCount={count}";
+            return await GetEnergy(".meters(all)", resolution, count);
+        }
+
+        public async Task<List<KeyValuePair<DateTime, double>>> GetEnergy(string meterDsuid, int resolution, int count)
+        {
+            var path = $"/json/metering/getValues?dsuid={meterDsuid}&type=consumption&resolution={resolution}&valueCount={count}";
             return await ParseTotalEnergyResponse(await GetDssPathAsync(path));
+        }
+
+        public async Task<Dictionary<string, string>> GetMeteringCircuits()
+        {
+            var path = "/json/property/query?query=/apartment/dSMeters/*(dSUID,name)/capabilities(metering)";
+            return await ParseMeteringCircuitsResponse(await GetDssPathAsync(path));
+        }
+
+        public async Task<Dictionary<string, List<int>>> GetCircuitZones()
+        {
+            var path = "/json/property/query?query=/apartment/dSMeters/*(dSUID)/zones/*(ZoneID)";
+            return await ParseCircuitZonesResponse(await GetDssPathAsync(path));
         }
 
         public async Task<Dictionary<Tuple<int, int>, Tuple<DateTime, double>>> GetSensorValues()
@@ -67,6 +84,55 @@ namespace SmarthomeApi.Clients.Digitalstrom
             return powerValuesRaw.result.values.Select(x => 
                 new KeyValuePair<DateTime, double>(UnixEpoch.AddSeconds(x.FirstOrDefault()), x.LastOrDefault()))
                 .OrderBy(x => x.Key).ToList();
+        }
+
+        private async Task<Dictionary<string, List<int>>> ParseCircuitZonesResponse(HttpResponseMessage response)
+        {
+            var definition = new
+            {
+                result = new
+                {
+                    dSMeters = new[] { new
+                    {
+                        dSUID = "",
+                        zones = new[] { new
+                        {
+                            ZoneID = 0
+                        } }
+                    } }
+                },
+                ok = true
+            };
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var circuitValuesRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
+            return circuitValuesRaw.result.dSMeters.Select(x =>
+                new KeyValuePair<string, List<int>>(x.dSUID, x.zones.Select(z => z.ZoneID).ToList()))
+                .ToDictionary(x => x.Key, x => x.Value);
+        }
+
+        private async Task<Dictionary<string, string>> ParseMeteringCircuitsResponse(HttpResponseMessage response)
+        {
+            var definition = new
+            {
+                result = new
+                {
+                    dSMeters = new[] { new
+                    {
+                        dSUID = "",
+                        name = "",
+                        capabilities = new[] { new
+                        {
+                            metering = false
+                        } }
+                    } }
+                },
+                ok = true
+            };
+            var responseStr = await response.Content.ReadAsStringAsync();
+            var circuitValuesRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
+            return circuitValuesRaw.result.dSMeters.Where(x => x.capabilities.FirstOrDefault()?.metering ?? false)
+                .Select(x => new KeyValuePair<string, string>(x.dSUID, x.name))
+                .ToDictionary(x => x.Key, x => x.Value);
         }
 
         private async Task<Dictionary<Tuple<int, int>, Tuple<DateTime, double>>> ParseSensorValuesResponse(HttpResponseMessage response)
