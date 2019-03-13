@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
 using SmarthomeApi.FormatParsers;
+using SmarthomeApi.Model;
 
 namespace SmarthomeApi.Services
 {
