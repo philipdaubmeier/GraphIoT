@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 
 namespace SmarthomeApi.FormatParsers
@@ -74,54 +73,6 @@ namespace SmarthomeApi.FormatParsers
 
             return Convert.ToBase64String(array);
         }
-        
-        public static TimeSeries<T> ToTimeseries<T>(this byte[] blob, DateTime begin, DateTime end, int count) where T : struct
-        {
-            var timeseries = new TimeSeries<T>(begin, end, count);
-            if (typeof(T) != typeof(int))
-                throw new InvalidCastException();
-
-            // TODO implementation
-            //(timeseries as TimeSeries<int>)[i / 2] = value == short.MinValue ? null : (short?)value;
-
-            return timeseries;
-        }
-        
-        public static byte[] ToCompressedBlob(this Dictionary<DSUID, TimeSeries<int>> timeseries)
-        {
-            var uncompressedSize = (timeseries.Count * (timeseries.FirstOrDefault().Value.Count * 2 + sizeof(int))) + DSUID.Size;
-            var compressionEstimate = 0.2d;
-            using (var compressedStream = new MemoryStream((int)(uncompressedSize * compressionEstimate)))
-            using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
-            using (var writer = new BinaryWriter(compressionStream))
-            {
-                writer.Write(timeseries.Count);
-                foreach (var series in timeseries)
-                {
-                    series.Key.WriteTo(compressionStream);
-                    compressionStream.WriteTimeseries(series.Value);
-                }
-
-                compressionStream.Flush();
-                compressedStream.Position = 0;
-                return compressedStream.ToArray();
-            }
-        }
-
-        public static byte[] ToCompressedBlob(this TimeSeries<int> timeseries)
-        {
-            using (var uncompressedStream = new MemoryStream(2 * 60 * 60 * 24))
-            {
-                uncompressedStream.WriteTimeseries(timeseries);
-
-                using (var compressedStream = new MemoryStream())
-                using (var compressionStream = new GZipStream(compressedStream, CompressionMode.Compress))
-                {
-                    uncompressedStream.CopyTo(compressionStream);
-                    return compressedStream.ToArray();
-                }
-            }
-        }
 
         /// <summary>
         /// Writes the given TimeSeries<int> to the stream as diff series, i.e. the first
@@ -140,7 +91,7 @@ namespace SmarthomeApi.FormatParsers
         ///  - output values (encoded as two bytes each on steam:
         ///     [120,   3,  -3,   1,   2,   0,  -3, -32768, -32768,   1,   3,   3,  903, -903]
         /// </summary>
-        public static void WriteTimeseries(this Stream stream, TimeSeries<int> timeseries)
+        public static void WriteTimeseries(this Stream stream, ITimeSeries<int> timeseries)
         {
             bool first = true;
             int previous = 0;

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -95,28 +97,42 @@ namespace SmarthomeApi.Services
 
         private async Task PollEnergyValues()
         {
-            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).ToList();
-            var energyCurves = new Dictionary<DSUID, TimeSeries<int>>();
-            foreach (var dsuid in dsuids)
+            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).Select(x => new DSUID(x)).ToList();
+
+            var timeSeriesCount = 60 * 60 * 24;
+            var begin = DateTime.Now.Date;
+            var end = begin.AddDays(1);
+            var fetchLastValues = 10 * 60;
+
+            var debug = true;
+            if (debug)
             {
-                var rawSeries = await _dsClient.GetEnergy(dsuid, 1, 10 * 60);
-                var timeseries = new TimeSeries<int>(rawSeries.First().Key, rawSeries.Last().Key, rawSeries.Count);
-                foreach (var rawValue in rawSeries)
-                    timeseries[rawValue.Key] = (int)rawValue.Value;
-                energyCurves.Add(new DSUID(dsuid), timeseries);
+                dsuids = dsuids.Take(1).ToList();
+                timeSeriesCount = 10;
+                fetchLastValues = 5;
+                begin = DateTime.Now.AddSeconds(-1 * timeSeriesCount);
+                end = begin.AddSeconds(timeSeriesCount);
             }
 
-            var energyCurvesAllDay = new Dictionary<DSUID, TimeSeries<int>>();
-            foreach (var dsuid in energyCurves.Keys)
+            byte[] blob1; string readable1;
+            using (var allEnergySeriesStream = new TimeSeriesStreamCollection<DSUID, int>(
+                dsuids, DSUID.Size, (dsuid, stream) => dsuid.WriteTo(stream), begin, end, timeSeriesCount))
             {
-                var timeseries = new TimeSeries<int>(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 60 * 60 * 24);
-                foreach (var value in energyCurves[dsuid])
-                    timeseries[value.Key] = value.Value;
-                energyCurvesAllDay.Add(dsuid, timeseries);
+                foreach (var dsuid in dsuids)
+                    await _dsClient.ReadEnergyToTimeSeries(dsuid, 1, fetchLastValues, allEnergySeriesStream[dsuid]);
+
+                readable1 = debug ? allEnergySeriesStream.ToString() : null;
+                blob1 = allEnergySeriesStream.ToCompressedByteArray();
             }
 
-            byte[] blob = energyCurves.ToCompressedBlob();
-            byte[] blob2 = energyCurvesAllDay.ToCompressedBlob();
+            byte[] blob2; string readable2;
+            using (var allEnergySeriesStream = new TimeSeriesStreamCollection<DSUID, int>(
+                blob1, DSUID.Size, stream => DSUID.ReadFrom(stream), begin, end, timeSeriesCount))
+            {
+                readable2 = debug ? allEnergySeriesStream.ToString() : null;
+                blob2 = allEnergySeriesStream.ToCompressedByteArray();
+            }
+
 
             _dbContext.Semaphore.WaitOne();
             try

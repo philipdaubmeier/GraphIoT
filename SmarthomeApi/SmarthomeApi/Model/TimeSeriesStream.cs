@@ -39,6 +39,9 @@ namespace SmarthomeApi.Model
             : this(new MemoryStream(typeof(T) == typeof(bool) ? count / 4 : count * sizeof(short)), 0, begin, end, count, decimalPlaces)
         {
             _isStreamManaged = true;
+
+            for (int i = 0; i < count; i++)
+                WriteValue(null);
         }
 
         /// <summary>
@@ -55,6 +58,7 @@ namespace SmarthomeApi.Model
                 throw new ArgumentException("underlying stream must be readable, writable and seekable");
             
             _stream = stream;
+            _startPosition = streamPosition;
             _decimalPlaces = decimalPlaces;
         }
         

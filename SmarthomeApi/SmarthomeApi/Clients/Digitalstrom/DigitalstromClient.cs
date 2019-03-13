@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -17,7 +19,7 @@ namespace SmarthomeApi.Clients.Digitalstrom
         private const string _baseUrl = "https://ds-tools.net/cloudredir.php";
         private const string _dsCloudDssId = "***REMOVED***";
         private const string _token = "***REMOVED***";
-        
+
         private static readonly HttpClient _client = new HttpClient();
 
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -38,6 +40,12 @@ namespace SmarthomeApi.Clients.Digitalstrom
         {
             var path = $"/json/metering/getValues?dsuid={meterDsuid}&type=consumption&resolution={resolution}&valueCount={count}";
             return await ParseTotalEnergyResponse(await GetDssPathAsync(path));
+        }
+
+        public async Task ReadEnergyToTimeSeries(string meterDsuid, int resolution, int count, ITimeSeries<int> timeseries)
+        {
+            var path = $"/json/metering/getValues?dsuid={meterDsuid}&type=consumption&resolution={resolution}&valueCount={count}";
+            await ParseTotalEnergyResponseIntoTimeSeries(await GetDssPathAsync(path), timeseries);
         }
 
         public async Task<Dictionary<string, string>> GetMeteringCircuits()
@@ -71,7 +79,6 @@ namespace SmarthomeApi.Clients.Digitalstrom
             {
                 result = new
                 {
-                    meterID = new List<string>(),
                     type = "",
                     unit = "",
                     resolution = 60,
@@ -84,6 +91,35 @@ namespace SmarthomeApi.Clients.Digitalstrom
             return powerValuesRaw.result.values.Select(x => 
                 new KeyValuePair<DateTime, double>(UnixEpoch.AddSeconds(x.FirstOrDefault()), x.LastOrDefault()))
                 .OrderBy(x => x.Key).ToList();
+        }
+
+        private async Task ParseTotalEnergyResponseIntoTimeSeries(HttpResponseMessage response, ITimeSeries<int> timeseries)
+        {
+            var definition = new
+            {
+                result = new
+                {
+                    type = "",
+                    unit = "",
+                    resolution = 60,
+                    values = new List<List<double>>()
+                },
+                ok = true
+            };
+
+            var serializer = new JsonSerializer();
+            using (var sr = new StreamReader(await response.Content.ReadAsStreamAsync()))
+            using (var jsonTextReader = new JsonTextReader(sr))
+            {
+                var powerValuesRaw = CastToAnonymousType(definition, serializer.Deserialize(jsonTextReader, definition.GetType()));
+                foreach (var value in powerValuesRaw.result.values)
+                    timeseries[UnixEpoch.AddSeconds(value.FirstOrDefault()).ToLocalTime()] = (int)value.LastOrDefault();
+            }
+        }
+
+        private static T CastToAnonymousType<T>(T typeHolder, object x)
+        {
+            return (T)x;
         }
 
         private async Task<Dictionary<string, List<int>>> ParseCircuitZonesResponse(HttpResponseMessage response)
