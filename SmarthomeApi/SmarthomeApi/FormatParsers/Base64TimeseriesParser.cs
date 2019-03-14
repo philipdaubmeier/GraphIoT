@@ -1,7 +1,6 @@
-﻿using SmarthomeApi.Model;
+﻿using CompactTimeSeries;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SmarthomeApi.FormatParsers

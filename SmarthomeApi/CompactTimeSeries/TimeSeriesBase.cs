@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public abstract class TimeSeriesBase<T> : ITimeSeries<T> where T : struct
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public class TimeSeriesStream<T> : TimeSeriesBase<T>, IDisposable where T : struct
     {

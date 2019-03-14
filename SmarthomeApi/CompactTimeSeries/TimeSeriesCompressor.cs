@@ -2,16 +2,17 @@
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public class TimeSeriesCompressor<TKey, T> where T : struct
     {
         private TimeSeriesStreamCollection<TKey, T> _timeseries;
 
         /// <summary>
-        /// Creates a new instance of the TimeSeriesCompressor class from a
-        /// TimeSeriesStreamCollection, which can be used to retrieve a
-        /// diff-compressed byte stream.
+        /// Creates a new instance of the TimeSeriesCompressor class for converting the given
+        /// TimeSeriesStreamCollection into a diff-compacted form before gzip compression.
+        /// Both compaction effects add up as the diff-ing of mostly constant or steady series
+        /// results in many small and similar values which can then be huffman coded more efficiently.
         /// </summary>
         public TimeSeriesCompressor(TimeSeriesStreamCollection<TKey, T> timeseries)
         {

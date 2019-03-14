@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using CompactTimeSeries;
+using Newtonsoft.Json;
 using SmarthomeApi.Database.Model;
 using SmarthomeApi.Model;
 using System;

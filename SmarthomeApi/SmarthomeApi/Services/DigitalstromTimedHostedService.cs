@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using CompactTimeSeries;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;

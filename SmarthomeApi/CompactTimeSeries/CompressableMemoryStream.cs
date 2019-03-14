@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.IO.Compression;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public class CompressableMemoryStream : MemoryStream
     {

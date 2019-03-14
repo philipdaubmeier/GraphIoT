@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public class TimeSeries<T> : TimeSeriesBase<T> where T : struct
     {
@@ -41,10 +41,13 @@ namespace SmarthomeApi.Model
 
         private bool TryFindIndex(DateTime time, out DateTime timeBucket, out int index)
         {
-            var bucket = timeBucket = _list.SkipWhile(d => d.Key < time).FirstOrDefault().Key;
-            var foundIndex = _list.FindIndex(li => li.Key == bucket);
+            var bucket = _list.SkipWhile(d => d.Key <= time).FirstOrDefault().Key;
+            var foundIndex = time < _begin ? -1
+                : bucket == DateTime.MinValue && time <= _end ? _list.Count
+                : _list.FindIndex(li => li.Key == bucket);
             index = Math.Max(0, foundIndex - 1);
-            return foundIndex >= 0;
+            timeBucket = index < _list.Count ? _list[index].Key : DateTime.MinValue;
+            return foundIndex >= 0 && timeBucket != DateTime.MinValue;
         }
 
         /// <summary>

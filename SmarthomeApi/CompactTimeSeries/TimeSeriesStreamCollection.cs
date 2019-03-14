@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SmarthomeApi.Model
+namespace CompactTimeSeries
 {
     public class TimeSeriesStreamCollection<TKey, T> : IEnumerable<KeyValuePair<TKey, ITimeSeries<T>>>, IDisposable where T : struct
     {
