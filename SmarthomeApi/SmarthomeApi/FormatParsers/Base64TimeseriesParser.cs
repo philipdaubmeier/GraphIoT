@@ -73,44 +73,5 @@ namespace SmarthomeApi.FormatParsers
 
             return Convert.ToBase64String(array);
         }
-
-        /// <summary>
-        /// Writes the given TimeSeries<int> to the stream as diff series, i.e. the first
-        /// value is encoded directly, all following values are encoded as diffs to previous
-        /// values. If any value is null (TimeSeries<int> contains nullable int), it is treated
-        /// as value 0 for diff calculation but put into the stream as short.MinValue to be
-        /// losslessly restoreable. Important: this encoding is only lossless for values in the
-        /// interval -16383 (short.MinValue + 1 / 2) and 16383 (short.MaxValue / 2) inclusively.
-        /// All values smaller or greater than those get cropped because they could lead to diffs
-        /// outside the signed 16 bit (short) value range.
-        /// 
-        /// Example:
-        ///  - input values (nullable int in TimeSeries object):
-        ///     [120, 123, 120, 121, 123, 123, 120,   null,   null, 121, 124, 127, 1030,  127]
-        ///     
-        ///  - output values (encoded as two bytes each on steam:
-        ///     [120,   3,  -3,   1,   2,   0,  -3, -32768, -32768,   1,   3,   3,  903, -903]
-        /// </summary>
-        public static void WriteTimeseries(this Stream stream, ITimeSeries<int> timeseries)
-        {
-            bool first = true;
-            int previous = 0;
-            foreach (var item in timeseries)
-            {
-                int current = item.Value ?? previous;
-                int diff = previous - current;
-                previous = current;
-
-                if (first)
-                {
-                    diff = item.Value ?? 0;
-                    first = false;
-                }
-
-                short diffShort = item.Value.HasValue ? (short)Math.Min(short.MaxValue, Math.Max(short.MinValue - 1, diff)) : short.MinValue;
-                stream.WriteByte((byte)(diffShort >> 8));
-                stream.WriteByte((byte)(diffShort & 0xff));
-            }
-        }
     }
 }
