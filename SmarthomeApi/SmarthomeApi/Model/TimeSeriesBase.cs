@@ -68,10 +68,20 @@ namespace SmarthomeApi.Model
         public abstract T? this[int index] { get; set; }
 
         /// <summary>
+        /// Returns the begin date and time of this time series
+        /// </summary>
+        public DateTime Begin => _begin;
+
+        /// <summary>
+        /// Returns the end date and time of this time series
+        /// </summary>
+        public DateTime End => _end;
+
+        /// <summary>
         /// Returns the number of elements (or time buckets, respectively) in this time series object.
         /// </summary>
         public int Count => _count;
-
+        
         public abstract IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()

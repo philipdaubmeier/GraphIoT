@@ -13,17 +13,18 @@ namespace SmarthomeApi.Model
 
         public class BinaryStreamMetrics
         {
-            private readonly int _bucketCount;
-
-            public BinaryStreamMetrics(int keySize, int bucketCount)
+            public BinaryStreamMetrics(int keySize, int bucketCount, int decimalPlaces)
             {
                 TimeseriesOffset = keySize;
-                _bucketCount = bucketCount;
+                TimeseriesBucketCount = bucketCount;
+                DecimalPlaces = decimalPlaces;
             }
 
             public int CollectionCountOffset => sizeof(int);
             public int TimeseriesOffset { get; private set; }
-            public int TimeseriesSize => _bucketCount * sizeof(short) + TimeseriesOffset;
+            public int TimeseriesBucketCount { get; private set; }
+            public int TimeseriesSize => TimeseriesBucketCount * sizeof(short) + TimeseriesOffset;
+            public int DecimalPlaces { get; private set; }
 
             public int StreamSize(int keyCount) => (keyCount * TimeseriesSize) + CollectionCountOffset;
 
@@ -41,7 +42,7 @@ namespace SmarthomeApi.Model
         public TimeSeriesStreamCollection(IEnumerable<TKey> keys, int keySize, Action<TKey, Stream> writeKeyAction, DateTime begin, DateTime end, int bucketCount, int decimalPlaces = 1) : base()
         {
             var keyList = keys.ToList();
-            Metrics = new BinaryStreamMetrics(keySize, bucketCount);
+            Metrics = new BinaryStreamMetrics(keySize, bucketCount, decimalPlaces);
 
             _dict = new Dictionary<TKey, ITimeSeries<T>>();
 
@@ -68,7 +69,7 @@ namespace SmarthomeApi.Model
         /// </summary>
         public TimeSeriesStreamCollection(byte[] compressedByteArray, int keySize, Func<Stream, TKey> readKeyFunc, DateTime begin, DateTime end, int bucketCount, int decimalPlaces = 1) : base()
         {
-            Metrics = new BinaryStreamMetrics(keySize, bucketCount);
+            Metrics = new BinaryStreamMetrics(keySize, bucketCount, decimalPlaces);
             _stream = CompressableMemoryStream.FromCompressedByteArray(compressedByteArray);
 
             _dict = new Dictionary<TKey, ITimeSeries<T>>();
@@ -89,6 +90,8 @@ namespace SmarthomeApi.Model
         public IEnumerator<KeyValuePair<TKey, ITimeSeries<T>>> GetEnumerator() => _dict.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => _dict.GetEnumerator();
+
+        public Stream UnderlyingStream => _stream;
 
         public void Dispose()
         {
