@@ -96,6 +96,9 @@ namespace CompactTimeSeries
         {
             set
             {
+                if (index < 0 || index >= _count)
+                    throw new ArgumentOutOfRangeException();
+
                 if (!SeekToTimeBucket(index))
                     return;
 
@@ -103,6 +106,9 @@ namespace CompactTimeSeries
             }
             get
             {
+                if (index < 0 || index >= _count)
+                    throw new ArgumentOutOfRangeException();
+
                 if (!SeekToTimeBucket(index))
                     return default(T?);
 
@@ -116,6 +122,8 @@ namespace CompactTimeSeries
                 return false;
 
             var index = (int)Math.Floor((time - _begin) / _duration);
+            if (index >= _count && time <= _end)
+                index = _count - 1;
             return SeekToTimeBucket(index);
         }
 
@@ -138,9 +146,17 @@ namespace CompactTimeSeries
             if (typeof(T) == typeof(int))
                 val = (value as int?);
             else if (typeof(T) == typeof(double))
-                val = value.HasValue ? (int)((value as double?).Value * Math.Pow(10d, _decimalPlaces)) : (int?)null;
+            {
+                if (!value.HasValue || double.IsNaN((value as double?).Value))
+                    val = null;
+                else
+                {
+                    var uncropped = (value as double?).Value * Math.Pow(10d, _decimalPlaces);
+                    val = uncropped > int.MaxValue ? int.MaxValue : uncropped < int.MinValue ? int.MinValue : (int)uncropped;
+                }
+            }
             
-            short valShort = val.HasValue ? (short)Math.Min(short.MaxValue, Math.Max(short.MinValue - 1, val.Value)) : short.MinValue;
+            short valShort = val.HasValue ? (short)Math.Min(short.MaxValue, Math.Max(short.MinValue + 1, val.Value)) : short.MinValue;
             _stream.WriteByte((byte)(valShort >> 8));
             _stream.WriteByte((byte)(valShort & 0xff));
         }

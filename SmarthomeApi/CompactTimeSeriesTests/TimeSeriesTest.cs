@@ -56,7 +56,11 @@ namespace CompactTimeSeries.Tests
             Assert.Null(timeseries[8]);
             Assert.Equal(99, timeseries[9]);
 
-            // test outside of index boundaries, should throw out of range exception
+            // test writing outside of index boundaries, should throw out of range exception
+            Assert.Throws<ArgumentOutOfRangeException>(() => timeseries[-1] = 22);
+            Assert.Throws<ArgumentOutOfRangeException>(() => timeseries[10] = 22);
+
+            // test reading outside of index boundaries, should throw out of range exception
             Assert.Throws<ArgumentOutOfRangeException>(() => timeseries[-1]);
             Assert.Throws<ArgumentOutOfRangeException>(() => timeseries[10]);
 
