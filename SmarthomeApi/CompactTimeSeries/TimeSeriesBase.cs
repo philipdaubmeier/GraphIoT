@@ -28,10 +28,7 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// Extracts the maximum filled list, i.e. removes all items with
-        /// null value from both the front and back of the enumeration of
-        /// this time series. If any null values should be present between
-        /// values, it will be set to the given defaultValue.
+        /// See <see cref="ITimeSeries{T}.ToList(T)"/>
         /// </summary>
         public List<T> ToList(T defaultValue)
         {
@@ -41,8 +38,7 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// Sets the given value in the matching time bucket or sums the
-        /// value up with the already existing value.
+        /// See <see cref="ITimeSeries{T}.Accumulate(DateTime, T)"/>
         /// </summary>
         public void Accumulate(DateTime time, T item)
         {
@@ -53,32 +49,33 @@ namespace CompactTimeSeries
                 this[time] = item;
         }
 
+        // Helper method/hack for adding up generic values
         private static ParameterExpression paramA = Expression.Parameter(typeof(T), "a");
         private static ParameterExpression paramB = Expression.Parameter(typeof(T), "b");
         private static Func<T, T, T> Add = Expression.Lambda<Func<T, T, T>>(Expression.Add(paramA, paramB), paramA, paramB).Compile();
 
         /// <summary>
-        /// Sets or gets the given value in the matching time bucket.
+        /// See <see cref="ITimeSeries{T}.this[DateTime time]"/>
         /// </summary>
         public abstract T? this[DateTime time] { set; get; }
 
         /// <summary>
-        /// Sets or gets the given value in the time bucket with the given index.
+        /// See <see cref="ITimeSeries{T}.this[int index]"/>
         /// </summary>
         public abstract T? this[int index] { get; set; }
 
         /// <summary>
-        /// Returns the begin date and time of this time series
+        /// See <see cref="ITimeSeries{T}.End"/>
         /// </summary>
         public DateTime Begin => _begin;
 
         /// <summary>
-        /// Returns the end date and time of this time series
+        /// See <see cref="ITimeSeries{T}.End"/>
         /// </summary>
         public DateTime End => _end;
 
         /// <summary>
-        /// Returns the number of elements (or time buckets, respectively) in this time series object.
+        /// See <see cref="ITimeSeries{T}.Count"/>
         /// </summary>
         public int Count => _count;
         

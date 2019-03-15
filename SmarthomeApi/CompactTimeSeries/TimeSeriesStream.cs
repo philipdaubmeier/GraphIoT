@@ -7,6 +7,19 @@ namespace CompactTimeSeries
 {
     public class TimeSeriesStream<T> : TimeSeriesBase<T>, IDisposable where T : struct
     {
+        /// <summary>
+        /// Private helper class for creating KeyValuePair structs that inherit the type parameter
+        /// from the time series, but construct them from a known number type. For instance,
+        /// if you have a int value you can neither construct nor cast it to a generic type
+        /// parameter T and also not build a KeyValuePair from it. This factory, however, can
+        /// be created with type parmeter T and then be casted to a concrete type.
+        /// 
+        /// Example usage:
+        ///     var factory = new KeyValuePairFactory<T>();
+        ///     int value = 23;
+        ///     (factory as KeyValuePairFactory<int>).Set(time, value);
+        ///     KeyValuePair<DateTime, T?> result = factory.Create();
+        /// </summary>
         private class KeyValuePairFactory<Tfac> where Tfac : struct
         {
             private DateTime _time;
@@ -69,7 +82,7 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// Sets or gets the given value in the matching time bucket.
+        /// See <see cref="ITimeSeries{T}.this[DateTime time]"/>
         /// </summary>
         public override T? this[DateTime time]
         {
@@ -90,7 +103,7 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// Sets or gets the given value in the time bucket with the given index.
+        /// See <see cref="ITimeSeries{T}.this[int index]"/>
         /// </summary>
         public override T? this[int index]
         {
@@ -114,51 +127,6 @@ namespace CompactTimeSeries
 
                 return ReadKeyValuePair(DateTime.MinValue).Value;
             }
-        }
-
-        private bool SeekToTimeBucket(DateTime time)
-        {
-            if (time < _begin || time > _end)
-                return false;
-
-            var index = (int)Math.Floor((time - _begin) / _duration);
-            if (index >= _count && time <= _end)
-                index = _count - 1;
-            return SeekToTimeBucket(index);
-        }
-
-        private bool SeekToTimeBucket(int index)
-        {
-            var pos = _startPosition + index * sizeof(short);
-            if (pos < 0 || pos > _stream.Length)
-                return false;
-
-            _stream.Seek(pos, SeekOrigin.Begin);
-            return true;
-        }
-
-        private void WriteValue(T? value)
-        {
-            if (typeof(T) != typeof(int) && typeof(T) != typeof(double))
-                throw new InvalidOperationException("TimeSeriesStream currently only supports writing int and double");
-
-            int? val = 0;
-            if (typeof(T) == typeof(int))
-                val = (value as int?);
-            else if (typeof(T) == typeof(double))
-            {
-                if (!value.HasValue || double.IsNaN((value as double?).Value))
-                    val = null;
-                else
-                {
-                    var uncropped = (value as double?).Value * Math.Pow(10d, _decimalPlaces);
-                    val = uncropped > int.MaxValue ? int.MaxValue : uncropped < int.MinValue ? int.MinValue : (int)uncropped;
-                }
-            }
-            
-            short valShort = val.HasValue ? (short)Math.Min(short.MaxValue, Math.Max(short.MinValue + 1, val.Value)) : short.MinValue;
-            _stream.WriteByte((byte)(valShort >> 8));
-            _stream.WriteByte((byte)(valShort & 0xff));
         }
 
         public override IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator()
@@ -187,6 +155,73 @@ namespace CompactTimeSeries
                 yield return item;
                 time += _duration;
             }
+        }
+
+        /// <summary>
+        /// Seeks the stream position to the bucket for the given time. If the time
+        /// is out of range, the current stream position is not touched and the function
+        /// returns false.
+        /// </summary>
+        private bool SeekToTimeBucket(DateTime time)
+        {
+            if (time < _begin || time > _end)
+                return false;
+
+            var index = (int)Math.Floor((time - _begin) / _duration);
+            if (index >= _count && time <= _end)
+                index = _count - 1;
+            return SeekToTimeBucket(index);
+        }
+
+        /// <summary>
+        /// Seeks the stream position to the bucket with the given index. If the index
+        /// is out of range, the current stream position is not touched and the function
+        /// returns false.
+        /// </summary>
+        private bool SeekToTimeBucket(int index)
+        {
+            var pos = _startPosition + index * sizeof(short);
+            if (pos < 0 || pos > _stream.Length)
+                return false;
+
+            _stream.Seek(pos, SeekOrigin.Begin);
+            return true;
+        }
+
+        /// <summary>
+        /// Writes the given value to the stream. The given integer value is cropped
+        /// to two bytes, i.e. the value range from short.MinValue + 1 to short.MaxValue,
+        /// where the value short.MinValue is specially reserved for representing null
+        /// in case of the nullable value is null. If a floating point type is given in
+        /// the generic type parameter, it is first converted to a fixed point decimal
+        /// with the number of decimal places given in the constructor of this object.
+        /// The value range then decreases depending on the number of decimal places,
+        /// e.g. -32767 to 32767 for 0 decimal places, -3276.7 to 3276.7 for 1 decimal places,
+        /// -0.32767 to 0.32767 for 5 decimal places etc. Positive and negative infinities
+        /// are cropped to max and min values respectively, NaN values are treated as null.
+        /// </summary>
+        private void WriteValue(T? value)
+        {
+            if (typeof(T) != typeof(int) && typeof(T) != typeof(double))
+                throw new InvalidOperationException("TimeSeriesStream currently only supports writing int and double");
+
+            int? val = 0;
+            if (typeof(T) == typeof(int))
+                val = (value as int?);
+            else if (typeof(T) == typeof(double))
+            {
+                if (!value.HasValue || double.IsNaN((value as double?).Value))
+                    val = null;
+                else
+                {
+                    var uncropped = (value as double?).Value * Math.Pow(10d, _decimalPlaces);
+                    val = uncropped > int.MaxValue ? int.MaxValue : uncropped < int.MinValue ? int.MinValue : (int)uncropped;
+                }
+            }
+
+            short valShort = val.HasValue ? (short)Math.Min(short.MaxValue, Math.Max(short.MinValue + 1, val.Value)) : short.MinValue;
+            _stream.WriteByte((byte)(valShort >> 8));
+            _stream.WriteByte((byte)(valShort & 0xff));
         }
 
         /// <summary>

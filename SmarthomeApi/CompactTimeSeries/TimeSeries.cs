@@ -19,7 +19,7 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// Sets or gets the given value in the matching time bucket.
+        /// See <see cref="ITimeSeries{T}.this[DateTime time]"/>
         /// </summary>
         public override T? this[DateTime time]
         {
@@ -39,19 +39,8 @@ namespace CompactTimeSeries
             }
         }
 
-        private bool TryFindIndex(DateTime time, out DateTime timeBucket, out int index)
-        {
-            var bucket = _list.SkipWhile(d => d.Key <= time).FirstOrDefault().Key;
-            var foundIndex = time < _begin ? -1
-                : bucket == DateTime.MinValue && time <= _end ? _list.Count
-                : _list.FindIndex(li => li.Key == bucket);
-            index = Math.Max(0, foundIndex - 1);
-            timeBucket = index < _list.Count ? _list[index].Key : DateTime.MinValue;
-            return foundIndex >= 0 && timeBucket != DateTime.MinValue;
-        }
-
         /// <summary>
-        /// Sets or gets the given value in the time bucket with the given index.
+        /// See <see cref="ITimeSeries{T}.this[int index]"/>
         /// </summary>
         public override T? this[int index]
         {
@@ -68,6 +57,22 @@ namespace CompactTimeSeries
         public override IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator()
         {
             return _list.GetEnumerator();
+        }
+
+        /// <summary>
+        /// Searches for the right time bucket for this given time and returns both the exact
+        /// time bucket and the list index, if found. If the given time is out of range, the
+        /// function returns false.
+        /// </summary>
+        private bool TryFindIndex(DateTime time, out DateTime timeBucket, out int index)
+        {
+            var bucket = _list.SkipWhile(d => d.Key <= time).FirstOrDefault().Key;
+            var foundIndex = time < _begin ? -1
+                : bucket == DateTime.MinValue && time <= _end ? _list.Count
+                : _list.FindIndex(li => li.Key == bucket);
+            index = Math.Max(0, foundIndex - 1);
+            timeBucket = index < _list.Count ? _list[index].Key : DateTime.MinValue;
+            return foundIndex >= 0 && timeBucket != DateTime.MinValue;
         }
     }
 }
