@@ -48,12 +48,12 @@ namespace CompactTimeSeries
         /// <summary>
         /// Creates a new TimeSeriesStream object with the given number of equally spaced time buckets.
         /// </summary>
-        public TimeSeriesStream(DateTime begin, DateTime end, int count, int decimalPlaces = 1)
-            : this(new MemoryStream(typeof(T) == typeof(bool) ? count / 4 : count * sizeof(short)), 0, begin, end, count, decimalPlaces)
+        public TimeSeriesStream(TimeSeriesSpan span, int decimalPlaces = 1)
+            : this(new MemoryStream(typeof(T) == typeof(bool) ? span.Count / 4 : span.Count * sizeof(short)), 0, span, decimalPlaces)
         {
             _isStreamManaged = true;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < _span.Count; i++)
                 WriteValue(null);
         }
 
@@ -61,8 +61,8 @@ namespace CompactTimeSeries
         /// Creates a new TimeSeriesStream object with an existing underlying stream that has to be
         /// readable, writable and seekable. The time series starts at the given streamPosition.
         /// </summary>
-        public TimeSeriesStream(Stream stream, int streamPosition, DateTime begin, DateTime end, int count, int decimalPlaces = 1)
-            : base (begin, end, count)
+        public TimeSeriesStream(Stream stream, int streamPosition, TimeSeriesSpan span, int decimalPlaces = 1)
+            : base(span)
         {
             if (stream == null)
                 throw new ArgumentException("underlying stream can not be null");
@@ -109,7 +109,7 @@ namespace CompactTimeSeries
         {
             set
             {
-                if (index < 0 || index >= _count)
+                if (index < 0 || index >= _span.Count)
                     throw new ArgumentOutOfRangeException();
 
                 if (!SeekToTimeBucket(index))
@@ -119,7 +119,7 @@ namespace CompactTimeSeries
             }
             get
             {
-                if (index < 0 || index >= _count)
+                if (index < 0 || index >= _span.Count)
                     throw new ArgumentOutOfRangeException();
 
                 if (!SeekToTimeBucket(index))
@@ -132,28 +132,28 @@ namespace CompactTimeSeries
         public override IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator()
         {
             _stream.Seek(_startPosition, SeekOrigin.Begin);
-            var time = _begin;
+            var time = _span.Begin;
 
             if (typeof(T) == typeof(bool))
             {
-                for (int i = 0; i < _count / 4; i++)
+                for (int i = 0; i < _span.Count / 4; i++)
                 {
                     foreach (var item in ReadBoolKeyValuePairs(time))
                         yield return item;
 
-                    time += _duration * 4;
+                    time += _span.Duration * 4;
                 }
                 yield break;
             }
             
-            for (int i = 0; i < _count; i++)
+            for (int i = 0; i < _span.Count; i++)
             {
                 var item = ReadKeyValuePair(time);
                 if (item.Key == DateTime.MinValue)
                     yield break;
 
                 yield return item;
-                time += _duration;
+                time += _span.Duration;
             }
         }
 
@@ -164,12 +164,12 @@ namespace CompactTimeSeries
         /// </summary>
         private bool SeekToTimeBucket(DateTime time)
         {
-            if (time < _begin || time > _end)
+            if (time < _span.Begin || time > _span.End)
                 return false;
 
-            var index = (int)Math.Floor((time - _begin) / _duration);
-            if (index >= _count && time <= _end)
-                index = _count - 1;
+            var index = (int)Math.Floor((time - _span.Begin) / _span.Duration);
+            if (index >= _span.Count && time <= _span.End)
+                index = _span.Count - 1;
             return SeekToTimeBucket(index);
         }
 
@@ -244,7 +244,7 @@ namespace CompactTimeSeries
                 (_keyValuePairFactory as KeyValuePairFactory<bool>).Set(time, b);
                 yield return _keyValuePairFactory.Create();
 
-                time += _duration;
+                time += _span.Duration;
             }
         }
 

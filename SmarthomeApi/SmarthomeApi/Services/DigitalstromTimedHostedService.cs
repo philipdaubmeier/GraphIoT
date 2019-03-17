@@ -95,47 +95,69 @@ namespace SmarthomeApi.Services
 
         private async Task PollEnergyValues()
         {
-            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).Select(x => new DSUID(x)).ToList();
+            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).ToList();
+            
+            var fetchLastValues = (int)TimeSeriesSpan.Spacing.Spacing10Min;
+            var days = new TimeSeriesSpan(DateTime.Now.AddSeconds(-1 * fetchLastValues), TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues).IncludedDates();
 
-            var timeSeriesCount = 60 * 60 * 24;
-            var begin = DateTime.Now.Date;
-            var end = begin.AddDays(1);
-            var fetchLastValues = 10 * 60;
-
-            var debug = true;
-            if (debug)
+            Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> timeseriesCollections = null;
+            try
             {
-                dsuids = dsuids.Take(1).ToList();
-                timeSeriesCount = 10;
-                fetchLastValues = 5;
-                begin = DateTime.Now.AddSeconds(-1 * timeSeriesCount);
-                end = begin.AddSeconds(timeSeriesCount);
-            }
+                timeseriesCollections = ReadEnergyValuesFromDb(days, dsuids);
 
-            byte[] blob1; string readable1;
-            using (var allEnergySeriesStream = new TimeSeriesStreamCollection<DSUID, int>(
-                dsuids, DSUID.Size, (dsuid, stream) => dsuid.WriteTo(stream), begin, end, timeSeriesCount))
-            {
                 foreach (var dsuid in dsuids)
-                    await _dsClient.ReadEnergyToTimeSeries(dsuid, 1, fetchLastValues, allEnergySeriesStream[dsuid]);
+                    await _dsClient.ReadEnergyToTimeSeries(dsuid, (int)TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues, timeseriesCollections.Select(x => x.Value[dsuid]).ToList());
 
-                readable1 = debug ? allEnergySeriesStream.ToString() : null;
-                blob1 = allEnergySeriesStream.ToCompressedByteArray();
+                SaveEnergyValuesToDb(timeseriesCollections);
             }
-
-            byte[] blob2; string readable2;
-            using (var allEnergySeriesStream = new TimeSeriesStreamCollection<DSUID, int>(
-                blob1, DSUID.Size, stream => DSUID.ReadFrom(stream), begin, end, timeSeriesCount))
+            catch { throw; }
+            finally
             {
-                readable2 = debug ? allEnergySeriesStream.ToString() : null;
-                blob2 = allEnergySeriesStream.ToCompressedByteArray();
+                if (timeseriesCollections != null)
+                    foreach (var collection in timeseriesCollections)
+                        collection.Value.Dispose();
             }
+        }
 
+        private Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> ReadEnergyValuesFromDb(IEnumerable<DateTime> days, List<DSUID> dsuids)
+        {
+            var timeseriesCollections = new Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>>();
 
             _dbContext.Semaphore.WaitOne();
             try
             {
-                // TODO: save the blob
+                foreach (var day in days)
+                {
+                    var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Day == day).FirstOrDefault();
+                    if (dbEnergySeries == null)
+                        timeseriesCollections.Add(day, DigitalstromEnergyHighresData.InitialEnergySeriesEveryMeter(day, dsuids));
+                    else
+                        timeseriesCollections.Add(day, dbEnergySeries.EnergySeriesEveryMeter);
+                }
+                return timeseriesCollections;
+            }
+            catch { throw; }
+            finally
+            {
+                _dbContext.Semaphore.Release();
+            }
+        }
+
+        private void SaveEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> timeseriesCollections)
+        {
+            _dbContext.Semaphore.WaitOne();
+            try
+            {
+                foreach (var collection in timeseriesCollections)
+                {
+                    var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Day == collection.Key).FirstOrDefault();
+                    if (dbEnergySeries == null)
+                        _dbContext.DsEnergyHighresDataSet.Add(dbEnergySeries = new DigitalstromEnergyHighresData() { Day = collection.Key });
+
+                    dbEnergySeries.EnergySeriesEveryMeter = collection.Value;
+                }
+
+                _dbContext.SaveChanges();
             }
             catch { throw; }
             finally

@@ -1,9 +1,8 @@
-﻿using SmarthomeApi.FormatParsers;
+﻿using CompactTimeSeries;
+using SmarthomeApi.FormatParsers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SmarthomeApi.Model;
-using CompactTimeSeries;
 
 namespace SmarthomeApi.Database.Model
 {
@@ -68,98 +67,98 @@ namespace SmarthomeApi.Database.Model
         [NotMapped]
         public TimeSeries<double> BurnerMinutesSeries
         {
-            get => BurnerMinutesCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => BurnerMinutesCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BurnerMinutesCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<int> BurnerStartsSeries
         {
-            get => BurnerStartsCurve.ToTimeseries<int>(Day, Day.AddDays(1), interval5min);
+            get => BurnerStartsCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BurnerStartsCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<int> BurnerModulationSeries
         {
-            get => BurnerModulationCurve.ToTimeseries<int>(Day, Day.AddDays(1), interval5min);
+            get => BurnerModulationCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BurnerModulationCurve = value.ToBase64(); }
         }
         
         [NotMapped]
         public TimeSeries<double> OutsideTempSeries
         {
-            get => OutsideTempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => OutsideTempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { OutsideTempCurve = value.ToBase64(); }
         }
         
         [NotMapped]
         public TimeSeries<double> BoilerTempSeries
         {
-            get => BoilerTempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => BoilerTempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BoilerTempCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> BoilerTempMainSeries
         {
-            get => BoilerTempMainCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => BoilerTempMainCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BoilerTempMainCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> Circuit0TempSeries
         {
-            get => Circuit0TempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => Circuit0TempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { Circuit0TempCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> Circuit1TempSeries
         {
-            get => Circuit1TempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => Circuit1TempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { Circuit1TempCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> DhwTempSeries
         {
-            get => DhwTempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => DhwTempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { DhwTempCurve = value.ToBase64(); }
         }
         
         [NotMapped]
         public TimeSeries<bool> BurnerActiveSeries
         {
-            get => BurnerActiveCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => BurnerActiveCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { BurnerActiveCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> Circuit0PumpSeries
         {
-            get => Circuit0PumpCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => Circuit0PumpCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { Circuit0PumpCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> Circuit1PumpSeries
         {
-            get => Circuit1PumpCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => Circuit1PumpCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { Circuit1PumpCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> DhwPrimaryPumpSeries
         {
-            get => DhwPrimaryPumpCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => DhwPrimaryPumpCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { DhwPrimaryPumpCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> DhwCirculationPumpSeries
         {
-            get => DhwCirculationPumpCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => DhwCirculationPumpCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { DhwCirculationPumpCurve = value.ToBase64(); }
         }
     }

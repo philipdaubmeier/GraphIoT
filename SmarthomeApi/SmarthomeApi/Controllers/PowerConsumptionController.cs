@@ -33,7 +33,7 @@ namespace SmarthomeApi.Controllers
             { frames = new List<object>() {
                     new
                     {
-                        text = $"{powerValues} W",
+                        text = $"{powerValues.LastOrDefault()} W",
                         icon = "a21256"
                     },
                     new

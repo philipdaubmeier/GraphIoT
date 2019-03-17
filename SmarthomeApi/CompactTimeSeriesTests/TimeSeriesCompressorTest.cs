@@ -10,12 +10,13 @@ namespace CompactTimeSeries.Tests
         private const int count = 10;
         private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
+        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
 
         [Fact]
         public void TestIntTimeSeriesCompression()
         {
             var timeseriesCollection = new TimeSeriesStreamCollection<byte, int>(
-                new List<byte>() { 0x01 }, 1, (b, stream) => stream.WriteByte(b), begin, end, count);
+                new List<byte>() { 0x01 }, 1, (b, stream) => stream.WriteByte(b), span);
             var timeseries = timeseriesCollection[0x01];
             timeseries[0] = 1;
             timeseries[3] = 23;

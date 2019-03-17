@@ -30,6 +30,11 @@ namespace CompactTimeSeries
         T? this[int index] { get; set; }
 
         /// <summary>
+        /// Returns the time series span of this time series, i.e. an object holding start, end and time spacing
+        /// </summary>
+        TimeSeriesSpan Span { get; }
+
+        /// <summary>
         /// Returns the begin date and time of this time series
         /// </summary>
         DateTime Begin { get; }

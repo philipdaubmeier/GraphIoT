@@ -1,9 +1,8 @@
-﻿using SmarthomeApi.FormatParsers;
+﻿using CompactTimeSeries;
+using SmarthomeApi.FormatParsers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SmarthomeApi.Model;
-using CompactTimeSeries;
 
 namespace SmarthomeApi.Database.Model
 {
@@ -37,35 +36,35 @@ namespace SmarthomeApi.Database.Model
         [NotMapped]
         public TimeSeries<int> SolarWhSeries
         {
-            get => SolarWhCurve.ToTimeseries<int>(Day, Day.AddDays(1), interval5min);
+            get => SolarWhCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { SolarWhCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> SolarCollectorTempSeries
         {
-            get => SolarCollectorTempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => SolarCollectorTempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { SolarCollectorTempCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<double> SolarHotwaterTempSeries
         {
-            get => SolarHotwaterTempCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min);
+            get => SolarHotwaterTempCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { SolarHotwaterTempCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> SolarPumpStateSeries
         {
-            get => SolarPumpStateCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => SolarPumpStateCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { SolarPumpStateCurve = value.ToBase64(); }
         }
 
         [NotMapped]
         public TimeSeries<bool> SolarSuppressionSeries
         {
-            get => SolarSuppressionCurve.ToTimeseries<bool>(Day, Day.AddDays(1), interval5min);
+            get => SolarSuppressionCurve.ToTimeseries<bool>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min));
             set { SolarSuppressionCurve = value.ToBase64(); }
         }
     }

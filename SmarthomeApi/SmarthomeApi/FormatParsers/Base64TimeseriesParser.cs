@@ -9,9 +9,9 @@ namespace SmarthomeApi.FormatParsers
     {
         private const int defaultDecimalPlaces = 1;
         
-        public static TimeSeries<T> ToTimeseries<T>(this string base64, DateTime begin, DateTime end, int count, int decimalPlaces = defaultDecimalPlaces) where T : struct
+        public static TimeSeries<T> ToTimeseries<T>(this string base64, TimeSeriesSpan span, int decimalPlaces = defaultDecimalPlaces) where T : struct
         {
-            var timeseries = new TimeSeries<T>(begin, end, count);
+            var timeseries = new TimeSeries<T>(span);
             if (string.IsNullOrWhiteSpace(base64))
                 return timeseries;
 
@@ -21,7 +21,7 @@ namespace SmarthomeApi.FormatParsers
                 int i = 0;
                 var boolValues = bytes.SelectMany(d => new byte[] { (byte)((d >> 6) & 0x3),
                     (byte)((d >> 4) & 0x3), (byte)((d >> 2) & 0x3), (byte)(d & 0x3) })
-                    .Select(d => d > 0x01 ? null : (bool?)(d == 0x01)).Take(count).ToList();
+                    .Select(d => d > 0x01 ? null : (bool?)(d == 0x01)).Take(span.Count).ToList();
                 foreach (var b in boolValues)
                 {
                     (timeseries as TimeSeries<bool>)[i++] = b;
@@ -29,7 +29,7 @@ namespace SmarthomeApi.FormatParsers
                 return timeseries;
             }
             
-            for (int i = 0; i < bytes.Length - 1 && i < count * 2; i += 2)
+            for (int i = 0; i < bytes.Length - 1 && i < span.Count * 2; i += 2)
             {
                 var value = (short)(bytes[i] << 8 | bytes[i + 1]);
                 if (typeof(T) == typeof(int))

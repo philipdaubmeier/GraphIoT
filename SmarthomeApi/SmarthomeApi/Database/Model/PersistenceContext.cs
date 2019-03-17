@@ -13,6 +13,8 @@ namespace SmarthomeApi.Database.Model
 
         public DbSet<DigitalstromZoneSensorData> DsSensorDataSet { get; set; }
 
+        public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
+
         public DbSet<Calendar> Calendars { get; set; }
 
         public DbSet<CalendarAppointment> CalendarAppointments { get; set; }

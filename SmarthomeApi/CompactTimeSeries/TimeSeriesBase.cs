@@ -8,23 +8,14 @@ namespace CompactTimeSeries
 {
     public abstract class TimeSeriesBase<T> : ITimeSeries<T> where T : struct
     {
-        protected DateTime _begin;
-        protected DateTime _end;
-        protected int _count;
-        protected TimeSpan _duration;
+        protected TimeSeriesSpan _span;
 
         /// <summary>
         /// TimeSeriesBase constructor for the given number of equally spaced time buckets.
         /// </summary>
-        public TimeSeriesBase(DateTime begin, DateTime end, int count)
+        public TimeSeriesBase(TimeSeriesSpan span)
         {
-            if (begin >= end)
-                throw new ArgumentException("begin after end");
-
-            _begin = begin;
-            _end = end;
-            _count = count;
-            _duration = end.Subtract(begin).Divide(count);
+            _span = span;
         }
 
         /// <summary>
@@ -65,19 +56,24 @@ namespace CompactTimeSeries
         public abstract T? this[int index] { get; set; }
 
         /// <summary>
-        /// See <see cref="ITimeSeries{T}.End"/>
+        /// See <see cref="ITimeSeries{T}.Span"/>
         /// </summary>
-        public DateTime Begin => _begin;
+        public TimeSeriesSpan Span => _span;
 
         /// <summary>
         /// See <see cref="ITimeSeries{T}.End"/>
         /// </summary>
-        public DateTime End => _end;
+        public DateTime Begin => _span.Begin;
+
+        /// <summary>
+        /// See <see cref="ITimeSeries{T}.End"/>
+        /// </summary>
+        public DateTime End => _span.End;
 
         /// <summary>
         /// See <see cref="ITimeSeries{T}.Count"/>
         /// </summary>
-        public int Count => _count;
+        public int Count => _span.Count;
         
         public abstract IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator();
 

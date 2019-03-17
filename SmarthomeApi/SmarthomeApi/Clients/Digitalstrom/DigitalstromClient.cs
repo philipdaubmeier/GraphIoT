@@ -43,13 +43,13 @@ namespace SmarthomeApi.Clients.Digitalstrom
             return await ParseTotalEnergyResponse(await GetDssPathAsync(path));
         }
 
-        public async Task ReadEnergyToTimeSeries(string meterDsuid, int resolution, int count, ITimeSeries<int> timeseries)
+        public async Task ReadEnergyToTimeSeries(string meterDsuid, int resolution, int count, IEnumerable<ITimeSeries<int>> timeseries)
         {
             var path = $"/json/metering/getValues?dsuid={meterDsuid}&type=consumption&resolution={resolution}&valueCount={count}";
             await ParseTotalEnergyResponseIntoTimeSeries(await GetDssPathAsync(path), timeseries);
         }
 
-        public async Task<Dictionary<string, string>> GetMeteringCircuits()
+        public async Task<Dictionary<DSUID, string>> GetMeteringCircuits()
         {
             var path = "/json/property/query?query=/apartment/dSMeters/*(dSUID,name)/capabilities(metering)";
             return await ParseMeteringCircuitsResponse(await GetDssPathAsync(path));
@@ -94,7 +94,7 @@ namespace SmarthomeApi.Clients.Digitalstrom
                 .OrderBy(x => x.Key).ToList();
         }
 
-        private async Task ParseTotalEnergyResponseIntoTimeSeries(HttpResponseMessage response, ITimeSeries<int> timeseries)
+        private async Task ParseTotalEnergyResponseIntoTimeSeries(HttpResponseMessage response, IEnumerable<ITimeSeries<int>> timeseries)
         {
             var definition = new
             {
@@ -113,8 +113,9 @@ namespace SmarthomeApi.Clients.Digitalstrom
             using (var jsonTextReader = new JsonTextReader(sr))
             {
                 var powerValuesRaw = CastToAnonymousType(definition, serializer.Deserialize(jsonTextReader, definition.GetType()));
-                foreach (var value in powerValuesRaw.result.values)
-                    timeseries[UnixEpoch.AddSeconds(value.FirstOrDefault()).ToLocalTime()] = (int)value.LastOrDefault();
+                foreach (var value in powerValuesRaw?.result?.values ?? new List<List<double>>())
+                    foreach (var series in timeseries)
+                        series[UnixEpoch.AddSeconds(value.FirstOrDefault()).ToLocalTime()] = (int)value.LastOrDefault();
             }
         }
 
@@ -147,7 +148,7 @@ namespace SmarthomeApi.Clients.Digitalstrom
                 .ToDictionary(x => x.Key, x => x.Value);
         }
 
-        private async Task<Dictionary<string, string>> ParseMeteringCircuitsResponse(HttpResponseMessage response)
+        private async Task<Dictionary<DSUID, string>> ParseMeteringCircuitsResponse(HttpResponseMessage response)
         {
             var definition = new
             {
@@ -169,7 +170,7 @@ namespace SmarthomeApi.Clients.Digitalstrom
             var circuitValuesRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return circuitValuesRaw.result.dSMeters.Where(x => x.capabilities.FirstOrDefault()?.metering ?? false)
                 .Select(x => new KeyValuePair<string, string>(x.dSUID, x.name))
-                .ToDictionary(x => x.Key, x => x.Value);
+                .ToDictionary(x => new DSUID(x.Key), x => x.Value);
         }
 
         private async Task<Dictionary<Tuple<int, int>, Tuple<DateTime, double>>> ParseSensorValuesResponse(HttpResponseMessage response)

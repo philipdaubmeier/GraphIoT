@@ -28,7 +28,8 @@ namespace CompactTimeSeries
 
             public int StreamSize(int keyCount) => (keyCount * TimeseriesSize) + CollectionCountOffset;
 
-            public int TimeseriesPosition(int index) => CollectionCountOffset + TimeseriesOffset + index * TimeseriesSize;
+            public int KeyPosition(int index) => CollectionCountOffset + index * TimeseriesSize;
+            public int TimeseriesPosition(int index) => TimeseriesOffset + KeyPosition(index);
         }
 
         public BinaryStreamMetrics Metrics { get; private set; }
@@ -39,10 +40,10 @@ namespace CompactTimeSeries
         /// to any TimeSeries will then be in-place on the already allocated buffer with the fixed size of
         /// keys.Count * bucketCount.
         /// </summary>
-        public TimeSeriesStreamCollection(IEnumerable<TKey> keys, int keySize, Action<TKey, Stream> writeKeyAction, DateTime begin, DateTime end, int bucketCount, int decimalPlaces = 1) : base()
+        public TimeSeriesStreamCollection(IEnumerable<TKey> keys, int keySize, Action<TKey, Stream> writeKeyAction, TimeSeriesSpan span, int decimalPlaces = 1) : base()
         {
             var keyList = keys.ToList();
-            Metrics = new BinaryStreamMetrics(keySize, bucketCount, decimalPlaces);
+            Metrics = new BinaryStreamMetrics(keySize, span.Count, decimalPlaces);
 
             _dict = new Dictionary<TKey, ITimeSeries<T>>();
 
@@ -56,7 +57,7 @@ namespace CompactTimeSeries
             {
                 writeKeyAction(keyList[i], _stream);
 
-                var timeseries = new TimeSeriesStream<T>(_stream, Metrics.TimeseriesPosition(i), begin, end, bucketCount, decimalPlaces);
+                var timeseries = new TimeSeriesStream<T>(_stream, Metrics.TimeseriesPosition(i), span, decimalPlaces);
                 foreach (var item in timeseries)
                     timeseries[item.Key] = null;
 
@@ -67,9 +68,9 @@ namespace CompactTimeSeries
         /// <summary>
         /// Restores a TimeSeriesStreamCollection from a compressed byte array.
         /// </summary>
-        public TimeSeriesStreamCollection(byte[] compressedByteArray, int keySize, Func<Stream, TKey> readKeyFunc, DateTime begin, DateTime end, int bucketCount, int decimalPlaces = 1) : base()
+        public TimeSeriesStreamCollection(byte[] compressedByteArray, int keySize, Func<Stream, TKey> readKeyFunc, TimeSeriesSpan span, int decimalPlaces = 1) : base()
         {
-            Metrics = new BinaryStreamMetrics(keySize, bucketCount, decimalPlaces);
+            Metrics = new BinaryStreamMetrics(keySize, span.Count, decimalPlaces);
             _stream = CompressableMemoryStream.FromCompressedByteArray(compressedByteArray);
 
             _dict = new Dictionary<TKey, ITimeSeries<T>>();
@@ -80,8 +81,10 @@ namespace CompactTimeSeries
 
             foreach (var i in Enumerable.Range(0, count))
             {
+                _stream.Seek(Metrics.KeyPosition(i), SeekOrigin.Begin);
                 var key = readKeyFunc(_stream);
-                _dict.Add(key, new TimeSeriesStream<T>(_stream, Metrics.TimeseriesPosition(i), begin, end, bucketCount, decimalPlaces));
+
+                _dict.Add(key, new TimeSeriesStream<T>(_stream, Metrics.TimeseriesPosition(i), span, decimalPlaces));
             }
         }
 

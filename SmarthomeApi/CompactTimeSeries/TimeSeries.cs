@@ -11,11 +11,11 @@ namespace CompactTimeSeries
         /// <summary>
         /// Creates a new TimeSeries object with the given number of equally spaced time buckets.
         /// </summary>
-        public TimeSeries(DateTime begin, DateTime end, int count)
-            : base(begin, end, count)
+        public TimeSeries(TimeSeriesSpan span)
+            : base(span)
         {
-            _list = Enumerable.Range(0, count).Select(t =>
-                new KeyValuePair<DateTime, T?>(begin.Add(_duration * t), default(T?))).ToList();
+            _list = Enumerable.Range(0, _span.Count).Select(t =>
+                new KeyValuePair<DateTime, T?>(span.Begin.Add(_span.Duration * t), default(T?))).ToList();
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace CompactTimeSeries
         private bool TryFindIndex(DateTime time, out DateTime timeBucket, out int index)
         {
             var bucket = _list.SkipWhile(d => d.Key <= time).FirstOrDefault().Key;
-            var foundIndex = time < _begin ? -1
-                : bucket == DateTime.MinValue && time <= _end ? _list.Count
+            var foundIndex = time < _span.Begin ? -1
+                : bucket == DateTime.MinValue && time <= _span.End ? _list.Count
                 : _list.FindIndex(li => li.Key == bucket);
             index = Math.Max(0, foundIndex - 1);
             timeBucket = index < _list.Count ? _list[index].Key : DateTime.MinValue;

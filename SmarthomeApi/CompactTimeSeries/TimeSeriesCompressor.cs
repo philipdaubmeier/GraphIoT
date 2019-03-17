@@ -43,8 +43,7 @@ namespace CompactTimeSeries
                 return null;
 
             var clonedTimeSeries = new TimeSeriesStreamCollection<TKey, T>(_timeseries.Select(x => x.Key),
-                metr.TimeseriesOffset, (k, s) => { s.Position += metr.TimeseriesOffset; }, firstitem.Begin,
-                firstitem.End, firstitem.Count, metr.DecimalPlaces);
+                metr.TimeseriesOffset, (k, s) => { s.Position += metr.TimeseriesOffset; }, firstitem.Span, metr.DecimalPlaces);
 
             foreach (var pos in Enumerable.Range(0, metr.TimeseriesBucketCount)
                 .Select(x => metr.CollectionCountOffset + x * metr.TimeseriesSize))

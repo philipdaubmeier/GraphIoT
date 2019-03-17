@@ -1,9 +1,8 @@
-﻿using SmarthomeApi.FormatParsers;
+﻿using CompactTimeSeries;
+using SmarthomeApi.FormatParsers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SmarthomeApi.Model;
-using CompactTimeSeries;
 
 namespace SmarthomeApi.Database.Model
 {
@@ -32,14 +31,14 @@ namespace SmarthomeApi.Database.Model
         [NotMapped]
         public TimeSeries<double> TemperatureSeries
         {
-            get => TemperatureCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min, decimalPlaces);
+            get => TemperatureCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min), decimalPlaces);
             set { TemperatureCurve = value.ToBase64(decimalPlaces); }
         }
 
         [NotMapped]
         public TimeSeries<double> HumiditySeries
         {
-            get => HumidityCurve.ToTimeseries<double>(Day, Day.AddDays(1), interval5min, decimalPlaces);
+            get => HumidityCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min), decimalPlaces);
             set { HumidityCurve = value.ToBase64(decimalPlaces); }
         }
     }

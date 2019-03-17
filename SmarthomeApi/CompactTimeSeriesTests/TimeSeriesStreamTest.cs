@@ -10,6 +10,7 @@ namespace CompactTimeSeries.Tests
         private const int count = 10;
         private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
+        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
 
         private static readonly DateTime outsideRange = new DateTime(2010, 08, 12, 07, 44, 00, DateTimeKind.Utc);
         private static readonly DateTime insideRangeExactSecond = new DateTime(2019, 01, 09, 13, 28, 00, DateTimeKind.Utc);
@@ -19,7 +20,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamIndexers()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             // test initial values, all should be null whether or not inside or outside the boundaries
             Assert.Null(timeseries[outsideRange]);
@@ -86,7 +87,7 @@ namespace CompactTimeSeries.Tests
         [InlineData(int.MaxValue)]
         public void TestIntTimeSeriesStreamValueRange(int? value)
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[0] = value;
             if (value <= short.MinValue)
@@ -119,7 +120,7 @@ namespace CompactTimeSeries.Tests
         {
             foreach (var decimalPlaces in Enumerable.Range(0, 3))
             {
-                var timeseries = new TimeSeriesStream<double>(begin, end, count, decimalPlaces);
+                var timeseries = new TimeSeriesStream<double>(span, decimalPlaces);
 
                 timeseries[0] = value;
 
@@ -143,7 +144,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamToList()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[insideRangeExactSecond] = 23;
             timeseries[insideRangeOddSecond1] = 42;
@@ -158,7 +159,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamCroppedFrontToList()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[insideRangeExactSecond] = 23;
             timeseries[insideRangeOddSecond1] = 42;
@@ -172,7 +173,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamCroppedBackToList()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[insideRangeExactSecond] = 23;
             timeseries[insideRangeOddSecond1] = 42;
@@ -186,7 +187,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamCroppedBothToList()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[insideRangeExactSecond] = 23;
             timeseries[insideRangeOddSecond1] = 42;
@@ -199,7 +200,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamAccumulate()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries.Accumulate(insideRangeExactSecond, 1);
             Assert.Equal(1, timeseries[insideRangeExactSecond]);
@@ -222,7 +223,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamProperties()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
             
             Assert.Equal(begin, timeseries.Begin);
             Assert.Equal(end, timeseries.End);
@@ -232,7 +233,7 @@ namespace CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamEnumerable()
         {
-            var timeseries = new TimeSeriesStream<int>(begin, end, count);
+            var timeseries = new TimeSeriesStream<int>(span);
 
             timeseries[insideRangeExactSecond] = 23;
             timeseries[insideRangeOddSecond1] = 42;

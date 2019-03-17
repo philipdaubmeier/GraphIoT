@@ -70,5 +70,34 @@ namespace SmarthomeApi.Controllers
                 })
             });
         }
+
+        // GET: api/digitalstrom/energy/curves/days/{day}
+        [HttpGet("energy/curves/days/{day}")]
+        public async Task<ActionResult> GetEnergyCurves([FromRoute] string day)
+        {
+            if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal, out DateTime dayDate))
+                return StatusCode(404);
+
+            DigitalstromEnergyHighresData energyData = null;
+            db.Semaphore.WaitOne();
+            try { energyData = db.DsEnergyHighresDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault(); }
+            catch { throw; }
+            finally { db.Semaphore.Release(); }
+            if (energyData == null)
+                return StatusCode(404);
+
+            var circuitNames = await dsClient.GetMeteringCircuits();
+
+            return Json(new
+            {
+                circuits = energyData.EnergySeriesEveryMeter.Select(circuit => new
+                {
+                    dsuid = circuit.Key.ToString(),
+                    name = circuitNames.ContainsKey(circuit.Key) ? circuitNames[circuit.Key] : null,
+                    energy_curve = circuit.Value.ToList(0)
+                })
+            });
+        }
     }
 }
