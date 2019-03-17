@@ -12,7 +12,7 @@ namespace CompactTimeSeries.Tests
         private static readonly DateTime end = begin.AddMinutes(count);
 
         [Fact]
-        public void TestIntTimeSeriesStreamIndexers()
+        public void TestIntTimeSeriesCompression()
         {
             var timeseriesCollection = new TimeSeriesStreamCollection<byte, int>(
                 new List<byte>() { 0x01 }, 1, (b, stream) => stream.WriteByte(b), begin, end, count);
