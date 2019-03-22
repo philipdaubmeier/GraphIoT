@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CompactTimeSeries;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using SmarthomeApi.Clients.Digitalstrom;
@@ -14,6 +15,8 @@ namespace SmarthomeApi.Controllers
     [Route("api/digitalstrom")]
     public class DigitalstromController : Controller
     {
+        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
         private static DigitalstromClient dsClient;
 
         private readonly PersistenceContext db;
@@ -89,12 +92,15 @@ namespace SmarthomeApi.Controllers
 
             var circuitNames = await dsClient.GetMeteringCircuits();
 
+            Func<ITimeSeries<int>, DateTime> getBegin = ts => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key;
+
             return Json(new
             {
                 circuits = energyData.EnergySeriesEveryMeter.Select(circuit => new
                 {
                     dsuid = circuit.Key.ToString(),
                     name = circuitNames.ContainsKey(circuit.Key) ? circuitNames[circuit.Key] : null,
+                    begin = (int)getBegin(circuit.Value).ToUniversalTime().Subtract(UnixEpoch).TotalSeconds,
                     energy_curve = circuit.Value.ToList(-1)
                 })
             });

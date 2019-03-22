@@ -1,14 +1,17 @@
 ﻿$(document).ready(function () {
-    var lines = [];
-
+    var getChart = function () {
+        return $("#chart").CanvasJSChart();
+    };
+    
     var toggleDataSeries = function (e) {
         if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible)
             e.dataSeries.visible = false;
         else
             e.dataSeries.visible = true;
-        chart.render();
+        getChart().render();
     };
 
+    var lines = [];
     var options = {
         zoomEnabled: true,
         animationEnabled: false,
@@ -31,8 +34,7 @@
         },
         data: lines
     };
-
-    var chart = new CanvasJS.Chart("chart", options);
+    $("#chart").CanvasJSChart(options);
 
     var addLine = function (name, curve) {
         lines.push({
@@ -57,12 +59,12 @@
                 for (var i = 0; i < data.circuits[n].energy_curve.length; i++) {
                     var val = data.circuits[n].energy_curve[i];
                     curve.push({
-                        x: new Date(1553258791 + i * 1000),
+                        x: new Date((data.circuits[n].begin + i) * 1000),
                         y: val < 0 ? null : val
                     });
                 }
                 addLine(data.circuits[n].name, curve);
             }
-            chart.render();
+            getChart().render();
         });
 });
