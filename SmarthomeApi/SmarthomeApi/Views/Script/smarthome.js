@@ -1,5 +1,13 @@
 ﻿$(document).ready(function () {
-    var dataPoints = [];
+    var lines = [];
+
+    var toggleDataSeries = function (e) {
+        if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible)
+            e.dataSeries.visible = false;
+        else
+            e.dataSeries.visible = true;
+        chart.render();
+    };
 
     var options = {
         zoomEnabled: true,
@@ -11,14 +19,32 @@
         axisY: {
             title: "Ws",
             titleFontSize: 12,
-            includeZero: false
+            includeZero: true
         },
-        data: [{
+        toolTip: {
+            shared: true
+        },
+        legend: {
+            cursor: "pointer",
+            fontSize: 8,
+            itemclick: toggleDataSeries
+        },
+        data: lines
+    };
+
+    var chart = new CanvasJS.Chart("chart", options);
+
+    var addLine = function (name, curve) {
+        lines.push({
             type: "line",
+            name: name,
+            showInLegend: true,
             yValueFormatString: "# Ws",
             xValueFormatString: "HH:mm:ss",
-            dataPoints: dataPoints
-        }]
+            connectNullData: true,
+            lineThickness : 1,
+            dataPoints: curve
+        });
     };
 
     $.ajax({
@@ -26,12 +52,17 @@
         method: "GET"
     })
         .done(function (data) {
-            for (var i = 0; i < data.circuits[0].energy_curve.length; i++) {
-                dataPoints.push({
-                    x: new Date(1553258791 + i * 1000),
-                    y: data.circuits[0].energy_curve[i]
-                });
+            for (var n = 0; n < data.circuits.length; n++) {
+                var curve = [];
+                for (var i = 0; i < data.circuits[n].energy_curve.length; i++) {
+                    var val = data.circuits[n].energy_curve[i];
+                    curve.push({
+                        x: new Date(1553258791 + i * 1000),
+                        y: val < 0 ? null : val
+                    });
+                }
+                addLine(data.circuits[n].name, curve);
             }
-            $("#chart").CanvasJSChart(options);
+            chart.render();
         });
 });
