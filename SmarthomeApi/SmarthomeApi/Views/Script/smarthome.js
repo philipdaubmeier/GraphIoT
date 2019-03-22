@@ -51,7 +51,7 @@
         };
 
         $.ajax({
-            url: "/api/digitalstrom/energy/curves/days/2019-03-22",
+            url: "../api/digitalstrom/energy/curves/days/2019-03-22",
             method: "GET"
         })
             .done(function (data) {
@@ -122,7 +122,7 @@
         };
 
         $.ajax({
-            url: "/api/viessmann/solar/curves/days/2019-03-22",
+            url: "../api/viessmann/solar/curves/days/2019-03-22",
             method: "GET"
         })
             .done(function (data) {
