@@ -95,7 +95,7 @@ namespace SmarthomeApi.Controllers
                 {
                     dsuid = circuit.Key.ToString(),
                     name = circuitNames.ContainsKey(circuit.Key) ? circuitNames[circuit.Key] : null,
-                    energy_curve = circuit.Value.ToList(0)
+                    energy_curve = circuit.Value.ToList(-1)
                 })
             });
         }
