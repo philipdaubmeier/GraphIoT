@@ -21,7 +21,7 @@ namespace CompactTimeSeries
         public int Count { get; private set; }
 
         /// <summary>
-        /// Returns the timespan between the begin and end datetimes of this object.
+        /// Returns the timespan of a time bucket of this object.
         /// </summary>
         public TimeSpan Duration { get; private set; }
 

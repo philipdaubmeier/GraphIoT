@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using CompactTimeSeries;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 using SmarthomeApi.Clients.Viessmann;
 using SmarthomeApi.Database.Model;
 
@@ -300,6 +302,55 @@ namespace SmarthomeApi.Controllers
                     pump_state = x.Item5,
                     suppression = x.Item6
                 })
+            });
+        }
+
+        // GET: api/viessmann/solar/curves
+        [HttpGet("solar/curves")]
+        public ActionResult GetSolarCurvesRange([FromQuery] string begin, [FromQuery] string end, [FromQuery] string count)
+        {
+            int min_count = 1;
+            int max_count = 2000;
+
+            if (!long.TryParse(begin, out long beginMillis) || !long.TryParse(end, out long endMillis) || !int.TryParse(end, out int countInt))
+                return StatusCode(404);
+
+            var span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
+                Instant.FromUnixTimeMilliseconds(endMillis).ToDateTimeUtc(), Math.Min(Math.Max(countInt, min_count), max_count));
+            
+            var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+            if (dbSolarSeries == null)
+                return StatusCode(404);
+            
+            var solarWh = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span);
+            var solarCollectorTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
+            var solarHotwaterTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
+            var solarPumpState = new TimeSeriesResampler<TimeSeriesStream<bool>, bool>(span);
+            var solarSuppression = new TimeSeriesResampler<TimeSeriesStream<bool>, bool>(span);
+            var empty = true;
+            foreach (var series in dbSolarSeries)
+            {
+                solarWh.SampleAccumulate(series.SolarWhSeries);
+                solarCollectorTemp.SampleAverage(series.SolarCollectorTempSeries, x => (decimal)x, x => (double)x);
+                solarHotwaterTemp.SampleAverage(series.SolarHotwaterTempSeries, x => (decimal)x, x => (double)x);
+                solarPumpState.SampleAggregate(series.SolarPumpStateSeries, x => x.Any(b => b));
+                solarSuppression.SampleAggregate(series.SolarSuppressionSeries, x => x.Any(b => b));
+                empty = false;
+            }
+
+            if (empty)
+                return StatusCode(404);
+
+            Func<ITimeSeries<int>, DateTime> getBegin = ts => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key.ToUniversalTime();
+            
+            return Json(new
+            {
+                begin = Instant.FromDateTimeUtc(getBegin(solarWh.Resampled)).ToUnixTimeMilliseconds(),
+                wh = solarWh.Resampled.ToList(-1),
+                collector_temp = solarCollectorTemp.Resampled.ToList(-255),
+                dhw_temp = solarHotwaterTemp.Resampled.ToList(-255),
+                pump_state = solarPumpState.Resampled.ToList(false),
+                suppression = solarSuppression.Resampled.ToList(false)
             });
         }
     }

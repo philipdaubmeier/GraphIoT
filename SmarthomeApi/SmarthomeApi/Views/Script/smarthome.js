@@ -1,4 +1,13 @@
 ﻿$(document).ready(function () {
+    var dateFormat = "dd.mm.yy";
+    var getDate = function (element) {
+        try {
+            return $.datepicker.parseDate(dateFormat, element.val());
+        } catch (error) {
+            return null;
+        }
+    }
+
     var energyConsumtionChart = function (chartElement) {
         var getChart = function () {
             return chartElement.CanvasJSChart();
@@ -89,7 +98,7 @@
             animationEnabled: false,
             theme: "light2",
             axisX: {
-                valueFormatString: "HH:mm:ss",
+                valueFormatString: "DD.MM.YY HH:mm:ss",
             },
             axisY: {
                 title: "Wh",
@@ -120,26 +129,53 @@
                 dataPoints: curve
             });
         };
-
-        $.ajax({
-            url: "../api/viessmann/solar/curves/days/2019-03-22",
-            method: "GET"
-        })
+        
+        $("#reload").on("click", function () {
+            $.ajax({
+                url: "../api/viessmann/solar/curves?begin=" + getDate($("#from")).getTime() + "&end=" + getDate($("#to")).getTime(),
+                method: "GET"
+            })
             .done(function (data) {
-                var begin = Date.parse(data.begin);
+                var begin = new Date(data.begin);
                 var curve_wh = [], curve_ct = [], curve_dt = [];
-                for (var i = 0; i < data.solardata.length; i++) {
-                    var time = new Date(begin + i * 5 * 60 * 1000)
-                    curve_wh.push({ x: time, y: data.solardata[i].wh });
-                    curve_ct.push({ x: time, y: data.solardata[i].collector_temp });
-                    curve_dt.push({ x: time, y: data.solardata[i].dhw_temp });
+                for (var i = 0; i < data.wh.length; i++) {
+                    var time = new Date(begin.getTime() + i * 5 * 60 * 1000)
+                    curve_wh.push({ x: time, y: data.wh[i] == -1 ? null : data.wh[i] });
+                    curve_ct.push({ x: time, y: data.collector_temp[i] == -255 ? null : data.collector_temp[i] });
+                    curve_dt.push({ x: time, y: data.dhw_temp[i] == -255 ? null : data.dhw_temp[i] });
                 }
                 addLine("Produktion Wh", curve_wh, "# Wh");
                 addLine("Kollektortemperatur", curve_ct, "#.# °C");
                 addLine("Warmwassertemperatur", curve_dt, "#.# °C");
                 getChart().render();
             });
+        });
     };
 
     solarDhwChart($("#chart"));
+    
+    var from = $("#from")
+        .datepicker({
+            defaultDate: 0,
+            changeMonth: true,
+            numberOfMonths: 1,
+            altField: "#from",
+            altFormat: dateFormat
+        });
+    
+    var to = $("#to")
+        .datepicker({
+            defaultDate: 0,
+            changeMonth: true,
+            numberOfMonths: 1,
+            altField: "#to",
+            altFormat: dateFormat
+        });
+
+    //from.on("change", function () {
+    //    to.datepicker("option", "minDate", getDate(this));
+    //});
+    //to.on("change", function () {
+    //    from.datepicker("option", "maxDate", getDate(this));
+    //});
 });

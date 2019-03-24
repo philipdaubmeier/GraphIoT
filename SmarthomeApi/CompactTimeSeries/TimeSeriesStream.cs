@@ -44,11 +44,16 @@ namespace CompactTimeSeries
         private int _startPosition = 0;
         
         private int _decimalPlaces;
-        
+
         /// <summary>
         /// Creates a new TimeSeriesStream object with the given number of equally spaced time buckets.
         /// </summary>
-        public TimeSeriesStream(TimeSeriesSpan span, int decimalPlaces = 1)
+        public TimeSeriesStream(TimeSeriesSpan span) : this(span, 1) { }
+
+        /// <summary>
+        /// Creates a new TimeSeriesStream object with the given number of equally spaced time buckets.
+        /// </summary>
+        public TimeSeriesStream(TimeSeriesSpan span, int decimalPlaces)
             : this(new MemoryStream(typeof(T) == typeof(bool) ? span.Count / 4 : span.Count * sizeof(short)), 0, span, decimalPlaces)
         {
             _isStreamManaged = true;

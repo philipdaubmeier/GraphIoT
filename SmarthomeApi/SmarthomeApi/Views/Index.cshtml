@@ -10,10 +10,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="~/style/style.css" rel="stylesheet" type="text/css" />
     <script src="~/script/jquery.min.js"></script>
+    <script src="~/script/jquery-ui.min.js"></script>
     <script src="~/script/canvasjs.min.js"></script>
     <script src="~/script/smarthome.js"></script>
 </head>
 <body>
+    <p>
+        <label for="from">Von</label>
+        <input type="text" id="from" name="from">
+        <label for="to">bis</label>
+        <input type="text" id="to" name="to">
+        <button id="reload">Neu laden</button>
+    </p>
     <div id="chart"></div>
 </body>
 </html>
