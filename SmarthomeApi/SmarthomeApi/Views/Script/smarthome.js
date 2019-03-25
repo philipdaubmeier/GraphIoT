@@ -137,9 +137,10 @@
             })
             .done(function (data) {
                 var begin = new Date(data.begin);
+                var spacing = data.spacing_millis;
                 var curve_wh = [], curve_ct = [], curve_dt = [];
                 for (var i = 0; i < data.wh.length; i++) {
-                    var time = new Date(begin.getTime() + i * 5 * 60 * 1000)
+                    var time = new Date(begin.getTime() + i * spacing)
                     curve_wh.push({ x: time, y: data.wh[i] == -1 ? null : data.wh[i] });
                     curve_ct.push({ x: time, y: data.collector_temp[i] == -255 ? null : data.collector_temp[i] });
                     curve_dt.push({ x: time, y: data.dhw_temp[i] == -255 ? null : data.dhw_temp[i] });

@@ -4,17 +4,54 @@ using System.Linq;
 
 namespace CompactTimeSeries
 {
+    public enum SamplingConstraint
+    {
+        SampleAny,
+        NoOversampling
+    }
+
     public class TimeSeriesResampler<Tseries, Tval> where Tval : struct where Tseries : TimeSeriesBase<Tval>
     {
-        public ITimeSeries<Tval> Resampled { get; private set; }
-
-        public TimeSeriesResampler(TimeSeriesSpan span)
+        private ITimeSeries<Tval> resampled = null;
+        public ITimeSeries<Tval> Resampled
         {
-            Resampled = (ITimeSeries<Tval>)Activator.CreateInstance(typeof(Tseries), span);
+            get
+            {
+                CreateDeferred(Span);
+                return resampled;
+            }
+            private set
+            {
+                resampled = value;
+            }
+        }
+
+        public TimeSeriesSpan Span { get; private set; }
+
+        public SamplingConstraint Constraint { get; private set; }
+
+        public TimeSeriesResampler(TimeSeriesSpan span) : this(span, SamplingConstraint.SampleAny) { }
+
+        public TimeSeriesResampler(TimeSeriesSpan span, SamplingConstraint constraint)
+        {
+            Span = span;
+            Constraint = constraint;
+        }
+
+        private void CreateDeferred(TimeSeriesSpan oldSpan)
+        {
+            if (resampled != null)
+                return;
+
+            if (Constraint == SamplingConstraint.NoOversampling && Span.Duration < oldSpan.Duration)
+                Span = new TimeSeriesSpan(Span.Begin, Span.End, oldSpan.Duration);
+
+            resampled = (ITimeSeries<Tval>)Activator.CreateInstance(typeof(Tseries), Span);
         }
 
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
         {
+            CreateDeferred(timeseries.Span);
             foreach (var item in timeseries)
                 if (item.Value.HasValue)
                     Resampled.Accumulate(item.Key, item.Value.Value);
@@ -33,6 +70,8 @@ namespace CompactTimeSeries
 
         public void SampleAggregate(ITimeSeries<Tval> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
         {
+            CreateDeferred(timeseries.Span);
+
             DateTime? lastTimeBucket = null;
             List<Tval> values = new List<Tval>();
             bool breakOuter = false;

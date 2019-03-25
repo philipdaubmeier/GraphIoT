@@ -322,11 +322,11 @@ namespace SmarthomeApi.Controllers
             if (dbSolarSeries == null)
                 return StatusCode(404);
             
-            var solarWh = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span);
-            var solarCollectorTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
-            var solarHotwaterTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
-            var solarPumpState = new TimeSeriesResampler<TimeSeries<bool>, bool>(span);
-            var solarSuppression = new TimeSeriesResampler<TimeSeries<bool>, bool>(span);
+            var solarWh = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
+            var solarCollectorTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
+            var solarHotwaterTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
+            var solarPumpState = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var solarSuppression = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
             var empty = true;
             foreach (var series in dbSolarSeries)
             {
@@ -346,6 +346,7 @@ namespace SmarthomeApi.Controllers
             return Json(new
             {
                 begin = Instant.FromDateTimeUtc(getBegin(solarWh.Resampled)).ToUnixTimeMilliseconds(),
+                spacing_millis = (int)solarWh.Resampled.Span.Duration.TotalMilliseconds,
                 wh = solarWh.Resampled.ToList(-1),
                 collector_temp = solarCollectorTemp.Resampled.ToList(-255),
                 dhw_temp = solarHotwaterTemp.Resampled.ToList(-255),

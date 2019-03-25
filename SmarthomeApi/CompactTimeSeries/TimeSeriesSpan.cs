@@ -55,6 +55,13 @@ namespace CompactTimeSeries
         { }
 
         /// <summary>
+        /// Creates a new TimeSeriesSpan object with the given time period and spacing of time buckets.
+        /// </summary>
+        public TimeSeriesSpan(DateTime begin, DateTime end, TimeSpan spacing)
+            : this(begin, end, (int)((end - begin) / spacing))
+        { }
+
+        /// <summary>
         /// Creates a new TimeSeriesSpan object with the given time period and a number of equally spaced time buckets.
         /// </summary>
         public TimeSeriesSpan(DateTime begin, DateTime end, int count)

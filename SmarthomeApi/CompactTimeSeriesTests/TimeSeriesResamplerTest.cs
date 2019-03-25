@@ -46,6 +46,60 @@ namespace CompactTimeSeries.Tests
 
             Assert.Equal(new List<int>(){ 1, 23, -1, 43, 104 }, resampler.Resampled.ToList(-1));
         }
+        
+        [Fact]
+        public void TestIntTimeSeriesDownsamplingNoOversampling()
+        {
+            var timeseries = new TimeSeriesStream<int>(span);
+
+            timeseries[0] = 1;
+            timeseries[3] = 23;
+            timeseries[7] = 43;
+            timeseries[8] = 5;
+            timeseries[9] = 99;
+
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanDownsampling, SamplingConstraint.NoOversampling);
+            resampler.SampleAccumulate(timeseries);
+
+            // should downsample, because oversampling only happens while upsampling
+            Assert.Equal(new List<int>() { 1, 23, -1, 43, 104 }, resampler.Resampled.ToList(-1));
+        }
+
+        [Fact]
+        public void TestIntTimeSeriesUpsampling()
+        {
+            var timeseries = new TimeSeriesStream<int>(span);
+
+            timeseries[0] = 1;
+            timeseries[3] = 23;
+            timeseries[7] = 43;
+            timeseries[8] = 5;
+            timeseries[9] = 99;
+
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanUpsampling);
+            resampler.SampleAccumulate(timeseries);
+
+            // should upsample, because no oversample constraint was set
+            Assert.Equal(new List<int>() { 1, -1, -1, -1, -1, -1, 23, -1, -1, -1, -1, -1, -1, -1, 43, -1, 5, -1, 99 }, resampler.Resampled.ToList(-1));
+        }
+
+        [Fact]
+        public void TestIntTimeSeriesUpsamplingNoOversampling()
+        {
+            var timeseries = new TimeSeriesStream<int>(span);
+
+            timeseries[0] = 1;
+            timeseries[3] = 23;
+            timeseries[7] = 43;
+            timeseries[8] = 5;
+            timeseries[9] = 99;
+
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanUpsampling, SamplingConstraint.NoOversampling);
+            resampler.SampleAccumulate(timeseries);
+
+            // should NOT upsample, because the oversample constraint was set
+            Assert.Equal(new List<int>() { 1, -1, -1, 23, -1, -1, -1, 43, 5, 99 }, resampler.Resampled.ToList(-1));
+        }
 
         [Fact]
         public void TestIntTimeSeriesUpDownsampling()
@@ -160,6 +214,25 @@ namespace CompactTimeSeries.Tests
             resampler.SampleAggregate(timeseries, x => x.Any(b => b));
 
             Assert.Equal(new List<bool>() { true, false, true, true, false }, resampler.Resampled.ToList(false));
+        }
+
+        [Fact]
+        public void TestIntTimeSeriesMerging()
+        {
+            var timeseries = new List<TimeSeries<int>>();
+            for (int i = 0; i < 5; i++)
+            {
+                var series = new TimeSeries<int>(new TimeSeriesSpan(begin.AddMinutes(count * i), end.AddMinutes(count * i), count));
+                for (int j = 0; j < 10; j++)
+                    series[j] = j * 10 + i;
+                timeseries.Add(series);
+            }
+
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(new TimeSeriesSpan(begin.AddMinutes(15), begin.AddMinutes(25), count));
+            foreach (var series in timeseries)
+                resampler.SampleAggregate(series, x => x.FirstOrDefault());
+
+            Assert.Equal(new List<int>() { 51, 61, 71, 81, 91, 2, 12, 22, 32, 42 }, resampler.Resampled.ToList(-1));
         }
     }
 }
