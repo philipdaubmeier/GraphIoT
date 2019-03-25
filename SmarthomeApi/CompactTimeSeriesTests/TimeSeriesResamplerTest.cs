@@ -139,5 +139,27 @@ namespace CompactTimeSeries.Tests
 
             Assert.Equal(new List<int>() { 7, 10, 36, 12 }, resampler2.Resampled.ToList(-1));
         }
+
+        [Fact]
+        public void TestBoolTimeSeriesResampling()
+        {
+            var timeseries = new TimeSeries<bool>(span);
+
+            timeseries[0] = true;
+            timeseries[1] = true;
+            timeseries[2] = null;
+            timeseries[3] = null;
+            timeseries[4] = true;
+            timeseries[5] = false;
+            timeseries[6] = null;
+            timeseries[7] = true;
+            timeseries[8] = null;
+            timeseries[9] = false;
+
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(spanDownsampling);
+            resampler.SampleAggregate(timeseries, x => x.Any(b => b));
+
+            Assert.Equal(new List<bool>() { true, false, true, true, false }, resampler.Resampled.ToList(false));
+        }
     }
 }
