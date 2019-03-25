@@ -92,6 +92,29 @@ namespace CompactTimeSeries.Tests
         }
 
         [Fact]
+        public void TestDoubleTimeSeriesSampleAverage()
+        {
+            var timeseries = new TimeSeriesStream<double>(span);
+
+            timeseries[0] = 0d;
+            timeseries[1] = 10d;
+            timeseries[2] = 0.0;
+            timeseries[3] = 0.5;
+            timeseries[4] = 0.01;
+            timeseries[5] = 0.02;
+            timeseries[6] = 50.7;
+            timeseries[7] = 60.7;
+            timeseries[8] = 50000;
+            timeseries[9] = 100000;
+
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(spanDownsampling);
+            resampler.SampleAverage(timeseries, x => (decimal)x, x => (double)x);
+
+            // results get cropped to 1 decimal place and to a max of short.MaxValue / 10
+            Assert.Equal(new List<double>() { 5d, 0.2, 0.0, 55.7, 3276.7 }, resampler.Resampled.ToList(-1d));
+        }
+
+        [Fact]
         public void TestIntTimeSeriesOddResampling()
         {
             var timeseries = new TimeSeriesStream<int>(new TimeSeriesSpan(begin, end, 5));
