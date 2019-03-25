@@ -40,6 +40,9 @@ namespace CompactTimeSeries
 
             foreach (var item in timeseries)
             {
+                if (item.Key < Resampled.Span.Begin)
+                    continue;
+
                 var timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
                 while (timebucket > item.Key || (timebucket + Resampled.Span.Duration) <= item.Key)
                 {

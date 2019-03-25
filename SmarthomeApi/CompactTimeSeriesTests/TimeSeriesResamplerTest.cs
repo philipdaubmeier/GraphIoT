@@ -90,5 +90,31 @@ namespace CompactTimeSeries.Tests
 
             Assert.Equal(new List<int>() { 5, 25, 15, 55, 7 }, resampler.Resampled.ToList(-1));
         }
+
+        [Fact]
+        public void TestIntTimeSeriesOddResampling()
+        {
+            var timeseries = new TimeSeriesStream<int>(new TimeSeriesSpan(begin, end, 5));
+
+            timeseries[0] = 7;
+            timeseries[1] = 10;
+            timeseries[2] = 23;
+            timeseries[3] = 50;
+            timeseries[4] = 12;
+
+            // Resample with slightly later start and slightly earlier end
+            var resampler1 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(
+                new TimeSeriesSpan(begin.AddSeconds(5), end.AddSeconds(-5), 5));
+            resampler1.SampleAverage(timeseries, x => x, x => (int)x);
+
+            Assert.Equal(new List<int>() { 10, 23, -1, 50, 12 }, resampler1.Resampled.ToList(-1));
+
+            // Resample with slightly earlier start and slightly later end
+            var resampler2 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(
+                new TimeSeriesSpan(begin.AddSeconds(-5), end.AddSeconds(5), 5));
+            resampler2.SampleAverage(timeseries, x => x, x => (int)x);
+
+            Assert.Equal(new List<int>() { 7, 10, 36, 12 }, resampler2.Resampled.ToList(-1));
+        }
     }
 }
