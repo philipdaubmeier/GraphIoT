@@ -33,26 +33,30 @@ namespace CompactTimeSeries
 
         public void SampleAggregate(ITimeSeries<Tval> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
         {
-            IEnumerator<KeyValuePair<DateTime, Tval?>> enumerator = Resampled.GetEnumerator();
             DateTime? lastTimeBucket = null;
             List<Tval> values = new List<Tval>();
             bool breakOuter = false;
+            int i = 0;
 
             foreach (var item in timeseries)
             {
-                while (enumerator.Current.Key > item.Key || (enumerator.Current.Key + Resampled.Span.Duration) <= item.Key)
+                var timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
+                while (timebucket > item.Key || (timebucket + Resampled.Span.Duration) <= item.Key)
                 {
-                    if (!enumerator.MoveNext())
+                    i++;
+                    if (i >= Resampled.Span.Count)
                     {
                         breakOuter = true;
                         break;
                     }
+                    else
+                        timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
                 }
 
                 if (!lastTimeBucket.HasValue)
-                    lastTimeBucket = enumerator.Current.Key;
+                    lastTimeBucket = timebucket;
 
-                if (breakOuter || lastTimeBucket.Value != enumerator.Current.Key)
+                if (breakOuter || lastTimeBucket.Value != timebucket)
                 {
                     if (values.Count > 0)
                         Resampled[lastTimeBucket.Value] = aggregate(values);
@@ -60,7 +64,7 @@ namespace CompactTimeSeries
                         break;
 
                     values = new List<Tval>();
-                    lastTimeBucket = enumerator.Current.Key;
+                    lastTimeBucket = timebucket;
                 }
 
                 if (item.Value.HasValue)

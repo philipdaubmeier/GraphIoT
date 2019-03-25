@@ -310,9 +310,9 @@ namespace SmarthomeApi.Controllers
         public ActionResult GetSolarCurvesRange([FromQuery] string begin, [FromQuery] string end, [FromQuery] string count)
         {
             int min_count = 1;
-            int max_count = 2000;
+            int max_count = 5000;
 
-            if (!long.TryParse(begin, out long beginMillis) || !long.TryParse(end, out long endMillis) || !int.TryParse(end, out int countInt))
+            if (!long.TryParse(begin, out long beginMillis) || !long.TryParse(end, out long endMillis) || !int.TryParse(count, out int countInt))
                 return StatusCode(404);
 
             var span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
@@ -325,8 +325,8 @@ namespace SmarthomeApi.Controllers
             var solarWh = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span);
             var solarCollectorTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
             var solarHotwaterTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span);
-            var solarPumpState = new TimeSeriesResampler<TimeSeriesStream<bool>, bool>(span);
-            var solarSuppression = new TimeSeriesResampler<TimeSeriesStream<bool>, bool>(span);
+            var solarPumpState = new TimeSeriesResampler<TimeSeries<bool>, bool>(span);
+            var solarSuppression = new TimeSeriesResampler<TimeSeries<bool>, bool>(span);
             var empty = true;
             foreach (var series in dbSolarSeries)
             {

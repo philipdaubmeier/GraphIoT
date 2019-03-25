@@ -132,7 +132,7 @@
         
         $("#reload").on("click", function () {
             $.ajax({
-                url: "../api/viessmann/solar/curves?begin=" + getDate($("#from")).getTime() + "&end=" + getDate($("#to")).getTime(),
+                url: "../api/viessmann/solar/curves?count=800&begin=" + getDate($("#from")).getTime() + "&end=" + getDate($("#to")).getTime(),
                 method: "GET"
             })
             .done(function (data) {
