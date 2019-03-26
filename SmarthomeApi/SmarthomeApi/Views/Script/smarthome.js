@@ -117,6 +117,10 @@
         };
         $("#chart").CanvasJSChart(options);
 
+        var clearLines = function () {
+            lines.splice(0, lines.length);
+        };
+
         var addLine = function (name, curve, format) {
             lines.push({
                 type: "line",
@@ -145,6 +149,7 @@
                     curve_ct.push({ x: time, y: data.collector_temp[i] == -255 ? null : data.collector_temp[i] });
                     curve_dt.push({ x: time, y: data.dhw_temp[i] == -255 ? null : data.dhw_temp[i] });
                 }
+                clearLines();
                 addLine("Produktion Wh", curve_wh, "# Wh");
                 addLine("Kollektortemperatur", curve_ct, "#.# °C");
                 addLine("Warmwassertemperatur", curve_dt, "#.# °C");
