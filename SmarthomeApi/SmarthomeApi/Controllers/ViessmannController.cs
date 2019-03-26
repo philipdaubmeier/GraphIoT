@@ -305,9 +305,9 @@ namespace SmarthomeApi.Controllers
             });
         }
 
-        // GET: api/viessmann/solar/curves
-        [HttpGet("solar/curves")]
-        public ActionResult GetSolarCurvesRange([FromQuery] string begin, [FromQuery] string end, [FromQuery] string count)
+        // GET: api/viessmann/solar/graph
+        [HttpGet("solar/graph")]
+        public ActionResult GetSolarGraph([FromQuery] string begin, [FromQuery] string end, [FromQuery] string count)
         {
             int min_count = 1;
             int max_count = 5000;
@@ -317,11 +317,11 @@ namespace SmarthomeApi.Controllers
 
             var span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
                 Instant.FromUnixTimeMilliseconds(endMillis).ToDateTimeUtc(), Math.Min(Math.Max(countInt, min_count), max_count));
-            
+
             var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
             if (dbSolarSeries == null)
                 return StatusCode(404);
-            
+
             var solarWh = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
             var solarCollectorTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
             var solarHotwaterTemp = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
@@ -330,7 +330,12 @@ namespace SmarthomeApi.Controllers
             var empty = true;
             foreach (var series in dbSolarSeries)
             {
-                solarWh.SampleAccumulate(series.SolarWhSeries);
+                // Hack: remove first 5 elements due to bug in day-boundaries
+                var whseries = series.SolarWhSeries;
+                for (int i = 0; i < 5; i++)
+                    whseries[i] = whseries[i].HasValue ? (int?)0 : null;
+
+                solarWh.SampleAccumulate(whseries);
                 solarCollectorTemp.SampleAverage(series.SolarCollectorTempSeries, x => (decimal)x, x => (double)x);
                 solarHotwaterTemp.SampleAverage(series.SolarHotwaterTempSeries, x => (decimal)x, x => (double)x);
                 solarPumpState.SampleAggregate(series.SolarPumpStateSeries, x => x.Any(b => b));
@@ -342,16 +347,39 @@ namespace SmarthomeApi.Controllers
                 return StatusCode(404);
 
             Func<ITimeSeries<int>, DateTime> getBegin = ts => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key.ToUniversalTime();
-            
+
             return Json(new
             {
                 begin = Instant.FromDateTimeUtc(getBegin(solarWh.Resampled)).ToUnixTimeMilliseconds(),
                 spacing_millis = (int)solarWh.Resampled.Span.Duration.TotalMilliseconds,
-                wh = solarWh.Resampled.ToList(-1),
-                collector_temp = solarCollectorTemp.Resampled.ToList(-255),
-                dhw_temp = solarHotwaterTemp.Resampled.ToList(-255),
-                pump_state = solarPumpState.Resampled.ToList(false),
-                suppression = solarSuppression.Resampled.ToList(false)
+                lines = new[]
+                {
+                    new {
+                        name = "Produktion Wh",
+                        format = "# Wh",
+                        points = solarWh.Resampled.ToList(-1).Select(x => x == -1 ? null : (int?)x).Cast<dynamic>()
+                    },
+                    new {
+                        name = "Kollektortemperatur °C",
+                        format = "#.# °C",
+                        points = solarCollectorTemp.Resampled.ToList(-255).Select(x => x == -255d ? null : (double?)x).Cast<dynamic>()
+                    },
+                    new {
+                        name = "Warmwassertemperatur °C",
+                        format = "#.# °C",
+                        points = solarHotwaterTemp.Resampled.ToList(-255).Select(x => x == -255d ? null : (double?)x).Cast<dynamic>()
+                    },
+                    new {
+                        name = "Solarpumpe",
+                        format = "# (0 = aus, 1 = ein)",
+                        points = solarPumpState.Resampled.ToList(false).Select(x => x ? 1 : 0).Cast<dynamic>()
+                    },
+                    new {
+                        name = "Nachheizunterdrückung",
+                        format = "# (0 = aus, 1 = ein)",
+                        points = solarSuppression.Resampled.ToList(false).Select(x => x ? 1 : 0).Cast<dynamic>()
+                    }
+                }
             });
         }
     }

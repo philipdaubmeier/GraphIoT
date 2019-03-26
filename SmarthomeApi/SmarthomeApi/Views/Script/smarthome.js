@@ -136,23 +136,21 @@
         
         $("#reload").on("click", function () {
             $.ajax({
-                url: "../api/viessmann/solar/curves?count=800&begin=" + getDate($("#from")).getTime() + "&end=" + getDate($("#to")).getTime(),
+                url: "../api/viessmann/solar/graph?count=800&begin=" + getDate($("#from")).getTime() + "&end=" + getDate($("#to")).getTime(),
                 method: "GET"
             })
             .done(function (data) {
+                clearLines();
                 var begin = new Date(data.begin);
                 var spacing = data.spacing_millis;
-                var curve_wh = [], curve_ct = [], curve_dt = [];
-                for (var i = 0; i < data.wh.length; i++) {
-                    var time = new Date(begin.getTime() + i * spacing)
-                    curve_wh.push({ x: time, y: data.wh[i] == -1 ? null : data.wh[i] });
-                    curve_ct.push({ x: time, y: data.collector_temp[i] == -255 ? null : data.collector_temp[i] });
-                    curve_dt.push({ x: time, y: data.dhw_temp[i] == -255 ? null : data.dhw_temp[i] });
+                for (var n = 0; n < data.lines.length; n++) {
+                    var curve = [];
+                    for (var i = 0; i < data.lines[n].points.length; i++) {
+                        var time = new Date(begin.getTime() + i * spacing)
+                        curve.push({ x: time, y: data.lines[n].points[i] });
+                    }
+                    addLine(data.lines[n].name, curve, data.lines[n].format);
                 }
-                clearLines();
-                addLine("Produktion Wh", curve_wh, "# Wh");
-                addLine("Kollektortemperatur", curve_ct, "#.# °C");
-                addLine("Warmwassertemperatur", curve_dt, "#.# °C");
                 getChart().render();
             });
         });
