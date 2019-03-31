@@ -44,7 +44,7 @@ namespace CompactTimeSeries.Tests
             var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanDownsampling);
             resampler.SampleAccumulate(timeseries);
 
-            Assert.Equal(new List<int>(){ 1, 23, -1, 43, 104 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>(){ 1, 23, -1, 43, 104 }, resampler.Resampled.Trimmed(-1));
         }
         
         [Fact]
@@ -62,7 +62,7 @@ namespace CompactTimeSeries.Tests
             resampler.SampleAccumulate(timeseries);
 
             // should downsample, because oversampling only happens while upsampling
-            Assert.Equal(new List<int>() { 1, 23, -1, 43, 104 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 1, 23, -1, 43, 104 }, resampler.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -80,7 +80,7 @@ namespace CompactTimeSeries.Tests
             resampler.SampleAccumulate(timeseries);
 
             // should upsample, because no oversample constraint was set
-            Assert.Equal(new List<int>() { 1, -1, -1, -1, -1, -1, 23, -1, -1, -1, -1, -1, -1, -1, 43, -1, 5, -1, 99 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 1, -1, -1, -1, -1, -1, 23, -1, -1, -1, -1, -1, -1, -1, 43, -1, 5, -1, 99 }, resampler.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace CompactTimeSeries.Tests
             resampler.SampleAccumulate(timeseries);
 
             // should NOT upsample, because the oversample constraint was set
-            Assert.Equal(new List<int>() { 1, -1, -1, 23, -1, -1, -1, 43, 5, 99 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 1, -1, -1, 23, -1, -1, -1, 43, 5, 99 }, resampler.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -120,7 +120,7 @@ namespace CompactTimeSeries.Tests
             var resampler2 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span);
             resampler2.SampleAccumulate(resampler.Resampled);
 
-            Assert.Equal(timeseries.ToList(-1), resampler2.Resampled.ToList(-1));
+            Assert.Equal(timeseries.Trimmed(-1), resampler2.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace CompactTimeSeries.Tests
             var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanDownsampling);
             resampler.SampleAverage(timeseries, x => x, x => (int)x);
 
-            Assert.Equal(new List<int>() { 5, 25, 15, 55, 7 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 5, 25, 15, 55, 7 }, resampler.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace CompactTimeSeries.Tests
             resampler.SampleAverage(timeseries, x => (decimal)x, x => (double)x);
 
             // results get cropped to 1 decimal place and to a max of short.MaxValue / 10
-            Assert.Equal(new List<double>() { 5d, 0.2, 0.0, 55.7, 3276.7 }, resampler.Resampled.ToList(-1d));
+            Assert.Equal(new List<double>() { 5d, 0.2, 0.0, 55.7, 3276.7 }, resampler.Resampled.Trimmed(-1d));
         }
 
         [Fact]
@@ -184,14 +184,14 @@ namespace CompactTimeSeries.Tests
                 new TimeSeriesSpan(begin.AddSeconds(5), end.AddSeconds(-5), 5));
             resampler1.SampleAverage(timeseries, x => x, x => (int)x);
 
-            Assert.Equal(new List<int>() { 10, 23, -1, 50, 12 }, resampler1.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 10, 23, -1, 50, 12 }, resampler1.Resampled.Trimmed(-1));
 
             // Resample with slightly earlier start and slightly later end
             var resampler2 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(
                 new TimeSeriesSpan(begin.AddSeconds(-5), end.AddSeconds(5), 5));
             resampler2.SampleAverage(timeseries, x => x, x => (int)x);
 
-            Assert.Equal(new List<int>() { 7, 10, 36, 12 }, resampler2.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 7, 10, 36, 12 }, resampler2.Resampled.Trimmed(-1));
         }
 
         [Fact]
@@ -213,7 +213,7 @@ namespace CompactTimeSeries.Tests
             var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(spanDownsampling);
             resampler.SampleAggregate(timeseries, x => x.Any(b => b));
 
-            Assert.Equal(new List<bool>() { true, false, true, true, false }, resampler.Resampled.ToList(false));
+            Assert.Equal(new List<bool>() { true, false, true, true, false }, resampler.Resampled.Trimmed(false));
         }
 
         [Fact]
@@ -232,7 +232,7 @@ namespace CompactTimeSeries.Tests
             foreach (var series in timeseries)
                 resampler.SampleAggregate(series, x => x.FirstOrDefault());
 
-            Assert.Equal(new List<int>() { 51, 61, 71, 81, 91, 2, 12, 22, 32, 42 }, resampler.Resampled.ToList(-1));
+            Assert.Equal(new List<int>() { 51, 61, 71, 81, 91, 2, 12, 22, 32, 42 }, resampler.Resampled.Trimmed(-1));
         }
     }
 }

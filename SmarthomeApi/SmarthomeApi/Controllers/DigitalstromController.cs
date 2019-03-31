@@ -68,8 +68,8 @@ namespace SmarthomeApi.Controllers
                 zones = sensorData.Select(zone => new
                 {
                     id = zone.ZoneId,
-                    temperature_curve = zone.TemperatureSeries.ToList(0d),
-                    humidity_curve = zone.HumiditySeries.ToList(0d)
+                    temperature_curve = zone.TemperatureSeries.Trimmed(0d),
+                    humidity_curve = zone.HumiditySeries.Trimmed(0d)
                 })
             });
         }
@@ -101,7 +101,7 @@ namespace SmarthomeApi.Controllers
                     dsuid = circuit.Key.ToString(),
                     name = circuitNames.ContainsKey(circuit.Key) ? circuitNames[circuit.Key] : null,
                     begin = (int)getBegin(circuit.Value).ToUniversalTime().Subtract(UnixEpoch).TotalSeconds,
-                    energy_curve = circuit.Value.ToList(-1)
+                    energy_curve = circuit.Value.Trimmed(-1)
                 })
             });
         }

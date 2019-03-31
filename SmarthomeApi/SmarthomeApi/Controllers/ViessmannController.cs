@@ -213,20 +213,20 @@ namespace SmarthomeApi.Controllers
             {
                 burner_hours_total = dbHeatingSeries.BurnerHoursTotal,
                 burner_starts_total = dbHeatingSeries.BurnerStartsTotal,
-                burner_minutes = dbHeatingSeries.BurnerMinutesSeries.ToList(0d),
-                burner_starts = dbHeatingSeries.BurnerStartsSeries.ToList(0),
-                burner_modulation = dbHeatingSeries.BurnerModulationSeries.ToList(0),
-                outside_temp = dbHeatingSeries.OutsideTempSeries.ToList(0d),
-                boiler_temp = dbHeatingSeries.BoilerTempSeries.ToList(0d),
-                boiler_temp_main = dbHeatingSeries.BoilerTempMainSeries.ToList(0d),
-                circuit_0_temp = dbHeatingSeries.Circuit0TempSeries.ToList(0d),
-                circuit_1_temp = dbHeatingSeries.Circuit1TempSeries.ToList(0d),
-                dhw_temp = dbHeatingSeries.DhwTempSeries.ToList(0d),
-                burner_active = dbHeatingSeries.BurnerActiveSeries.ToList(false),
-                circuit_0_pump = dbHeatingSeries.Circuit0PumpSeries.ToList(false),
-                circuit_1_pump = dbHeatingSeries.Circuit1PumpSeries.ToList(false),
-                dhw_prim_pump = dbHeatingSeries.DhwPrimaryPumpSeries.ToList(false),
-                dhw_circ_pump = dbHeatingSeries.DhwCirculationPumpSeries.ToList(false),
+                burner_minutes = dbHeatingSeries.BurnerMinutesSeries.Trimmed(0d),
+                burner_starts = dbHeatingSeries.BurnerStartsSeries.Trimmed(0),
+                burner_modulation = dbHeatingSeries.BurnerModulationSeries.Trimmed(0),
+                outside_temp = dbHeatingSeries.OutsideTempSeries.Trimmed(0d),
+                boiler_temp = dbHeatingSeries.BoilerTempSeries.Trimmed(0d),
+                boiler_temp_main = dbHeatingSeries.BoilerTempMainSeries.Trimmed(0d),
+                circuit_0_temp = dbHeatingSeries.Circuit0TempSeries.Trimmed(0d),
+                circuit_1_temp = dbHeatingSeries.Circuit1TempSeries.Trimmed(0d),
+                dhw_temp = dbHeatingSeries.DhwTempSeries.Trimmed(0d),
+                burner_active = dbHeatingSeries.BurnerActiveSeries.Trimmed(false),
+                circuit_0_pump = dbHeatingSeries.Circuit0PumpSeries.Trimmed(false),
+                circuit_1_pump = dbHeatingSeries.Circuit1PumpSeries.Trimmed(false),
+                dhw_prim_pump = dbHeatingSeries.DhwPrimaryPumpSeries.Trimmed(false),
+                dhw_circ_pump = dbHeatingSeries.DhwCirculationPumpSeries.Trimmed(false),
             });
         }
 
@@ -239,7 +239,7 @@ namespace SmarthomeApi.Controllers
                 return StatusCode(404);
 
             var totalYieldToday = (double)dbSolarSeries.SolarWhTotal / 1000d;
-            var chartSolarYield = dbSolarSeries.SolarWhSeries.ToList(0).TakeLast(37);
+            var chartSolarYield = dbSolarSeries.SolarWhSeries.Trimmed(0).TakeLast(37);
             var currentCollectorTemp = dbSolarSeries.SolarCollectorTempSeries.Reverse()
                 .SkipWhile(x => !x.Value.HasValue).FirstOrDefault().Value;
 
@@ -357,27 +357,27 @@ namespace SmarthomeApi.Controllers
                     new {
                         name = "Produktion Wh",
                         format = "# Wh",
-                        points = solarWh.Resampled.ToList(-1).Select(x => x == -1 ? null : (int?)x).Cast<dynamic>()
+                        points = solarWh.Resampled.Trimmed().Cast<dynamic>()
                     },
                     new {
                         name = "Kollektortemperatur °C",
                         format = "#.# °C",
-                        points = solarCollectorTemp.Resampled.ToList(-255).Select(x => x == -255d ? null : (double?)x).Cast<dynamic>()
+                        points = solarCollectorTemp.Resampled.Trimmed().Cast<dynamic>()
                     },
                     new {
                         name = "Warmwassertemperatur °C",
                         format = "#.# °C",
-                        points = solarHotwaterTemp.Resampled.ToList(-255).Select(x => x == -255d ? null : (double?)x).Cast<dynamic>()
+                        points = solarHotwaterTemp.Resampled.Trimmed().Cast<dynamic>()
                     },
                     new {
                         name = "Solarpumpe",
                         format = "# (0 = aus, 1 = ein)",
-                        points = solarPumpState.Resampled.ToList(false).Select(x => x ? 1 : 0).Cast<dynamic>()
+                        points = solarPumpState.Resampled.Trimmed().Cast<dynamic>()
                     },
                     new {
                         name = "Nachheizunterdrückung",
                         format = "# (0 = aus, 1 = ein)",
-                        points = solarSuppression.Resampled.ToList(false).Select(x => x ? 1 : 0).Cast<dynamic>()
+                        points = solarSuppression.Resampled.Trimmed().Cast<dynamic>()
                     }
                 }
             });

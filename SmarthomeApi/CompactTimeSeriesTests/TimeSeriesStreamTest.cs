@@ -153,7 +153,7 @@ namespace CompactTimeSeries.Tests
             timeseries[end] = 99;
             
             var expected = new List<int>() { 1, 77, 77, 42, 77, 23, 77, 43, 77, 99 };
-            Assert.Equal(expected, timeseries.ToList(77));
+            Assert.Equal(expected, timeseries.Trimmed(77));
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace CompactTimeSeries.Tests
             timeseries[end] = 99;
 
             var expected = new List<int>() { 42, 77, 23, 77, 43, 77, 99 };
-            Assert.Equal(expected, timeseries.ToList(77));
+            Assert.Equal(expected, timeseries.Trimmed(77));
         }
 
         [Fact]
@@ -181,7 +181,7 @@ namespace CompactTimeSeries.Tests
             timeseries[begin] = 1;
 
             var expected = new List<int>() { 1, 77, 77, 42, 77, 23, 77, 43 };
-            Assert.Equal(expected, timeseries.ToList(77));
+            Assert.Equal(expected, timeseries.Trimmed(77));
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace CompactTimeSeries.Tests
             timeseries[insideRangeOddSecond2] = 43;
 
             var expected = new List<int>() { 42, 77, 23, 77, 43 };
-            Assert.Equal(expected, timeseries.ToList(77));
+            Assert.Equal(expected, timeseries.Trimmed(77));
         }
 
         [Fact]

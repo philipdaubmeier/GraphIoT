@@ -19,13 +19,21 @@ namespace CompactTimeSeries
         }
 
         /// <summary>
-        /// See <see cref="ITimeSeries{T}.ToList(T)"/>
+        /// See <see cref="ITimeSeries{T}.Trimmed()"/>
         /// </summary>
-        public List<T> ToList(T defaultValue)
+        public List<T?> Trimmed()
         {
             return this.SkipWhile(x => !x.Value.HasValue)
                 .Reverse().SkipWhile(x => !x.Value.HasValue).Reverse()
-                .Select(x => x.Value ?? defaultValue).ToList();
+                .Select(x => x.Value).ToList();
+        }
+
+        /// <summary>
+        /// See <see cref="ITimeSeries{T}.Trimmed(T)"/>
+        /// </summary>
+        public List<T> Trimmed(T defaultValue)
+        {
+            return Trimmed().Select(x => x ?? defaultValue).ToList();
         }
 
         /// <summary>

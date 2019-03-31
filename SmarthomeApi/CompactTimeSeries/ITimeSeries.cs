@@ -7,11 +7,17 @@ namespace CompactTimeSeries
     {
         /// <summary>
         /// Extracts the maximum filled list, i.e. removes all items with
+        /// null value from both the front and back of the enumeration.
+        /// </summary>
+        List<T?> Trimmed();
+
+        /// <summary>
+        /// Extracts the maximum filled list, i.e. removes all items with
         /// null value from both the front and back of the enumeration of
         /// this time series. If any null values should be present between
         /// values, it will be set to the given defaultValue.
         /// </summary>
-        List<T> ToList(T defaultValue);
+        List<T> Trimmed(T defaultValue);
 
         /// <summary>
         /// Sets the given value in the matching time bucket or sums the
