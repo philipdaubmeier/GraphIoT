@@ -48,6 +48,24 @@ namespace CompactTimeSeries
 
             resampled = (ITimeSeries<Tval>)Activator.CreateInstance(typeof(Tseries), Span);
         }
+        
+        public void SampleAccumulate(IEnumerable<ITimeSeries<Tval>> timeseries)
+        {
+            foreach (var series in timeseries)
+                SampleAccumulate(series);
+        }
+
+        public void SampleAverage(IEnumerable<ITimeSeries<Tval>> timeseries, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast)
+        {
+            foreach (var series in timeseries)
+                SampleAverage(series, selector, resultCast);
+        }
+
+        public void SampleAggregate(IEnumerable<ITimeSeries<Tval>> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
+        {
+            foreach (var series in timeseries)
+                SampleAggregate(series, aggregate);
+        }
 
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
         {
@@ -55,12 +73,6 @@ namespace CompactTimeSeries
             foreach (var item in timeseries)
                 if (item.Value.HasValue)
                     Resampled.Accumulate(item.Key, item.Value.Value);
-        }
-
-        public void SampleAccumulate(IEnumerable<ITimeSeries<Tval>> timeseries)
-        {
-            foreach (var series in timeseries)
-                SampleAccumulate(series);
         }
 
         public void SampleAverage(ITimeSeries<Tval> timeseries, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast)
