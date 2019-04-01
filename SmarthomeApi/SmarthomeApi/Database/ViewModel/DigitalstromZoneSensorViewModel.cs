@@ -20,7 +20,7 @@ namespace SmarthomeApi.Database.ViewModel
             this.span = span;
             data = db.DsSensorDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
 
-            zoneNames = db.DsZones.ToDictionary(x => x.Id, x => x.Name.ToString());
+            zoneNames = db.DsZones.Where(x => x.Name != 0).ToDictionary(x => x.Id, x => x.Name.ToString());
         }
 
         public bool IsEmpty => (TemperatureGraphs?.Count() ?? 0) <= 0 || !TemperatureGraphs.First().Value.Points.Any();
@@ -80,8 +80,8 @@ namespace SmarthomeApi.Database.ViewModel
             foreach (var series in data.ToList().GroupBy(x => x.ZoneId))
             {
                 var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-                resampler.SampleAverage(series.Select(x => x.TemperatureSeries), x => (decimal)x, x => (double)x);
-                _humidityGraphs.Add(series.Key, new GraphViewModel<double>(resampler.Resampled, $"Luftfeuchtigkeit {zoneNames.GetValueOrDefault(series.Key, "Zone " + series.Key)}", "#.# °C"));
+                resampler.SampleAverage(series.Select(x => x.HumiditySeries), x => (decimal)x, x => (double)x);
+                _humidityGraphs.Add(series.Key, new GraphViewModel<double>(resampler.Resampled, $"Luftfeuchtigkeit {zoneNames.GetValueOrDefault(series.Key, "Zone " + series.Key)}", "#.0 '%'"));
             }
         }
     }
