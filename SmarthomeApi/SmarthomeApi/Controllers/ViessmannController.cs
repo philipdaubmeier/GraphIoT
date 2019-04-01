@@ -1,16 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using SmarthomeApi.Clients.Viessmann;
+using SmarthomeApi.Database.Model;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using CompactTimeSeries;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NodaTime;
-using SmarthomeApi.Clients.Viessmann;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Database.ViewModel;
-using SmarthomeApi.FormatParsers;
 
 namespace SmarthomeApi.Controllers
 {
@@ -303,30 +298,6 @@ namespace SmarthomeApi.Controllers
                     dhw_temp = x.Item4,
                     pump_state = x.Item5,
                     suppression = x.Item6
-                })
-            });
-        }
-
-        // GET: api/viessmann/solar/graph
-        [HttpGet("solar/graph")]
-        public ActionResult GetSolarGraph([FromQuery] string begin, [FromQuery] string end, [FromQuery] string count)
-        {
-            if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
-                return StatusCode(404);
-
-            var graphs = new ViessmannSolarViewModel(db, span);
-            if (graphs.IsEmpty)
-                return StatusCode(404);
-
-            return Json(new
-            {
-                begin = graphs.SolarWh.BeginUnixTimestamp,
-                spacing_millis = graphs.SolarWh.SpacingMillis,
-                lines = graphs.AllGraphs().Select(g => new
-                {
-                    name = g.Name,
-                    format = g.Format,
-                    points = g.Points
                 })
             });
         }
