@@ -6,6 +6,15 @@ using System.Linq;
 
 namespace SmarthomeApi.Database.ViewModel
 {
+    public interface IGraphCollectionViewModel
+    {
+        int GraphCount();
+
+        GraphViewModel Graph(int index);
+
+        IEnumerable<GraphViewModel> Graphs();
+    }
+
     public class GraphViewModel
     {
         public DateTime Begin { get; set; }
@@ -25,6 +34,16 @@ namespace SmarthomeApi.Database.ViewModel
             Name = string.Empty;
             Format = string.Empty;
             Points = new List<dynamic>();
+        }
+
+        public IEnumerable<dynamic[]> TimestampedPoints()
+        {
+            var timestamp = BeginUnixTimestamp;
+            foreach (var point in Points)
+            {
+                yield return new dynamic[] { point, timestamp };
+                timestamp += SpacingMillis;
+            }
         }
     }
 

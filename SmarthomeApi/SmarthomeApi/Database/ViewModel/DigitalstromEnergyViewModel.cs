@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace SmarthomeApi.Database.ViewModel
 {
-    public class DigitalstromEnergyViewModel
+    public class DigitalstromEnergyViewModel : IGraphCollectionViewModel
     {
         private readonly PersistenceContext db;
         private readonly IQueryable<DigitalstromEnergyHighresData> data;
@@ -27,7 +27,17 @@ namespace SmarthomeApi.Database.ViewModel
 
         public bool IsEmpty => (EnergyGraphs?.Count() ?? 0) <= 0 || !EnergyGraphs.First().Value.Points.Any();
 
-        public IEnumerable<GraphViewModel> AllGraphs()
+        public int GraphCount()
+        {
+            return EnergyGraphs.Count;
+        }
+
+        public GraphViewModel Graph(int index)
+        {
+            return Graphs().Skip(index).FirstOrDefault() ?? new GraphViewModel();
+        }
+
+        public IEnumerable<GraphViewModel> Graphs()
         {
             foreach (var graph in EnergyGraphs)
                 yield return graph.Value;

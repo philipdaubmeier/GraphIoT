@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SmarthomeApi.Database.ViewModel
 {
-    public class ViessmannHeatingViewModel
+    public class ViessmannHeatingViewModel : IGraphCollectionViewModel
     {
         private readonly PersistenceContext db;
         private readonly IQueryable<ViessmannHeatingData> data;
@@ -21,22 +21,33 @@ namespace SmarthomeApi.Database.ViewModel
 
         public bool IsEmpty => !BurnerMinutes.Points.Any();
 
-        public IEnumerable<GraphViewModel> AllGraphs()
+        public int GraphCount() => 14;
+
+        public GraphViewModel Graph(int index)
         {
-            yield return BurnerMinutes;
-            yield return BurnerStarts;
-            yield return BurnerModulation;
-            yield return OutsideTemp;
-            yield return BoilerTemp;
-            yield return BoilerTempMain;
-            yield return Circuit0Temp;
-            yield return Circuit1Temp;
-            yield return DhwTemp;
-            yield return BurnerActive;
-            yield return Circuit0Pump;
-            yield return Circuit1Pump;
-            yield return DhwPrimaryPump;
-            yield return DhwCirculationPump;
+            switch(index)
+            {
+                case 0: return BurnerMinutes;
+                case 1: return BurnerStarts;
+                case 2: return BurnerModulation;
+                case 3: return OutsideTemp;
+                case 4: return BoilerTemp;
+                case 5: return BoilerTempMain;
+                case 6: return Circuit0Temp;
+                case 7: return Circuit1Temp;
+                case 8: return DhwTemp;
+                case 9: return BurnerActive;
+                case 10: return Circuit0Pump;
+                case 11: return Circuit1Pump;
+                case 12: return DhwPrimaryPump;
+                case 13: return DhwCirculationPump;
+                default: return new GraphViewModel();
+            }
+        }
+
+        public IEnumerable<GraphViewModel> Graphs()
+        {
+            return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
 
         private GraphViewModel _burnerMinutes = null;

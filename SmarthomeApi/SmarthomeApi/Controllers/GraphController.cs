@@ -44,7 +44,7 @@ namespace SmarthomeApi.Controllers
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
-            return GetGraphs(graphs.AllGraphs());
+            return GetGraphs(graphs.Graphs());
         }
 
         // GET: api/graph/heating
@@ -58,7 +58,7 @@ namespace SmarthomeApi.Controllers
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
-            return GetGraphs(graphs.AllGraphs());
+            return GetGraphs(graphs.Graphs());
         }
 
         // GET: api/graph/sensors
@@ -72,7 +72,7 @@ namespace SmarthomeApi.Controllers
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
-            return GetGraphs(graphs.AllGraphs());
+            return GetGraphs(graphs.Graphs());
         }
 
         // GET: api/graph/energy
@@ -86,7 +86,7 @@ namespace SmarthomeApi.Controllers
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
-            return GetGraphs(graphs.AllGraphs());
+            return GetGraphs(graphs.Graphs());
         }
     }
 }

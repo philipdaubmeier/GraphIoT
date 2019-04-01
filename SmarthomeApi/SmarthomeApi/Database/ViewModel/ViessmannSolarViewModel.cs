@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SmarthomeApi.Database.ViewModel
 {
-    public class ViessmannSolarViewModel
+    public class ViessmannSolarViewModel : IGraphCollectionViewModel
     {
         private readonly PersistenceContext db;
         private readonly IQueryable<ViessmannSolarData> data;
@@ -21,13 +21,24 @@ namespace SmarthomeApi.Database.ViewModel
 
         public bool IsEmpty => !SolarWh.Points.Any();
 
-        public IEnumerable<GraphViewModel> AllGraphs()
+        public int GraphCount() => 5;
+
+        public GraphViewModel Graph(int index)
         {
-            yield return SolarWh;
-            yield return SolarCollectorTemp;
-            yield return SolarHotwaterTemp;
-            yield return SolarPumpState;
-            yield return SolarSuppression;
+            switch (index)
+            {
+                case 0: return SolarWh;
+                case 1: return SolarCollectorTemp;
+                case 2: return SolarHotwaterTemp;
+                case 3: return SolarPumpState;
+                case 4: return SolarSuppression;
+                default: return new GraphViewModel();
+            }
+        }
+
+        public IEnumerable<GraphViewModel> Graphs()
+        {
+            return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
 
         private GraphViewModel _solarWh = null;
