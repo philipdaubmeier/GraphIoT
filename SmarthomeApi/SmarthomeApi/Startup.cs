@@ -1,16 +1,20 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using ProxyKit;
 using SmarthomeApi.Database.Model;
 using SmarthomeApi.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SmarthomeApi
 {
@@ -39,9 +43,12 @@ namespace SmarthomeApi
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
             });
+            
+            services.AddProxy();
 
             services.AddHostedService<DigitalstromTimedHostedService>();
             services.AddHostedService<ViessmannTimedHostedService>();
+            services.AddHostedService<GrafanaBackendProcessService>();
 
             return services.BuildServiceProvider();
         }
@@ -55,6 +62,13 @@ namespace SmarthomeApi
             }
 
             app.UseMvc();
+
+            // reverse proxy for grafana
+            var grafanaRegex = @"^(/smarthome)?/grafana($|/.*)";
+            Func<string, string> rewriteFunc = (s) => new PathString(Regex.Matches(s, grafanaRegex).FirstOrDefault()?.Groups.Skip(2).FirstOrDefault()?.Value ?? string.Empty);
+            app.UseWhen(context => Regex.IsMatch(context.Request.Path, grafanaRegex), appInner => appInner
+                .UseRewriter(new RewriteOptions().Add(context => context.HttpContext.Request.Path = rewriteFunc(context.HttpContext.Request.Path)))
+                .RunProxy(context => context.ForwardTo("http://localhost:8088").Send()));
 
             app.UseStaticFiles(new StaticFileOptions()
             {
