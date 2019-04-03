@@ -31,10 +31,14 @@
     <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.cs" />
     <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.Designer.cs" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Include="Views\Script\*" CopyToPublishDirectory="PreserveNewest" />
     <Content Include="Views\Style\*" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Grafana\**\*" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>
