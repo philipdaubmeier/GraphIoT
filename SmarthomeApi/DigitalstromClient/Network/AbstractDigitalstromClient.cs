@@ -44,7 +44,7 @@ namespace DigitalstromClient.Network
         protected string log;
         private DigitalstromCertificate _dssCert;
         private IDigitalstromAuth _authData;
-        private HttpClientHandler _httpFilter;
+        private HttpClientHandler _clientHandler;
         private HttpClient _client;
         private Task _initializeTask;
 
@@ -66,7 +66,8 @@ namespace DigitalstromClient.Network
 
             _dssCert = new DigitalstromCertificate();
 
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) =>
+            _clientHandler = new HttpClientHandler();
+            _clientHandler.ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
             {
                 if (sslPolicyErrors == SslPolicyErrors.None)
                     return true; // certificate is valid anyways
@@ -81,9 +82,7 @@ namespace DigitalstromClient.Network
                 return true;
             };
 
-            //_httpFilter = new HttpClientHandler();
-            //TODO: remove if caching isnt an issue _httpFilter.CacheControl.ReadBehavior = HttpCacheReadBehavior.NoCache;
-            _client = new HttpClient();
+            _client = new HttpClient(_clientHandler);
 
             _initializeTask = Initialize();
         }
