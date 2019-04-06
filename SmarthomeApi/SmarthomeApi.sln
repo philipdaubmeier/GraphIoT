@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CompactTimeSeries", "Compac
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalstromClient", "DigitalstromClient\DigitalstromClient.csproj", "{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalstromClientTests", "DigitalstromClientTests\DigitalstromClientTests.csproj", "{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -41,7 +47,7 @@ Global
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -57,5 +63,8 @@ Global
 		SccProjectUniqueName4 = DigitalstromClient\\DigitalstromClient.csproj
 		SccProjectName4 = DigitalstromClient
 		SccLocalPath4 = DigitalstromClient
+		SccProjectUniqueName5 = DigitalstromClientTests\\DigitalstromClientTests.csproj
+		SccProjectName5 = DigitalstromClientTests
+		SccLocalPath5 = DigitalstromClientTests
 	EndGlobalSection
 EndGlobal
