@@ -18,11 +18,11 @@ namespace DigitalstromClient.Network
         /// app and user credentials given via the authentication data object. If
         /// a valid application token is given in the auth data, it is used directly.
         /// </summary>
-        /// <param name="baseUri">The uri of the Digitalstrom DSS RESTful webservice</param>
-        /// <param name="authData">The authentication information needed to use for
-        /// the webservice or to perform a new or renewed authentication</param>
-        public DigitalstromWebserviceClient(Uri baseUri, IDigitalstromAuth authData)
-            : base(new List<Uri>() { baseUri }, authData) { }
+        /// <param name="connectionProvider">All necessary connection infos like uris and
+        /// authentication data needed to use for the webservice or to perform a new or
+        /// renewed authentication</param>
+        public DigitalstromWebserviceClient(IDigitalstromConnectionProvider connectionProvider)
+            : base(connectionProvider) { }
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at one of the given uris with
@@ -36,7 +36,7 @@ namespace DigitalstromClient.Network
         /// <param name="authData">The authentication information needed to use for
         /// the webservice or to perform a new or renewed authentication</param>
         public DigitalstromWebserviceClient(Uri localBaseUri, Uri internetBaseUri, IDigitalstromAuth authData)
-            : base(new List<Uri>() { localBaseUri, internetBaseUri }, authData) { }
+            : base(new DigitalstromConnectionProvider(new List<Uri>() { localBaseUri, internetBaseUri }, authData)) { }
 
         /// <summary>
         /// Returns a list of sensor relevant for the apartment.
@@ -51,7 +51,7 @@ namespace DigitalstromClient.Network
         /// </summary>
         public async Task<SensorValuesResponse> GetSensorValues()
         {
-            return await Load<SensorValuesResponse>(new Uri(await GetBaseUri(), "/json/apartment/getSensorValues"));
+            return await Load<SensorValuesResponse>(new Uri("/json/apartment/getSensorValues", UriKind.Relative));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace DigitalstromClient.Network
         /// </summary>
         public async Task<StructureResponse> GetStructure()
         {
-            return await Load<StructureResponse>(new Uri(await GetBaseUri(), "/json/apartment/getStructure"));
+            return await Load<StructureResponse>(new Uri("/json/apartment/getStructure", UriKind.Relative));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace DigitalstromClient.Network
         /// <returns>List of zones with their status values each</returns>
         public async Task<TemperatureControlStatusResponse> GetTemperatureControlStatus()
         {
-            return await Load<TemperatureControlStatusResponse>(new Uri(await GetBaseUri(), "/json/apartment/getTemperatureControlStatus"));
+            return await Load<TemperatureControlStatusResponse>(new Uri("/json/apartment/getTemperatureControlStatus", UriKind.Relative));
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace DigitalstromClient.Network
         /// <returns>List of zones with their control values each</returns>
         public async Task<TemperatureControlValuesResponse> GetTemperatureControlValues()
         {
-            return await Load<TemperatureControlValuesResponse>(new Uri(await GetBaseUri(), "/json/apartment/getTemperatureControlValues"));
+            return await Load<TemperatureControlValuesResponse>(new Uri("/json/apartment/getTemperatureControlValues", UriKind.Relative));
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace DigitalstromClient.Network
         /// <returns>List of zones with their config values each</returns>
         public async Task<TemperatureControlConfigResponse> GetTemperatureControlConfig()
         {
-            return await Load<TemperatureControlConfigResponse>(new Uri(await GetBaseUri(), "/json/apartment/getTemperatureControlConfig"));
+            return await Load<TemperatureControlConfigResponse>(new Uri("/json/apartment/getTemperatureControlConfig", UriKind.Relative));
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace DigitalstromClient.Network
         /// <param name="notUsed">NotUsed Preset value for operation mode 3: "Not Used"</param>
         public async Task SetTemperatureControlValues(int id, int? comfort = null, int? economy = null, int? night = null, int? holiday = null, int? cooling = null, int? coolingOff = null, int? off = null, int? notUsed = null)
         {
-            await Load(new Uri(await GetBaseUri(), "/json/zone/setTemperatureControlValues")
+            await Load(new Uri("/json/zone/setTemperatureControlValues", UriKind.Relative)
                 .AddQuery("id", id).AddQuery("Off", off).AddQuery("Comfort", comfort).AddQuery("Economy", economy)
                 .AddQuery("NotUsed", notUsed).AddQuery("Night", night).AddQuery("Holiday", holiday)
                 .AddQuery("Cooling", cooling).AddQuery("CoolingOff", coolingOff));
@@ -127,7 +127,7 @@ namespace DigitalstromClient.Network
         /// <param name="force">Boolean value, if set a forced scene call is issued. Optional</param>
         public async Task CallScene(int id, int groupID, int sceneNumber, bool? force = null)
         {
-            await Load(new Uri(await GetBaseUri(), "/json/zone/callScene")
+            await Load(new Uri("/json/zone/callScene", UriKind.Relative)
                 .AddQuery("id", id).AddQuery("groupID", groupID)
                 .AddQuery("sceneNumber", sceneNumber).AddQuery("force", force));
         }
@@ -139,7 +139,7 @@ namespace DigitalstromClient.Network
         /// <param name="groupID">Number of the target group</param>
         public async Task<ReachableScenesResponse> GetReachableScenes(int id, int groupID)
         {
-            return await Load<ReachableScenesResponse>(new Uri(await GetBaseUri(), "/json/zone/getReachableScenes")
+            return await Load<ReachableScenesResponse>(new Uri("/json/zone/getReachableScenes", UriKind.Relative)
                 .AddQuery("id", id).AddQuery("groupID", groupID));
         }
 
@@ -150,7 +150,7 @@ namespace DigitalstromClient.Network
         /// <param name="groupID">Number of the target group</param>
         public async Task<LastCalledScenesResponse> GetLastCalledScene(int id, int? groupID = null)
         {
-            return await Load<LastCalledScenesResponse>(new Uri(await GetBaseUri(), "/json/zone/getLastCalledScene")
+            return await Load<LastCalledScenesResponse>(new Uri("/json/zone/getLastCalledScene", UriKind.Relative)
                 .AddQuery("id", id).AddQuery("groupID", groupID));
         }
         
@@ -159,8 +159,8 @@ namespace DigitalstromClient.Network
         /// </summary>
         public async Task<ZonesAndLastCalledScenesResponse> GetZonesAndLastCalledScenes()
         {
-            return await Load<ZonesAndLastCalledScenesResponse>(new Uri(await GetBaseUri(), 
-                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/*(group,lastCalledScene)"));
+            return await Load<ZonesAndLastCalledScenesResponse>(new Uri(
+                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/*(group,lastCalledScene)", UriKind.Relative));
         }
         
         /// <summary>
@@ -168,8 +168,8 @@ namespace DigitalstromClient.Network
         /// </summary>
         public async Task<ZonesAndSensorValuesResponse> GetZonesAndSensorValues()
         {
-            return await Load<ZonesAndSensorValuesResponse>(new Uri(await GetBaseUri(),
-                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)"));
+            return await Load<ZonesAndSensorValuesResponse>(new Uri(
+                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)", UriKind.Relative));
         }
         
         /// <summary>
@@ -181,7 +181,7 @@ namespace DigitalstromClient.Network
         /// <param name="subscriptionID">Numerical unique value</param>
         public async Task Subscribe(IEventName name, int subscriptionID)
         {
-            await Load(new Uri(await GetBaseUri(), "/json/event/subscribe")
+            await Load(new Uri("/json/event/subscribe", UriKind.Relative)
                 .AddQuery("name", name.name).AddQuery("subscriptionID", subscriptionID));
         }
 
@@ -193,7 +193,7 @@ namespace DigitalstromClient.Network
         /// <param name="subscriptionID">Numerical unique value</param>
         public async Task Unsubscribe(IEventName name, int subscriptionID)
         {
-            await Load(new Uri(await GetBaseUri(), "/json/event/unsubscribe")
+            await Load(new Uri("/json/event/unsubscribe", UriKind.Relative)
                 .AddQuery("name", name.name).AddQuery("subscriptionID", subscriptionID));
         }
 
@@ -208,7 +208,7 @@ namespace DigitalstromClient.Network
         /// <param name="timeout">Numerical value, timeout in milli seconds</param>
         public async Task<EventPollingResponse> PollForEvents(int subscriptionID, int? timeout = null)
         {
-            return await Load<EventPollingResponse>(new Uri(await GetBaseUri(), "/json/event/get")
+            return await Load<EventPollingResponse>(new Uri("/json/event/get", UriKind.Relative)
                 .AddQuery("subscriptionID", subscriptionID).AddQuery("timeout", timeout));
         }
 
@@ -226,7 +226,7 @@ namespace DigitalstromClient.Network
         /// <param name="parameters">List of key-value pairs</param>
         public async Task RaiseEvent(IEventName name, List<KeyValuePair<string, string>> parameters = null)
         {
-            await Load(new Uri(await GetBaseUri(), "/json/event/raise")
+            await Load(new Uri("/json/event/raise", UriKind.Relative)
                 .AddQuery("name", name.name).AddQuery("parameter", parameters));
         }
     }

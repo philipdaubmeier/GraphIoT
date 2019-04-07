@@ -1,14 +1,13 @@
-﻿using Newtonsoft.Json;
-using DigitalstromClient.Model;
+﻿using DigitalstromClient.Model;
 using DigitalstromClient.Model.Auth;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
-using System.Net.Security;
 
 namespace DigitalstromClient.Network
 {
@@ -16,7 +15,7 @@ namespace DigitalstromClient.Network
     {
         /// <summary>
         /// Contains the self signed certificate of the Digitalstrom DSS server
-        /// which can be added to the trust store.
+        /// which can be used for custom validation.
         /// </summary>
         private class DigitalstromCertificate : X509Certificate2
         {
@@ -56,13 +55,13 @@ namespace DigitalstromClient.Network
         /// the self signed DSS certificate as was as the authentication flow including
         /// fetching and activating the application token and obtaining a session token.
         /// </summary>
-        /// <param name="baseUris">The possible uris of the Digitalstrom DSS RESTful webservice</param>
-        /// <param name="authData">The authentication information needed to use for
-        /// the webservice or to perform a new or renewed authentication</param>
-        public AbstractDigitalstromClient(List<Uri> baseUris, IDigitalstromAuth authData)
+        /// <param name="connectionProvider">All necessary connection infos like uris and
+        /// authentication data needed to use for the webservice or to perform a new or
+        /// renewed authentication</param>
+        public AbstractDigitalstromClient(IDigitalstromConnectionProvider connectionProvider)
         {
-            _baseUris = baseUris;
-            _authData = authData;
+            _baseUris = connectionProvider.Uris.DeepClone();
+            _authData = connectionProvider.AuthData;
 
             _dssCert = new DigitalstromCertificate();
 
@@ -81,6 +80,13 @@ namespace DigitalstromClient.Network
                     return false;
                 return true;
             };
+
+            if (connectionProvider.Proxy != null)
+            {
+                _clientHandler.UseProxy = true;
+                _clientHandler.Proxy = new WebProxy(connectionProvider.Proxy.Address, connectionProvider.Proxy.BypassProxyOnLocal,
+                    connectionProvider.Proxy.BypassList, connectionProvider.Proxy.Credentials);
+            }
 
             _client = new HttpClient(_clientHandler);
 
@@ -110,7 +116,7 @@ namespace DigitalstromClient.Network
             }
         }
 
-        protected async Task<Uri> GetBaseUri()
+        private async Task<Uri> GetBaseUri()
         {
             if (_initializeTask == null)
                 return _baseUris.GetCurrent();
@@ -119,6 +125,15 @@ namespace DigitalstromClient.Network
             _initializeTask = null;
 
             return _baseUris.GetCurrent();
+        }
+
+        protected async Task<Uri> BuildAbsoluteUri(Uri relativeUri)
+        {
+            var baseUri = await GetBaseUri();
+            if (_baseUris.CurrentHasAuthIncluded())
+                return new Uri($"{baseUri}{WebUtility.UrlEncode(relativeUri.ToString())}");
+            else
+                return new Uri(baseUri, relativeUri);
         }
 
         /// <summary>
@@ -152,6 +167,10 @@ namespace DigitalstromClient.Network
         /// </summary>
         protected async Task Authenticate()
         {
+            // needs no auth, url contains auth info already
+            if (_baseUris.CurrentHasAuthIncluded())
+                return;
+
             // we have a valid, not expired session token
             if (!_authData.MustFetchSessionToken())
                 return;
@@ -177,9 +196,8 @@ namespace DigitalstromClient.Network
 
             var responseData = await LoadWiremessage<ApplicationTokenResponse>(uri);
 
-            _authData.ApplicationToken = responseData == null || responseData.result == null ? null 
-                : responseData.result.applicationToken;
-            _authData.SessionToken = null;
+            var appToken = responseData == null || responseData.result == null ? null : responseData.result.applicationToken;
+            await _authData.UpdateTokenAsync(null, DateTime.MinValue, appToken);
 
             if (_authData.ApplicationToken == null)
                 throw new IOException("Could not get an application token");
@@ -232,8 +250,7 @@ namespace DigitalstromClient.Network
 
             if (responseData.ok && responseData.result != null && !string.IsNullOrEmpty(responseData.result.token))
             {
-                _authData.SessionToken = responseData.result.token;
-                _authData.TouchSessionToken();
+                await _authData.UpdateTokenAsync(responseData.result.token, DateTime.UtcNow.AddSeconds(60), _authData.ApplicationToken);
                 return true;
             }
 
@@ -265,9 +282,11 @@ namespace DigitalstromClient.Network
         {
             await Authenticate();
 
-            Uri uriWithAuth = uri.AddQuery("token", _authData.SessionToken);
+            if (!_baseUris.CurrentHasAuthIncluded())
+                uri = uri.AddQuery("token", _authData.SessionToken);
 
-            IWiremessagePayload<T>.Wiremessage responseData = await LoadWiremessage<T>(uriWithAuth);
+            var requestUri = await BuildAbsoluteUri(uri);
+            IWiremessagePayload<T>.Wiremessage responseData = await LoadWiremessage<T>(requestUri);
 
             if (responseData == null)
                 throw new FormatException("No response data received");
@@ -282,7 +301,8 @@ namespace DigitalstromClient.Network
                 throw new IOException("Received ok=true but no result object!");
 
             // only touch token if successful
-            _authData.TouchSessionToken();
+            if (!_baseUris.CurrentHasAuthIncluded())
+                await _authData.TouchSessionTokenAsync();
 
             return responseData.result;
         }

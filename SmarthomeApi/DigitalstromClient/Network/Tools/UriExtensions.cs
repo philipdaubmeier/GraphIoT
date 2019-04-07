@@ -65,8 +65,8 @@ namespace DigitalstromClient.Network
             var queryStr = new StringBuilder();
 
             // presumes that if there's a Query set, it starts with a ?
-            var str = string.IsNullOrWhiteSpace(builder._uri.Query) ?
-                      "" : builder._uri.Query.Substring(1) + "&";
+            var query = builder._uri.ToString().Split('?', 2).Skip(1).FirstOrDefault();
+            var str = string.IsNullOrWhiteSpace(query) ? "?" : query + "&";
 
             foreach (var key in builder._values.AllKeys)
             {
@@ -76,10 +76,7 @@ namespace DigitalstromClient.Network
 
             // query string will be encoded by building a new Uri instance
             // overwrites the existing query if it exists
-            return new UriBuilder(builder._uri)
-            {
-                Query = queryStr.ToString()
-            }.Uri;
+            return new Uri(builder._uri + queryStr.ToString(), builder._uri.IsAbsoluteUri ? UriKind.Absolute : UriKind.Relative);
         }
     }
 

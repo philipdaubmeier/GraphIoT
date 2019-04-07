@@ -1,4 +1,5 @@
-﻿using DigitalstromClient.Model.Core;
+﻿using DigitalstromClient.Model;
+using DigitalstromClient.Model.Core;
 using DigitalstromClient.Model.Events;
 using DigitalstromClient.Model.RoomState;
 using System;
@@ -16,6 +17,10 @@ namespace DigitalstromClient.Network
         private DigitalstromWebserviceClient apiClient;
 
         public ApartmentState Scenes { get; set; }
+
+        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider)
+            : this(new DigitalstromWebserviceClient(connectionProvider))
+        { }
 
         public DigitalstromSceneClient(DigitalstromWebserviceClient client) : base()
         {

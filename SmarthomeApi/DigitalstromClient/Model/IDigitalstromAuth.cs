@@ -1,18 +1,20 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace DigitalstromClient.Model
 {
-    public interface IDigitalstromAuth
+    public interface IDigitalstromAuth : IDeepCloneable<IDigitalstromAuth>
     {
         string AppId { get; }
-        string ApplicationToken { get; set; }
-        DateTime SessionExpiration { get; set; }
-        string SessionToken { get; set; }
+        string ApplicationToken { get; }
+        DateTime SessionExpiration { get; }
+        string SessionToken { get; }
         string Username { get; }
         string UserPassword { get; }
 
         bool MustFetchApplicationToken();
         bool MustFetchSessionToken();
-        void TouchSessionToken();
+        Task TouchSessionTokenAsync();
+        Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken);
     }
 }

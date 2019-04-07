@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using DigitalstromClient.Model;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
@@ -8,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using ProxyKit;
+using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
 using SmarthomeApi.Services;
 using System;
@@ -46,6 +48,8 @@ namespace SmarthomeApi
             
             services.AddProxy();
 
+            services.AddSingleton<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
+            services.AddHostedService<DigitalstromEventsHostedService>();
             services.AddHostedService<DigitalstromTimedHostedService>();
             services.AddHostedService<ViessmannTimedHostedService>();
             services.AddHostedService<GrafanaBackendProcessService>();
