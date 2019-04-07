@@ -68,6 +68,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CompactTimeSeries\CompactTimeSeries.csproj" />
+    <ProjectReference Include="..\DigitalstromClient\DigitalstromClient.csproj" />
   </ItemGroup>
 
 </Project>

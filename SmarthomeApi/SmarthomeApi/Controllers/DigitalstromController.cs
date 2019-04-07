@@ -17,13 +17,13 @@ namespace SmarthomeApi.Controllers
     {
         private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private static DigitalstromClient dsClient;
+        private static DigitalstromSmallClient dsClient;
 
         private readonly PersistenceContext db;
         public DigitalstromController(PersistenceContext databaseContext)
         {
             db = databaseContext;
-            dsClient = new DigitalstromClient(db);
+            dsClient = new DigitalstromSmallClient(db);
         }
 
         // GET api/digitalstrom/sensors

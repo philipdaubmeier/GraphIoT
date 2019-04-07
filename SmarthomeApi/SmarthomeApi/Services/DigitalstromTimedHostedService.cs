@@ -16,14 +16,14 @@ namespace SmarthomeApi.Services
     {
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;
-        private readonly DigitalstromClient _dsClient;
+        private readonly DigitalstromSmallClient _dsClient;
         private Timer _timer;
 
         public DigitalstromTimedHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext)
         {
             _logger = logger;
             _dbContext = databaseContext;
-            _dsClient = new DigitalstromClient(_dbContext);
+            _dsClient = new DigitalstromSmallClient(_dbContext);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

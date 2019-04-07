@@ -13,13 +13,13 @@ namespace SmarthomeApi.Controllers
     [Route("powerconsumption")]
     public class PowerConsumptionController : Controller
     {
-        private static DigitalstromClient dsClient;
+        private static DigitalstromSmallClient dsClient;
 
         private readonly PersistenceContext db;
         public PowerConsumptionController(PersistenceContext databaseContext)
         {
             db = databaseContext;
-            dsClient = new DigitalstromClient(db);
+            dsClient = new DigitalstromSmallClient(db);
         }
 
         // GET powerconsumption

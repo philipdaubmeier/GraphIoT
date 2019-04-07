@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SmarthomeApi.Clients.Digitalstrom
 {
-    public class DigitalstromClient
+    public class DigitalstromSmallClient
     {
         private const string _username = "***REMOVED***";
         private const string _baseUrl = "https://ds-tools.net/cloudredir.php";
@@ -27,7 +27,7 @@ namespace SmarthomeApi.Clients.Digitalstrom
 
         private TokenStore _tokenStore;
 
-        public DigitalstromClient(PersistenceContext databaseContext)
+        public DigitalstromSmallClient(PersistenceContext databaseContext)
         {
             _tokenStore = new TokenStore(databaseContext, "digitalstrom_dss");
         }
