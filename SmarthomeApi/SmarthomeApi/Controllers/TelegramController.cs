@@ -8,8 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SmarthomeApi.Clients.Netatmo;
+using SmarthomeApi.Model.Config;
 
 namespace SmarthomeApi.Controllers
 {
@@ -17,9 +19,16 @@ namespace SmarthomeApi.Controllers
     [Route("api/telegram")]
     public class TelegramController : Controller
     {
+        private NetatmoCameraImage _netatmoClient;
+
         private static readonly HttpClient httpClient = new HttpClient();
         private const string mybot = "***REMOVED***";
         private const string chatId = "***REMOVED***";
+
+        public TelegramController(IOptions<NetatmoConfig> config)
+        {
+            _netatmoClient = new NetatmoCameraImage(config);
+        }
 
         /// <summary>
         /// GET: api/telegram/***REMOVED***/sendcamera
@@ -29,7 +38,7 @@ namespace SmarthomeApi.Controllers
         [HttpGet("{bot}/sendcamera", Name = "sendcamera")]
         public async Task<JsonResult> sendcamera(string bot)
         {
-            await sendTelegramPhoto(bot, chatId, "Es hat geklingelt!", await NetatmoCameraImage.GetLastEventSnapshot());
+            await sendTelegramPhoto(bot, chatId, "Es hat geklingelt!", await _netatmoClient.GetLastEventSnapshot());
 
             return Json(new { result = "ok" });
         }
@@ -87,20 +96,20 @@ namespace SmarthomeApi.Controllers
                     {
                         await sendTelegramMessage(bot, chatId, "Ich triggere die linke Garage...");
                         await httpClient.GetStringAsync("***REMOVED***/json/zone/callScene%3Fid%3D31990%26groupID%3D5%26sceneNumber%3D0%26category%3Dmanual");
-                        await sendTelegramPhoto(bot, chatId, "Linke Garage getriggert...", await NetatmoCameraImage.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Linke Garage getriggert...", await _netatmoClient.GetCurrentSnapshot());
                         await Task.Delay(15000);
                         await sendTelegramMessage(bot, chatId, "Stromverbrauch: xxx W");
-                        await sendTelegramPhoto(bot, chatId, "Linke Garage nach 15 Sekunden...", await NetatmoCameraImage.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Linke Garage nach 15 Sekunden...", await _netatmoClient.GetCurrentSnapshot());
                         break;
                     }
                 case "gr":
                     {
                         await sendTelegramMessage(bot, chatId, "Ich triggere die linke Garage...");
                         await httpClient.GetStringAsync("***REMOVED***/json/zone/callScene%3Fid%3D31990%26groupID%3D4%26sceneNumber%3D0%26category%3Dmanual");
-                        await sendTelegramPhoto(bot, chatId, "Rechte Garage getriggert...", await NetatmoCameraImage.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Rechte Garage getriggert...", await _netatmoClient.GetCurrentSnapshot());
                         await Task.Delay(15000);
                         await sendTelegramMessage(bot, chatId, "Stromverbrauch: xxx W");
-                        await sendTelegramPhoto(bot, chatId, "Rechte Garage nach 15 Sekunden...", await NetatmoCameraImage.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Rechte Garage nach 15 Sekunden...", await _netatmoClient.GetCurrentSnapshot());
                         break;
                     }
             }

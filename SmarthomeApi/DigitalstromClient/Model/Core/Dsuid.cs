@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace SmarthomeApi.Model
+namespace DigitalstromClient.Model.Core
 {
     public class DSUID : IComparable, IComparable<DSUID>, IEquatable<DSUID>
     {

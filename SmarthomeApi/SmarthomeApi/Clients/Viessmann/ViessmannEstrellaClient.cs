@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +13,14 @@ namespace SmarthomeApi.Clients.Viessmann
 {
     public class ViessmannEstrellaClient
     {
+        private readonly IOptions<ViessmannConfig> _config;
+
         private HttpClient _client = new HttpClient();
+
+        public ViessmannEstrellaClient(IOptions<ViessmannConfig> config)
+        {
+            _config = config;
+        }
 
         public async Task<List<int>> GetGateways()
         {
@@ -33,8 +42,8 @@ namespace SmarthomeApi.Clients.Viessmann
                 Method = HttpMethod.Get,
             };
 
-            var username = "***REMOVED***";
-            var password = "***REMOVED***";
+            var username = _config.Value.Username;
+            var password = _config.Value.Password;
             var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
             

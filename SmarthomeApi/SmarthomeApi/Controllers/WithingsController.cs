@@ -8,9 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SmarthomeApi.Clients.Withings;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 
 namespace SmarthomeApi.Controllers
 {
@@ -19,9 +21,9 @@ namespace SmarthomeApi.Controllers
     public class WithingsController : Controller
     {
         private readonly WithingsClient withingsClient;
-        public WithingsController(PersistenceContext databaseContext)
+        public WithingsController(PersistenceContext databaseContext, IOptions<WithingsConfig> config)
         {
-            withingsClient = new WithingsClient(databaseContext);
+            withingsClient = new WithingsClient(databaseContext, config);
         }
 
         // GET: api/withings/login

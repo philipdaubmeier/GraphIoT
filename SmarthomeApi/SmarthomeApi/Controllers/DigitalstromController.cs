@@ -1,49 +1,49 @@
-﻿using System;
+﻿using CompactTimeSeries;
+using DigitalstromClient.Model;
+using DigitalstromClient.Network;
+using Microsoft.AspNetCore.Mvc;
+using NodaTime;
+using SmarthomeApi.Database.Model;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using CompactTimeSeries;
-using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using SmarthomeApi.Clients.Digitalstrom;
-using SmarthomeApi.Database.Model;
 
 namespace SmarthomeApi.Controllers
 {
     [Route("api/digitalstrom")]
     public class DigitalstromController : Controller
     {
-        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        private static DigitalstromSmallClient dsClient;
+        private static DigitalstromWebserviceClient dsClient;
 
         private readonly PersistenceContext db;
-        public DigitalstromController(PersistenceContext databaseContext)
+        public DigitalstromController(PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
         {
             db = databaseContext;
-            dsClient = new DigitalstromSmallClient(db);
+            dsClient = new DigitalstromWebserviceClient(connectionProvider);
         }
 
         // GET api/digitalstrom/sensors
         [HttpGet("sensors")]
         public async Task<JsonResult> GetSensors()
         {
-            var sensorValues = (await dsClient.GetSensorValues()).GroupBy(x => x.Key.Item1);
+            var sensorValues = (await dsClient.GetZonesAndSensorValues()).zones;
 
             return Json(new
             {
-                zones = sensorValues.Select(x => {
-                    var temperatureVals = x.Where(s => s.Key.Item2 == 9).ToList();
-                    var humidityVals = x.Where(s => s.Key.Item2 == 13).ToList();
-                    return new
+                zones = sensorValues.Select(x => new Tuple<int, List<double>, List<double>>(
+                        x.ZoneID,
+                        x?.sensor?.Where(s => s.type == 9).Select(s => s.value).ToList(),
+                        x?.sensor?.Where(s => s.type == 13).Select(s => s.value).ToList()
+                    ))
+                    .Where(x => (x.Item2?.Count ?? 0) > 0 || (x.Item3?.Count ?? 0) > 0)
+                    .Select(x => new
                     {
-                        zone_id = x.Key,
-                        temperature = temperatureVals.Count > 0 ? (double?)temperatureVals.First().Value.Item2 : null,
-                        humidity = humidityVals.Count > 0 ? (double?)humidityVals.First().Value.Item2 : null
-                    };
-                })
+                        zone_id = x.Item1,
+                        temperature = (x.Item2?.Count ?? 0) > 0 ? (double?)x.Item2.First() : null,
+                        humidity = (x.Item3?.Count ?? 0) > 0 ? (double?)x.Item3.First() : null
+                    })
             });
         }
 
@@ -90,7 +90,7 @@ namespace SmarthomeApi.Controllers
             if (energyData == null)
                 return StatusCode(404);
 
-            var circuitNames = await dsClient.GetMeteringCircuits();
+            var circuitNames = (await dsClient.GetMeteringCircuits()).FilteredMeterNames;
 
             Func<ITimeSeries<int>, DateTime> getBegin = ts => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key;
 
@@ -100,7 +100,7 @@ namespace SmarthomeApi.Controllers
                 {
                     dsuid = circuit.Key.ToString(),
                     name = circuitNames.ContainsKey(circuit.Key) ? circuitNames[circuit.Key] : null,
-                    begin = (int)getBegin(circuit.Value).ToUniversalTime().Subtract(UnixEpoch).TotalSeconds,
+                    begin = Instant.FromDateTimeUtc(getBegin(circuit.Value).ToUniversalTime()).ToUnixTimeSeconds(),
                     energy_curve = circuit.Value.Trimmed(-1)
                 })
             });

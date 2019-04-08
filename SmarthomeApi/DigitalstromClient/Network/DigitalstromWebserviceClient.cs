@@ -1,5 +1,7 @@
 ﻿using DigitalstromClient.Model;
 using DigitalstromClient.Model.Apartment;
+using DigitalstromClient.Model.Core;
+using DigitalstromClient.Model.Energy;
 using DigitalstromClient.Model.Events;
 using DigitalstromClient.Model.Heating;
 using DigitalstromClient.Model.PropertyTree;
@@ -172,6 +174,49 @@ namespace DigitalstromClient.Network
                 "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)", UriKind.Relative));
         }
         
+        /// <summary>
+        /// Returns a list of all circuits and an info about their energy metering capabilities
+        /// </summary>
+        public async Task<MeteringCircuitsResponse> GetMeteringCircuits()
+        {
+            return await Load<MeteringCircuitsResponse>(new Uri(
+                "/json/property/query?query=/apartment/dSMeters/*(dSUID,name)/capabilities(metering)", UriKind.Relative));
+        }
+
+        /// <summary>
+        /// Returns a list of all circuits and their associated zone ids.
+        /// </summary>
+        public async Task<CircuitZonesResponse> GetCircuitZones()
+        {
+            return await Load<CircuitZonesResponse>(new Uri(
+                "/json/property/query?query=/apartment/dSMeters/*(dSUID)/zones/*(ZoneID)", UriKind.Relative));
+        }
+
+        /// <summary>
+        /// Returns a time series of values for the total power consumption of all circuits.
+        /// </summary>
+        /// <param name="resolution">The desired resolution in seconds for the values</param>
+        /// <param name="count">The requested number of values</param>
+        public async Task<EnergyMeteringResponse> GetTotalEnergy(int resolution, int count)
+        {
+            return await Load<EnergyMeteringResponse>(new Uri("/json/metering/getValues", UriKind.Relative)
+                .AddQuery("dsuid", ".meters(all)").AddQuery("type", "consumption")
+                .AddQuery("resolution", resolution).AddQuery("valueCount", count));
+        }
+
+        /// <summary>
+        /// Returns a time series of values for the power consumption of the given circuit.
+        /// </summary>
+        /// <param name="meterDsuid">The circuits digitalstrom unique id</param>
+        /// <param name="resolution">The desired resolution in seconds for the values</param>
+        /// <param name="count">The requested number of values</param>
+        public async Task<EnergyMeteringResponse> GetEnergy(DSUID meterDsuid, int resolution, int count)
+        {
+            return await Load<EnergyMeteringResponse>(new Uri("/json/metering/getValues", UriKind.Relative)
+                .AddQuery("dsuid", meterDsuid).AddQuery("type", "consumption")
+                .AddQuery("resolution", resolution).AddQuery("valueCount", count));
+        }
+
         /// <summary>
         /// Subscribe to an event with the given name and registers the callers
         /// subscriptionId. A unique subscriptionId can be selected by the subscriber.

@@ -136,6 +136,9 @@ namespace SmarthomeApi.Controllers
             var data = new Dictionary<string, List<dynamic[]>>();
             foreach (var target in query.targets)
             {
+                if (target == null || string.IsNullOrEmpty(target.target))
+                    continue;
+
                 var splitted = target.target.Split('_');
                 if (splitted.Length < 2 || !int.TryParse(splitted[1], out int index) || index < 0
                     || !viewModels.ContainsKey(splitted[0]) || index >= viewModels[splitted[0]].GraphCount())

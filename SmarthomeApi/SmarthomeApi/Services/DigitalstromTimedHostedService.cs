@@ -1,9 +1,10 @@
 ﻿using CompactTimeSeries;
+using DigitalstromClient.Model;
+using DigitalstromClient.Model.Core;
+using DigitalstromClient.Network;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace SmarthomeApi.Services
     {
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;
-        private readonly DigitalstromSmallClient _dsClient;
+        private readonly DigitalstromWebserviceClient _dsClient;
         private Timer _timer;
 
-        public DigitalstromTimedHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext)
+        public DigitalstromTimedHostedService(ILogger<DigitalstromTimedHostedService> logger, PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
         {
             _logger = logger;
             _dbContext = databaseContext;
-            _dsClient = new DigitalstromSmallClient(_dbContext);
+            _dsClient = new DigitalstromWebserviceClient(connectionProvider);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -76,13 +77,14 @@ namespace SmarthomeApi.Services
 
         private async Task PollSensorValues()
         {
-            var sensorValues = (await _dsClient.GetSensorValues()).GroupBy(x => x.Key.Item1);
+            var sensorValues = (await _dsClient.GetZonesAndSensorValues()).zones;
 
             _dbContext.Semaphore.WaitOne();
             try
             {
-                foreach (var zoneGrouping in sensorValues)
-                    SaveZoneSensorValues(zoneGrouping.Key, zoneGrouping.ToDictionary(x => x.Key.Item2, x => x.Value.Item2));
+                foreach (var zone in sensorValues)
+                    if (zone != null && zone.sensor != null)
+                        SaveZoneSensorValues(zone.ZoneID, zone.sensor.ToDictionary(x => x.type, x => x.value));
 
                 _dbContext.SaveChanges();
             }
@@ -95,7 +97,7 @@ namespace SmarthomeApi.Services
 
         private async Task PollEnergyValues()
         {
-            var dsuids = (await _dsClient.GetMeteringCircuits()).Select(x => x.Key).ToList();
+            var dsuids = (await _dsClient.GetMeteringCircuits()).FilteredMeterNames.Select(x => x.Key).ToList();
             
             var fetchLastValues = (int)TimeSeriesSpan.Spacing.Spacing10Min;
             var days = new TimeSeriesSpan(DateTime.Now.AddSeconds(-1 * fetchLastValues), TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues).IncludedDates();
@@ -106,7 +108,9 @@ namespace SmarthomeApi.Services
                 timeseriesCollections = ReadEnergyValuesFromDb(days, dsuids);
 
                 foreach (var dsuid in dsuids)
-                    await _dsClient.ReadEnergyToTimeSeries(dsuid, (int)TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues, timeseriesCollections.Select(x => x.Value[dsuid]).ToList());
+                    foreach (var timestampedValue in (await _dsClient.GetEnergy(dsuid, (int)TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues)).TimeSeries)
+                        foreach (var timeseries in timeseriesCollections.Select(x => x.Value[dsuid]))
+                            timeseries[timestampedValue.Key.ToLocalTime()] = (int)timestampedValue.Value;
 
                 SaveEnergyValuesToDb(timeseriesCollections);
             }

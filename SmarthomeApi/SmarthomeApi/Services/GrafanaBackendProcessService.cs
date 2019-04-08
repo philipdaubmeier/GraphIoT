@@ -15,7 +15,7 @@ namespace SmarthomeApi.Services
         private readonly string _rootPath;
         private Process _process = null;
 
-        public GrafanaBackendProcessService(ILogger<ViessmannTimedHostedService> logger, IHostingEnvironment env)
+        public GrafanaBackendProcessService(ILogger<GrafanaBackendProcessService> logger, IHostingEnvironment env)
         {
             _logger = logger;
             _rootPath = env.ContentRootPath;

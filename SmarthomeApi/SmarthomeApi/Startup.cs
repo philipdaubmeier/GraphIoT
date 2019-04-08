@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Logging;
 using ProxyKit;
 using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
@@ -23,12 +24,14 @@ namespace SmarthomeApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -46,11 +49,29 @@ namespace SmarthomeApi
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
             });
-            
+
+            services.AddLogging(config =>
+            {
+                config.ClearProviders();
+                config.AddConfiguration(Configuration.GetSection("Logging"));
+
+                if (Environment.IsDevelopment())
+                {
+                    config.AddConsole();
+                    config.AddDebug();
+                    config.AddEventSourceLogger();
+                }
+            });
+
             services.AddProxy();
 
             services.AddOptions();
+            services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
             services.Configure<DigitalstromConfig>(Configuration.GetSection("DigitalstromConfig"));
+            services.Configure<NetatmoConfig>(Configuration.GetSection("NetatmoConfig"));
+            services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
+            services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
+            services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
             services.AddSingleton<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
             services.AddHostedService<DigitalstromEventsHostedService>();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DigitalstromClient.Model.Core;
+using NodaTime;
 
 namespace DigitalstromClient.Model.PropertyTree
 {
@@ -22,7 +23,6 @@ namespace DigitalstromClient.Model.PropertyTree
         public long time { get; set; }
 
         public SensorType sensorType { get { return type; } }
-        public DateTime timestamp { get { return epoch.AddSeconds(time).ToLocalTime(); } }
-        private static readonly DateTime epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        public DateTime timestamp { get { return Instant.FromUnixTimeSeconds(time).ToDateTimeUtc().ToLocalTime(); } }
     }
 }

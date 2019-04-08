@@ -6,8 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SmarthomeApi.Clients.Viessmann;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 
 namespace SmarthomeApi.Services
 {
@@ -19,12 +21,12 @@ namespace SmarthomeApi.Services
         private readonly ViessmannVitotrolClient _vitotrolClient;
         private Timer _timer;
 
-        public ViessmannTimedHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext)
+        public ViessmannTimedHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             _logger = logger;
             _dbContext = databaseContext;
-            _vitotrolClient = new ViessmannVitotrolClient(_dbContext);
-            _platformClient = new ViessmannPlatformClient(_dbContext);
+            _vitotrolClient = new ViessmannVitotrolClient(_dbContext, config);
+            _platformClient = new ViessmannPlatformClient(_dbContext, config);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

@@ -20,7 +20,7 @@ namespace SmarthomeApi.Services
         private readonly IDigitalstromConnectionProvider _connProvider;
         private DigitalstromSceneClient _dsSceneClient = null;
         
-        public DigitalstromEventsHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
         {
             _logger = logger;
             _dbContext = databaseContext;

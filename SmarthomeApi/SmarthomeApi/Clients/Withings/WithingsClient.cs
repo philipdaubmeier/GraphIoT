@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NodaTime;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,17 +14,15 @@ namespace SmarthomeApi.Clients.Withings
 {
     public class WithingsClient
     {
+        private readonly IOptions<WithingsConfig> _config;
+
         private static readonly HttpClient httpClient = new HttpClient();
 
         private const string _baseUri = "https://wbsapi.withings.net";
-
-        private const string _clientId = "***REMOVED***";
-        private const string _clientSecret = "***REMOVED***";
-        public string ClientId { get { return _clientId; } }
+        
+        public string ClientId { get { return _config.Value.WithingsClientId; } }
 
         private TokenStore _tokenStore;
-
-        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         public enum MeasureType
         {
@@ -43,9 +44,10 @@ namespace SmarthomeApi.Clients.Withings
             PulseWave   = 91  /// <summary>Pulse Wave Velocity</summary>
         }
 
-        public WithingsClient(PersistenceContext databaseContext)
+        public WithingsClient(PersistenceContext databaseContext, IOptions<WithingsConfig> config)
         {
             _tokenStore = new TokenStore(databaseContext, "withings");
+            _config = config;
         }
 
         public async Task<Dictionary<DateTime, int>> GetMeasures(MeasureType type)
@@ -72,8 +74,8 @@ namespace SmarthomeApi.Clients.Withings
                 new Uri("https://account.withings.com/oauth2/token"), new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
+                    new KeyValuePair<string, string>("client_id", _config.Value.WithingsClientId),
+                    new KeyValuePair<string, string>("client_secret", _config.Value.WithingsClientSecret),
                     new KeyValuePair<string, string>("code", authorization_code),
                     new KeyValuePair<string, string>("redirect_uri", "https://your.domain/smarthome/api/withings/callback")
                 })));
@@ -94,8 +96,8 @@ namespace SmarthomeApi.Clients.Withings
                 new Uri("https://account.withings.com/oauth2/token"), new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
+                    new KeyValuePair<string, string>("client_id", _config.Value.WithingsClientId),
+                    new KeyValuePair<string, string>("client_secret", _config.Value.WithingsClientSecret),
                     new KeyValuePair<string, string>("refresh_token", _tokenStore.RefreshToken)
                 })));
 
@@ -152,7 +154,7 @@ namespace SmarthomeApi.Clients.Withings
                 }
             };
             var measuresRaw = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
-            return measuresRaw.body.measuregrps.Select(x => new KeyValuePair<DateTime, int>(UnixEpoch.AddSeconds(x.date), x.measures.First().value)).ToDictionary(x => x.Key, x => x.Value);
+            return measuresRaw.body.measuregrps.Select(x => new KeyValuePair<DateTime, int>(Instant.FromUnixTimeSeconds(x.date).ToDateTimeUtc(), x.measures.First().value)).ToDictionary(x => x.Key, x => x.Value);
         }
 
         private async Task<List<Tuple<string, string>>> ParseDevicesResponse(HttpResponseMessage response)

@@ -1,27 +1,32 @@
-﻿using System;
-using System.Net.Http;
+﻿using Microsoft.Extensions.Options;
+using SmarthomeApi.Model.Config;
+using System;
 using System.Threading.Tasks;
 
 namespace SmarthomeApi.Clients.Netatmo
 {
     public class NetatmoCameraImage
     {
-        private static NetatmoAuth netatmoAuthData = new NetatmoAuth()
+        private NetatmoWebserviceClient netatmoApiClient;
+
+        public NetatmoCameraImage(IOptions<NetatmoConfig> config)
         {
-            NetatmoAppId = "***REMOVED***",
-            NetatmoAppSecret = "***REMOVED***",
-            Username = "***REMOVED***",
-            UserPassword = "***REMOVED***"
-        };
+            var netatmoAuthData = new NetatmoAuth()
+            {
+                NetatmoAppId = config.Value.NetatmoAppId,
+                NetatmoAppSecret = config.Value.NetatmoAppSecret,
+                Username = config.Value.Username,
+                UserPassword = config.Value.Password
+            };
+            netatmoApiClient = new NetatmoWebserviceClient(new Uri("https://api.netatmo.net"), netatmoAuthData);
+        }
 
-        private static NetatmoWebserviceClient netatmoApiClient = new NetatmoWebserviceClient(new Uri("https://api.netatmo.net"), netatmoAuthData);
-
-        public static async Task<string> GetLastEventSnapshot()
+        public async Task<string> GetLastEventSnapshot()
         {
             return (await netatmoApiClient.GetCameraPicture()).Item1;
         }
 
-        public static async Task<string> GetCurrentSnapshot()
+        public async Task<string> GetCurrentSnapshot()
         {
             return (await netatmoApiClient.GetCameraPicture()).Item2;
         }

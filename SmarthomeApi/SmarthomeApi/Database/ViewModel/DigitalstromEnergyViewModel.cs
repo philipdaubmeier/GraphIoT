@@ -1,6 +1,6 @@
 ﻿using CompactTimeSeries;
+using DigitalstromClient.Model.Core;
 using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model;
 using System.Collections.Generic;
 using System.Linq;
 

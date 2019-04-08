@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,8 +12,15 @@ namespace SmarthomeApi.Clients.AudiConnect
 {
     public class AudiConnectClient
     {
+        private IOptions<AudiConnectConfig> _config;
+
         private string _token = null;
         private DateTime _tokenValidTo = DateTime.MinValue;
+
+        public AudiConnectClient(IOptions<AudiConnectConfig> config)
+        {
+            _config = config;
+        }
 
         /// <summary>
         /// Returns a dictionary containing CSIDs as keys and VINs as values
@@ -66,8 +75,8 @@ namespace SmarthomeApi.Clients.AudiConnect
                 new Uri("https://msg.audi.de/fs-car/core/auth/v1/Audi/DE/token"), new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "password"),
-                    new KeyValuePair<string, string>("username", "***REMOVED***"),
-                    new KeyValuePair<string, string>("password", "***REMOVED***")
+                    new KeyValuePair<string, string>("username", _config.Value.Username),
+                    new KeyValuePair<string, string>("password", _config.Value.Password)
                 })));
 
             _token = loadedToken.Item1;

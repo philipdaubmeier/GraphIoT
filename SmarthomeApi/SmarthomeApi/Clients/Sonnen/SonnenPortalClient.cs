@@ -1,5 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NodaTime;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +14,11 @@ namespace SmarthomeApi.Clients.Sonnen
 {
     public class SonnenPortalClient
     {
-        private const string _username = "demo";
-        private const string _password = "demo";
+        private IOptions<SonnenConfig> _config;
 
         private static readonly HttpClient _client = new HttpClient();
 
         private const string _baseUri = @"https://meine.sonnenbatterie.de/";
-
-        private static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private TokenStore _tokenStore;
 
@@ -50,15 +50,16 @@ namespace SmarthomeApi.Clients.Sonnen
             public int SOC { get; set; }
         }
 
-        public SonnenPortalClient(PersistenceContext databaseContext)
+        public SonnenPortalClient(PersistenceContext databaseContext, IOptions<SonnenConfig> config)
         {
             _tokenStore = new TokenStore(databaseContext, "sonnen_portal");
+            _config = config;
         }
 
         public async Task<Dictionary<DateTime, EnergyStats>> GetEnergyStats(DateTime date)
         {
             await Authenticate();
-            var uri = $"{_baseUri}historydata/basic_data?psb=demo&{(int)((date - UnixEpoch).TotalSeconds)}";
+            var uri = $"{_baseUri}historydata/basic_data?psb=demo&{Instant.FromDateTimeUtc(date.ToUniversalTime()).ToUnixTimeSeconds()}";
             return await ParseEnergyStats(await CallSonnenApi(new Uri(uri), _tokenStore.AccessToken));
         }
 
@@ -81,8 +82,8 @@ namespace SmarthomeApi.Clients.Sonnen
             AddCommonHeaders(request.Headers, $"{_baseUri}login");
             request.Content = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("user", "demo"),
-                    new KeyValuePair<string, string>("pass", "demo")
+                    new KeyValuePair<string, string>("user", _config.Value.Username),
+                    new KeyValuePair<string, string>("pass", _config.Value.Password)
                 });
 
             return await _client.SendAsync(request);
@@ -115,7 +116,7 @@ namespace SmarthomeApi.Clients.Sonnen
 
             var energyStatsRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return energyStatsRaw.Select(item => new KeyValuePair<DateTime, EnergyStats>(
-                UnixEpoch.AddSeconds(item[0]),
+                Instant.FromUnixTimeSeconds(item[0]).ToDateTimeUtc().ToLocalTime(),
                 new EnergyStats()
                 {
                     Discharge = item[1],

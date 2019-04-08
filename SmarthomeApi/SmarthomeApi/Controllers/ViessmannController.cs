@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SmarthomeApi.Clients.Viessmann;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,12 +20,12 @@ namespace SmarthomeApi.Controllers
         private readonly ViessmannVitotrolClient vitotrolClient;
 
         private readonly PersistenceContext db;
-        public ViessmannController(PersistenceContext databaseContext)
+        public ViessmannController(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             db = databaseContext;
-            estrellaClient = new ViessmannEstrellaClient();
-            platformClient = new ViessmannPlatformClient(db);
-            vitotrolClient = new ViessmannVitotrolClient(db);
+            estrellaClient = new ViessmannEstrellaClient(config);
+            platformClient = new ViessmannPlatformClient(db, config);
+            vitotrolClient = new ViessmannVitotrolClient(db, config);
         }
 
         // GET: api/viessmann/installations/names

@@ -1,4 +1,6 @@
-﻿using SmarthomeApi.Database.Model;
+﻿using Microsoft.Extensions.Options;
+using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,10 +15,7 @@ namespace SmarthomeApi.Clients.Viessmann
 {
     public class ViessmannVitotrolClient
     {
-        private const string _username = "***REMOVED***";
-        private const string _password = "***REMOVED***";
-        private const string _deviceId = "***REMOVED***";
-        private const string _installationId = "***REMOVED***";
+        private readonly IOptions<ViessmannConfig> _config;
 
         private static readonly HttpClient _client = new HttpClient();
 
@@ -27,16 +26,17 @@ namespace SmarthomeApi.Clients.Viessmann
 
         private TokenStore _tokenStore;
 
-        public ViessmannVitotrolClient(PersistenceContext databaseContext)
+        public ViessmannVitotrolClient(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             _tokenStore = new TokenStore(databaseContext, "viessmann_vitotrol");
+            _config = config;
         }
 
         public async Task<List<KeyValuePair<string, string>>> GetTypeInfo()
         {
             await Authenticate();
 
-            var body = $"<GeraetId>{_deviceId}</GeraetId><AnlageId>{_installationId}</AnlageId>";
+            var body = $"<GeraetId>{_config.Value.VitotrolDeviceId}</GeraetId><AnlageId>{_config.Value.VitotrolInstallationId}</AnlageId>";
             return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _tokenStore.AccessToken));
         }
 
@@ -45,7 +45,7 @@ namespace SmarthomeApi.Clients.Viessmann
             await Authenticate();
 
             var datapointList = string.Join("</int><int>", datapoints.Select(x => x.ToString()));
-            var body = $"<UseCache>false</UseCache><GeraetId>{_deviceId}</GeraetId><AnlageId>{_installationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
+            var body = $"<UseCache>false</UseCache><GeraetId>{_config.Value.VitotrolDeviceId}</GeraetId><AnlageId>{_config.Value.VitotrolInstallationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
             return await ParseData(await SendSoap("GetData", body, _tokenStore.AccessToken));
         }
 
@@ -54,7 +54,7 @@ namespace SmarthomeApi.Clients.Viessmann
             if (_tokenStore.IsAccessTokenValid())
                 return;
 
-            var body = $"<Betriebssystem>Android</Betriebssystem><AppId>prod</AppId><Benutzer>{_username}</Benutzer><AppVersion>93</AppVersion><Passwort>{_password}</Passwort>";
+            var body = $"<Betriebssystem>Android</Betriebssystem><AppId>prod</AppId><Benutzer>{_config.Value.Username}</Benutzer><AppVersion>93</AppVersion><Passwort>{_config.Value.Password}</Passwort>";
             var response = await SendSoap("Login", body, null);
 
             var cookies = response.Headers.GetValues("Set-Cookie").Select(x => x.Replace("path=/; HttpOnly", "").Trim().TrimEnd(';')).ToList();

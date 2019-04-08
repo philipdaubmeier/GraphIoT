@@ -8,11 +8,7 @@ namespace DigitalstromClient
 {
     public class DigitalstromWebserviceClientTest
     {
-        private static IDigitalstromAuth digitalstromAuthData = new EphemeralDigitalstromAuth("DigitalstromClientUnittests")
-        {
-            Username = "***REMOVED***",
-            UserPassword = "***REMOVED***"
-        };
+        private static IDigitalstromAuth digitalstromAuthData = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "***REMOVED***", "***REMOVED***");
 
         private static Uri uri1 = new Uri("***REMOVED***");
         private static Uri uri2 = new Uri("https://***REMOVED***.digitalstrom.net:8080/");

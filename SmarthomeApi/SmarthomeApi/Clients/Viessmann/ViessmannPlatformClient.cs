@@ -1,5 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,7 @@ namespace SmarthomeApi.Clients.Viessmann
 {
     public class ViessmannPlatformClient
     {
-        private const string _username = "***REMOVED***";
-        private const string _password = "***REMOVED***";
-        private const string _installationId = "***REMOVED***";
-        private const string _gatewayId = "***REMOVED***";
+        private readonly IOptions<ViessmannConfig> _config;
 
         private static readonly HttpClientHandler _authClientHandler = new HttpClientHandler() { AllowAutoRedirect = false };
         private static readonly HttpClient _authClient = new HttpClient(_authClientHandler);
@@ -23,8 +22,6 @@ namespace SmarthomeApi.Clients.Viessmann
 
         private const string _authUri = "https://iam.viessmann.com/idp/v1/authorize";
         private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
-        private const string _clientId = "***REMOVED***";
-        private const string _clientSecret = "***REMOVED***";
         private const string _redirectUri = "vicare://oauth-callback/everest";
 
         private TokenStore _tokenStore;
@@ -35,9 +32,10 @@ namespace SmarthomeApi.Clients.Viessmann
             Circuit1
         }
 
-        public ViessmannPlatformClient(PersistenceContext databaseContext)
+        public ViessmannPlatformClient(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             _tokenStore = new TokenStore(databaseContext, "viessmann_platform");
+            _config = config;
         }
 
         public async Task<string> GetInstallations()
@@ -157,7 +155,7 @@ namespace SmarthomeApi.Clients.Viessmann
             string baseUrl = "https://api.viessmann-platform.io/operational-data/v1/";
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{baseUrl}installations/{_installationId}/gateways/{_gatewayId}/devices/0/features/{featureName}"),
+                RequestUri = new Uri($"{baseUrl}installations/{_config.Value.PlattformInstallationId}/gateways/{_config.Value.PlattformGatewayId}/devices/0/features/{featureName}"),
                 Method = HttpMethod.Get
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenStore.AccessToken);
@@ -172,11 +170,11 @@ namespace SmarthomeApi.Clients.Viessmann
             
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_clientId}&redirect_uri={_redirectUri}&response_type=code"),
+                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_config.Value.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
                 Method = HttpMethod.Get,
             };
 
-            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_username}:{_password}"));
+            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_config.Value.Username}:{_config.Value.Password}"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
 
             var response = await _authClient.SendAsync(request);
@@ -192,8 +190,8 @@ namespace SmarthomeApi.Clients.Viessmann
                 new Uri(_tokenUri), new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
+                    new KeyValuePair<string, string>("client_id", _config.Value.PlattformApiClientId),
+                    new KeyValuePair<string, string>("client_secret", _config.Value.PlattformApiClientSecret),
                     new KeyValuePair<string, string>("code", authorization_code),
                     new KeyValuePair<string, string>("redirect_uri", _redirectUri)
                 })));
