@@ -11,6 +11,7 @@ using Microsoft.Extensions.FileProviders;
 using ProxyKit;
 using SmarthomeApi.Clients.Digitalstrom;
 using SmarthomeApi.Database.Model;
+using SmarthomeApi.Model.Config;
 using SmarthomeApi.Services;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,9 @@ namespace SmarthomeApi
             });
             
             services.AddProxy();
+
+            services.AddOptions();
+            services.Configure<DigitalstromConfig>(Configuration.GetSection("DigitalstromConfig"));
 
             services.AddSingleton<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
             services.AddHostedService<DigitalstromEventsHostedService>();
