@@ -97,5 +97,14 @@ namespace CompactTimeSeries
             for (int i = 0; i <= (d2 - d1).Days; i++)
                 yield return d1.AddDays(i);
         }
+
+        /// <summary>
+        /// Check wether the given date is included in this TimeSeriesSpan, i.e. the date is
+        /// in the interval between Begin (included) and End (excluded)
+        /// </summary>
+        public bool IsIncluded(DateTime dateTime)
+        {
+            return dateTime >= Begin && dateTime < End;
+        }
     }
 }

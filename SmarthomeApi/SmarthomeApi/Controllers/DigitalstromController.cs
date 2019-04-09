@@ -105,5 +105,34 @@ namespace SmarthomeApi.Controllers
                 })
             });
         }
+
+        // GET: api/digitalstrom/events/callscene/days/{day}
+        [HttpGet("events/callscene/days/{day}")]
+        public ActionResult GetCallSceneEvents([FromRoute] string day)
+        {
+            if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
+                DateTimeStyles.AssumeLocal, out DateTime dayDate))
+                return StatusCode(404);
+
+            DigitalstromSceneEventData eventData = null;
+            db.Semaphore.WaitOne();
+            try { eventData = db.DsSceneEventDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault(); }
+            catch { throw; }
+            finally { db.Semaphore.Release(); }
+            if (eventData == null)
+                return StatusCode(404);
+            
+            return Json(new
+            {
+                circuits = eventData.EventStream.Select(dssEvent => new
+                {
+                    timestamp = dssEvent.TimestampUtc,
+                    name = dssEvent.systemEvent,
+                    zone = (int)dssEvent.properties.zone,
+                    group = (int)dssEvent.properties.group,
+                    scene = (int)dssEvent.properties.scene
+                })
+            });
+        }
     }
 }
