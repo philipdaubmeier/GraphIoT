@@ -124,10 +124,10 @@ namespace SmarthomeApi.Controllers
             
             return Json(new
             {
-                circuits = eventData.EventStream.Select(dssEvent => new
+                events = eventData.EventStream.Select(dssEvent => new
                 {
                     timestamp = dssEvent.TimestampUtc,
-                    name = dssEvent.systemEvent,
+                    dssEvent.systemEvent.name,
                     zone = (int)dssEvent.properties.zone,
                     group = (int)dssEvent.properties.group,
                     scene = (int)dssEvent.properties.scene

@@ -1,9 +1,8 @@
 ﻿using CompactTimeSeries;
-using SmarthomeApi.FormatParsers;
-using SmarthomeApi.Model;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SceneEventStream = CompactTimeSeries.EventTimeSeriesStream<DigitalstromClient.Model.Events.DssEvent, SmarthomeApi.Services.EventProcessing.DssSceneEventProcessorPlugin.DssSceneEventSerializer>;
 
 namespace SmarthomeApi.Database.Model
 {
@@ -20,12 +19,15 @@ namespace SmarthomeApi.Database.Model
 
         [MaxLength(10000)]
         public string EventStreamEncoded { get; set; }
-        
+
+        [NotMapped]
+        public TimeSeriesSpan Span => new TimeSeriesSpan(Day, Day.AddDays(1), MaxEventsPerDay);
+
         [NotMapped]
         public SceneEventStream EventStream
         {
-            get => EventStreamEncoded.ToEventStream(new TimeSeriesSpan(Day, Day.AddDays(1), MaxEventsPerDay));
-            set { EventStreamEncoded = value.ToBase64(); }
+            get => SceneEventStream.FromByteArray(Span, Convert.FromBase64String(EventStreamEncoded));
+            set { EventStreamEncoded = Convert.ToBase64String(value.ToByteArray()); }
         }
     }
 }

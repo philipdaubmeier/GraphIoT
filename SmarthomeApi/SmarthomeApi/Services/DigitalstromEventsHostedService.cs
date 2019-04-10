@@ -1,13 +1,13 @@
-﻿using CompactTimeSeries;
-using DigitalstromClient.Model;
+﻿using DigitalstromClient.Model;
 using DigitalstromClient.Model.Events;
 using DigitalstromClient.Network;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model;
+using SmarthomeApi.Services.EventProcessing;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +17,6 @@ namespace SmarthomeApi.Services
     public class DigitalstromEventsHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly PersistenceContext _dbContext;
         private readonly IDigitalstromConnectionProvider _connProvider;
         private DigitalstromSceneClient _dsSceneClient = null;
 
@@ -25,14 +24,18 @@ namespace SmarthomeApi.Services
         private CancellationToken _cancellationToken;
         private BlockingCollection<DssEvent> _persistenceQueue;
         private Task _persistenceWorkerThread = null;
-        
-        private SceneEventStream _eventStream = null;
+
+        private IEnumerable<IDssEventProcessorPlugin> _plugins;
 
         public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
         {
             _logger = logger;
-            _dbContext = databaseContext;
             _connProvider = connectionProvider;
+
+            _plugins = new List<IDssEventProcessorPlugin>()
+            {
+                new DssSceneEventProcessorPlugin(databaseContext)
+            };
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -47,7 +50,7 @@ namespace SmarthomeApi.Services
             _persistenceQueue = new BlockingCollection<DssEvent>();
             _persistenceWorkerThread = Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-            _dsSceneClient = new DigitalstromSceneClient(_connProvider);
+            _dsSceneClient = new DigitalstromSceneClient(_connProvider, _plugins.SelectMany(p => p.EventNames));
             _dsSceneClient.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
             _dsSceneClient.ErrorOccured += (s, e) => DigitalstromSceneClientError(e.Error);
 
@@ -119,7 +122,10 @@ namespace SmarthomeApi.Services
                         DequeueAndPipeToEventStream(remainingMs);
                     }
 
-                    SaveEventStreamToDb();
+                    foreach (var plugin in _plugins)
+                        plugin.SaveEventStreamToDb();
+
+                    _logger.LogInformation($"{DateTime.Now} Persisted event clump");
                 }
                 catch (Exception ex)
                 {
@@ -133,7 +139,6 @@ namespace SmarthomeApi.Services
         /// DssEvent. The event is then written to the event stream, which is read from the db or created if
         /// not existing. If a new day is reached, it automatically creates a new event stream which it writes to.
         /// </summary>
-        /// <param name="millisecondsTimeout"></param>
         private void DequeueAndPipeToEventStream(int millisecondsTimeout)
         {
             _persistenceQueue.TryTake(out DssEvent dsEvent, millisecondsTimeout, _cancellationToken);
@@ -141,74 +146,21 @@ namespace SmarthomeApi.Services
             // Timeout was triggered, no event was read - leave method and continue in main thread loop
             if (dsEvent == null)
                 return;
-
+            
             if (millisecondsTimeout < 0)
                 _logger.LogInformation($"{DateTime.Now} Dequeued event (first in clump) with timestamp {dsEvent?.TimestampUtc}");
             else
                 _logger.LogInformation($"{DateTime.Now} Dequeued event (clump successor) with timestamp {dsEvent?.TimestampUtc}");
 
-            // We try to save to the event stream the first time, so first create one
-            if (_eventStream == null)
-                ReadOrCreateEventStream(dsEvent.TimestampUtc.ToLocalTime().Date);
-
-            // We have reached the day boundary - save the current event stream and create a new one for the new day
-            if (!_eventStream.Span.IsIncluded(dsEvent.TimestampUtc.ToLocalTime()))
+            foreach (var plugin in _plugins.Where(p => p.EventNames.Contains(dsEvent.systemEvent)))
             {
-                SaveEventStreamToDb();
-                ReadOrCreateEventStream(dsEvent.TimestampUtc.ToLocalTime().Date);
-            }
+                plugin.ReadOrCreateEventStream(dsEvent.TimestampUtc.ToLocalTime().Date);
 
-            _eventStream.WriteEvent(dsEvent);
-        }
+                // We have already written the same event the last second or sooner
+                if (plugin.HasDuplicate(dsEvent, 1000))
+                    continue;
 
-        /// <summary>
-        /// Reads the event stream for the given day from the db or creates a new one if not existing yet.
-        /// </summary>
-        private void ReadOrCreateEventStream(DateTime date)
-        {
-            if (_eventStream != null && _eventStream.Span.IsIncluded(date))
-                return;
-
-            _dbContext.Semaphore.WaitOne();
-            try
-            {
-                var dbSceneEvents = _dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
-                if (dbSceneEvents != null)
-                    _eventStream = dbSceneEvents.EventStream;
-                else
-                    _eventStream = new SceneEventStream(new TimeSeriesSpan(date, date.AddDays(1), DigitalstromSceneEventData.MaxEventsPerDay));
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
-            }
-        }
-
-        /// <summary>
-        /// Saves the event stream to the database by updating an existing row or creating a new one if
-        /// not existing yet.
-        /// </summary>
-        private void SaveEventStreamToDb()
-        {
-            var date = _eventStream.Span.Begin.Date;
-
-            _dbContext.Semaphore.WaitOne();
-            try
-            {
-                var dbSceneEvents = _dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
-                if (dbSceneEvents == null)
-                    _dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Day = date });
-
-                dbSceneEvents.EventStream = _eventStream;
-
-                _dbContext.SaveChanges();
-                _logger.LogInformation($"{DateTime.Now} Persisted event clump");
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
+                plugin.WriteToEventStream(dsEvent);
             }
         }
     }

@@ -16,20 +16,30 @@ namespace DigitalstromClient.Network
         private int subscriptionId;
         private DigitalstromWebserviceClient apiClient;
 
+        private IEnumerable<IEventName> eventsToSubscribe;
+
         public ApartmentState Scenes { get; set; }
 
-        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider)
-            : this(new DigitalstromWebserviceClient(connectionProvider))
+        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null)
+            : this(new DigitalstromWebserviceClient(connectionProvider), eventsToSubscribe)
         { }
 
-        public DigitalstromSceneClient(DigitalstromWebserviceClient client) : base()
+        public DigitalstromSceneClient(DigitalstromWebserviceClient client, IEnumerable<IEventName> eventsToSubscribe = null) : base()
         {
             Scenes = new ApartmentState();
             ApiEventRaised += HandleDssApiEvent;
             subscriptionId = new Random(Convert.ToInt32(DateTime.UtcNow.Ticks % int.MaxValue)).Next(10, 100);
             apiClient = client;
             subscribed = false;
-            
+
+            this.eventsToSubscribe = new List<IEventName>()
+            {
+                (SystemEventName)SystemEventName.EventType.CallScene,
+                (SystemEventName)SystemEventName.EventType.CallSceneBus
+            };
+            if (eventsToSubscribe != null)
+                ((List<IEventName>)this.eventsToSubscribe).AddRange(eventsToSubscribe);
+
             LoadApartment();
         }
         
@@ -98,8 +108,8 @@ namespace DigitalstromClient.Network
         {
             if (!subscribed)
             {
-                await apiClient.Subscribe((SystemEventName)SystemEventName.EventType.CallScene, subscriptionId);
-                await apiClient.Subscribe((SystemEventName)SystemEventName.EventType.CallSceneBus, subscriptionId);
+                foreach (var eventName in eventsToSubscribe)
+                    await apiClient.Subscribe(eventName, subscriptionId);
                 subscribed = true;
             }
             var events = await apiClient.PollForEvents(subscriptionId, 60000);
@@ -113,19 +123,7 @@ namespace DigitalstromClient.Network
         {
             if (args.ApiEvent == null)
                 return;
-
-            var dssEventProps = args.ApiEvent.properties;
-
-            try
-            {
-                var bla = args.ApiEvent.systemEvent;
-                var foo = bla.type;
-            }
-            catch(Exception ex)
-            {
-                var exx = ex;
-            }
-
+            
             switch (args.ApiEvent.systemEvent.type)
             {
                 case SystemEventName.EventType.CallSceneBus: goto case SystemEventName.EventType.CallScene;
