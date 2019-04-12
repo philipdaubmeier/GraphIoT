@@ -1,0 +1,70 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.SmarthomeApi", "PhilipDaubmeier.SmarthomeApi\PhilipDaubmeier.SmarthomeApi.csproj", "{957D571E-8C81-4E83-9AA6-4AB1948630AA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.CompactTimeSeries.Tests", "PhilipDaubmeier.CompactTimeSeries.Tests\PhilipDaubmeier.CompactTimeSeries.Tests.csproj", "{1E81426A-B0AE-478A-8393-8F7F105DE13A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.CompactTimeSeries", "PhilipDaubmeier.CompactTimeSeries\PhilipDaubmeier.CompactTimeSeries.csproj", "{82F35B1B-A22D-4DE5-9061-4447437E2C37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromClient", "PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj", "{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromClient.Tests", "PhilipDaubmeier.DigitalstromClient.Tests\PhilipDaubmeier.DigitalstromClient.Tests.csproj", "{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E81426A-B0AE-478A-8393-8F7F105DE13A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E81426A-B0AE-478A-8393-8F7F105DE13A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E81426A-B0AE-478A-8393-8F7F105DE13A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E81426A-B0AE-478A-8393-8F7F105DE13A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82F35B1B-A22D-4DE5-9061-4447437E2C37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82F35B1B-A22D-4DE5-9061-4447437E2C37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82F35B1B-A22D-4DE5-9061-4447437E2C37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82F35B1B-A22D-4DE5-9061-4447437E2C37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 6
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = PhilipDaubmeier.SmarthomeApi\\PhilipDaubmeier.SmarthomeApi.csproj
+		SccProjectName1 = PhilipDaubmeier.SmarthomeApi
+		SccLocalPath1 = PhilipDaubmeier.SmarthomeApi
+		SccProjectUniqueName2 = PhilipDaubmeier.CompactTimeSeries.Tests\\PhilipDaubmeier.CompactTimeSeries.Tests.csproj
+		SccProjectName2 = PhilipDaubmeier.CompactTimeSeries.Tests
+		SccLocalPath2 = PhilipDaubmeier.CompactTimeSeries.Tests
+		SccProjectUniqueName3 = PhilipDaubmeier.CompactTimeSeries\\PhilipDaubmeier.CompactTimeSeries.csproj
+		SccProjectName3 = PhilipDaubmeier.CompactTimeSeries
+		SccLocalPath3 = PhilipDaubmeier.CompactTimeSeries
+		SccProjectUniqueName4 = PhilipDaubmeier.DigitalstromClient\\PhilipDaubmeier.DigitalstromClient.csproj
+		SccProjectName4 = PhilipDaubmeier.DigitalstromClient
+		SccLocalPath4 = PhilipDaubmeier.DigitalstromClient
+		SccProjectUniqueName5 = PhilipDaubmeier.DigitalstromClient.Tests\\PhilipDaubmeier.DigitalstromClient.Tests.csproj
+		SccProjectName5 = PhilipDaubmeier.DigitalstromClient.Tests
+		SccLocalPath5 = PhilipDaubmeier.DigitalstromClient.Tests
+	EndGlobalSection
+EndGlobal

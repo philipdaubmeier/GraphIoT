@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.cs" />
+    <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\Script\*" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="Views\Style\*" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Grafana\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="Grafana\data\grafana.db" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="readme_setup_production_db.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="readme_setup_production_db.md" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ical.Net" Version="4.1.10" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.2" />
+    <PackageReference Include="ProxyKit" Version="2.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhilipDaubmeier.CompactTimeSeries\PhilipDaubmeier.CompactTimeSeries.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj" />
+  </ItemGroup>
+
+</Project>
