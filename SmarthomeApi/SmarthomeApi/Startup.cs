@@ -73,7 +73,7 @@ namespace SmarthomeApi
             services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
-            services.AddSingleton<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
+            services.AddTransient<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
             services.AddHostedService<DigitalstromEventsHostedService>();
             services.AddHostedService<DigitalstromTimedHostedService>();
             services.AddHostedService<ViessmannTimedHostedService>();

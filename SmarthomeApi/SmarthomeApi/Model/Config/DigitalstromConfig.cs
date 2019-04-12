@@ -8,6 +8,8 @@ namespace SmarthomeApi.Model.Config
         public string DssUsername { get; set; }
         public string DssPassword { get; set; }
 
+        public string DssCertificate { get; set; }
+
         public string DssUriLocal { get; set; }
         public string DssUriDsNet { get; set; }
         public string DssUriCloudredir { get; set; }
