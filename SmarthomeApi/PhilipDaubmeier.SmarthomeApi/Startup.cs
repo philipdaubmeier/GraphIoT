@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddDbContext<PersistenceContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
-            });
+            }, ServiceLifetime.Transient);
 
             services.AddLogging(config =>
             {
