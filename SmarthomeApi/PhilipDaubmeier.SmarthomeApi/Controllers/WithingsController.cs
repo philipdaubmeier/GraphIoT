@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SmarthomeApi.Clients.Withings;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/withings")]

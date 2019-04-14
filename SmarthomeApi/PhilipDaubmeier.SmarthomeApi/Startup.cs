@@ -10,17 +10,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using ProxyKit;
-using SmarthomeApi.Clients.Digitalstrom;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
-using SmarthomeApi.Services;
+using PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SmarthomeApi
+namespace PhilipDaubmeier.SmarthomeApi
 {
     public class Startup
     {

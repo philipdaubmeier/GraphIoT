@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SmarthomeApi.Clients.Viessmann;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/viessmann")]

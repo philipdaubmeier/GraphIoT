@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients.Viessmann
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
 {
     public class ViessmannPlatformClient
     {

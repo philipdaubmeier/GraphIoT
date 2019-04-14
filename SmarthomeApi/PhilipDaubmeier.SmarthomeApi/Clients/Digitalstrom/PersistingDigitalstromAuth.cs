@@ -1,9 +1,9 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients.Digitalstrom
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom
 {
     public class PersistingDigitalstromAuth : EphemeralDigitalstromAuth
     {

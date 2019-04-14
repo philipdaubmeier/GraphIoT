@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
 {
     public static class Base64TimeseriesParser
     {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SmarthomeApi.Migrations
+namespace PhilipDaubmeier.SmarthomeApi.Migrations
 {
     public partial class Calendar_v2 : Migration
     {

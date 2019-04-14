@@ -3,8 +3,8 @@ using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Services.EventProcessing;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Services.EventProcessing;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Services
+namespace PhilipDaubmeier.SmarthomeApi.Services
 {
     public class DigitalstromEventsHostedService : IHostedService, IDisposable
     {

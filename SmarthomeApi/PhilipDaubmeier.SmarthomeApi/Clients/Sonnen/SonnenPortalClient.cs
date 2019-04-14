@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients.Sonnen
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Sonnen
 {
     public class SonnenPortalClient
     {

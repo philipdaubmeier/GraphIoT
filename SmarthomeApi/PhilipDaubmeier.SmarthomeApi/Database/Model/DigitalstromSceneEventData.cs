@@ -2,9 +2,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using SceneEventStream = PhilipDaubmeier.CompactTimeSeries.EventTimeSeriesStream<PhilipDaubmeier.DigitalstromClient.Model.Events.DssEvent, SmarthomeApi.Services.EventProcessing.DssSceneEventProcessorPlugin.DssSceneEventSerializer>;
+using SceneEventStream = PhilipDaubmeier.CompactTimeSeries.EventTimeSeriesStream<PhilipDaubmeier.DigitalstromClient.Model.Events.DssEvent, PhilipDaubmeier.SmarthomeApi.Services.EventProcessing.DssSceneEventProcessorPlugin.DssSceneEventSerializer>;
 
-namespace SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class DigitalstromSceneEventData
     {

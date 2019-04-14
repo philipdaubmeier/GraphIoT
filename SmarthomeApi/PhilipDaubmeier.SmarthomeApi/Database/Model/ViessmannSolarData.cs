@@ -1,10 +1,10 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using SmarthomeApi.FormatParsers;
+using PhilipDaubmeier.SmarthomeApi.FormatParsers;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class ViessmannSolarData
     {

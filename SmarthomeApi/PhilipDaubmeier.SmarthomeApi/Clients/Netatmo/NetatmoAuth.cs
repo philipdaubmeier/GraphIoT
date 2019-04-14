@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmarthomeApi.Clients.Netatmo
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Netatmo
 {
     public class NetatmoAuth
     {

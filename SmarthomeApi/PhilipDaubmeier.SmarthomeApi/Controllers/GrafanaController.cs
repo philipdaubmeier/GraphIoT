@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NodaTime;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Database.ViewModel;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,7 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     /// <summary>
     /// More documentation about datasource plugins can be found in the Docs:

@@ -10,10 +10,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using SmarthomeApi.Clients.Netatmo;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Clients.Netatmo;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/telegram")]

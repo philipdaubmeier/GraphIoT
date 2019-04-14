@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 
-namespace SmarthomeApi.Migrations
+namespace PhilipDaubmeier.SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
     [Migration("20190318123908_Digitalstrom_Energy_v1")]

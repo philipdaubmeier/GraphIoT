@@ -1,12 +1,12 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using Microsoft.AspNetCore.Mvc;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Database.ViewModel;
-using SmarthomeApi.FormatParsers;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.ViewModel;
+using PhilipDaubmeier.SmarthomeApi.FormatParsers;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/graph")]

@@ -1,14 +1,14 @@
 ﻿using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.FormatParsers.Utility;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
 {
     public class IcsParser
     {

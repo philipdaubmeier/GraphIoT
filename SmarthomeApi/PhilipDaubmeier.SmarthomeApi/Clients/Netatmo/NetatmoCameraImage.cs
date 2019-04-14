@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients.Netatmo
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Netatmo
 {
     public class NetatmoCameraImage
     {

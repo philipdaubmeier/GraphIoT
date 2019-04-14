@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SmarthomeApi.Model.Config
+namespace PhilipDaubmeier.SmarthomeApi.Model.Config
 {
     public class DigitalstromConfig
     {

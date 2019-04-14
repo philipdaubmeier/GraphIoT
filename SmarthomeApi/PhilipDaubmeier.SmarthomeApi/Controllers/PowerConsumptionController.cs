@@ -1,13 +1,13 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using Microsoft.AspNetCore.Mvc;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Route("powerconsumption")]
     public class PowerConsumptionController : Controller

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SmarthomeApi.Clients;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Clients;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/dyndns")]

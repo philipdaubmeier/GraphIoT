@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Services
+namespace PhilipDaubmeier.SmarthomeApi.Services
 {
     public class GrafanaBackendProcessService : IHostedService, IDisposable
     {

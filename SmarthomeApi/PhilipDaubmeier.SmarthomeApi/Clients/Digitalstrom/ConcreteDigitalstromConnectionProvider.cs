@@ -1,15 +1,15 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using Microsoft.Extensions.Options;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 
-namespace SmarthomeApi.Clients.Digitalstrom
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom
 {
     public class ConcreteDigitalstromConnectionProvider : IDigitalstromConnectionProvider
     {

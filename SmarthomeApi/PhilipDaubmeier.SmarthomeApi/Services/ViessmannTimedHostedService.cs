@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SmarthomeApi.Clients.Viessmann;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 
-namespace SmarthomeApi.Services
+namespace PhilipDaubmeier.SmarthomeApi.Services
 {
     public class ViessmannTimedHostedService : IHostedService, IDisposable
     {

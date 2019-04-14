@@ -3,7 +3,7 @@ using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using System;
 using System.Collections.Generic;
 
-namespace SmarthomeApi.Services.EventProcessing
+namespace PhilipDaubmeier.SmarthomeApi.Services.EventProcessing
 {
     interface IDssEventProcessorPlugin
     {

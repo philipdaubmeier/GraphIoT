@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients.Netatmo
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Netatmo
 {
     internal class NetatmoWebserviceClient
     {

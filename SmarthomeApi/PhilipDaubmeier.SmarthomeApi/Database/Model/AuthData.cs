@@ -1,4 +1,4 @@
-﻿namespace SmarthomeApi.Database.Model
+﻿namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class AuthData
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace SmarthomeApi.Migrations
+namespace PhilipDaubmeier.SmarthomeApi.Migrations
 {
     public partial class Digitalstrom_Sensors_v1 : Migration
     {

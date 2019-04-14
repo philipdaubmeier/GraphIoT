@@ -1,9 +1,9 @@
-﻿using SmarthomeApi.Database.Model;
+﻿using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Clients
+namespace PhilipDaubmeier.SmarthomeApi.Clients
 {
     public class TokenStore
     {

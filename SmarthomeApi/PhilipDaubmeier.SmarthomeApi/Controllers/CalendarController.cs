@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ical.Net.CalendarComponents;
 using Microsoft.AspNetCore.Mvc;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.FormatParsers;
-using SmarthomeApi.FormatParsers.Utility;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.FormatParsers;
+using PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility;
 using System;
 using System.IO;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Produces("application/json")]
     [Route("api/calendars")]

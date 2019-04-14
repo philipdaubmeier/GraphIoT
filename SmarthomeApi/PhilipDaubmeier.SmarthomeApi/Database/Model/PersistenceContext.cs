@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Threading;
 
-namespace SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class PersistenceContext : DbContext
     {

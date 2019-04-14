@@ -3,14 +3,14 @@ using PhilipDaubmeier.DigitalstromClient.Model;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using Microsoft.AspNetCore.Mvc;
 using NodaTime;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Controllers
+namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Route("api/digitalstrom")]
     public class DigitalstromController : Controller

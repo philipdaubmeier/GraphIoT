@@ -1,10 +1,10 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmarthomeApi.Database.ViewModel
+namespace PhilipDaubmeier.SmarthomeApi.Database.ViewModel
 {
     public class DigitalstromEnergyViewModel : IGraphCollectionViewModel
     {

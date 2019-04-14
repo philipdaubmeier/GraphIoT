@@ -4,14 +4,14 @@ using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SmarthomeApi.Services
+namespace PhilipDaubmeier.SmarthomeApi.Services
 {
     public class DigitalstromTimedHostedService : IHostedService, IDisposable
     {

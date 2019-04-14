@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class CalendarOccurence
     {

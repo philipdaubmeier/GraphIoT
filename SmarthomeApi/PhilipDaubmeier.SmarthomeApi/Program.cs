@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
-namespace SmarthomeApi
+namespace PhilipDaubmeier.SmarthomeApi
 {
     public class Program
     {

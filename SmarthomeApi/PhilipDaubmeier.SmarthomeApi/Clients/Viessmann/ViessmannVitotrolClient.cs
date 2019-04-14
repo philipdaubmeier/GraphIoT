@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using SmarthomeApi.Database.Model;
-using SmarthomeApi.Model.Config;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SmarthomeApi.Clients.Viessmann
+namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
 {
     public class ViessmannVitotrolClient
     {

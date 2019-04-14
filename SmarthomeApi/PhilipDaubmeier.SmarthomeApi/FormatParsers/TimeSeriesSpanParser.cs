@@ -2,7 +2,7 @@
 using NodaTime;
 using System;
 
-namespace SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
 {
     public static class TimeSeriesSpanParser
     {

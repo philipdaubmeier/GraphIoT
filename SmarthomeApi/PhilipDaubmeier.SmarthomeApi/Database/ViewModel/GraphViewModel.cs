@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SmarthomeApi.Database.ViewModel
+namespace PhilipDaubmeier.SmarthomeApi.Database.ViewModel
 {
     public interface IGraphCollectionViewModel
     {

@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
 {
     /// <summary>
     /// Specialized parser for recognizing essential location information

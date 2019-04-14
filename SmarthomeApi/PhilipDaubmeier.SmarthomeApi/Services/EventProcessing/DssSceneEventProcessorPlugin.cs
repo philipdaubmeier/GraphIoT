@@ -1,13 +1,13 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SmarthomeApi.Services.EventProcessing
+namespace PhilipDaubmeier.SmarthomeApi.Services.EventProcessing
 {
     public class DssSceneEventProcessorPlugin : IDssEventProcessorPlugin
     {

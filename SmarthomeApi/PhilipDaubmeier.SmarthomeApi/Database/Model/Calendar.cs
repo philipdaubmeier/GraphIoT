@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class Calendar
     {
