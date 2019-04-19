@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,14 +18,16 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
     {
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;
+        private readonly DbContextOptions<PersistenceContext> _dbContextOptions;
         private readonly ViessmannPlatformClient _platformClient;
         private readonly ViessmannVitotrolClient _vitotrolClient;
         private Timer _timer;
 
-        public ViessmannTimedHostedService(ILogger<ViessmannTimedHostedService> logger, PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
+        public ViessmannTimedHostedService(ILogger<ViessmannTimedHostedService> logger, DbContextOptions<PersistenceContext> dbContextOptions, IOptions<ViessmannConfig> config)
         {
             _logger = logger;
-            _dbContext = databaseContext;
+            _dbContextOptions = dbContextOptions;
+            _dbContext = new PersistenceContext(_dbContextOptions);
             _vitotrolClient = new ViessmannVitotrolClient(_dbContext, config);
             _platformClient = new ViessmannPlatformClient(_dbContext, config);
         }
@@ -50,6 +53,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
         public void Dispose()
         {
             _timer?.Dispose();
+            _dbContext.Dispose();
         }
 
         private async void PollAll(object state)
@@ -100,12 +104,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
             var time = DateTime.Now;
             var day = time.Date;
 
-            _dbContext.Semaphore.WaitOne();
-            try
+            using (var dbContext = new PersistenceContext(_dbContextOptions))
             {
-                var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Day == day).FirstOrDefault();
+                var dbHeatingSeries = dbContext.ViessmannHeatingTimeseries.Where(x => x.Day == day).FirstOrDefault();
                 if (dbHeatingSeries == null)
-                    _dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingData() { Day = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });
+                    dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingData() { Day = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });
 
                 var oldHours = dbHeatingSeries.BurnerHoursTotal;
                 var minutes = (burnerHoursTotal - oldHours) * 60;
@@ -169,12 +172,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
                 series14[time] = dhwCircPump;
                 dbHeatingSeries.DhwCirculationPumpSeries = series14;
 
-                _dbContext.SaveChanges();
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
+                dbContext.SaveChanges();
             }
         }
 
@@ -184,12 +182,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
             var time = data.First().Item3;
             var day = time.Date;
 
-            _dbContext.Semaphore.WaitOne();
-            try
+            using (var dbContext = new PersistenceContext(_dbContextOptions))
             {
-                var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Day == day).FirstOrDefault();
+                var dbSolarSeries = dbContext.ViessmannSolarTimeseries.Where(x => x.Day == day).FirstOrDefault();
                 if (dbSolarSeries == null)
-                    _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarData() { Day = day });
+                    dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarData() { Day = day });
 
                 var item = data.First(d => d.Item1 == 7895.ToString());
                 var newValue = int.Parse(item.Item2);
@@ -219,12 +216,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
                 series5[time] = item.Item2.Trim() != "0";
                 dbSolarSeries.SolarSuppressionSeries = series5;
 
-                _dbContext.SaveChanges();
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
+                dbContext.SaveChanges();
             }
         }
     }
