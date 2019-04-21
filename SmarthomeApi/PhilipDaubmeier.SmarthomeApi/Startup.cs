@@ -19,6 +19,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
+using PhilipDaubmeier.DigitalstromClient.Network;
 
 namespace PhilipDaubmeier.SmarthomeApi
 {
@@ -48,7 +50,7 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddDbContext<PersistenceContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
-            }, ServiceLifetime.Transient);
+            });
 
             services.AddLogging(config =>
             {
@@ -64,6 +66,7 @@ namespace PhilipDaubmeier.SmarthomeApi
             });
 
             services.AddProxy();
+            services.AddHostedService<GrafanaBackendProcessService>();
 
             services.AddOptions();
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
@@ -72,12 +75,20 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
             services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
-
+            
             services.AddTransient<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
-            services.AddHostedService<DigitalstromEventsHostedService>();
+            services.AddScoped<DigitalstromWebserviceClient>();
+            services.AddScoped<DigitalstromEnergyPollingService>();
+            services.AddScoped<DigitalstromSensorPollingService>();
             services.AddHostedService<DigitalstromTimedHostedService>();
+
+            services.AddHostedService<DigitalstromEventsHostedService>();
+
+            services.AddScoped<ViessmannPlatformClient>();
+            services.AddScoped<ViessmannVitotrolClient>();
+            services.AddScoped<ViessmannSolarPollingService>();
+            services.AddScoped<ViessmannHeatingPollingService>();
             services.AddHostedService<ViessmannTimedHostedService>();
-            services.AddHostedService<GrafanaBackendProcessService>();
 
             return services.BuildServiceProvider();
         }
