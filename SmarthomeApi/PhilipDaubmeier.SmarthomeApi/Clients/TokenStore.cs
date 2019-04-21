@@ -32,39 +32,24 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients
         {
             if (_accessToken != null && _accessTokenExpiry.HasValue)
                 return true;
-
-            _dbContext.Semaphore.WaitOne();
-            try
-            {
-                _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
-                _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
-                _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
-                return true;
-            }
-            catch { return false; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
-            }
+            
+            _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
+            _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
+            _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
+            return true;
         }
 
         public async Task UpdateToken(string accessToken, DateTime accessTokenExpiry, string refreshToken)
         {
-            _dbContext.Semaphore.WaitOne();
-            try
-            {
-                UpdateValue(_accessTokenId, _accessToken, accessToken);
-                UpdateValue(_accessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
-                UpdateValue(_refreshTokenId, _refreshToken, refreshToken);
+            UpdateValue(_accessTokenId, _accessToken, accessToken);
+            UpdateValue(_accessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
+            UpdateValue(_refreshTokenId, _refreshToken, refreshToken);
 
-                _accessToken = accessToken;
-                _accessTokenExpiry = accessTokenExpiry;
-                _refreshToken = refreshToken;
+            _accessToken = accessToken;
+            _accessTokenExpiry = accessTokenExpiry;
+            _refreshToken = refreshToken;
 
-                await _dbContext.SaveChangesAsync();
-            }
-            catch { throw; }
-            finally { _dbContext.Semaphore.Release(); }
+            await _dbContext.SaveChangesAsync();
         }
 
         public bool IsAccessTokenValid()

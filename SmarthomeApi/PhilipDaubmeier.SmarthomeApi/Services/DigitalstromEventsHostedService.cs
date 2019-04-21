@@ -27,14 +27,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
 
         private IEnumerable<IDssEventProcessorPlugin> _plugins;
 
-        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromEventsHostedService(IServiceProvider serviceProvider, ILogger<DigitalstromEventsHostedService> logger, IDigitalstromConnectionProvider connectionProvider)
         {
             _logger = logger;
             _connProvider = connectionProvider;
 
             _plugins = new List<IDssEventProcessorPlugin>()
             {
-                new DssSceneEventProcessorPlugin(databaseContext)
+                new DssSceneEventProcessorPlugin(serviceProvider)
             };
         }
 

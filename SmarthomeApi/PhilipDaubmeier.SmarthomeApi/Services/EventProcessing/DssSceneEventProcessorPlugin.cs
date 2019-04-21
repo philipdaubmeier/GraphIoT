@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.DependencyInjection;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
@@ -84,13 +85,13 @@ namespace PhilipDaubmeier.SmarthomeApi.Services.EventProcessing
             }
         }
 
-        private readonly PersistenceContext _dbContext;
+        private readonly IServiceProvider _services;
         private EventTimeSeriesStream<DssEvent, DssSceneEventSerializer> _eventStream = null;
         private bool _hasChanges = false;
 
-        public DssSceneEventProcessorPlugin(PersistenceContext databaseContext)
+        public DssSceneEventProcessorPlugin(IServiceProvider services)
         {
-            _dbContext = databaseContext;
+            _services = services;
         }
 
         /// <summary>
@@ -137,22 +138,17 @@ namespace PhilipDaubmeier.SmarthomeApi.Services.EventProcessing
                 return;
 
             // We have reached the day boundary - save the current event stream and create a new one for the new day
-            if (_eventStream != null && !Span.IsIncluded(date))
-                SaveEventStreamToDb();
-
-            _dbContext.Semaphore.WaitOne();
-            try
+            using (var scope = _services.CreateScope())
+            using (var dbContext = scope.ServiceProvider.GetRequiredService<PersistenceContext>())
             {
-                var dbSceneEvents = _dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
+                if (_eventStream != null && !Span.IsIncluded(date))
+                    SaveEventStreamToDb();
+
+                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
                 if (dbSceneEvents != null)
                     _eventStream = dbSceneEvents.EventStream;
                 else
                     _eventStream = new EventTimeSeriesStream<DssEvent, DssSceneEventSerializer>(new TimeSeriesSpan(date, date.AddDays(1), DigitalstromSceneEventData.MaxEventsPerDay));
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
             }
         }
 
@@ -166,23 +162,18 @@ namespace PhilipDaubmeier.SmarthomeApi.Services.EventProcessing
 
             var date = Span.Begin.Date;
 
-            _dbContext.Semaphore.WaitOne();
-            try
+            using (var scope = _services.CreateScope())
+            using (var dbContext = scope.ServiceProvider.GetRequiredService<PersistenceContext>())
             {
-                var dbSceneEvents = _dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
+                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
                 if (dbSceneEvents == null)
-                    _dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Day = date });
+                    dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Day = date });
 
                 dbSceneEvents.EventStream = _eventStream;
 
-                _dbContext.SaveChanges();
+                dbContext.SaveChanges();
 
                 _hasChanges = false;
-            }
-            catch { throw; }
-            finally
-            {
-                _dbContext.Semaphore.Release();
             }
         }
     }

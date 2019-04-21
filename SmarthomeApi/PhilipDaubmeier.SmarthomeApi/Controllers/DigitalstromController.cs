@@ -55,11 +55,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
 
-            List<DigitalstromZoneSensorData> sensorData = null; 
-            db.Semaphore.WaitOne();
-            try { sensorData = db.DsSensorDataSet.Where(x => x.Day == dayDate.Date).ToList(); }
-            catch { throw; }
-            finally { db.Semaphore.Release(); }
+            var sensorData = db.DsSensorDataSet.Where(x => x.Day == dayDate.Date).ToList();
             if (sensorData == null)
                 return StatusCode(404);
 
@@ -81,12 +77,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
-
-            DigitalstromEnergyHighresData energyData = null;
-            db.Semaphore.WaitOne();
-            try { energyData = db.DsEnergyHighresDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault(); }
-            catch { throw; }
-            finally { db.Semaphore.Release(); }
+            
+            var energyData = db.DsEnergyHighresDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault();
             if (energyData == null)
                 return StatusCode(404);
 
@@ -114,11 +106,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
 
-            DigitalstromSceneEventData eventData = null;
-            db.Semaphore.WaitOne();
-            try { eventData = db.DsSceneEventDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault(); }
-            catch { throw; }
-            finally { db.Semaphore.Release(); }
+            var eventData = db.DsSceneEventDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault();
             if (eventData == null)
                 return StatusCode(404);
             

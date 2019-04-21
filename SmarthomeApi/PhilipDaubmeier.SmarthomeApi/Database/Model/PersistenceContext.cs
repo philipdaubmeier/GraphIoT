@@ -1,12 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Threading;
 
 namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
     public class PersistenceContext : DbContext
     {
-        public Semaphore Semaphore { get; set; } = new Semaphore(1, 1);
-
         public DbSet<AuthData> AuthDataSet { get; set; }
         
         public DbSet<DigitalstromZone> DsZones { get; set; }
