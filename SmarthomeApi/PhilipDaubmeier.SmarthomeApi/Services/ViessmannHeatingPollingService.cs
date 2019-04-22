@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Services
 {
-    public class ViessmannHeatingPollingService : IScopedPollingService
+    public class ViessmannHeatingPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;

@@ -1,8 +1,11 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Database.ViewModel;
-using PhilipDaubmeier.SmarthomeApi.FormatParsers;
+using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
+using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -13,9 +16,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     public class GraphController : Controller
     {
         private readonly PersistenceContext db;
-        public GraphController(PersistenceContext databaseContext)
+        private readonly DigitalstromDbContext dsDb;
+        public GraphController(PersistenceContext databaseContext, DigitalstromDbContext dsDatabaseContext)
         {
             db = databaseContext;
+            dsDb = dsDatabaseContext;
         }
 
         private JsonResult GetGraphs(IEnumerable<GraphViewModel> graphs)
@@ -68,7 +73,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new DigitalstromZoneSensorViewModel(db, span);
+            var graphs = new DigitalstromZoneSensorViewModel(dsDb, span);
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
@@ -82,7 +87,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new DigitalstromEnergyViewModel(db, span);
+            var graphs = new DigitalstromEnergyViewModel(dsDb, span);
             if (graphs.IsEmpty)
                 return StatusCode(404);
 

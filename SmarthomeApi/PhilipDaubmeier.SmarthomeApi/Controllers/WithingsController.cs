@@ -1,19 +1,11 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using PhilipDaubmeier.SmarthomeApi.Clients;
-using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
@@ -21,10 +13,10 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     [Route("api/withings")]
     public class WithingsController : Controller
     {
-        private readonly WithingsClient withingsClient;
-        public WithingsController(TokenStore<WithingsClient> tokenStore, IOptions<WithingsConfig> config)
+        private readonly WithingsClient _withingsClient;
+        public WithingsController(WithingsClient withingsClient)
         {
-            withingsClient = new WithingsClient(tokenStore, config);
+            _withingsClient = withingsClient;
         }
 
         // GET: api/withings/login
@@ -33,7 +25,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             var scopes = new string[] { "user.info", "user.metrics", "user.activity" };
 
-            Response.Redirect("https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=" + withingsClient.ClientId +
+            Response.Redirect("https://account.withings.com/oauth2_user/authorize2?response_type=code&client_id=" + _withingsClient.ClientId +
                 "&state=f84b57ec&scope=" + string.Join(",", scopes) + "&redirect_uri=https://your.domain/smarthome/api/withings/callback");
         }
 
@@ -46,7 +38,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 return StatusCode(403);
 
             var authorization_code = code;
-            var refresh_token = await withingsClient.AuthenticateLogin(code);
+            var refresh_token = await _withingsClient.AuthenticateLogin(code);
 
             Func<string, Task> sendTelegramMessage = async message => await (new HttpClient()).GetStringAsync("https://api.telegram.org/***REMOVED***/sendMessage?chat_id=***REMOVED***&text=" + WebUtility.UrlEncode(message));
             await sendTelegramMessage("Refresh token: " + refresh_token);
@@ -65,7 +57,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("measures")]
         public async Task<JsonResult> Measures()
         {
-            var measures = await withingsClient.GetMeasures(WithingsClient.MeasureType.Weight);
+            var measures = await _withingsClient.GetMeasures(WithingsClient.MeasureType.Weight);
 
             return Json(new
             {
@@ -77,7 +69,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("devices")]
         public async Task<JsonResult> Devices()
         {
-            var devices = await withingsClient.GetDevices();
+            var devices = await _withingsClient.GetDevices();
 
             return Json(new
             {
@@ -93,7 +85,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("lametric")]
         public async Task<JsonResult> LaMetric()
         {
-            var measures = (await withingsClient.GetMeasures(WithingsClient.MeasureType.Weight)).OrderBy(x => x.Key).ToList();
+            var measures = (await _withingsClient.GetMeasures(WithingsClient.MeasureType.Weight)).OrderBy(x => x.Key).ToList();
 
             var minMeasure = measures.TakeLast(37).Select(x => x.Value).Min();
             var chartMeasures = measures.TakeLast(37).Select(x => (int)(Math.Round(((decimal)(x.Value - minMeasure)) / 1000, 1) * 10));

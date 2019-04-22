@@ -1,5 +1,6 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 

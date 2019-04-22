@@ -1,5 +1,4 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
@@ -9,22 +8,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using ProxyKit;
-using PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom;
+using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
+using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
+using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
+using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
+using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
+using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
+using PhilipDaubmeier.TokenStore.DependencyInjection;
+using ProxyKit;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
-using PhilipDaubmeier.DigitalstromClient.Network;
-using PhilipDaubmeier.SmarthomeApi.Clients;
-using PhilipDaubmeier.SmarthomeApi.Controllers;
-using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
-using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
 
 namespace PhilipDaubmeier.SmarthomeApi
 {
@@ -51,11 +50,10 @@ namespace PhilipDaubmeier.SmarthomeApi
                 })
                 .WithRazorPagesAtContentRoot();
 
-            Action<DbContextOptionsBuilder> dbContextOptions = options =>
+            Action<DbContextOptionsBuilder> smarthomeSqlServer = options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
-
-            services.AddDbContext<TokenStoreDbContext>(dbContextOptions);
-            services.AddDbContext<PersistenceContext>(dbContextOptions);
+            
+            services.AddDbContext<PersistenceContext>(smarthomeSqlServer);
 
             services.AddLogging(config =>
             {
@@ -74,35 +72,31 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddHostedService<GrafanaBackendProcessService>();
 
             services.AddOptions();
-            services.Configure<TokenStoreConfig>(Configuration.GetSection("TokenStoreConfig"));
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
-            services.Configure<DigitalstromConfig>(Configuration.GetSection("DigitalstromConfig"));
             services.Configure<NetatmoConfig>(Configuration.GetSection("NetatmoConfig"));
             services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
             services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
-            services.AddScoped<TokenStore<PersistingDigitalstromAuth>>();
-            services.AddScoped<TokenStore<ViessmannPlatformClient>>();
-            services.AddScoped<TokenStore<ViessmannVitotrolClient>>();
-            services.AddScoped<TokenStore<SonnenPortalClient>>();
-            services.AddScoped<TokenStore<WithingsClient>>();
-            services.AddScoped<TokenStore<DynDnsController.DynDnsIpv4>>();
-            services.AddScoped<TokenStore<DynDnsController.DynDnsIpv6>>();
+            services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
+            services.AddTokenStore<ViessmannPlatformClient>();
+            services.AddTokenStore<ViessmannVitotrolClient>();
+            services.AddTokenStore<SonnenPortalClient>();
+            services.AddTokenStore<WithingsClient>();
+            services.AddTokenStore<DynDnsController.DynDnsIpv4>();
+            services.AddTokenStore<DynDnsController.DynDnsIpv6>();
 
-            services.AddTransient<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
-            services.AddScoped<DigitalstromWebserviceClient>();
-            services.AddScoped<DigitalstromEnergyPollingService>();
-            services.AddScoped<DigitalstromSensorPollingService>();
-            services.AddHostedService<DigitalstromTimedHostedService>();
-
-            services.AddHostedService<DigitalstromEventsHostedService>();
+            services.AddScoped<WithingsClient>();
+            services.AddScoped<SonnenPortalClient>();
+            services.AddScoped<ViessmannEstrellaClient>();
+            
+            services.AddDigitalstromHost(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddScoped<ViessmannPlatformClient>();
             services.AddScoped<ViessmannVitotrolClient>();
-            services.AddScoped<ViessmannSolarPollingService>();
-            services.AddScoped<ViessmannHeatingPollingService>();
-            services.AddHostedService<ViessmannTimedHostedService>();
+            services.AddPollingService<IViessmannPollingService, ViessmannSolarPollingService>();
+            services.AddPollingService<IViessmannPollingService, ViessmannHeatingPollingService>();
+            services.AddTimedPollingHost<IViessmannPollingService>(Configuration.GetSection("ViessmannConfig").GetSection("PollingService"));
 
             return services.BuildServiceProvider();
         }

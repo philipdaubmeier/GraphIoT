@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Services
 {
-    public class ViessmannSolarPollingService : IScopedPollingService
+    public class ViessmannSolarPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NodaTime;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
+using PhilipDaubmeier.TokenStore;
 using System;
 using System.Collections.Generic;
 using System.Linq;

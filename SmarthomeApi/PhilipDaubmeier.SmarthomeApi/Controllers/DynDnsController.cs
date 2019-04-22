@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhilipDaubmeier.SmarthomeApi.Clients;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.TokenStore;
 using System;
 using System.Net;
 using System.Net.Sockets;

@@ -1,9 +1,12 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using NodaTime;
+using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Database.ViewModel;
+using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,17 +54,19 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         }
 
         private readonly PersistenceContext db;
-        public GrafanaController(PersistenceContext databaseContext)
+        private readonly DigitalstromDbContext dsDb;
+        public GrafanaController(PersistenceContext databaseContext, DigitalstromDbContext dsDatabaseContext)
         {
             db = databaseContext;
+            dsDb = dsDatabaseContext;
         }
 
         private Dictionary<string, IGraphCollectionViewModel> GenerateViewModels(TimeSeriesSpan span)
         {
             return new Dictionary<string, IGraphCollectionViewModel>()
             {
-                { "energy", new DigitalstromEnergyViewModel(db, span) },
-                { "sensors", new DigitalstromZoneSensorViewModel(db, span) },
+                { "energy", new DigitalstromEnergyViewModel(dsDb, span) },
+                { "sensors", new DigitalstromZoneSensorViewModel(dsDb, span) },
                 { "heating", new ViessmannHeatingViewModel(db, span) },
                 { "solar", new ViessmannSolarViewModel(db, span) },
             };

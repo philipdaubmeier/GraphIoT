@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.TokenStore.Database;
 using System;
 using System.Linq;
 

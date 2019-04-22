@@ -9,9 +9,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.CompactTime
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.CompactTimeSeries", "PhilipDaubmeier.CompactTimeSeries\PhilipDaubmeier.CompactTimeSeries.csproj", "{82F35B1B-A22D-4DE5-9061-4447437E2C37}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromClient", "PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj", "{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromClient", "PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj", "{972E5075-0C6C-4221-BA2A-FEDE04EEE59B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromClient.Tests", "PhilipDaubmeier.DigitalstromClient.Tests\PhilipDaubmeier.DigitalstromClient.Tests.csproj", "{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromClient.Tests", "PhilipDaubmeier.DigitalstromClient.Tests\PhilipDaubmeier.DigitalstromClient.Tests.csproj", "{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TokenStore", "PhilipDaubmeier.TokenStore\PhilipDaubmeier.TokenStore.csproj", "{23B1AD86-174D-47F7-BA28-26598CE76A7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.TimeseriesHostCommon", "PhilipDaubmeier.TimeseriesHostCommon\PhilipDaubmeier.TimeseriesHostCommon.csproj", "{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromHost", "PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj", "{048F4390-6981-49AA-AC7B-CFEEB8100B45}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +45,18 @@ Global
 		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23B1AD86-174D-47F7-BA28-26598CE76A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23B1AD86-174D-47F7-BA28-26598CE76A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23B1AD86-174D-47F7-BA28-26598CE76A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23B1AD86-174D-47F7-BA28-26598CE76A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}.Release|Any CPU.Build.0 = Release|Any CPU
+		{048F4390-6981-49AA-AC7B-CFEEB8100B45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{048F4390-6981-49AA-AC7B-CFEEB8100B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{048F4390-6981-49AA-AC7B-CFEEB8100B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{048F4390-6981-49AA-AC7B-CFEEB8100B45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,7 +65,7 @@ Global
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
+		SccNumberOfProjects = 9
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -66,5 +84,14 @@ Global
 		SccProjectUniqueName5 = PhilipDaubmeier.DigitalstromClient.Tests\\PhilipDaubmeier.DigitalstromClient.Tests.csproj
 		SccProjectName5 = PhilipDaubmeier.DigitalstromClient.Tests
 		SccLocalPath5 = PhilipDaubmeier.DigitalstromClient.Tests
+		SccProjectUniqueName6 = PhilipDaubmeier.TokenStore\\PhilipDaubmeier.TokenStore.csproj
+		SccProjectName6 = PhilipDaubmeier.TokenStore
+		SccLocalPath6 = PhilipDaubmeier.TokenStore
+		SccProjectUniqueName7 = PhilipDaubmeier.TimeseriesHostCommon\\PhilipDaubmeier.TimeseriesHostCommon.csproj
+		SccProjectName7 = PhilipDaubmeier.TimeseriesHostCommon
+		SccLocalPath7 = PhilipDaubmeier.TimeseriesHostCommon
+		SccProjectUniqueName8 = PhilipDaubmeier.DigitalstromHost\\PhilipDaubmeier.DigitalstromHost.csproj
+		SccProjectName8 = PhilipDaubmeier.DigitalstromHost
+		SccLocalPath8 = PhilipDaubmeier.DigitalstromHost
 	EndGlobalSection
 EndGlobal

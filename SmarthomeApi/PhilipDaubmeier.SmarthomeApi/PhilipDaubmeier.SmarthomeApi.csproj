@@ -71,6 +71,9 @@
   <ItemGroup>
     <ProjectReference Include="..\PhilipDaubmeier.CompactTimeSeries\PhilipDaubmeier.CompactTimeSeries.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.TimeseriesHostCommon\PhilipDaubmeier.TimeseriesHostCommon.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.TokenStore\PhilipDaubmeier.TokenStore.csproj" />
   </ItemGroup>
 
 </Project>

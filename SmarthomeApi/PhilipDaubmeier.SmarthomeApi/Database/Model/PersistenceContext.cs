@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.TokenStore.Database;
 
 namespace PhilipDaubmeier.SmarthomeApi.Database.Model
 {
