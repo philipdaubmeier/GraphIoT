@@ -20,12 +20,12 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private readonly ViessmannVitotrolClient vitotrolClient;
 
         private readonly PersistenceContext db;
-        public ViessmannController(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
+        public ViessmannController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             db = databaseContext;
             estrellaClient = new ViessmannEstrellaClient(config);
-            platformClient = new ViessmannPlatformClient(db, config);
-            vitotrolClient = new ViessmannVitotrolClient(db, config);
+            platformClient = new ViessmannPlatformClient(tokenDbContext, config);
+            vitotrolClient = new ViessmannVitotrolClient(tokenDbContext, config);
         }
 
         // GET: api/viessmann/installations/names

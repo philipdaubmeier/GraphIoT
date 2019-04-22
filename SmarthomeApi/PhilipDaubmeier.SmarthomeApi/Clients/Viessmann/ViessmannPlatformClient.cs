@@ -32,9 +32,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
             Circuit1
         }
 
-        public ViessmannPlatformClient(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
+        public ViessmannPlatformClient(TokenStoreDbContext tokenDbContext, IOptions<ViessmannConfig> config)
         {
-            _tokenStore = new TokenStore(databaseContext, "viessmann_platform");
+            _tokenStore = new TokenStore(tokenDbContext, "viessmann_platform");
             _config = config;
         }
 

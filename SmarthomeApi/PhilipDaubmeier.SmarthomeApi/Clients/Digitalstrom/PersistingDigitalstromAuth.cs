@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom
         public new string SessionToken => _tokenStore.AccessToken;
         public new DateTime SessionExpiration => _tokenStore.AccessTokenExpiry;
 
-        public PersistingDigitalstromAuth(PersistenceContext db, string appId, string username, string password) : base(appId, username, password)
+        public PersistingDigitalstromAuth(TokenStoreDbContext db, string appId, string username, string password) : base(appId, username, password)
         {
             _tokenStore = new TokenStore(db, $"digitalstrom.{appId.ToLowerInvariant()}");
         }

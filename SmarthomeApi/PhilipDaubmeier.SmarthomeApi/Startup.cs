@@ -47,10 +47,11 @@ namespace PhilipDaubmeier.SmarthomeApi
                 })
                 .WithRazorPagesAtContentRoot();
 
-            services.AddDbContext<PersistenceContext>(options =>
-            {
+            Action<DbContextOptionsBuilder> dbContextOptions = options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
-            });
+
+            services.AddDbContext<TokenStoreDbContext>(dbContextOptions);
+            services.AddDbContext<PersistenceContext>(dbContextOptions);
 
             services.AddLogging(config =>
             {
@@ -128,9 +129,8 @@ namespace PhilipDaubmeier.SmarthomeApi
                     { ".js", "application/javascript" },
                 })
             });
-
-            var dbService = serviceProvider.GetRequiredService<PersistenceContext>();
-            dbService.Database.Migrate();
+            
+            serviceProvider.GetRequiredService<PersistenceContext>().Database.Migrate();
         }
     }
 }

@@ -15,10 +15,10 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private static SonnenPortalClient sonnenClient;
 
         private readonly PersistenceContext db;
-        public SonnenController(PersistenceContext databaseContext, IOptions<SonnenConfig> config)
+        public SonnenController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext, IOptions<SonnenConfig> config)
         {
             db = databaseContext;
-            sonnenClient = new SonnenPortalClient(db, config);
+            sonnenClient = new SonnenPortalClient(tokenDbContext, config);
         }
 
         // GET api/sonnen/history/week

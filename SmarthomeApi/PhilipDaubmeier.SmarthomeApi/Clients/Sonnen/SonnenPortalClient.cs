@@ -50,9 +50,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Sonnen
             public int SOC { get; set; }
         }
 
-        public SonnenPortalClient(PersistenceContext databaseContext, IOptions<SonnenConfig> config)
+        public SonnenPortalClient(TokenStoreDbContext tokenDbContext, IOptions<SonnenConfig> config)
         {
-            _tokenStore = new TokenStore(databaseContext, "sonnen_portal");
+            _tokenStore = new TokenStore(tokenDbContext, "sonnen_portal");
             _config = config;
         }
 

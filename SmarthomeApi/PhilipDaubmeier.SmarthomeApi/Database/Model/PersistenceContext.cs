@@ -5,7 +5,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Database.Model
     public class PersistenceContext : DbContext
     {
         public DbSet<AuthData> AuthDataSet { get; set; }
-        
+
         public DbSet<DigitalstromZone> DsZones { get; set; }
 
         public DbSet<DigitalstromZoneSensorData> DsSensorDataSet { get; set; }

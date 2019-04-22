@@ -14,7 +14,6 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
         private readonly ILogger _logger;
         private readonly PersistenceContext _dbContext;
         private readonly DigitalstromWebserviceClient _dsClient;
-        private Timer _timer;
 
         public DigitalstromSensorPollingService(ILogger<DigitalstromSensorPollingService> logger, PersistenceContext databaseContext, DigitalstromWebserviceClient dsClient)
         {

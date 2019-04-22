@@ -21,9 +21,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     public class WithingsController : Controller
     {
         private readonly WithingsClient withingsClient;
-        public WithingsController(PersistenceContext databaseContext, IOptions<WithingsConfig> config)
+        public WithingsController(TokenStoreDbContext tokenDbContext, IOptions<WithingsConfig> config)
         {
-            withingsClient = new WithingsClient(databaseContext, config);
+            withingsClient = new WithingsClient(tokenDbContext, config);
         }
 
         // GET: api/withings/login

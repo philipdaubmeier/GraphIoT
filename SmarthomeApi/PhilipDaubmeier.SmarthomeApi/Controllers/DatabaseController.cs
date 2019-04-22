@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using System;
+using System.Linq;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
     [Route("api/database")]
     public class DatabaseController : Controller
     {
-        private readonly PersistenceContext db;
-        public DatabaseController(PersistenceContext databaseContext)
+        private readonly TokenStoreDbContext db;
+        public DatabaseController(TokenStoreDbContext databaseContext)
         {
             db = databaseContext;
         }

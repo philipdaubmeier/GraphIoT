@@ -44,9 +44,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Withings
             PulseWave   = 91  /// <summary>Pulse Wave Velocity</summary>
         }
 
-        public WithingsClient(PersistenceContext databaseContext, IOptions<WithingsConfig> config)
+        public WithingsClient(TokenStoreDbContext tokenDbContext, IOptions<WithingsConfig> config)
         {
-            _tokenStore = new TokenStore(databaseContext, "withings");
+            _tokenStore = new TokenStore(tokenDbContext, "withings");
             _config = config;
         }
 

@@ -26,9 +26,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
 
         private TokenStore _tokenStore;
 
-        public ViessmannVitotrolClient(PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
+        public ViessmannVitotrolClient(TokenStoreDbContext tokenDbContext, IOptions<ViessmannConfig> config)
         {
-            _tokenStore = new TokenStore(databaseContext, "viessmann_vitotrol");
+            _tokenStore = new TokenStore(tokenDbContext, "viessmann_vitotrol");
             _config = config;
         }
 

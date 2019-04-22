@@ -17,11 +17,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private readonly TokenStore _tokenStoreIPv4;
         private readonly TokenStore _tokenStoreIPv6;
 
-        public DynDnsController(PersistenceContext databaseContext)
+        public DynDnsController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext)
         {
             _db = databaseContext;
-            _tokenStoreIPv4 = new TokenStore(_db, "dyndns_ipv4");
-            _tokenStoreIPv6 = new TokenStore(_db, "dyndns_ipv6");
+            _tokenStoreIPv4 = new TokenStore(tokenDbContext, "dyndns_ipv4");
+            _tokenStoreIPv6 = new TokenStore(tokenDbContext, "dyndns_ipv6");
         }
 
         // GET api/dyndns/update?username={username}&password={password}&domain={domain}&ipv4={ipv4}&ipv6={ipv6}

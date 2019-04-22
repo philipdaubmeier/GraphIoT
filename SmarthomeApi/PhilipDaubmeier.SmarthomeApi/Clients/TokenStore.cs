@@ -8,9 +8,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients
     public class TokenStore
     {
         private string _serviceName;
-        private PersistenceContext _dbContext;
+        private TokenStoreDbContext _dbContext;
 
-        public TokenStore(PersistenceContext databaseContext, string serviceName)
+        public TokenStore(TokenStoreDbContext databaseContext, string serviceName)
         {
             _serviceName = serviceName;
             _dbContext = databaseContext;
