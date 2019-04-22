@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Sonnen
 
         private const string _baseUri = @"https://meine.sonnenbatterie.de/";
 
-        private TokenStore _tokenStore;
+        private TokenStore<SonnenPortalClient> _tokenStore;
 
         public class EnergyStats
         {
@@ -50,9 +50,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Sonnen
             public int SOC { get; set; }
         }
 
-        public SonnenPortalClient(TokenStoreDbContext tokenDbContext, IOptions<SonnenConfig> config)
+        public SonnenPortalClient(TokenStore<SonnenPortalClient> tokenStore, IOptions<SonnenConfig> config)
         {
-            _tokenStore = new TokenStore(tokenDbContext, "sonnen_portal");
+            _tokenStore = tokenStore;
             _config = config;
         }
 

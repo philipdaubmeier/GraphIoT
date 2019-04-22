@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
         private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
         private const string _redirectUri = "vicare://oauth-callback/everest";
 
-        private TokenStore _tokenStore;
+        private TokenStore<ViessmannPlatformClient> _tokenStore;
 
         public enum Circuit
         {
@@ -32,9 +32,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
             Circuit1
         }
 
-        public ViessmannPlatformClient(TokenStoreDbContext tokenDbContext, IOptions<ViessmannConfig> config)
+        public ViessmannPlatformClient(TokenStore<ViessmannPlatformClient> tokenStore, IOptions<ViessmannConfig> config)
         {
-            _tokenStore = new TokenStore(tokenDbContext, "viessmann_platform");
+            _tokenStore = tokenStore;
             _config = config;
         }
 

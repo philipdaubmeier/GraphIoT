@@ -14,14 +14,17 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     {
         private const int expiryDays = 7;
         private readonly PersistenceContext _db;
-        private readonly TokenStore _tokenStoreIPv4;
-        private readonly TokenStore _tokenStoreIPv6;
+        private readonly TokenStore<DynDnsIpv4> _tokenStoreIPv4;
+        private readonly TokenStore<DynDnsIpv6> _tokenStoreIPv6;
 
-        public DynDnsController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext)
+        public class DynDnsIpv4 { }
+        public class DynDnsIpv6 { }
+
+        public DynDnsController(TokenStore<DynDnsIpv4> tokenStoreIPv4, TokenStore<DynDnsIpv6> tokenStoreIPv6, PersistenceContext databaseContext)
         {
             _db = databaseContext;
-            _tokenStoreIPv4 = new TokenStore(tokenDbContext, "dyndns_ipv4");
-            _tokenStoreIPv6 = new TokenStore(tokenDbContext, "dyndns_ipv6");
+            _tokenStoreIPv4 = tokenStoreIPv4;
+            _tokenStoreIPv6 = tokenStoreIPv6;
         }
 
         // GET api/dyndns/update?username={username}&password={password}&domain={domain}&ipv4={ipv4}&ipv6={ipv6}

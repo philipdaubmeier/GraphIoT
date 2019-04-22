@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Withings
         
         public string ClientId { get { return _config.Value.WithingsClientId; } }
 
-        private TokenStore _tokenStore;
+        private TokenStore<WithingsClient> _tokenStore;
 
         public enum MeasureType
         {
@@ -44,9 +44,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Withings
             PulseWave   = 91  /// <summary>Pulse Wave Velocity</summary>
         }
 
-        public WithingsClient(TokenStoreDbContext tokenDbContext, IOptions<WithingsConfig> config)
+        public WithingsClient(TokenStore<WithingsClient> tokenStore, IOptions<WithingsConfig> config)
         {
-            _tokenStore = new TokenStore(tokenDbContext, "withings");
+            _tokenStore = tokenStore;
             _config = config;
         }
 

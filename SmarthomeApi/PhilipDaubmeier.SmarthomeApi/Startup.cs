@@ -21,6 +21,10 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.DigitalstromClient.Network;
+using PhilipDaubmeier.SmarthomeApi.Clients;
+using PhilipDaubmeier.SmarthomeApi.Controllers;
+using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
+using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
 
 namespace PhilipDaubmeier.SmarthomeApi
 {
@@ -70,13 +74,22 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddHostedService<GrafanaBackendProcessService>();
 
             services.AddOptions();
+            services.Configure<TokenStoreConfig>(Configuration.GetSection("TokenStoreConfig"));
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
             services.Configure<DigitalstromConfig>(Configuration.GetSection("DigitalstromConfig"));
             services.Configure<NetatmoConfig>(Configuration.GetSection("NetatmoConfig"));
             services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
             services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
-            
+
+            services.AddScoped<TokenStore<PersistingDigitalstromAuth>>();
+            services.AddScoped<TokenStore<ViessmannPlatformClient>>();
+            services.AddScoped<TokenStore<ViessmannVitotrolClient>>();
+            services.AddScoped<TokenStore<SonnenPortalClient>>();
+            services.AddScoped<TokenStore<WithingsClient>>();
+            services.AddScoped<TokenStore<DynDnsController.DynDnsIpv4>>();
+            services.AddScoped<TokenStore<DynDnsController.DynDnsIpv6>>();
+
             services.AddTransient<IDigitalstromConnectionProvider, ConcreteDigitalstromConnectionProvider>();
             services.AddScoped<DigitalstromWebserviceClient>();
             services.AddScoped<DigitalstromEnergyPollingService>();

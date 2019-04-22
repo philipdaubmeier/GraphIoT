@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using PhilipDaubmeier.SmarthomeApi.Clients;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
@@ -21,9 +22,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     public class WithingsController : Controller
     {
         private readonly WithingsClient withingsClient;
-        public WithingsController(TokenStoreDbContext tokenDbContext, IOptions<WithingsConfig> config)
+        public WithingsController(TokenStore<WithingsClient> tokenStore, IOptions<WithingsConfig> config)
         {
-            withingsClient = new WithingsClient(tokenDbContext, config);
+            withingsClient = new WithingsClient(tokenStore, config);
         }
 
         // GET: api/withings/login

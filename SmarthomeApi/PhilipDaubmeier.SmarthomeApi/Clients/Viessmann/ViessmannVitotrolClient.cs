@@ -24,11 +24,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
         private const string _soapSuffix = @"</soap:Body></soap:Envelope>";
         private const string _soapAction = @"http://www.e-controlnet.de/services/vii/";
 
-        private TokenStore _tokenStore;
+        private TokenStore<ViessmannVitotrolClient> _tokenStore;
 
-        public ViessmannVitotrolClient(TokenStoreDbContext tokenDbContext, IOptions<ViessmannConfig> config)
+        public ViessmannVitotrolClient(TokenStore<ViessmannVitotrolClient> tokenStore, IOptions<ViessmannConfig> config)
         {
-            _tokenStore = new TokenStore(tokenDbContext, "viessmann_vitotrol");
+            _tokenStore = tokenStore;
             _config = config;
         }
 

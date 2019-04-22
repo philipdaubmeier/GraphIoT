@@ -1,5 +1,4 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using System;
 using System.Threading.Tasks;
 
@@ -7,15 +6,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Digitalstrom
 {
     public class PersistingDigitalstromAuth : EphemeralDigitalstromAuth
     {
-        private TokenStore _tokenStore;
+        private TokenStore<PersistingDigitalstromAuth> _tokenStore;
 
         public new string ApplicationToken => _tokenStore.RefreshToken;
         public new string SessionToken => _tokenStore.AccessToken;
         public new DateTime SessionExpiration => _tokenStore.AccessTokenExpiry;
 
-        public PersistingDigitalstromAuth(TokenStoreDbContext db, string appId, string username, string password) : base(appId, username, password)
+        public PersistingDigitalstromAuth(TokenStore<PersistingDigitalstromAuth> tokenStore, string appId, string username, string password) : base(appId, username, password)
         {
-            _tokenStore = new TokenStore(db, $"digitalstrom.{appId.ToLowerInvariant()}");
+            _tokenStore = tokenStore;
         }
 
         public new async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)

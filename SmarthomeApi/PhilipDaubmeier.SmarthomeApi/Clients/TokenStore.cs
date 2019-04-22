@@ -1,17 +1,23 @@
-﻿using PhilipDaubmeier.SmarthomeApi.Database.Model;
+﻿using Microsoft.Extensions.Options;
+using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Clients
 {
-    public class TokenStore
+    public class TokenStore<T>
     {
         private string _serviceName;
         private TokenStoreDbContext _dbContext;
 
-        public TokenStore(TokenStoreDbContext databaseContext, string serviceName)
+        public TokenStore(TokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
+            string serviceName = string.Empty;
+            if (!(config?.Value?.ClassNameMapping?.TryGetValue(typeof(T).Name, out serviceName) ?? false))
+                serviceName = typeof(T).Name;
+
             _serviceName = serviceName;
             _dbContext = databaseContext;
         }

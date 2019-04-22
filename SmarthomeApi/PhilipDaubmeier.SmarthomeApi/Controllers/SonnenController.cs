@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using PhilipDaubmeier.SmarthomeApi.Clients;
 using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
@@ -15,10 +16,10 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private static SonnenPortalClient sonnenClient;
 
         private readonly PersistenceContext db;
-        public SonnenController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext, IOptions<SonnenConfig> config)
+        public SonnenController(TokenStore<SonnenPortalClient> tokenStore, PersistenceContext databaseContext, IOptions<SonnenConfig> config)
         {
             db = databaseContext;
-            sonnenClient = new SonnenPortalClient(tokenDbContext, config);
+            sonnenClient = new SonnenPortalClient(tokenStore, config);
         }
 
         // GET api/sonnen/history/week

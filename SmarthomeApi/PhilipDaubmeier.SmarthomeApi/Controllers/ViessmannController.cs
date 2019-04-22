@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using PhilipDaubmeier.SmarthomeApi.Clients;
 using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
@@ -20,12 +21,12 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private readonly ViessmannVitotrolClient vitotrolClient;
 
         private readonly PersistenceContext db;
-        public ViessmannController(TokenStoreDbContext tokenDbContext, PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
+        public ViessmannController(TokenStore<ViessmannPlatformClient> tokenStorePlatform, TokenStore<ViessmannVitotrolClient> tokenStoreVitotrol, PersistenceContext databaseContext, IOptions<ViessmannConfig> config)
         {
             db = databaseContext;
             estrellaClient = new ViessmannEstrellaClient(config);
-            platformClient = new ViessmannPlatformClient(tokenDbContext, config);
-            vitotrolClient = new ViessmannVitotrolClient(tokenDbContext, config);
+            platformClient = new ViessmannPlatformClient(tokenStorePlatform, config);
+            vitotrolClient = new ViessmannVitotrolClient(tokenStoreVitotrol, config);
         }
 
         // GET: api/viessmann/installations/names
