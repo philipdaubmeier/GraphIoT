@@ -25,7 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HostsClients", "HostsClient
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MainWebserver", "MainWebserver", "{65C89DCA-5096-479C-82F3-F33BF729FDE5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.CalendarHost", "PhilipDaubmeier.CalendarHost\PhilipDaubmeier.CalendarHost.csproj", "{C2A0FD73-6024-45B7-A69F-671D9F81374D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.CalendarHost", "PhilipDaubmeier.CalendarHost\PhilipDaubmeier.CalendarHost.csproj", "{C2A0FD73-6024-45B7-A69F-671D9F81374D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.ViessmannClient", "PhilipDaubmeier.ViessmannClient\PhilipDaubmeier.ViessmannClient.csproj", "{22BF5CFE-BDF0-474E-935B-6E52D9670C0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{C2A0FD73-6024-45B7-A69F-671D9F81374D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2A0FD73-6024-45B7-A69F-671D9F81374D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2A0FD73-6024-45B7-A69F-671D9F81374D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -83,12 +89,13 @@ Global
 		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
 		{048F4390-6981-49AA-AC7B-CFEEB8100B45} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{C2A0FD73-6024-45B7-A69F-671D9F81374D} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 10
+		SccNumberOfProjects = 11
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -128,5 +135,9 @@ Global
 		SccProjectTopLevelParentUniqueName9 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName9 = PhilipDaubmeier.CalendarHost
 		SccLocalPath9 = PhilipDaubmeier.CalendarHost
+		SccProjectUniqueName10 = PhilipDaubmeier.ViessmannClient\\PhilipDaubmeier.ViessmannClient.csproj
+		SccProjectTopLevelParentUniqueName10 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName10 = PhilipDaubmeier.ViessmannClient
+		SccLocalPath10 = PhilipDaubmeier.ViessmannClient
 	EndGlobalSection
 EndGlobal

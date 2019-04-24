@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Options;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
-using PhilipDaubmeier.TokenStore;
+﻿using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,11 +9,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
+namespace PhilipDaubmeier.ViessmannClient
 {
     public class ViessmannVitotrolClient
     {
-        private readonly IOptions<ViessmannConfig> _config;
+        private readonly IViessmannConnectionProvider<ViessmannVitotrolClient> _connectionProvider;
 
         private static readonly HttpClient _client = new HttpClient();
 
@@ -23,21 +21,18 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
         private const string _soapPrefix = @"<?xml version=""1.0"" encoding=""UTF-8""?><soap:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns=""http://www.e-controlnet.de/services/vii/""><soap:Body>";
         private const string _soapSuffix = @"</soap:Body></soap:Envelope>";
         private const string _soapAction = @"http://www.e-controlnet.de/services/vii/";
-
-        private TokenStore<ViessmannVitotrolClient> _tokenStore;
-
-        public ViessmannVitotrolClient(TokenStore<ViessmannVitotrolClient> tokenStore, IOptions<ViessmannConfig> config)
+        
+        public ViessmannVitotrolClient(IViessmannConnectionProvider<ViessmannVitotrolClient> connectionProvider)
         {
-            _tokenStore = tokenStore;
-            _config = config;
+            _connectionProvider = connectionProvider;
         }
 
         public async Task<List<KeyValuePair<string, string>>> GetTypeInfo()
         {
             await Authenticate();
 
-            var body = $"<GeraetId>{_config.Value.VitotrolDeviceId}</GeraetId><AnlageId>{_config.Value.VitotrolInstallationId}</AnlageId>";
-            return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _tokenStore.AccessToken));
+            var body = $"<GeraetId>{_connectionProvider.VitotrolDeviceId}</GeraetId><AnlageId>{_connectionProvider.VitotrolInstallationId}</AnlageId>";
+            return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _connectionProvider.AuthData.AccessToken));
         }
 
         public async Task<List<Tuple<string, string, DateTime>>> GetData(IEnumerable<int> datapoints)
@@ -45,22 +40,22 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
             await Authenticate();
 
             var datapointList = string.Join("</int><int>", datapoints.Select(x => x.ToString()));
-            var body = $"<UseCache>false</UseCache><GeraetId>{_config.Value.VitotrolDeviceId}</GeraetId><AnlageId>{_config.Value.VitotrolInstallationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
-            return await ParseData(await SendSoap("GetData", body, _tokenStore.AccessToken));
+            var body = $"<UseCache>false</UseCache><GeraetId>{_connectionProvider.VitotrolDeviceId}</GeraetId><AnlageId>{_connectionProvider.VitotrolInstallationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
+            return await ParseData(await SendSoap("GetData", body, _connectionProvider.AuthData.AccessToken));
         }
 
         private async Task Authenticate()
         {
-            if (_tokenStore.IsAccessTokenValid())
+            if (_connectionProvider.AuthData.IsAccessTokenValid())
                 return;
 
-            var body = $"<Betriebssystem>Android</Betriebssystem><AppId>prod</AppId><Benutzer>{_config.Value.Username}</Benutzer><AppVersion>93</AppVersion><Passwort>{_config.Value.Password}</Passwort>";
+            var body = $"<Betriebssystem>Android</Betriebssystem><AppId>prod</AppId><Benutzer>{_connectionProvider.AuthData.Username}</Benutzer><AppVersion>93</AppVersion><Passwort>{_connectionProvider.AuthData.UserPassword}</Passwort>";
             var response = await SendSoap("Login", body, null);
 
             var cookies = response.Headers.GetValues("Set-Cookie").Select(x => x.Replace("path=/; HttpOnly", "").Trim().TrimEnd(';')).ToList();
             var sessiontoken = string.Join(";", cookies);
 
-            await _tokenStore.UpdateToken(sessiontoken, DateTime.Now.AddHours(1), string.Empty);
+            await _connectionProvider.AuthData.UpdateTokenAsync(sessiontoken, DateTime.Now.AddHours(1), string.Empty);
         }
 
         private async Task<HttpResponseMessage> SendSoap(string action, string body, string token)

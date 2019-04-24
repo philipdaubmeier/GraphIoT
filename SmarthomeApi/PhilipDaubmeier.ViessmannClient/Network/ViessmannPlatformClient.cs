@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
-using PhilipDaubmeier.TokenStore;
+﻿using Newtonsoft.Json;
+using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +8,11 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
+namespace PhilipDaubmeier.ViessmannClient
 {
     public class ViessmannPlatformClient
     {
-        private readonly IOptions<ViessmannConfig> _config;
+        private readonly IViessmannConnectionProvider<ViessmannPlatformClient> _connectionProvider;
 
         private static readonly HttpClientHandler _authClientHandler = new HttpClientHandler() { AllowAutoRedirect = false };
         private static readonly HttpClient _authClient = new HttpClient(_authClientHandler);
@@ -24,18 +22,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
         private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
         private const string _redirectUri = "vicare://oauth-callback/everest";
 
-        private TokenStore<ViessmannPlatformClient> _tokenStore;
-
         public enum Circuit
         {
             Circuit0,
             Circuit1
         }
 
-        public ViessmannPlatformClient(TokenStore<ViessmannPlatformClient> tokenStore, IOptions<ViessmannConfig> config)
+        public ViessmannPlatformClient(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
         {
-            _tokenStore = tokenStore;
-            _config = config;
+            _connectionProvider = connectionProvider;
         }
 
         public async Task<string> GetInstallations()
@@ -47,7 +42,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
                 RequestUri = new Uri("https://api.viessmann-platform.io/general-management/v1/installations?expanded=true"),
                 Method = HttpMethod.Get
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenStore.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
 
             return await (await _authClient.SendAsync(request)).Content.ReadAsStringAsync();
         }
@@ -155,26 +150,26 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
             string baseUrl = "https://api.viessmann-platform.io/operational-data/v1/";
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{baseUrl}installations/{_config.Value.PlattformInstallationId}/gateways/{_config.Value.PlattformGatewayId}/devices/0/features/{featureName}"),
+                RequestUri = new Uri($"{baseUrl}installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features/{featureName}"),
                 Method = HttpMethod.Get
             };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _tokenStore.AccessToken);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
 
             return await _authClient.SendAsync(request);
         }
 
         private async Task Authenticate()
         {
-            if (_tokenStore.IsAccessTokenValid())
+            if (_connectionProvider.AuthData.IsAccessTokenValid())
                 return;
             
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_config.Value.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
+                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
                 Method = HttpMethod.Get,
             };
 
-            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_config.Value.Username}:{_config.Value.Password}"));
+            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_connectionProvider.AuthData.Username}:{_connectionProvider.AuthData.UserPassword}"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
 
             var response = await _authClient.SendAsync(request);
@@ -190,13 +185,13 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
                 new Uri(_tokenUri), new FormUrlEncodedContent(new[]
                 {
                     new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("client_id", _config.Value.PlattformApiClientId),
-                    new KeyValuePair<string, string>("client_secret", _config.Value.PlattformApiClientSecret),
+                    new KeyValuePair<string, string>("client_id", _connectionProvider.PlattformApiClientId),
+                    new KeyValuePair<string, string>("client_secret", _connectionProvider.PlattformApiClientSecret),
                     new KeyValuePair<string, string>("code", authorization_code),
                     new KeyValuePair<string, string>("redirect_uri", _redirectUri)
                 })));
 
-            await _tokenStore.UpdateToken(loadedToken.Item1, loadedToken.Item2, string.Empty);
+            await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, string.Empty);
         }
 
         private async Task<Tuple<string, DateTime>> ParseTokenResponse(HttpResponseMessage response)

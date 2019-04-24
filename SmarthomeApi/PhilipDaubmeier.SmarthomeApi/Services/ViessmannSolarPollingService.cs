@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.ViessmannClient;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

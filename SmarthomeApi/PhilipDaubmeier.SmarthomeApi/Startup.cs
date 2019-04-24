@@ -11,14 +11,16 @@ using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CalendarHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
 using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
-using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
+using PhilipDaubmeier.SmarthomeApi.Viessmann;
 using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
+using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannClient.Model;
 using ProxyKit;
 using System;
 using System.Collections.Generic;
@@ -80,6 +82,7 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
             services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
+            services.AddTokenStore<ViessmannEstrellaClient>();
             services.AddTokenStore<ViessmannPlatformClient>();
             services.AddTokenStore<ViessmannVitotrolClient>();
             services.AddTokenStore<SonnenPortalClient>();
@@ -89,12 +92,16 @@ namespace PhilipDaubmeier.SmarthomeApi
 
             services.AddScoped<WithingsClient>();
             services.AddScoped<SonnenPortalClient>();
-            services.AddScoped<ViessmannEstrellaClient>();
             
             services.AddDigitalstromHost(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
             
             services.AddCalendarHost(smarthomeSqlServer);
+            
+            services.AddScoped<IViessmannConnectionProvider<ViessmannEstrellaClient>, ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
+            services.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
+            services.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
 
+            services.AddScoped<ViessmannEstrellaClient>();
             services.AddScoped<ViessmannPlatformClient>();
             services.AddScoped<ViessmannVitotrolClient>();
             services.AddPollingService<IViessmannPollingService, ViessmannSolarPollingService>();

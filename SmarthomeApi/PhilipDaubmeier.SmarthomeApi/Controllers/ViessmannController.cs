@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using PhilipDaubmeier.SmarthomeApi.Clients;
-using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
 using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
+using PhilipDaubmeier.ViessmannClient;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

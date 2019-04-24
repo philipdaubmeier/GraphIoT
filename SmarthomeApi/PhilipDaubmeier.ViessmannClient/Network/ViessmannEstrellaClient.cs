@@ -1,6 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
+﻿using Newtonsoft.Json;
+using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +8,17 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
+namespace PhilipDaubmeier.ViessmannClient
 {
     public class ViessmannEstrellaClient
     {
-        private readonly IOptions<ViessmannConfig> _config;
+        private readonly IViessmannConnectionProvider<ViessmannEstrellaClient> _connectionProvider;
 
         private HttpClient _client = new HttpClient();
 
-        public ViessmannEstrellaClient(IOptions<ViessmannConfig> config)
+        public ViessmannEstrellaClient(IViessmannConnectionProvider<ViessmannEstrellaClient> connectionProvider)
         {
-            _config = config;
+            _connectionProvider = connectionProvider;
         }
 
         public async Task<List<int>> GetGateways()
@@ -42,8 +41,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Clients.Viessmann
                 Method = HttpMethod.Get,
             };
 
-            var username = _config.Value.Username;
-            var password = _config.Value.Password;
+            var username = _connectionProvider.AuthData.Username;
+            var password = _connectionProvider.AuthData.UserPassword;
             var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
             
