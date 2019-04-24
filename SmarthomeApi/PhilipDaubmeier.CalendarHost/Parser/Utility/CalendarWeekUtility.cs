@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility
+namespace PhilipDaubmeier.CalendarHost.FormatParsers
 {
     public class CalendarWeekUtility
     {

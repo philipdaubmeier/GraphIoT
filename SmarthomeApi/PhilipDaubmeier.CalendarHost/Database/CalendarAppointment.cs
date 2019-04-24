@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PhilipDaubmeier.SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.CalendarHost.Database
 {
     public class CalendarAppointment
     {

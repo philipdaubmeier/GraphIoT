@@ -57,7 +57,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Ical.Net" Version="4.1.10" />
+    <PackageReference Include="Ical.Net" Version="4.1.11" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.2" />
@@ -65,10 +65,12 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.2" />
+    <PackageReference Include="NodaTime" Version="2.4.5" />
     <PackageReference Include="ProxyKit" Version="2.0.4" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PhilipDaubmeier.CalendarHost\PhilipDaubmeier.CalendarHost.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.CompactTimeSeries\PhilipDaubmeier.CompactTimeSeries.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj" />

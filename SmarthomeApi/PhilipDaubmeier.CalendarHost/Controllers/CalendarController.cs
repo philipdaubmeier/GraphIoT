@@ -1,24 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Ical.Net.CalendarComponents;
+﻿using Ical.Net.CalendarComponents;
 using Microsoft.AspNetCore.Mvc;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.FormatParsers;
-using PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility;
+using Microsoft.EntityFrameworkCore;
+using PhilipDaubmeier.CalendarHost.Database;
+using PhilipDaubmeier.CalendarHost.FormatParsers;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Globalization;
 
-namespace PhilipDaubmeier.SmarthomeApi.Controllers
+namespace PhilipDaubmeier.CalendarHost.Controllers
 {
     [Produces("application/json")]
     [Route("api/calendars")]
     public class CalendarController : Controller
     {
-        private readonly PersistenceContext _dbContext;
-        public CalendarController(PersistenceContext databaseContext)
+        private readonly CalendarDbContext _dbContext;
+        public CalendarController(CalendarDbContext databaseContext)
         {
             _dbContext = databaseContext;
         }

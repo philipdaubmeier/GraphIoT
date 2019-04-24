@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PhilipDaubmeier.CalendarHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.TokenStore.Database;
 
@@ -17,9 +18,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Database.Model
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
 
         public DbSet<Calendar> Calendars { get; set; }
-
+        
         public DbSet<CalendarAppointment> CalendarAppointments { get; set; }
-
+        
         public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
 
         public DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }

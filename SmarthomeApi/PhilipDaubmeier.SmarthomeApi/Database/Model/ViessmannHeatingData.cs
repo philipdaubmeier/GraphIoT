@@ -1,5 +1,4 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.SmarthomeApi.FormatParsers;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.ComponentModel.DataAnnotations;

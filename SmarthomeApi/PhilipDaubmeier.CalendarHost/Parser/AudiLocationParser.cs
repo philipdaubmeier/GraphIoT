@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.CalendarHost.FormatParsers
 {
     /// <summary>
     /// Specialized parser for recognizing essential location information

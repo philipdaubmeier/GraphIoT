@@ -1,22 +1,20 @@
 ﻿using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility;
+using PhilipDaubmeier.CalendarHost.Database;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
+namespace PhilipDaubmeier.CalendarHost.FormatParsers
 {
     public class IcsParser
     {
-        private PersistenceContext _dbContext;
+        private CalendarDbContext _dbContext;
         private string _owner;
         private AudiLocationParser _location = new AudiLocationParser();
 
-        public IcsParser(PersistenceContext databaseContext, string ownerEmail)
+        public IcsParser(CalendarDbContext databaseContext, string ownerEmail)
         {
             _dbContext = databaseContext;
             _owner = ownerEmail;
@@ -41,7 +39,7 @@ namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
             }
         }
 
-        private void StoreCalendarEntries(PersistenceContext db, Ical.Net.Calendar calendar)
+        private void StoreCalendarEntries(CalendarDbContext db, Ical.Net.Calendar calendar)
         {
             var calendarIdStr = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-WR-RELCALID"))?.Value as string;
             var owner = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-OWNER"))?.Value as string;
@@ -90,7 +88,7 @@ namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
             db.SaveChanges();
         }
 
-        private CalendarAppointment CreateOrUpdateAppointment(PersistenceContext db, Calendar dbCalendar, CalendarEvent entry)
+        private CalendarAppointment CreateOrUpdateAppointment(CalendarDbContext db, Calendar dbCalendar, CalendarEvent entry)
         {
             var guid = GuidUtility.FromIcsUID(entry.Uid);
             
@@ -117,7 +115,7 @@ namespace PhilipDaubmeier.SmarthomeApi.FormatParsers
             return dbEntry;
         }
 
-        private void CreateOccurence(PersistenceContext db, CalendarAppointment dbAppointment, Occurrence occurence)
+        private void CreateOccurence(CalendarDbContext db, CalendarAppointment dbAppointment, Occurrence occurence)
         {
             var summary = GetSummary(occurence.Source as CalendarEvent);
             var location = GetLocation(occurence.Source as CalendarEvent);

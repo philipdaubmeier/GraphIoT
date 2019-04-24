@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.CalendarHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
 using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
 using PhilipDaubmeier.SmarthomeApi.Clients.Viessmann;
@@ -91,6 +92,8 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddScoped<ViessmannEstrellaClient>();
             
             services.AddDigitalstromHost(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
+            
+            services.AddCalendarHost(smarthomeSqlServer);
 
             services.AddScoped<ViessmannPlatformClient>();
             services.AddScoped<ViessmannVitotrolClient>();

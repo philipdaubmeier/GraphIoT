@@ -3,7 +3,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PhilipDaubmeier.SmarthomeApi.FormatParsers.Utility
+namespace PhilipDaubmeier.CalendarHost.FormatParsers
 {
     /// <summary>
     /// Helper methods for working with <see cref="Guid"/>.
