@@ -15,9 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.Digitalstro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TokenStore", "PhilipDaubmeier.TokenStore\PhilipDaubmeier.TokenStore.csproj", "{23B1AD86-174D-47F7-BA28-26598CE76A7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.TimeseriesHostCommon", "PhilipDaubmeier.TimeseriesHostCommon\PhilipDaubmeier.TimeseriesHostCommon.csproj", "{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TimeseriesHostCommon", "PhilipDaubmeier.TimeseriesHostCommon\PhilipDaubmeier.TimeseriesHostCommon.csproj", "{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromHost", "PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj", "{048F4390-6981-49AA-AC7B-CFEEB8100B45}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromHost", "PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj", "{048F4390-6981-49AA-AC7B-CFEEB8100B45}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{C7CE2B7C-9302-4960-88B2-8EB380247CB8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HostsClients", "HostsClients", "{BACF690E-BFC9-4008-9831-FFBA91968BB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MainWebserver", "MainWebserver", "{65C89DCA-5096-479C-82F3-F33BF729FDE5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,6 +67,16 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{957D571E-8C81-4E83-9AA6-4AB1948630AA} = {65C89DCA-5096-479C-82F3-F33BF729FDE5}
+		{1E81426A-B0AE-478A-8393-8F7F105DE13A} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{82F35B1B-A22D-4DE5-9061-4447437E2C37} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{972E5075-0C6C-4221-BA2A-FEDE04EEE59B} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{DEC5ADC0-EF92-4DB2-A5AF-45A61A17D658} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{23B1AD86-174D-47F7-BA28-26598CE76A7A} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{F2FB1080-D7E7-4F7A-AFA8-61922BAC0637} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{048F4390-6981-49AA-AC7B-CFEEB8100B45} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
@@ -70,27 +86,35 @@ Global
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = PhilipDaubmeier.SmarthomeApi\\PhilipDaubmeier.SmarthomeApi.csproj
+		SccProjectTopLevelParentUniqueName1 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName1 = PhilipDaubmeier.SmarthomeApi
 		SccLocalPath1 = PhilipDaubmeier.SmarthomeApi
 		SccProjectUniqueName2 = PhilipDaubmeier.CompactTimeSeries.Tests\\PhilipDaubmeier.CompactTimeSeries.Tests.csproj
+		SccProjectTopLevelParentUniqueName2 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName2 = PhilipDaubmeier.CompactTimeSeries.Tests
 		SccLocalPath2 = PhilipDaubmeier.CompactTimeSeries.Tests
 		SccProjectUniqueName3 = PhilipDaubmeier.CompactTimeSeries\\PhilipDaubmeier.CompactTimeSeries.csproj
+		SccProjectTopLevelParentUniqueName3 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName3 = PhilipDaubmeier.CompactTimeSeries
 		SccLocalPath3 = PhilipDaubmeier.CompactTimeSeries
 		SccProjectUniqueName4 = PhilipDaubmeier.DigitalstromClient\\PhilipDaubmeier.DigitalstromClient.csproj
+		SccProjectTopLevelParentUniqueName4 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName4 = PhilipDaubmeier.DigitalstromClient
 		SccLocalPath4 = PhilipDaubmeier.DigitalstromClient
 		SccProjectUniqueName5 = PhilipDaubmeier.DigitalstromClient.Tests\\PhilipDaubmeier.DigitalstromClient.Tests.csproj
+		SccProjectTopLevelParentUniqueName5 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName5 = PhilipDaubmeier.DigitalstromClient.Tests
 		SccLocalPath5 = PhilipDaubmeier.DigitalstromClient.Tests
 		SccProjectUniqueName6 = PhilipDaubmeier.TokenStore\\PhilipDaubmeier.TokenStore.csproj
+		SccProjectTopLevelParentUniqueName6 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName6 = PhilipDaubmeier.TokenStore
 		SccLocalPath6 = PhilipDaubmeier.TokenStore
 		SccProjectUniqueName7 = PhilipDaubmeier.TimeseriesHostCommon\\PhilipDaubmeier.TimeseriesHostCommon.csproj
+		SccProjectTopLevelParentUniqueName7 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName7 = PhilipDaubmeier.TimeseriesHostCommon
 		SccLocalPath7 = PhilipDaubmeier.TimeseriesHostCommon
 		SccProjectUniqueName8 = PhilipDaubmeier.DigitalstromHost\\PhilipDaubmeier.DigitalstromHost.csproj
+		SccProjectTopLevelParentUniqueName8 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName8 = PhilipDaubmeier.DigitalstromHost
 		SccLocalPath8 = PhilipDaubmeier.DigitalstromHost
 	EndGlobalSection
