@@ -9,9 +9,9 @@ namespace PhilipDaubmeier.TokenStore
     public class TokenStore<T>
     {
         private string _serviceName;
-        private TokenStoreDbContext _dbContext;
+        private ITokenStoreDbContext _dbContext;
 
-        public TokenStore(TokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
+        public TokenStore(ITokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
             string serviceName = string.Empty;
             if (!(config?.Value?.ClassNameMapping?.TryGetValue(typeof(T).Name, out serviceName) ?? false))

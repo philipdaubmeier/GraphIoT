@@ -2,7 +2,7 @@
 
 namespace PhilipDaubmeier.DigitalstromHost.Database
 {
-    public class DigitalstromDbContext : DbContext
+    public class DigitalstromDbContext : DbContext, IDigitalstromDbContext
     {
         public DbSet<DigitalstromZone> DsZones { get; set; }
 
@@ -14,9 +14,6 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         
         public DigitalstromDbContext(DbContextOptions<DigitalstromDbContext> options)
             : base(options)
-        { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
         { }
     }
 }

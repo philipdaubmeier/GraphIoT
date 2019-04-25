@@ -10,11 +10,11 @@ namespace PhilipDaubmeier.CalendarHost.FormatParsers
 {
     public class IcsParser
     {
-        private CalendarDbContext _dbContext;
+        private ICalendarDbContext _dbContext;
         private string _owner;
         private AudiLocationParser _location = new AudiLocationParser();
 
-        public IcsParser(CalendarDbContext databaseContext, string ownerEmail)
+        public IcsParser(ICalendarDbContext databaseContext, string ownerEmail)
         {
             _dbContext = databaseContext;
             _owner = ownerEmail;
@@ -39,7 +39,7 @@ namespace PhilipDaubmeier.CalendarHost.FormatParsers
             }
         }
 
-        private void StoreCalendarEntries(CalendarDbContext db, Ical.Net.Calendar calendar)
+        private void StoreCalendarEntries(ICalendarDbContext db, Ical.Net.Calendar calendar)
         {
             var calendarIdStr = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-WR-RELCALID"))?.Value as string;
             var owner = calendar.Properties.FirstOrDefault(p => p.Name.Equals("X-OWNER"))?.Value as string;
@@ -88,7 +88,7 @@ namespace PhilipDaubmeier.CalendarHost.FormatParsers
             db.SaveChanges();
         }
 
-        private CalendarAppointment CreateOrUpdateAppointment(CalendarDbContext db, Calendar dbCalendar, CalendarEvent entry)
+        private CalendarAppointment CreateOrUpdateAppointment(ICalendarDbContext db, Calendar dbCalendar, CalendarEvent entry)
         {
             var guid = GuidUtility.FromIcsUID(entry.Uid);
             
@@ -115,7 +115,7 @@ namespace PhilipDaubmeier.CalendarHost.FormatParsers
             return dbEntry;
         }
 
-        private void CreateOccurence(CalendarDbContext db, CalendarAppointment dbAppointment, Occurrence occurence)
+        private void CreateOccurence(ICalendarDbContext db, CalendarAppointment dbAppointment, Occurrence occurence)
         {
             var summary = GetSummary(occurence.Source as CalendarEvent);
             var location = GetLocation(occurence.Source as CalendarEvent);

@@ -9,14 +9,14 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
     public class DigitalstromEnergyViewModel : IGraphCollectionViewModel
     {
-        private readonly DigitalstromDbContext db;
+        private readonly IDigitalstromDbContext db;
         private readonly IQueryable<DigitalstromEnergyHighresData> data;
 
         private readonly TimeSeriesSpan span;
 
         private readonly Dictionary<DSUID, string> circuitNames;
 
-        public DigitalstromEnergyViewModel(DigitalstromDbContext databaseContext, TimeSeriesSpan span)
+        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, TimeSeriesSpan span)
         {
             db = databaseContext;
             this.span = span;

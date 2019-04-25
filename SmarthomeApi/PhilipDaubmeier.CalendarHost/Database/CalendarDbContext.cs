@@ -2,7 +2,7 @@
 
 namespace PhilipDaubmeier.CalendarHost.Database
 {
-    public class CalendarDbContext : DbContext
+    public class CalendarDbContext : DbContext, ICalendarDbContext
     {
         public DbSet<Calendar> Calendars { get; set; }
 
@@ -12,9 +12,6 @@ namespace PhilipDaubmeier.CalendarHost.Database
 
         public CalendarDbContext(DbContextOptions<CalendarDbContext> options)
             : base(options)
-        { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
         { }
     }
 }

@@ -2,23 +2,15 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.TokenStore.Database;
+using System;
 
 namespace PhilipDaubmeier.TokenStore.DependencyInjection
 {
     public static class TokenStoreExtensions
     {
-        public static IServiceCollection ConfigureTokenStore(this IServiceCollection serviceCollection, IConfiguration config = null)
+        public static IServiceCollection ConfigureTokenStore<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbOptionsAction, IConfiguration config = null) where TDbContext : DbContext, ITokenStoreDbContext
         {
-            var configSection = new TokenStoreConfig();
-            config?.Bind(configSection);
-
-            if (configSection.ConnectionString == null)
-                return serviceCollection;
-
-            return serviceCollection.AddDbContext<TokenStoreDbContext>(options =>
-                                    {
-                                        options.UseSqlServer(configSection.ConnectionString);
-                                    })
+            return serviceCollection.AddDbContext<ITokenStoreDbContext, TDbContext>(dbOptionsAction)
                                     .Configure<TokenStoreConfig>(config);
         }
 

@@ -16,8 +16,8 @@ namespace PhilipDaubmeier.CalendarHost.Controllers
     [Route("api/calendars")]
     public class CalendarController : Controller
     {
-        private readonly CalendarDbContext _dbContext;
-        public CalendarController(CalendarDbContext databaseContext)
+        private readonly ICalendarDbContext _dbContext;
+        public CalendarController(ICalendarDbContext databaseContext)
         {
             _dbContext = databaseContext;
         }

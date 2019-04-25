@@ -81,7 +81,7 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.Configure<ViessmannConfig>(Configuration.GetSection("ViessmannConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
-            services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
+            services.ConfigureTokenStore<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("TokenStoreConfig"));
             services.AddTokenStore<ViessmannEstrellaClient>();
             services.AddTokenStore<ViessmannPlatformClient>();
             services.AddTokenStore<ViessmannVitotrolClient>();
@@ -93,9 +93,9 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddScoped<WithingsClient>();
             services.AddScoped<SonnenPortalClient>();
             
-            services.AddDigitalstromHost(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
             
-            services.AddCalendarHost(smarthomeSqlServer);
+            services.AddCalendarHost<PersistenceContext>(smarthomeSqlServer);
             
             services.AddScoped<IViessmannConnectionProvider<ViessmannEstrellaClient>, ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
             services.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();

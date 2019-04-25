@@ -11,10 +11,10 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
     public class DigitalstromSensorPollingService : IDigitalstromPollingService
     {
         private readonly ILogger _logger;
-        private readonly DigitalstromDbContext _dbContext;
+        private readonly IDigitalstromDbContext _dbContext;
         private readonly DigitalstromWebserviceClient _dsClient;
 
-        public DigitalstromSensorPollingService(ILogger<DigitalstromSensorPollingService> logger, DigitalstromDbContext databaseContext, DigitalstromWebserviceClient dsClient)
+        public DigitalstromSensorPollingService(ILogger<DigitalstromSensorPollingService> logger, IDigitalstromDbContext databaseContext, DigitalstromWebserviceClient dsClient)
         {
             _logger = logger;
             _dbContext = databaseContext;

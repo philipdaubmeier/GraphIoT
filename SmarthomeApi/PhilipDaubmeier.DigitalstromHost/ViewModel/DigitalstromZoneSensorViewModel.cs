@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
     public class DigitalstromZoneSensorViewModel : IGraphCollectionViewModel
     {
-        private readonly DigitalstromDbContext db;
+        private readonly IDigitalstromDbContext db;
         private readonly IQueryable<DigitalstromZoneSensorData> data;
 
         private readonly TimeSeriesSpan span;
@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         private readonly Dictionary<int, string> zoneNames;
         private readonly int zoneCount;
 
-        public DigitalstromZoneSensorViewModel(DigitalstromDbContext databaseContext, TimeSeriesSpan span)
+        public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, TimeSeriesSpan span)
         {
             db = databaseContext;
             this.span = span;

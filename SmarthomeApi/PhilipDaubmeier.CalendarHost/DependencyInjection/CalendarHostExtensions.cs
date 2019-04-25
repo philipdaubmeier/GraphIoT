@@ -7,9 +7,9 @@ namespace PhilipDaubmeier.CalendarHost.DependencyInjection
 {
     public static class CalendarHostExtensions
     {
-        public static IServiceCollection AddCalendarHost(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig)
+        public static IServiceCollection AddCalendarHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig) where TDbContext : DbContext, ICalendarDbContext
         {
-            serviceCollection.AddDbContext<CalendarDbContext>(dbConfig);
+            serviceCollection.AddDbContext<ICalendarDbContext, TDbContext>(dbConfig);
             return serviceCollection;
         }
     }
