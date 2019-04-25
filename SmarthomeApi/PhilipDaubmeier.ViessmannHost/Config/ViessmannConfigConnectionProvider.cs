@@ -1,10 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.TokenStore;
 using PhilipDaubmeier.ViessmannClient.Model;
 using System.Net.Http;
 
-namespace PhilipDaubmeier.SmarthomeApi.Viessmann
+namespace PhilipDaubmeier.ViessmannHost.Config
 {
     public class ViessmannConfigConnectionProvider<T> : IViessmannConnectionProvider<T>
     {

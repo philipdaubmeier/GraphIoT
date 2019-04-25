@@ -2,10 +2,10 @@
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
-using PhilipDaubmeier.SmarthomeApi.Database.ViewModel;
+using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
+using PhilipDaubmeier.ViessmannHost.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 

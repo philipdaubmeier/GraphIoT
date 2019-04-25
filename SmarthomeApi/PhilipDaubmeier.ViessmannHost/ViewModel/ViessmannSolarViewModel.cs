@@ -1,19 +1,19 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
+using PhilipDaubmeier.ViessmannHost.Database;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PhilipDaubmeier.SmarthomeApi.Database.ViewModel
+namespace PhilipDaubmeier.ViessmannHost.ViewModel
 {
     public class ViessmannSolarViewModel : IGraphCollectionViewModel
     {
-        private readonly PersistenceContext db;
+        private readonly IViessmannDbContext db;
         private readonly IQueryable<ViessmannSolarData> data;
 
         private readonly TimeSeriesSpan span;
 
-        public ViessmannSolarViewModel(PersistenceContext databaseContext, TimeSeriesSpan span)
+        public ViessmannSolarViewModel(IViessmannDbContext databaseContext, TimeSeriesSpan span)
         {
             db = databaseContext;
             this.span = span;

@@ -1,19 +1,19 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannHost.Database;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Services
+namespace PhilipDaubmeier.ViessmannHost.Polling
 {
     public class ViessmannHeatingPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
-        private readonly PersistenceContext _dbContext;
+        private readonly IViessmannDbContext _dbContext;
         private readonly ViessmannPlatformClient _platformClient;
 
-        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, PersistenceContext dbContext, ViessmannPlatformClient platformClient)
+        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, IViessmannDbContext dbContext, ViessmannPlatformClient platformClient)
         {
             _logger = logger;
             _dbContext = dbContext;

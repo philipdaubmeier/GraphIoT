@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
+using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.ViessmannClient;
 using System;
 using System.Collections.Generic;

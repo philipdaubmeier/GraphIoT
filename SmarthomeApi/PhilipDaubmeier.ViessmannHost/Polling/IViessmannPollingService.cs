@@ -1,6 +1,6 @@
 ﻿using PhilipDaubmeier.TimeseriesHostCommon;
 
-namespace PhilipDaubmeier.SmarthomeApi.Services
+namespace PhilipDaubmeier.ViessmannHost.Polling
 {
     public interface IViessmannPollingService : IScopedPollingService
     {

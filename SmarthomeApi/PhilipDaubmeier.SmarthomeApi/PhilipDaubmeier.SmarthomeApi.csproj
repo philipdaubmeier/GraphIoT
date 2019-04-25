@@ -77,6 +77,7 @@
     <ProjectReference Include="..\PhilipDaubmeier.TimeseriesHostCommon\PhilipDaubmeier.TimeseriesHostCommon.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.TokenStore\PhilipDaubmeier.TokenStore.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.ViessmannClient\PhilipDaubmeier.ViessmannClient.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.ViessmannHost\PhilipDaubmeier.ViessmannHost.csproj" />
   </ItemGroup>
 
 </Project>

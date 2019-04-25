@@ -3,7 +3,7 @@ using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Viessmann
+namespace PhilipDaubmeier.ViessmannHost.Config
 {
     public class ViessmannAuth<T> : IViessmannAuth
     {

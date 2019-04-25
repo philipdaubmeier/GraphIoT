@@ -1,21 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.SmarthomeApi.Database.Model;
 using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannHost.Database;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Services
+namespace PhilipDaubmeier.ViessmannHost.Polling
 {
     public class ViessmannSolarPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
-        private readonly PersistenceContext _dbContext;
+        private readonly IViessmannDbContext _dbContext;
         private readonly ViessmannVitotrolClient _vitotrolClient;
 
-        public ViessmannSolarPollingService(ILogger<ViessmannSolarPollingService> logger, PersistenceContext dbContext, ViessmannVitotrolClient vitotrolClient)
+        public ViessmannSolarPollingService(ILogger<ViessmannSolarPollingService> logger, IViessmannDbContext dbContext, ViessmannVitotrolClient vitotrolClient)
         {
             _logger = logger;
             _dbContext = dbContext;

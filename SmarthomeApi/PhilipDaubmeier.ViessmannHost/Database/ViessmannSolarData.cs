@@ -4,7 +4,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PhilipDaubmeier.SmarthomeApi.Database.Model
+namespace PhilipDaubmeier.ViessmannHost.Database
 {
     public class ViessmannSolarData
     {

@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.SmarthomeApi.Model.Config
+﻿namespace PhilipDaubmeier.ViessmannHost.Config
 {
     public class ViessmannConfig
     {
