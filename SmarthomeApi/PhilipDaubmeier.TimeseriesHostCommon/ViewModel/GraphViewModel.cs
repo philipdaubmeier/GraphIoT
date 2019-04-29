@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
         public GraphViewModel()
         {
-            Begin = DateTime.MinValue;
+            Begin = Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc();
             Spacing = TimeSpan.FromMilliseconds(0);
             Name = string.Empty;
             Format = string.Empty;
@@ -44,7 +44,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
         {
             Name = name ?? string.Empty;
             Format = format ?? string.Empty;
-            Begin = FindBegin(timeseries);
+            Begin = Max(FindBegin(timeseries), Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc());
             Spacing = timeseries.Span.Duration;
             Points = timeseries.Trimmed().Cast<dynamic>().ToList();
         }
@@ -52,6 +52,11 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
         private DateTime FindBegin(ITimeSeries<T> timeseries)
         {
             return timeseries.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key.ToUniversalTime();
+        }
+
+        private DateTime Max(DateTime val1, DateTime val2)
+        {
+            return DateTime.FromBinary(Math.Max(val1.ToBinary(), val2.ToBinary()));
         }
     }
 }

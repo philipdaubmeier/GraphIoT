@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2000
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.SmarthomeApi", "PhilipDaubmeier.SmarthomeApi\PhilipDaubmeier.SmarthomeApi.csproj", "{957D571E-8C81-4E83-9AA6-4AB1948630AA}"
 EndProject
@@ -31,7 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.ViessmannCl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.ViessmannHost", "PhilipDaubmeier.ViessmannHost\PhilipDaubmeier.ViessmannHost.csproj", "{6478BBDD-6579-44D8-AED1-E3524743B4F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromTimeSeriesApi", "PhilipDaubmeier.DigitalstromTimeSeriesApi\PhilipDaubmeier.DigitalstromTimeSeriesApi.csproj", "{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromTimeSeriesApi", "PhilipDaubmeier.DigitalstromTimeSeriesApi\PhilipDaubmeier.DigitalstromTimeSeriesApi.csproj", "{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TokenStore.Tests", "PhilipDaubmeier.TokenStore.Tests\PhilipDaubmeier.TokenStore.Tests.csproj", "{E22B7F48-F3B0-4187-8C18-D5430DD2F413}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.TimeseriesHostCommon.Tests", "PhilipDaubmeier.TimeseriesHostCommon.Tests\PhilipDaubmeier.TimeseriesHostCommon.Tests.csproj", "{B13144EA-FE45-423E-960D-7E1F5BF12987}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +91,14 @@ Global
 		{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E22B7F48-F3B0-4187-8C18-D5430DD2F413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E22B7F48-F3B0-4187-8C18-D5430DD2F413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E22B7F48-F3B0-4187-8C18-D5430DD2F413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E22B7F48-F3B0-4187-8C18-D5430DD2F413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,12 +116,14 @@ Global
 		{22BF5CFE-BDF0-474E-935B-6E52D9670C0D} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{6478BBDD-6579-44D8-AED1-E3524743B4F5} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E} = {65C89DCA-5096-479C-82F3-F33BF729FDE5}
+		{E22B7F48-F3B0-4187-8C18-D5430DD2F413} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{B13144EA-FE45-423E-960D-7E1F5BF12987} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 13
+		SccNumberOfProjects = 15
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -161,5 +175,13 @@ Global
 		SccProjectTopLevelParentUniqueName12 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName12 = PhilipDaubmeier.DigitalstromTimeSeriesApi
 		SccLocalPath12 = PhilipDaubmeier.DigitalstromTimeSeriesApi
+		SccProjectUniqueName13 = PhilipDaubmeier.TokenStore.Tests\\PhilipDaubmeier.TokenStore.Tests.csproj
+		SccProjectTopLevelParentUniqueName13 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName13 = PhilipDaubmeier.TokenStore.Tests
+		SccLocalPath13 = PhilipDaubmeier.TokenStore.Tests
+		SccProjectUniqueName14 = PhilipDaubmeier.TimeseriesHostCommon.Tests\\PhilipDaubmeier.TimeseriesHostCommon.Tests.csproj
+		SccProjectTopLevelParentUniqueName14 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName14 = PhilipDaubmeier.TimeseriesHostCommon.Tests
+		SccLocalPath14 = PhilipDaubmeier.TimeseriesHostCommon.Tests
 	EndGlobalSection
 EndGlobal
