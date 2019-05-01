@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         {
             Scenes = new ApartmentState();
             ApiEventRaised += HandleDssApiEvent;
-            subscriptionId = new Random(Convert.ToInt32(DateTime.UtcNow.Ticks % int.MaxValue)).Next(10, 100);
+            subscriptionId = 42;// new Random(Convert.ToInt32(DateTime.UtcNow.Ticks % int.MaxValue)).Next(10, 100);
             apiClient = client;
             subscribed = false;
 

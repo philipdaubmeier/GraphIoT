@@ -8,6 +8,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
         public string sceneID { get; set; }
         public string groupID { get; set; }
         public string zoneID { get; set; }
+        public bool? forced { get; set; }
         public string originToken { get; set; }
         public string originDSUID { get; set; }
 

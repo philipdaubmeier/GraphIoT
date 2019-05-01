@@ -55,7 +55,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 catch (Exception ex)
                 {
                     OnErrorOccured(ex, actionWorkerThread);
-                    return;
                 }
             }
         }
@@ -72,7 +71,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 catch (Exception ex)
                 {
                     OnErrorOccured(ex, eventWorkerThread);
-                    return;
                 }
             }
         }
