@@ -4,19 +4,43 @@ using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Tests
 {
     public static class MockDigitalstromConnection
     {
+        public class TestGenerationHttpMessageHandler : MockHttpMessageHandler
+        {
+            public string LastCalledUri { get; private set; }
+
+            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+            {
+                LastCalledUri = request.RequestUri.ToString();
+
+                return base.SendAsync(request, cancellationToken);
+            }
+        }
+
         private static IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "***REMOVED***", "mocksecret");
-        private static UriPriorityList uris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
+        private static UriPriorityList testGenerationUris = new UriPriorityList(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
+        private static UriPriorityList mockUris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
 
         public static string BaseUri => "https://unittestdummy0000123456789abcdef.digitalstrom.net:8080";
+        public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";
+
+        public static DigitalstromConnectionProvider ToTestGenerationProvider(this MockHttpMessageHandler mockHandler)
+        {
+            if (!(mockHandler is TestGenerationHttpMessageHandler))
+                throw new ArgumentException("TestGenerationHttpMessageHandler type expected", nameof(mockHandler));
+
+            return new DigitalstromConnectionProvider(testGenerationUris, auth, null, mockHandler);
+        }
 
         public static DigitalstromConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler)
         {
-            return new DigitalstromConnectionProvider(uris, auth, null, mockHandler);
+            return new DigitalstromConnectionProvider(mockUris, auth, null, mockHandler);
         }
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)
@@ -49,7 +73,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                     .WithExactQueryString("loginToken=3b00f95e7_dummy_unittest_token_8e2adbcabcd8b67391e3fd0a95f68d40e")
                     .Respond("application/json", @"{
                                   ""result"": {
-                                      ""token"": ""5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2""
+                                      ""token"": """ + AppToken + @"""
                                   },
                                   ""ok"": true
                               }");
