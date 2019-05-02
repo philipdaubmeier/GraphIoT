@@ -70,7 +70,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         private Group(int colorCode)
         {
-            _group = Math.Min(Math.Max(colorCode, 0), 128);
+            _group = Math.Min(Math.Max(colorCode, 0), 64);
+            if (_group > 12 && !(_group == 48 || _group == 64))
+                _group = 0;
         }
 
         public static implicit operator int(Group group)
@@ -87,7 +89,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         {
             int color;
             if (!int.TryParse(groupID, out color))
-                return new Group((int)Color.Gray);
+                return new Group((int)Color.White);
 
             return new Group(color);
         }
@@ -104,7 +106,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Color(Group group)
         {
-            if (group._group <= 0 || group._group > 8)
+            if (group._group <= 0)
+                return Color.White;
+
+            if ((group._group >= 9 && group._group <= 12) || group._group == 48 || group._group == 64)
+                return Color.Blue;
+
+            if (group._group > 8)
                 return Color.White;
 
             return (Color)group._group;
@@ -149,25 +157,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
-            switch (_group)
-            {
-                case 0: return "ID 0: White - Various";
-                case 1: return "ID 1: Yellow - Light";
-                case 2: return "ID 2: Grey - Shading";
-                case 3: return "ID 3: Blue - Heating";
-                case 4: return "ID 4: Cyan - Audio";
-                case 5: return "ID 5: Magenta - Video";
-                case 6: return "ID 6: Red - Security";
-                case 7: return "ID 7: Green - Access";
-                case 8: return "ID 8: Black - Joker";
-                case 9: return "ID 9: Blue - Cooling";
-                case 10: return "ID 10: Blue - Ventilation";
-                case 11: return "ID 11: Blue - Window";
-                case 12: return "ID 12: Blue - AirRecirculation";
-                case 48: return "ID 48: Blue - TemperatureControl";
-                case 64: return "ID 64: Blue - Ventilation";
-                default: return string.Format("ID {0}: Unknown", _group);
-            }
+            return $"ID {_group}: {((Color)this).ToString()} - {((Type)this).ToString()}";
         }
     }
 }
