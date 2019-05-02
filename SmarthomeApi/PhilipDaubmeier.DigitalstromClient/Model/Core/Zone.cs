@@ -16,6 +16,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return zone._zone;
         }
 
+        public static implicit operator Zone(long zone)
+        {
+            return (int)zone;
+        }
+
         public static implicit operator Zone(int zone)
         {
             return new Zone(zone);

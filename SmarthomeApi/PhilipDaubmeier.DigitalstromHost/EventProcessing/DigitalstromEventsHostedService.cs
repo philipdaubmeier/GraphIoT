@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
@@ -77,7 +77,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
 
         private void DigitalstromEventReceived(DssEvent dsEvent)
         {
-            _logger.LogInformation($"{DateTime.Now} Received DSS Event: name '{dsEvent.name}' zone '{dsEvent.properties.zone}' group '{dsEvent.properties.group}' scene '{dsEvent.properties.scene}'");
+            _logger.LogInformation($"{DateTime.Now} Received DSS Event: name '{dsEvent.Name}' zone '{dsEvent.Properties.ZoneID}' group '{dsEvent.Properties.GroupID}' scene '{dsEvent.Properties.SceneID}'");
 
             if (!(_persistenceQueue?.TryAdd(dsEvent) ?? false))
                 _logger.LogError($"{DateTime.Now} Exception in Digitalstrom Event Subscriber Service: could not enqueue dss event!");
@@ -146,7 +146,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             else
                 _logger.LogInformation($"{DateTime.Now} Dequeued event (clump successor) with timestamp {dsEvent?.TimestampUtc}");
 
-            foreach (var plugin in _plugins.Where(p => p.EventNames.Contains(dsEvent.systemEvent)))
+            foreach (var plugin in _plugins.Where(p => p.EventNames.Contains(dsEvent.SystemEvent)))
             {
                 plugin.ReadOrCreateEventStream(dsEvent.TimestampUtc.ToLocalTime().Date);
 

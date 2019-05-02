@@ -1,5 +1,4 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
 {
@@ -7,7 +6,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
     {
         public SensorState()
         {
-            Value = new SensorTypeAndValues() { type = 0, time = 0, value = 0 };
+            Value = new SensorTypeAndValues() { Type = 0, Time = 0, Value = 0 };
         }
     }
 }

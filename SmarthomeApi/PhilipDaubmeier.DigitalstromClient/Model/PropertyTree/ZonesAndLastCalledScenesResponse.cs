@@ -1,21 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System.Collections.Generic;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
 {
     public class ZonesAndLastCalledScenesResponse : IWiremessagePayload<ZonesAndLastCalledScenesResponse>
     {
-        public List<ZoneAndLastCalledScenes> zones { get; set; }
+        public List<ZoneAndLastCalledScenes> Zones { get; set; }
     }
 
     public class ZoneAndLastCalledScenes
     {
-        public int ZoneID { get; set; }
-        public List<GroupAndLastCalledScenes> groups { get; set; }
+        public Zone ZoneID { get; set; }
+        public List<GroupAndLastCalledScenes> Groups { get; set; }
     }
 
     public class GroupAndLastCalledScenes
     {
-        public int group { get; set; }
-        public int lastCalledScene { get; set; }
+        public Group Group { get; set; }
+        public Scene LastCalledScene { get; set; }
     }
 }

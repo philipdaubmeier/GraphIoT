@@ -43,9 +43,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         private Name _name = Name.Broadcast;
 
-        private GroupName(string name)
+        private GroupName(Name name)
         {
-            _mapping.TryGetValue(name, out _name);
+            _name = name;
         }
 
         public static implicit operator string(GroupName name)
@@ -55,12 +55,20 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator GroupName(string name)
         {
-            return new GroupName(name);
+            if (!_mapping.TryGetValue(name, out Name enumName))
+                return new GroupName(Name.Broadcast);
+
+            return new GroupName(enumName);
         }
 
         public static implicit operator Name(GroupName name)
         {
             return name._name;
+        }
+
+        public static implicit operator GroupName(Name name)
+        {
+            return new GroupName(name);
         }
     }
 }

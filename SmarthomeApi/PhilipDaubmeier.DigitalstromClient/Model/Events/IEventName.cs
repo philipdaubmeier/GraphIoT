@@ -2,6 +2,6 @@
 {
     public interface IEventName
     {
-        string name { get; }
+        string Name { get; }
     }
 }

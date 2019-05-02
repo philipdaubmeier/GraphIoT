@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
@@ -12,7 +13,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public DSUID(string hex)
         {
-            _hex = hex.ToLowerInvariant().Substring(0, Math.Min(hex.Length, Size * 2)).PadRight(Size * 2, '0');
+            _hex = new string(hex.ToLowerInvariant().ToCharArray().Where(c => IsHexChar(c)).ToArray());
+            _hex = _hex.Substring(0, Math.Min(_hex.Length, Size * 2)).PadLeft(Size * 2, '0');
         }
 
         public static DSUID ReadFrom(Stream stream)
@@ -31,7 +33,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         }
 
         private int GetHexVal(char hex) => hex - (hex < 58 ? 48 : 87);
+        private bool IsHexChar(char c) => (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
 
+        public static implicit operator DSUID(string hex) => new DSUID(hex);
         public static implicit operator string(DSUID dsuid) => dsuid._hex;
         public int CompareTo(DSUID value) => _hex.CompareTo(value._hex);
         public int CompareTo(object value) => _hex.CompareTo((value as DSUID)?._hex ?? value);

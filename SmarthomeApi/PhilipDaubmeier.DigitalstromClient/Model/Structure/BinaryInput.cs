@@ -1,10 +1,12 @@
-﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+
+namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
 {
     public class BinaryInput
     {
-        public int targetGroup { get; set; }
-        public int inputType { get; set; }
-        public int inputId { get; set; }
-        public int state { get; set; }
+        public Group TargetGroup { get; set; }
+        public int InputType { get; set; }
+        public int InputId { get; set; }
+        public int State { get; set; }
     }
 }

@@ -13,13 +13,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
         /// </summary>
         public Dictionary<DSUID, string> FilteredMeterNames =>
                 DSMeters.Where(x => x.Capabilities.FirstOrDefault()?.Metering ?? false)
-                .Select(x => new KeyValuePair<string, string>(x.DSUID, x.Name))
-                .ToDictionary(x => new DSUID(x.Key), x => x.Value);
+                .ToDictionary(x => x.DSUID, x => x.Name);
     }
 
     public class MeteringCapabilities
     {
-        public string DSUID { get; set; }
+        public DSUID DSUID { get; set; }
         public string Name { get; set; }
         public List<MeteringCapability> Capabilities { get; set; }
     }

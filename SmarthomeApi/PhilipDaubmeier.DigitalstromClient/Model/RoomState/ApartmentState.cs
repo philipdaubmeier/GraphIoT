@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
             }
         }
 
-        public SensorState this[Zone zone, SensorType sensor]
+        public SensorState this[Zone zone, Core.Sensor sensor]
         {
             get
             {

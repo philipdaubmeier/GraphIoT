@@ -4,16 +4,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 {
     public class DssEventProperties
     {
-        public string callOrigin { get; set; }
-        public string sceneID { get; set; }
-        public string groupID { get; set; }
-        public string zoneID { get; set; }
-        public bool? forced { get; set; }
-        public string originToken { get; set; }
-        public string originDSUID { get; set; }
-
-        public Scene scene { get { return sceneID; } }
-        public Group group { get { return groupID; } }
-        public Zone zone { get { return zoneID; } }
+        public string CallOrigin { get; set; }
+        public Scene SceneID { get; set; }
+        public Group GroupID { get; set; }
+        public Zone ZoneID { get; set; }
+        public bool? Forced { get; set; }
+        public string OriginToken { get; set; }
+        public string OriginDSUID { get; set; }
     }
 }

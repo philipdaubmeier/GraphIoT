@@ -4,6 +4,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 {
     public class EventPollingResponse : IWiremessagePayload<EventPollingResponse>
     {
-        public List<DssEvent> events { get; set; }
+        public List<DssEvent> Events { get; set; }
     }
 }

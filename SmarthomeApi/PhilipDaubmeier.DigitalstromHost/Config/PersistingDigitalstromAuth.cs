@@ -1,4 +1,4 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.TokenStore;
 using System;
 using System.Threading.Tasks;

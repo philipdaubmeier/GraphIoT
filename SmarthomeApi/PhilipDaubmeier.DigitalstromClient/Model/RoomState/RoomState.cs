@@ -6,16 +6,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
 {
     public class RoomState
     {
-        private readonly Scene.SceneCommand _defaultScene = (new SceneState()).Value;
+        private readonly SceneCommand _defaultScene = (new SceneState()).Value;
         private readonly Dictionary<Group, SceneState> _sceneStates;
-        private readonly Dictionary<SensorType, SensorState> _sensorStates;
+        private readonly Dictionary<Sensor, SensorState> _sensorStates;
 
         public RoomState()
         {
             _sceneStates = Group.GetGroups().ToDictionary(x => x, _ => new SceneState());
-            _sensorStates = SensorType.GetTypes().Where(x => x == SensorType.TypeValue.TemperatureIndoors
-               || x == SensorType.TypeValue.HumidityIndoors
-               || x == SensorType.TypeValue.RoomTemperatureSetpoint).ToDictionary(x => x, _ => new SensorState());
+            _sensorStates = Sensor.GetTypes().Where(x => x == SensorType.TemperatureIndoors
+               || x == SensorType.HumidityIndoors
+               || x == SensorType.RoomTemperatureSetpoint).ToDictionary(x => x, _ => new SensorState());
         }
 
         /// <summary>
@@ -54,12 +54,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// <summary>
         /// Returns true if the given sensor type has a valid value.
         /// </summary>
-        public bool HasSensorValue(SensorType sensor)
+        public bool HasSensorValue(Core.Sensor sensor)
         {
             SensorState state;
             if (!_sensorStates.TryGetValue(sensor, out state))
                 return false;
-            return state.Value.sensorType != SensorType.TypeValue.UnknownType;
+            return state.Value.Type != Core.SensorType.UnknownType;
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// </summary>
         /// <param name="sensor">The sensor type, e.g. temperature, humidity, etc.</param>
         /// <returns>The sensor state, e.g. 23°C, 54%, etc.</returns>
-        public SensorState this[SensorType sensor]
+        public SensorState this[Core.Sensor sensor]
         {
             get
             {

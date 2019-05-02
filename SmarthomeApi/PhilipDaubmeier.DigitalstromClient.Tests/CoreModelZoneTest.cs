@@ -40,12 +40,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
             Zone zone4 = 12;
             Zone zone5 = 12;
 
-            Assert.False(zone1 == zone3);
+            Assert.True(zone1 == zone2);
             Assert.False(zone2 == zone3);
             Assert.False(zone3 == zone4);
             Assert.True(zone4 == zone5);
 
-            Assert.True(zone1 != zone3);
+            Assert.False(zone1 != zone2);
             Assert.True(zone2 != zone3);
             Assert.True(zone3 != zone4);
             Assert.False(zone4 != zone5);

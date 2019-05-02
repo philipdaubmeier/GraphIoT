@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model
+namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
 {
     public interface IDigitalstromAuth : IDeepCloneable<IDigitalstromAuth>
     {

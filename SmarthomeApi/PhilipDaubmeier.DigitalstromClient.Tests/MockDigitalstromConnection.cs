@@ -1,4 +1,5 @@
 using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using RichardSzalay.MockHttp;
 using System;

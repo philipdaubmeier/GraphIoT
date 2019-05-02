@@ -1,48 +1,46 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
-using PhilipDaubmeier.DigitalstromClient.Model.Core;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Model.RoomState;
+using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Network
+namespace PhilipDaubmeier.DigitalstromClient
 {
     public class DigitalstromSceneClient : WebApiWorkerThreadBase<DssEvent>
     {
+        private const int defaultSubscriptionId = 10;
+
         public event EventHandler ModelChanged;
 
         private volatile bool subscribed;
-        private int subscriptionId;
+        private readonly int subscriptionId;
         private DigitalstromWebserviceClient apiClient;
 
-        private IEnumerable<IEventName> eventsToSubscribe;
+        private readonly IEnumerable<IEventName> eventsToSubscribe;
 
         public ApartmentState Scenes { get; set; }
 
-        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null)
-            : this(new DigitalstromWebserviceClient(connectionProvider), eventsToSubscribe)
-        { }
-
-        public DigitalstromSceneClient(DigitalstromWebserviceClient client, IEnumerable<IEventName> eventsToSubscribe = null) : base()
+        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
         {
+            apiClient = new DigitalstromWebserviceClient(connectionProvider);
             Scenes = new ApartmentState();
             ApiEventRaised += HandleDssApiEvent;
-            subscriptionId = 42;// new Random(Convert.ToInt32(DateTime.UtcNow.Ticks % int.MaxValue)).Next(10, 100);
-            apiClient = client;
+            this.subscriptionId = subscriptionId;
             subscribed = false;
 
             this.eventsToSubscribe = new List<IEventName>()
             {
-                (SystemEventName)SystemEventName.EventType.CallScene,
-                (SystemEventName)SystemEventName.EventType.CallSceneBus
+                (SystemEventName)SystemEvent.CallScene,
+                (SystemEventName)SystemEvent.CallSceneBus
             };
             if (eventsToSubscribe != null)
                 ((List<IEventName>)this.eventsToSubscribe).AddRange(eventsToSubscribe);
 
             LoadApartment();
         }
-        
+
         private async void LoadApartment()
         {
             await LoadApartmentScenes();
@@ -53,22 +51,22 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private async Task LoadApartmentScenes()
         {
-            var apartment = await apiClient.GetZonesAndLastCalledScenes();
-            if (apartment == null || apartment.zones == null)
+            var apartment = await apiClient?.GetZonesAndLastCalledScenes();
+            if (apartment == null || apartment.Zones == null)
                 return;
 
-            foreach (var zone in apartment.zones)
+            foreach (var zone in apartment.Zones)
             {
-                if (zone == null || zone.groups == null || zone.groups.Count <= 0)
+                if (zone == null || zone.Groups == null || zone.Groups.Count <= 0)
                     continue;
 
                 RoomState roomState = new RoomState();
-                foreach (var groupstructure in zone.groups)
+                foreach (var groupstructure in zone.Groups)
                 {
                     if (groupstructure == null)
                         continue;
 
-                    roomState[(Group)groupstructure.group].Value = groupstructure.lastCalledScene;
+                    roomState[groupstructure.Group].Value = groupstructure.LastCalledScene;
                 }
                 Scenes[zone.ZoneID] = roomState;
             }
@@ -76,32 +74,32 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private async Task LoadApartmentSensors()
         {
-            var apartment = await apiClient.GetZonesAndSensorValues();
-            if (apartment == null || apartment.zones == null)
+            var apartment = await apiClient?.GetZonesAndSensorValues();
+            if (apartment == null || apartment.Zones == null)
                 return;
 
-            foreach (var zone in apartment.zones)
+            foreach (var zone in apartment.Zones)
             {
-                if (zone == null || zone.sensor == null || zone.sensor.Count <= 0)
+                if (zone == null || zone.Sensor == null || zone.Sensor.Count <= 0)
                     continue;
 
                 RoomState roomState = Scenes[zone.ZoneID];
                 if (roomState == null)
                     roomState = new RoomState();
-                foreach (var sensor in zone.sensor)
+                foreach (var sensor in zone.Sensor)
                 {
                     if (sensor == null)
                         continue;
 
-                    roomState[sensor.sensorType].Value = sensor;
+                    roomState[sensor.Type].Value = sensor;
                 }
                 Scenes[zone.ZoneID] = roomState;
             }
         }
 
-        public void callScene(Zone zone, Group group, Scene scene)
+        public void CallScene(Zone zone, Group group, Scene scene)
         {
-            QueueAction(async () => await apiClient.CallScene(zone, group, scene));
+            QueueAction(async () => await apiClient?.CallScene(zone, group, scene));
         }
 
         protected override async Task<IEnumerable<DssEvent>> ProcessEventPolling()
@@ -109,36 +107,36 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (!subscribed)
             {
                 foreach (var eventName in eventsToSubscribe)
-                    await apiClient.Subscribe(eventName, subscriptionId);
+                    await apiClient?.Subscribe(eventName, subscriptionId);
                 subscribed = true;
             }
-            var events = await apiClient.PollForEvents(subscriptionId, 60000);
-            if (events.events == null)
+            var events = await apiClient?.PollForEvents(subscriptionId, 60000);
+            if (events.Events == null)
                 return new List<DssEvent>();
 
-            return events.events;
+            return events.Events;
         }
 
         private void HandleDssApiEvent(object sender, ApiEventRaisedEventArgs<DssEvent> args)
         {
             if (args.ApiEvent == null)
                 return;
-            
-            switch (args.ApiEvent.systemEvent.type)
+
+            switch (args.ApiEvent.SystemEvent.Type)
             {
-                case SystemEventName.EventType.CallSceneBus: goto case SystemEventName.EventType.CallScene;
-                case SystemEventName.EventType.CallScene:
+                case SystemEvent.CallSceneBus: goto case SystemEvent.CallScene;
+                case SystemEvent.CallScene:
                     HandleDssCallSceneEvent(args.ApiEvent); break;
             }
         }
 
         private void HandleDssCallSceneEvent(DssEvent dssEvent)
         {
-            var props = dssEvent.properties;
+            var props = dssEvent.Properties;
             if (props == null)
                 return;
 
-            Scenes[props.zone, props.group].Value = props.scene;
+            Scenes[props.ZoneID, props.GroupID].Value = props.SceneID;
             OnModelChanged();
         }
 
@@ -148,6 +146,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 return;
 
             ModelChanged(this, null);
+        }
+
+        public new void Dispose()
+        {
+            apiClient?.Dispose();
+            apiClient = null;
+
+            base.Dispose();
         }
     }
 }

@@ -1,6 +1,5 @@
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 {
     public class DigitalstromSceneClientTest
     {
-        private Zone zoneKitchen = 32027;
+        private readonly Zone zoneKitchen = 32027;
 
         [Fact]
         public async Task TestEventSubscription()
@@ -87,6 +86,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
+#pragma warning disable IDE0039
             Func<Scene, string> MockedSceneEvent = scene => @"{
                                   ""result"":
                                   {
@@ -115,12 +115,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   },
                                   ""ok"": true
                               }";
+#pragma warning restore IDE0039
 
             var mockedEventResponse = mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/event/get")
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
-                    .Respond("application/json", MockedSceneEvent(Scene.SceneCommand.Preset0));
+                    .Respond("application/json", MockedSceneEvent(SceneCommand.Preset0));
 
-            using (var sceneClient = new DigitalstromSceneClient(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var sceneClient = new DigitalstromSceneClient(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
             {
                 await Task.Delay(100);
                 mockHttp.AutoFlush = true;
@@ -131,25 +132,25 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                 sceneClient.ApiEventRaised += (s, e) => { events.Add(e.ApiEvent); };
                 sceneClient.ErrorOccured += (s, e) => { errors.Add(e.Error); };
 
-                mockedEventResponse.Respond("application/json", MockedSceneEvent(Scene.SceneCommand.Preset1));
+                mockedEventResponse.Respond("application/json", MockedSceneEvent(SceneCommand.Preset1));
                 mockHttp.Flush();
                 await Task.Delay(50);
 
-                Assert.Equal((int)Scene.SceneCommand.Preset1, (int)sceneClient.Scenes[zoneKitchen, Group.Color.Yellow].Value);
+                Assert.Equal((int)SceneCommand.Preset1, (int)sceneClient.Scenes[zoneKitchen, Color.Yellow].Value);
 
-                mockedEventResponse.Respond("application/json", MockedSceneEvent(Scene.SceneCommand.Preset2));
+                mockedEventResponse.Respond("application/json", MockedSceneEvent(SceneCommand.Preset2));
                 mockHttp.Flush();
                 await Task.Delay(50);
 
-                Assert.Equal((int)Scene.SceneCommand.Preset2, (int)sceneClient.Scenes[zoneKitchen, Group.Color.Yellow].Value);
+                Assert.Equal((int)SceneCommand.Preset2, (int)sceneClient.Scenes[zoneKitchen, Color.Yellow].Value);
 
-                mockedEventResponse.Respond("application/json", MockedSceneEvent(Scene.SceneCommand.Preset1));
+                mockedEventResponse.Respond("application/json", MockedSceneEvent(SceneCommand.Preset1));
                 mockHttp.Flush();
                 await Task.Delay(50);
 
-                Assert.Equal((int)Scene.SceneCommand.Preset1, (int)sceneClient.Scenes[zoneKitchen, Group.Color.Yellow].Value);
+                Assert.Equal((int)SceneCommand.Preset1, (int)sceneClient.Scenes[zoneKitchen, Color.Yellow].Value);
 
-                Assert.NotEmpty(events.Where(e => e.systemEvent == SystemEventName.EventType.CallScene));
+                Assert.NotEmpty(events.Where(e => e.SystemEvent == SystemEvent.CallScene));
                 Assert.Empty(errors);
             }
         }

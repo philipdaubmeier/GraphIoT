@@ -7,11 +7,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
     public class CoreModelGroupTest
     {
         [Theory]
-        [InlineData(0, Group.Type.Various)]
-        [InlineData(1, Group.Type.Light)]
-        [InlineData(8, Group.Type.Joker)]
-        [InlineData(64, Group.Type.ApartmentVentilation)]
-        public void TestImplicitConversions(int intVal, Group.Type enumVal)
+        [InlineData(0, GroupType.Various)]
+        [InlineData(1, GroupType.Light)]
+        [InlineData(8, GroupType.Joker)]
+        [InlineData(64, GroupType.ApartmentVentilation)]
+        public void TestImplicitConversions(int intVal, GroupType enumVal)
         {
             Group groupFromInt = intVal;
             Group groupFromStringImplicit = intVal.ToString();
@@ -24,9 +24,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
 
             // implicit conversions back to enum and then to int
             Assert.Equal(intVal, (int)enumVal);
-            Assert.Equal(intVal, (int)(Group.Type)groupFromInt);
-            Assert.Equal((int)enumVal, (int)(Group.Type)groupFromStringImplicit);
-            Assert.Equal((int)enumVal, (int)(Group.Type)groupFromEnumImplicit);
+            Assert.Equal(intVal, (int)(GroupType)groupFromInt);
+            Assert.Equal((int)enumVal, (int)(GroupType)groupFromStringImplicit);
+            Assert.Equal((int)enumVal, (int)(GroupType)groupFromEnumImplicit);
 
             // all the same?
             Assert.Equal((int)groupFromInt, (int)groupFromStringImplicit);
@@ -72,16 +72,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Group group1 = null;
             Group group2 = null;
-            Group group3 = Group.Type.Various;
-            Group group4 = Group.Type.Light;
-            Group group5 = Group.Type.Light;
+            Group group3 = GroupType.Various;
+            Group group4 = GroupType.Light;
+            Group group5 = GroupType.Light;
 
-            Assert.False(group1 == group3);
+            Assert.True(group1 == group2);
             Assert.False(group2 == group3);
             Assert.False(group3 == group4);
             Assert.True(group4 == group5);
 
-            Assert.True(group1 != group3);
+            Assert.False(group1 != group2);
             Assert.True(group2 != group3);
             Assert.True(group3 != group4);
             Assert.False(group4 != group5);
@@ -91,10 +91,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         }
 
         [Theory]
-        [InlineData(0, Group.Type.Various)]
-        [InlineData(1, Group.Type.Light)]
-        [InlineData(64, Group.Type.ApartmentVentilation)]
-        public void TestGetHashCode(int expected, Group.Type inputVal)
+        [InlineData(0, GroupType.Various)]
+        [InlineData(1, GroupType.Light)]
+        [InlineData(64, GroupType.ApartmentVentilation)]
+        public void TestGetHashCode(int expected, GroupType inputVal)
         {
             Group group = inputVal;
 
@@ -102,10 +102,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         }
 
         [Theory]
-        [InlineData("ID 0: White - Various", Group.Type.Various)]
-        [InlineData("ID 1: Yellow - Light", Group.Type.Light)]
-        [InlineData("ID 64: Blue - ApartmentVentilation", Group.Type.ApartmentVentilation)]
-        public void TestToString(string expected, Group.Type inputVal)
+        [InlineData("ID 0: White - Various", GroupType.Various)]
+        [InlineData("ID 1: Yellow - Light", GroupType.Light)]
+        [InlineData("ID 64: Blue - ApartmentVentilation", GroupType.ApartmentVentilation)]
+        public void TestToString(string expected, GroupType inputVal)
         {
             Group group = inputVal;
 
@@ -113,26 +113,26 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         }
 
         [Theory]
-        [InlineData(Group.Color.White, Group.Type.Various)]
-        [InlineData(Group.Color.Yellow, Group.Type.Light)]
-        [InlineData(Group.Color.Gray, Group.Type.Shading)]
-        [InlineData(Group.Color.Cyan, Group.Type.Audio)]
-        [InlineData(Group.Color.Magenta, Group.Type.Video)]
-        [InlineData(Group.Color.Red, Group.Type.Security)]
-        [InlineData(Group.Color.Green, Group.Type.Access)]
-        [InlineData(Group.Color.Black, Group.Type.Joker)]
-        [InlineData(Group.Color.Blue, Group.Type.Heating)]
-        [InlineData(Group.Color.Blue, Group.Type.Cooling)]
-        [InlineData(Group.Color.Blue, Group.Type.Ventilation)]
-        [InlineData(Group.Color.Blue, Group.Type.Window)]
-        [InlineData(Group.Color.Blue, Group.Type.AirRecirculation)]
-        [InlineData(Group.Color.Blue, Group.Type.ApartmentVentilation)]
-        [InlineData(Group.Color.Blue, Group.Type.TemperatureControl)]
-        public void TestGroupTypeToColor(Group.Color expected, Group.Type inputVal)
+        [InlineData(Color.White, GroupType.Various)]
+        [InlineData(Color.Yellow, GroupType.Light)]
+        [InlineData(Color.Gray, GroupType.Shading)]
+        [InlineData(Color.Cyan, GroupType.Audio)]
+        [InlineData(Color.Magenta, GroupType.Video)]
+        [InlineData(Color.Red, GroupType.Security)]
+        [InlineData(Color.Green, GroupType.Access)]
+        [InlineData(Color.Black, GroupType.Joker)]
+        [InlineData(Color.Blue, GroupType.Heating)]
+        [InlineData(Color.Blue, GroupType.Cooling)]
+        [InlineData(Color.Blue, GroupType.Ventilation)]
+        [InlineData(Color.Blue, GroupType.Window)]
+        [InlineData(Color.Blue, GroupType.AirRecirculation)]
+        [InlineData(Color.Blue, GroupType.ApartmentVentilation)]
+        [InlineData(Color.Blue, GroupType.TemperatureControl)]
+        public void TestGroupTypeToColor(Color expected, GroupType inputVal)
         {
             Group group = inputVal;
 
-            Assert.Equal((int)expected, (int)(Group.Color)group);
+            Assert.Equal((int)expected, (int)(Color)group);
         }
 
         [Fact]

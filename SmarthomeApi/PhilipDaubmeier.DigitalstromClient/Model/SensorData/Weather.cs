@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Apartment
+﻿namespace PhilipDaubmeier.DigitalstromClient.Model.SensorData
 {
     public class Weather
     {

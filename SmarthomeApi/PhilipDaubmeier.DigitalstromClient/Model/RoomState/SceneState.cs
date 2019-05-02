@@ -6,7 +6,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
     {
         public SceneState()
         {
-            Value = Scene.SceneCommand.Unknown;
+            Value = SceneCommand.Unknown;
         }
     }
 }

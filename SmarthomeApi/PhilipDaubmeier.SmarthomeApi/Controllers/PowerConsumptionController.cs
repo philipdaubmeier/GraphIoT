@@ -1,6 +1,6 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
+﻿using Microsoft.AspNetCore.Mvc;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Network;
-using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.SmarthomeApi.Database;
 using System;
 using System.Collections.Generic;

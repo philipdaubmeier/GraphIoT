@@ -7,22 +7,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
 {
     public class ZonesAndSensorValuesResponse : IWiremessagePayload<ZonesAndSensorValuesResponse>
     {
-        public List<ZonesAndSensorValues> zones { get; set; }
+        public List<ZonesAndSensorValues> Zones { get; set; }
     }
 
     public class ZonesAndSensorValues
     {
-        public int ZoneID { get; set; }
-        public List<SensorTypeAndValues> sensor { get; set; }
+        public Zone ZoneID { get; set; }
+        public List<SensorTypeAndValues> Sensor { get; set; }
     }
     
     public class SensorTypeAndValues
     {
-        public int type { get; set; }
-        public double value { get; set; }
-        public long time { get; set; }
+        public Sensor Type { get; set; }
+        public double Value { get; set; }
+        public long Time { get; set; }
 
-        public SensorType sensorType { get { return type; } }
-        public DateTime timestamp { get { return Instant.FromUnixTimeSeconds(time).ToDateTimeUtc().ToLocalTime(); } }
+        public DateTime Timestamp { get { return Instant.FromUnixTimeSeconds(Time).ToDateTimeUtc().ToLocalTime(); } }
     }
 }

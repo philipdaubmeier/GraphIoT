@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
+﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
 {
     public class ModelFeatures
     {
-        public bool dontcare { get; set; }
-        public bool blink { get; set; }
-        public bool ledauto { get; set; }
+        public bool Dontcare { get; set; }
+        public bool Blink { get; set; }
+        public bool Ledauto { get; set; }
     }
 }

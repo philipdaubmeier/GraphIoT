@@ -16,8 +16,8 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
         {
             get
             {
-                yield return (SystemEventName)SystemEventName.EventType.CallScene;
-                yield return (SystemEventName)SystemEventName.EventType.CallSceneBus;
+                yield return (SystemEventName)SystemEvent.CallScene;
+                yield return (SystemEventName)SystemEvent.CallSceneBus;
             }
         }
 
@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             /// <summary>
             /// See <see cref="IEventSerializer{TEvent}.CanSerialize(TEvent)"/>
             /// </summary>
-            public bool CanSerialize(DssEvent eventObj) => AcceptedEvents.Contains(eventObj.systemEvent);
+            public bool CanSerialize(DssEvent eventObj) => AcceptedEvents.Contains(eventObj.SystemEvent);
 
             /// <summary>
             /// See <see cref="IEventSerializer{TEvent}.Serialize(BinaryWriter, TEvent)"/>
@@ -49,9 +49,9 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
                 if (eventObj == null)
                     throw new ArgumentNullException("eventObj");
                 
-                writer.Write((ushort)Math.Min(Math.Max(eventObj.properties.zone, 0), ushort.MaxValue));
-                writer.Write((byte)Math.Min(Math.Max(eventObj.properties.group, 0), byte.MaxValue));
-                writer.Write((byte)Math.Min(Math.Max(eventObj.properties.scene, 0), byte.MaxValue));
+                writer.Write((ushort)Math.Min(Math.Max(eventObj.Properties.ZoneID, 0), ushort.MaxValue));
+                writer.Write((byte)Math.Min(Math.Max(eventObj.Properties.GroupID, 0), byte.MaxValue));
+                writer.Write((byte)Math.Min(Math.Max(eventObj.Properties.SceneID, 0), byte.MaxValue));
             }
 
             /// <summary>
@@ -67,18 +67,18 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
                 var scene = (Scene)reader.ReadByte();
                 var props = new DssEventProperties()
                 {
-                    zoneID = ((int)zone).ToString(),
-                    groupID = ((int)group).ToString(),
-                    sceneID = ((int)scene).ToString(),
-                    originDSUID = string.Empty,
-                    originToken = string.Empty,
-                    callOrigin = string.Empty
+                    ZoneID = ((int)zone).ToString(),
+                    GroupID = ((int)group).ToString(),
+                    SceneID = ((int)scene).ToString(),
+                    OriginDSUID = string.Empty,
+                    OriginToken = string.Empty,
+                    CallOrigin = string.Empty
                 };
                 var dssevent = new DssEvent(timestampUtc)
                 {
-                    name = new SystemEventName(SystemEventName.EventType.CallScene).name,
-                    properties = props,
-                    source = new DssEventSource()
+                    Name = new SystemEventName(SystemEvent.CallScene).Name,
+                    Properties = props,
+                    Source = new DssEventSource()
                 };
 
                 return dssevent;
@@ -123,9 +123,9 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
                 return false;
 
             return lastEvent.TimestampUtc.AddMilliseconds(milliseconds) > dsEvent.TimestampUtc
-                && lastEvent.properties.zone == dsEvent.properties.zone
-                && lastEvent.properties.group == dsEvent.properties.group
-                && lastEvent.properties.scene == dsEvent.properties.scene;
+                && lastEvent.Properties.ZoneID == dsEvent.Properties.ZoneID
+                && lastEvent.Properties.GroupID == dsEvent.Properties.GroupID
+                && lastEvent.Properties.SceneID == dsEvent.Properties.SceneID;
         }
 
         /// <summary>

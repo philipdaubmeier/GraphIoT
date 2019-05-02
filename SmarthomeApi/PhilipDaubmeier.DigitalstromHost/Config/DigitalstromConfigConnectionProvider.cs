@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.TokenStore;

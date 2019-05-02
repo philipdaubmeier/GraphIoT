@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.DigitalstromClient.Network;
+using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using System;
 using System.Collections.Generic;
@@ -37,16 +39,16 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
 
         private async Task PollSensorValues()
         {
-            var sensorValues = (await _dsClient.GetZonesAndSensorValues()).zones;
+            var sensorValues = (await _dsClient.GetZonesAndSensorValues()).Zones;
             
             foreach (var zone in sensorValues)
-                if (zone != null && zone.sensor != null)
-                    SaveZoneSensorValues(zone.ZoneID, zone.sensor.ToDictionary(x => x.type, x => x.value));
+                if (zone != null && zone.Sensor != null)
+                    SaveZoneSensorValues(zone.ZoneID, zone.Sensor.ToDictionary((Func<SensorTypeAndValues, Sensor>)(x => (Sensor)x.Type), x => x.Value));
 
             _dbContext.SaveChanges();
         }
         
-        private void SaveZoneSensorValues(int zoneId, Dictionary<int, double> sensorValues)
+        private void SaveZoneSensorValues(int zoneId, Dictionary<Sensor, double> sensorValues)
         {
             int temperatureType = 9;
             int humidityType = 13;

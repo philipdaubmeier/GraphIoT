@@ -6,7 +6,7 @@
         private string _message;
         private T _result;
 
-        public bool ok
+        public bool Ok
         {
             get
             {
@@ -18,14 +18,14 @@
             }
         }
 
-        public string message
+        public string Message
         {
             get
             {
                 if (_ok == null)
                     return "Warning! No OK value set at all!";
 
-                return ok ? "Success" : _message;
+                return Ok ? "Success" : _message;
             }
             set
             {
@@ -33,11 +33,11 @@
             }
         }
 
-        public T result
+        public T Result
         {
             get
             {
-                return ok ? _result : null;
+                return Ok ? _result : null;
             }
             set
             {

@@ -1,12 +1,14 @@
-﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Events
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+
+namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 {
     public class DssEventSource
     {
-        public string set { get; set; }
-        public int groupID { get; set; }
-        public int zoneID { get; set; }
-        public bool isApartment { get; set; }
-        public bool isGroup { get; set; }
-        public bool isDevice { get; set; }
+        public string Set { get; set; }
+        public Group GroupID { get; set; }
+        public Zone ZoneID { get; set; }
+        public bool IsApartment { get; set; }
+        public bool IsGroup { get; set; }
+        public bool IsDevice { get; set; }
     }
 }

@@ -5,15 +5,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
 {
     public class GroupStructure
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public GroupName groupName { get { return name; } }
-        public int color { get; set; }
-        public Group group { get { return color; } }
-        public int applicationType { get; set; }
-        public bool isPresent { get; set; }
-        public bool isValid { get; set; }
-        public List<string> devices { get; set; }
-        public List<int?> activeBasicScenes { get; set; }
+        public Group Id { get; set; }
+        public GroupName Name { get; set; }
+        public Group Color { get; set; }
+        public int ApplicationType { get; set; }
+        public bool IsPresent { get; set; }
+        public bool IsValid { get; set; }
+        public List<DSUID> Devices { get; set; }
+        public List<Scene> ActiveBasicScenes { get; set; }
     }
 }

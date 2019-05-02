@@ -1,8 +1,8 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.DigitalstromClient.Model;
-using PhilipDaubmeier.DigitalstromClient.Network;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NodaTime;
+using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.DigitalstromClient.Network;
 using PhilipDaubmeier.SmarthomeApi.Database;
 using System;
 using System.Collections.Generic;
@@ -28,14 +28,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("sensors")]
         public async Task<JsonResult> GetSensors()
         {
-            var sensorValues = (await dsClient.GetZonesAndSensorValues()).zones;
+            var sensorValues = (await dsClient.GetZonesAndSensorValues()).Zones;
 
             return Json(new
             {
                 zones = sensorValues.Select(x => new Tuple<int, List<double>, List<double>>(
                         x.ZoneID,
-                        x?.sensor?.Where(s => s.type == 9).Select(s => s.value).ToList(),
-                        x?.sensor?.Where(s => s.type == 13).Select(s => s.value).ToList()
+                        x?.Sensor?.Where(s => s.Type == 9).Select(s => s.Value).ToList(),
+                        x?.Sensor?.Where(s => s.Type == 13).Select(s => s.Value).ToList()
                     ))
                     .Where(x => (x.Item2?.Count ?? 0) > 0 || (x.Item3?.Count ?? 0) > 0)
                     .Select(x => new
@@ -115,10 +115,10 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 events = eventData.EventStream.Select(dssEvent => new
                 {
                     timestamp = dssEvent.TimestampUtc,
-                    dssEvent.systemEvent.name,
-                    zone = (int)dssEvent.properties.zone,
-                    group = (int)dssEvent.properties.group,
-                    scene = (int)dssEvent.properties.scene
+                    dssEvent.SystemEvent.Name,
+                    zone = (int)dssEvent.Properties.ZoneID,
+                    group = (int)dssEvent.Properties.GroupID,
+                    scene = (int)dssEvent.Properties.SceneID
                 })
             });
         }

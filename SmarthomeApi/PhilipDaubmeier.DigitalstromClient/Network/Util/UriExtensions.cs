@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
     public class UriQueryStringBuilder
     {
         private Uri _uri;
-        private NameValueCollection _values;
+        private readonly NameValueCollection _values;
 
         public UriQueryStringBuilder(Uri uri, NameValueCollection values)
         {
@@ -84,8 +84,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
     {
         public static UriQueryStringBuilder AddQuery(this Uri uri, string key, string value)
         {
-            var values = new NameValueCollection();
-            values.Add(key, value);
+            var values = new NameValueCollection
+            {
+                { key, value }
+            };
             return new UriQueryStringBuilder(uri, values);
         }
 

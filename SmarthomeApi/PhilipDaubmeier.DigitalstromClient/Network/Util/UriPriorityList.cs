@@ -7,8 +7,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 {
     public class UriPriorityList : IDeepCloneable<UriPriorityList>
     {
-        private List<Uri> _list;
-        private List<bool> _authIncluded;
+        private readonly List<Uri> _list;
+        private readonly List<bool> _authIncluded;
         private int _currentIndex = 0;
 
         public UriPriorityList(List<Uri> list)

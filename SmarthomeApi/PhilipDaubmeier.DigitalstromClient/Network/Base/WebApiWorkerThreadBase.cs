@@ -22,13 +22,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public event EventHandler<ApiEventRaisedEventArgs<TApiEvent>> ApiEventRaised;
 
-        private Task eventWorkerThread = null;
+        private readonly Task eventWorkerThread = null;
 
-        private BlockingCollection<Func<Task>> actionQueue = new BlockingCollection<Func<Task>>();
-        private Task actionWorkerThread = null;
+        private readonly BlockingCollection<Func<Task>> actionQueue = new BlockingCollection<Func<Task>>();
+        private readonly Task actionWorkerThread = null;
 
-        private CancellationTokenSource cancellationSource = new CancellationTokenSource();
-        private CancellationToken cancellationToken;
+        private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        private readonly CancellationToken cancellationToken;
 
         public WebApiWorkerThreadBase()
         {

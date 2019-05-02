@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using System;
 using System.Collections.Generic;

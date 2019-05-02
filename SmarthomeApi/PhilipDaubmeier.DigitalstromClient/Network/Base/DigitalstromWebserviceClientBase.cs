@@ -1,6 +1,7 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
+﻿using Newtonsoft.Json;
+using PhilipDaubmeier.DigitalstromClient.Model;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
-using Newtonsoft.Json;
+using PhilipDaubmeier.DigitalstromClient.Model.Token;
 using System;
 using System.IO;
 using System.Net;
@@ -11,29 +12,28 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
 {
-    public abstract class AbstractDigitalstromClient
+    public abstract class DigitalstromWebserviceClientBase : IDisposable
     {
         protected UriPriorityList _baseUris;
-        protected bool isLogging = false;
-        protected string log;
-        private X509Certificate2 _dssCert;
-        private IDigitalstromAuth _authData;
-        private HttpMessageHandler _clientHandler;
-        private HttpClient _client;
+        private readonly X509Certificate2 _dssCert;
+        private readonly IDigitalstromAuth _authData;
+        private readonly HttpMessageHandler _clientHandler;
+        private readonly HttpClient _client;
         private Task _initializeTask;
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
-        /// app and user credentials given via the authentication data object. If
+        /// app and user credentials given via the IDigitalstromConnectionProvider object. If
         /// a valid application token is given in the auth data, it is used directly.
         /// This abstract base class handles establishing the TLS connection with accepting
-        /// the self signed DSS certificate as was as the authentication flow including
-        /// fetching and activating the application token and obtaining a session token.
+        /// the self signed DSS certificate, the authentication flow including fetching and
+        /// activating the application token, obtaining a session token as well as deserializing
+        /// responses and unpacking the wiremessage.
         /// </summary>
         /// <param name="connectionProvider">All necessary connection infos like uris and
         /// authentication data needed to use for the webservice or to perform a new or
         /// renewed authentication</param>
-        public AbstractDigitalstromClient(IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromWebserviceClientBase(IDigitalstromConnectionProvider connectionProvider)
         {
             _baseUris = connectionProvider.Uris.DeepClone();
             _authData = connectionProvider.AuthData;
@@ -166,7 +166,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             var responseData = await LoadWiremessage<ApplicationTokenResponse>(uri);
 
-            var appToken = responseData == null || responseData.result == null ? null : responseData.result.applicationToken;
+            var appToken = responseData == null || responseData.Result == null ? null : responseData.Result.ApplicationToken;
             await _authData.UpdateTokenAsync(null, DateTime.MinValue, appToken);
 
             if (_authData.ApplicationToken == null)
@@ -183,8 +183,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             if (responseData == null)
                 throw new FormatException("No response data received");
-            if (responseData.ok && responseData.result != null)
-                return responseData.result.token;
+            if (responseData.Ok && responseData.Result != null)
+                return responseData.Result.Token;
             throw new IOException("Could not log in");
         }
 
@@ -201,8 +201,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             if (responseData == null)
                 throw new FormatException("No response data received");
-            if (!responseData.ok)
-                throw new IOException(string.Format("Could not activate application token. Message: {0}", responseData.message));
+            if (!responseData.Ok)
+                throw new IOException(string.Format("Could not activate application token. Message: {0}", responseData.Message));
         }
 
         private async Task<bool> RefreshSessionToken()
@@ -218,14 +218,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (responseData == null)
                 throw new FormatException("No response data received");
 
-            if (responseData.ok && responseData.result != null && !string.IsNullOrEmpty(responseData.result.token))
+            if (responseData.Ok && responseData.Result != null && !string.IsNullOrEmpty(responseData.Result.Token))
             {
-                await _authData.UpdateTokenAsync(responseData.result.token, DateTime.UtcNow.AddSeconds(60), _authData.ApplicationToken);
+                await _authData.UpdateTokenAsync(responseData.Result.Token, DateTime.UtcNow.AddSeconds(60), _authData.ApplicationToken);
                 return true;
             }
 
             // Must login first, try login of the application token
-            if (responseData.message != null && responseData.message.Equals("Application-Authentication failed", StringComparison.OrdinalIgnoreCase))
+            if (responseData.Message != null && responseData.Message.Equals("Application-Authentication failed", StringComparison.OrdinalIgnoreCase))
                 return false;
 
             // In this case, a retry does not seem to be a solution
@@ -234,9 +234,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private async Task<IWiremessagePayload<T>.Wiremessage> LoadWiremessage<T>(Uri uri) where T : IWiremessagePayload<T>
         {
-            if (isLogging)
-                log += (await (await _client.GetAsync(uri)).Content.ReadAsStringAsync()) + "\n";
-
             var responseMessage = await _client.GetAsync(uri);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
             
@@ -261,20 +258,25 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (responseData == null)
                 throw new FormatException("No response data received");
 
-            if (!responseData.ok)
+            if (!responseData.Ok)
             {
                 throw new IOException(string.Format("Received ok=false in DSS API! Message: \"{0}\"",
-                    responseData.message == null ? "null" : responseData.message));
+                    responseData.Message ?? "null"));
             }
 
-            if (hasPayload && responseData.result == null)
+            if (hasPayload && responseData.Result == null)
                 throw new IOException("Received ok=true but no result object!");
 
             // only touch token if successful
             if (!_baseUris.CurrentHasAuthIncluded())
                 await _authData.TouchSessionTokenAsync();
 
-            return responseData.result;
+            return responseData.Result;
+        }
+
+        public void Dispose()
+        {
+            _client.Dispose();
         }
     }
 }

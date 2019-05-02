@@ -1,7 +1,7 @@
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using RichardSzalay.MockHttp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -60,28 +60,28 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetSensorValues();
 
-            Assert.Equal("01n", result.weather.WeatherIconId);
-            Assert.Equal("800", result.weather.WeatherConditionId);
-            Assert.Equal("7", result.weather.WeatherServiceId);
-            Assert.Equal("2019-05-01T21:15:07.560Z", result.weather.WeatherServiceTime);
+            Assert.Equal("01n", result.Weather.WeatherIconId);
+            Assert.Equal("800", result.Weather.WeatherConditionId);
+            Assert.Equal("7", result.Weather.WeatherServiceId);
+            Assert.Equal("2019-05-01T21:15:07.560Z", result.Weather.WeatherServiceTime);
 
-            Assert.Null(result.outdoor.temperature);
-            Assert.Null(result.outdoor.humidity);
-            Assert.Null(result.outdoor.brightness);
-            Assert.Null(result.outdoor.precipitation);
-            Assert.Null(result.outdoor.airpressure);
-            Assert.Null(result.outdoor.windspeed);
-            Assert.Null(result.outdoor.winddirection);
-            Assert.Null(result.outdoor.gustspeed);
-            Assert.Null(result.outdoor.gustdirection);
+            Assert.Null(result.Outdoor.Temperature);
+            Assert.Null(result.Outdoor.Humidity);
+            Assert.Null(result.Outdoor.Brightness);
+            Assert.Null(result.Outdoor.Precipitation);
+            Assert.Null(result.Outdoor.Airpressure);
+            Assert.Null(result.Outdoor.Windspeed);
+            Assert.Null(result.Outdoor.Winddirection);
+            Assert.Null(result.Outdoor.Gustspeed);
+            Assert.Null(result.Outdoor.Gustdirection);
 
-            Assert.Equal(20.05, result.zones[1].values[0].TemperatureValue);
-            Assert.Equal(42.475, result.zones[1].values[1].HumidityValue);
+            Assert.Equal(20.05, result.Zones[1].Values[0].TemperatureValue);
+            Assert.Equal(42.475, result.Zones[1].Values[1].HumidityValue);
 
-            Assert.Equal(20.05, result.zones[1].temperature.value);
-            Assert.Equal(42.475, result.zones[1].humidity.value);
-            Assert.Null(result.zones[1].brightness);
-            Assert.Null(result.zones[1].co2concentration);
+            Assert.Equal(20.05, result.Zones[1].Temperature.Value);
+            Assert.Equal(42.475, result.Zones[1].Humidity.Value);
+            Assert.Null(result.Zones[1].Brightness);
+            Assert.Null(result.Zones[1].Co2concentration);
         }
 
         [Fact]
@@ -216,26 +216,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetStructure();
 
-            Assert.Equal("South - none", result.apartment.clusters[0].name);
-            Assert.Equal(2, result.apartment.clusters[0].applicationType);
-            Assert.True(result.apartment.clusters[0].isPresent);
+            Assert.Equal("South - none", result.Clusters[0].Name);
+            Assert.Equal(2, result.Clusters[0].ApplicationType);
+            Assert.True(result.Clusters[0].IsPresent);
 
-            Assert.Equal(32027, result.apartment.zones[0].id);
-            Assert.True(result.apartment.zones[0].isPresent);
+            Assert.Equal(32027, (int)result.Zones[0].Id);
+            Assert.True(result.Zones[0].IsPresent);
 
-            Assert.Equal("1337234200000e80deadbeef", result.apartment.zones[0].devices[0].id);
-            Assert.Equal("MyDevice", result.apartment.zones[0].devices[0].name);
-            Assert.Equal("13372342f800000000000f0000deadbeef", result.apartment.zones[0].devices[0].dSUID);
-            Assert.Equal("99999942f800000000000f0000deadbeef", result.apartment.zones[0].devices[0].meterDSUID);
-            Assert.Equal(new List<int>() { 48 }, result.apartment.zones[0].devices[0].groups);
+            Assert.Equal("1337234200000e80deadbeef", result.Zones[0].Devices[0].Id);
+            Assert.Equal("MyDevice", result.Zones[0].Devices[0].Name);
+            Assert.Equal("13372342f800000000000f0000deadbeef", result.Zones[0].Devices[0].DSUID);
+            Assert.Equal("99999942f800000000000f0000deadbeef", result.Zones[0].Devices[0].MeterDSUID);
+            Assert.Equal(new DateTime(2019, 04, 19, 22, 33, 29), result.Zones[0].Devices[0].LastDiscovered);
+            Assert.Equal(new List<int>() { 48 }.Select(x => (Group)x), result.Zones[0].Devices[0].Groups);
 
-            Assert.Equal(253, result.apartment.zones[0].devices[0].sensors[0].type);
-            Assert.Equal(0, result.apartment.zones[0].devices[0].sensors[0].value);
-            Assert.False(result.apartment.zones[0].devices[0].sensors[0].valid);
+            Assert.Equal(253, (int)result.Zones[0].Devices[0].Sensors[0].Type);
+            Assert.Equal(0, result.Zones[0].Devices[0].Sensors[0].Value);
+            Assert.False(result.Zones[0].Devices[0].Sensors[0].Valid);
 
-            Assert.Equal(3, result.apartment.zones[0].groups[0].color);
-            Assert.True(result.apartment.zones[0].groups[0].isValid);
-            Assert.Equal(new List<int?>() { 0, 5, 17, 18, 19, 6 }, result.apartment.zones[0].groups[0].activeBasicScenes);
+            Assert.Equal(3, (int)result.Zones[0].Groups[0].Color);
+            Assert.True(result.Zones[0].Groups[0].IsValid);
+            Assert.Equal(new List<int>() { 0, 5, 17, 18, 19, 6 }.Select(x => (Scene)x), result.Zones[0].Groups[0].ActiveBasicScenes);
         }
 
         [Fact]
@@ -285,15 +286,15 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetTemperatureControlStatus();
 
-            Assert.Equal(32027, result.zones[2].id);
-            Assert.Equal("RoomWithControl", result.zones[2].name);
-            Assert.Equal(1, result.zones[2].ControlMode);
-            Assert.Equal(19.925, result.zones[2].TemperatureValue);
-            Assert.Equal("2019-05-02T09:12:43Z", result.zones[2].TemperatureValueTime);
-            Assert.Equal(20, result.zones[2].NominalValue);
-            Assert.Equal("2018-12-08T18:10:44Z", result.zones[2].NominalValueTime);
-            Assert.Equal(93, result.zones[2].ControlValue);
-            Assert.Equal("2019-05-02T09:12:53Z", result.zones[2].ControlValueTime);
+            Assert.Equal(32027, (int)result.Zones[2].Id);
+            Assert.Equal("RoomWithControl", result.Zones[2].Name);
+            Assert.Equal(1, result.Zones[2].ControlMode);
+            Assert.Equal(19.925, result.Zones[2].TemperatureValue);
+            Assert.Equal(new DateTime(2019, 5, 2, 9, 12, 43, DateTimeKind.Utc), result.Zones[2].TemperatureValueTime);
+            Assert.Equal(20, result.Zones[2].NominalValue);
+            Assert.Equal(new DateTime(2018, 12, 8, 18, 10, 44, DateTimeKind.Utc), result.Zones[2].NominalValueTime);
+            Assert.Equal(93, result.Zones[2].ControlValue);
+            Assert.Equal(new DateTime(2019, 5, 2, 9, 12, 53, DateTimeKind.Utc), result.Zones[2].ControlValueTime);
         }
 
         [Fact]
@@ -332,15 +333,15 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetTemperatureControlValues();
 
-            Assert.Equal(32027, result.zones[1].id);
-            Assert.Equal("RoomWithControl", result.zones[1].name);
-            Assert.Equal(8, result.zones[1].Off);
-            Assert.Equal(21, result.zones[1].Comfort);
-            Assert.Equal(20, result.zones[1].Economy);
+            Assert.Equal(32027, (int)result.Zones[1].Id);
+            Assert.Equal("RoomWithControl", result.Zones[1].Name);
+            Assert.Equal(8, result.Zones[1].Off);
+            Assert.Equal(21, result.Zones[1].Comfort);
+            Assert.Equal(20, result.Zones[1].Economy);
 
-            Assert.Null(result.zones[0].Off);
-            Assert.Null(result.zones[0].Comfort);
-            Assert.Null(result.zones[0].Economy);
+            Assert.Null(result.Zones[0].Off);
+            Assert.Null(result.Zones[0].Comfort);
+            Assert.Null(result.Zones[0].Economy);
         }
 
         [Fact]
@@ -390,22 +391,22 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetTemperatureControlConfig();
 
-            Assert.Equal(0, result.zones[0].ControlMode);
-            Assert.Null(result.zones[0].ReferenceZone);
-            Assert.Null(result.zones[0].CtrlOffset);
+            Assert.Equal(0, result.Zones[0].ControlMode);
+            Assert.Null(result.Zones[0].ReferenceZone);
+            Assert.Null(result.Zones[0].CtrlOffset);
 
-            Assert.Equal(2, result.zones[1].ControlMode);
-            Assert.Equal(32027, result.zones[1].ReferenceZone);
-            Assert.Equal(0, result.zones[1].CtrlOffset);
-            Assert.Null(result.zones[1].CtrlKp);
+            Assert.Equal(2, result.Zones[1].ControlMode);
+            Assert.Equal(32027, result.Zones[1].ReferenceZone);
+            Assert.Equal(0, result.Zones[1].CtrlOffset);
+            Assert.Null(result.Zones[1].CtrlKp);
 
-            Assert.Equal(32027, result.zones[2].id);
-            Assert.Equal(1, result.zones[2].ControlMode);
-            Assert.Equal(75, result.zones[2].EmergencyValue);
-            Assert.Equal(5, result.zones[2].CtrlKp);
-            Assert.Equal(1, result.zones[2].CtrlTs);
-            Assert.Equal(240, result.zones[2].CtrlTi);
-            Assert.Null(result.zones[2].ReferenceZone);
+            Assert.Equal(32027, (int)result.Zones[2].Id);
+            Assert.Equal(1, result.Zones[2].ControlMode);
+            Assert.Equal(75, result.Zones[2].EmergencyValue);
+            Assert.Equal(5, result.Zones[2].CtrlKp);
+            Assert.Equal(1, result.Zones[2].CtrlTs);
+            Assert.Equal(240, result.Zones[2].CtrlTi);
+            Assert.Null(result.Zones[2].ReferenceZone);
         }
 
         [Fact]
@@ -438,7 +439,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            await dsApiClient.CallScene(zoneKitchen, (Group)Group.Color.Yellow, (Scene)Scene.SceneCommand.Preset1, true);
+            await dsApiClient.CallScene(zoneKitchen, (Group)Color.Yellow, (Scene)SceneCommand.Preset1, true);
         }
 
         [Fact]
@@ -459,10 +460,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Group.Color.Yellow);
+            var result = await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Color.Yellow);
 
-            Assert.Equal(new List<int>() { 0, 5, 17, 18, 19 }, result.reachableScenes);
-            Assert.Equal(new List<string>(), result.userSceneNames);
+            Assert.Equal(new List<int>() { 0, 5, 17, 18, 19 }.Select(x => (Scene)x), result.ReachableScenes);
+            Assert.Equal(new List<string>(), result.UserSceneNames);
         }
 
         [Fact]
@@ -482,9 +483,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Group.Color.Yellow);
+            var result = await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Color.Yellow);
 
-            Assert.Equal(5, result.scene);
+            Assert.Equal(5, (int)result.Scene);
         }
 
         [Fact]
@@ -527,10 +528,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var zonesScenes = await dsApiClient.GetZonesAndLastCalledScenes();
-            Assert.NotEmpty(zonesScenes.zones);
+            Assert.NotEmpty(zonesScenes.Zones);
 
-            Assert.Equal(5, zonesScenes.zones[0].groups.First(g => g.group == 4).lastCalledScene);
-            Assert.Equal(40, zonesScenes.zones[0].groups.First(g => g.group == 8).lastCalledScene);
+            Assert.Equal(5, (int)zonesScenes.Zones[0].Groups.First(g => g.Group == 4).LastCalledScene);
+            Assert.Equal(40, (int)zonesScenes.Zones[0].Groups.First(g => g.Group == 8).LastCalledScene);
         }
 
         [Fact]
@@ -574,13 +575,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.GetZonesAndSensorValues();
 
-            Assert.Equal(0, result.zones[0].ZoneID);
-            Assert.Null(result.zones[0].sensor);
+            Assert.Equal(0, (int)result.Zones[0].ZoneID);
+            Assert.Null(result.Zones[0].Sensor);
 
-            Assert.Equal(32027, result.zones[2].ZoneID);
-            Assert.Equal(9, result.zones[2].sensor[0].type);
-            Assert.Equal(21.3, result.zones[2].sensor[0].value);
-            Assert.Equal(1556789036, result.zones[2].sensor[0].time);
+            Assert.Equal(32027, (int)result.Zones[2].ZoneID);
+            Assert.Equal(9, (int)result.Zones[2].Sensor[0].Type);
+            Assert.Equal(21.3, result.Zones[2].Sensor[0].Value);
+            Assert.Equal(1556789036, result.Zones[2].Sensor[0].Time);
         }
 
         [Fact]
@@ -660,9 +661,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             var result = await dsApiClient.GetCircuitZones();
 
             Assert.Equal("99999942f800000000000f0000deadbeef", result.DSMeters[0].DSUID);
-            Assert.Equal(2, result.DSMeters[0].zones.Count);
-            Assert.Equal(4, result.DSMeters[0].zones[0].ZoneID);
-            Assert.Equal(32027, result.DSMeters[0].zones[1].ZoneID);
+            Assert.Equal(2, result.DSMeters[0].Zones.Count);
+            Assert.Equal(4, (int)result.DSMeters[0].Zones[0].ZoneID);
+            Assert.Equal(32027, (int)result.DSMeters[0].Zones[1].ZoneID);
         }
 
         [Fact]
@@ -763,7 +764,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            await dsApiClient.Subscribe((SystemEventName)SystemEventName.EventType.CallScene, 42);
+            await dsApiClient.Subscribe((SystemEventName)SystemEvent.CallScene, 42);
         }
 
         [Fact]
@@ -779,7 +780,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            await dsApiClient.Unsubscribe((SystemEventName)SystemEventName.EventType.CallScene, 42);
+            await dsApiClient.Unsubscribe((SystemEventName)SystemEvent.CallScene, 42);
         }
 
         [Fact]
@@ -822,19 +823,19 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var result = await dsApiClient.PollForEvents(42, 60000);
 
-            Assert.Equal("callScene", result.events[0].name);
-            Assert.Equal("2", result.events[0].properties.callOrigin);
-            Assert.Equal("5", result.events[0].properties.sceneID);
-            Assert.True(result.events[0].properties.forced);
-            Assert.Equal("32027", result.events[0].properties.zoneID);
-            Assert.Equal("5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2", result.events[0].properties.originToken);
-            Assert.Equal("0000000000000000000000000000000000", result.events[0].properties.originDSUID);
-            Assert.Equal(".zone(32027).group(1)", result.events[0].source.set);
-            Assert.Equal(1, result.events[0].source.groupID);
-            Assert.Equal(32027, result.events[0].source.zoneID);
-            Assert.False(result.events[0].source.isApartment);
-            Assert.True(result.events[0].source.isGroup);
-            Assert.False(result.events[0].source.isDevice);
+            Assert.Equal("callScene", result.Events[0].Name);
+            Assert.Equal("2", result.Events[0].Properties.CallOrigin);
+            Assert.Equal("5", result.Events[0].Properties.SceneID);
+            Assert.True(result.Events[0].Properties.Forced);
+            Assert.Equal("32027", result.Events[0].Properties.ZoneID);
+            Assert.Equal("5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2", result.Events[0].Properties.OriginToken);
+            Assert.Equal("0000000000000000000000000000000000", result.Events[0].Properties.OriginDSUID);
+            Assert.Equal(".zone(32027).group(1)", result.Events[0].Source.Set);
+            Assert.Equal(1, (int)result.Events[0].Source.GroupID);
+            Assert.Equal(32027, (int)result.Events[0].Source.ZoneID);
+            Assert.False(result.Events[0].Source.IsApartment);
+            Assert.True(result.Events[0].Source.IsGroup);
+            Assert.False(result.Events[0].Source.IsDevice);
         }
 
         [Fact]
@@ -849,7 +850,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                               }");
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            await dsApiClient.RaiseEvent((SystemEventName)SystemEventName.EventType.CallScene,
+            await dsApiClient.RaiseEvent((SystemEventName)SystemEvent.CallScene,
                 new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("mykey", "myval") });
         }
 
@@ -879,13 +880,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             try { await dsApiClient.SetTemperatureControlValues(zoneKitchen, null, null, 22); } catch { }
             UriForMethodName.Add("SetTemperatureControlValues", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.CallScene(zoneKitchen, (Group)Group.Color.Yellow, (Scene)Scene.SceneCommand.Preset1, true); } catch { }
+            try { await dsApiClient.CallScene(zoneKitchen, (Group)Color.Yellow, (Scene)SceneCommand.Preset1, true); } catch { }
             UriForMethodName.Add("CallScene", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Group.Color.Yellow); } catch { }
+            try { await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Color.Yellow); } catch { }
             UriForMethodName.Add("GetReachableScenes", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Group.Color.Yellow); } catch { }
+            try { await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Color.Yellow); } catch { }
             UriForMethodName.Add("GetLastCalledScene", mockHttp.LastCalledUri);
 
             try { await dsApiClient.GetZonesAndLastCalledScenes(); } catch { }
@@ -906,16 +907,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             try { await dsApiClient.GetEnergy(new DSUID("99999942f800000000000f0000deadbeef"), 1, 600); } catch { }
             UriForMethodName.Add("GetEnergy", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.Subscribe((SystemEventName)SystemEventName.EventType.CallScene, 42); } catch { }
+            try { await dsApiClient.Subscribe((SystemEventName)SystemEvent.CallScene, 42); } catch { }
             UriForMethodName.Add("Subscribe", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.Unsubscribe((SystemEventName)SystemEventName.EventType.CallScene, 42); } catch { }
+            try { await dsApiClient.Unsubscribe((SystemEventName)SystemEvent.CallScene, 42); } catch { }
             UriForMethodName.Add("Unsubscribe", mockHttp.LastCalledUri);
 
             try { await dsApiClient.PollForEvents(42, 60000); } catch { }
             UriForMethodName.Add("PollForEvents", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.RaiseEvent((SystemEventName)SystemEventName.EventType.CallScene,
+            try { await dsApiClient.RaiseEvent((SystemEventName)SystemEvent.CallScene,
                 new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("mykey", "myval") }); } catch { }
             UriForMethodName.Add("RaiseEvent", mockHttp.LastCalledUri);
 

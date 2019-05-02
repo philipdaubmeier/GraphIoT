@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System.Collections.Generic;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 {
@@ -10,11 +11,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
     public class MeterZones
     {
         public string DSUID { get; set; }
-        public List<MeterZone> zones { get; set; }
+        public List<MeterZone> Zones { get; set; }
     }
 
     public class MeterZone
     {
-        public int ZoneID { get; set; }
+        public Zone ZoneID { get; set; }
     }
 }

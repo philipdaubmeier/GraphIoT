@@ -1,8 +1,8 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Network;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model
+namespace PhilipDaubmeier.DigitalstromClient.Network
 {
     public class DigitalstromConnectionProvider : IDigitalstromConnectionProvider
     {

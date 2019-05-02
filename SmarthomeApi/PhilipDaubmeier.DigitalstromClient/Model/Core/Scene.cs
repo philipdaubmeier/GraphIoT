@@ -2,200 +2,201 @@
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
+    /// <summary>
+    /// All scene commands supported by the DSS.
+    /// </summary>
+    public enum SceneCommand
+    {
+        ///<summary>Set output value to Preset 0 (Default: Off)</summary>
+        Preset0 = 0,
+        ///<summary>Set output value to Preset Area 1 Off (Default: Off)</summary>
+        Area1Off = 1,
+        ///<summary>Set output value to Area 2 Off (Default: Off)</summary>
+        Area2Off = 2,
+        ///<summary>Set output value to Area 3 Off (Default: Off)</summary>
+        Area3Off = 3,
+        ///<summary>Set output value to Area 4 Off (Default: Off)</summary>
+        Area4Off = 4,
+        ///<summary>Set output value to Preset 1 (Default: On)</summary>
+        Preset1 = 5,
+        ///<summary>Set output value to Preset Area 1 On (Default: On)</summary>
+        Area1On = 6,
+        ///<summary>Set output value to Area 2 On (Default: On)</summary>
+        Area2On = 7,
+        ///<summary>Set output value to Area 3 On (Default: On)</summary>
+        Area3On = 8,
+        ///<summary>Set output value to Area 4 On (Default: On)</summary>
+        Area4On = 9,
+        ///<summary>Next step to increment or decrement</summary>
+        AreaSteppingContinue = 10,
+        ///<summary>Decrement output value</summary>
+        Decrement = 11,
+        ///<summary>Increment output value</summary>
+        Increment = 12,
+        ///<summary>Minimum output value</summary>
+        Minimum = 13,
+        ///<summary>Maximum output value</summary>
+        Maximum = 14,
+        ///<summary>Stop output value change at current position</summary>
+        Stop = 15,
+        ///<summary>Reserved for future use</summary>
+        Reserved = 16,
+        ///<summary>Set output value to Preset 2</summary>
+        Preset2 = 17,
+        ///<summary>Set output value to Preset 3</summary>
+        Preset3 = 18,
+        ///<summary>Set output value to Preset 4</summary>
+        Preset4 = 19,
+        ///<summary>Set output value to Preset 12</summary>
+        Preset12 = 20,
+        ///<summary>Set output value to Preset 13</summary>
+        Preset13 = 21,
+        ///<summary>Set output value to Preset 14</summary>
+        Preset14 = 22,
+        ///<summary>Set output value to Preset 22</summary>
+        Preset22 = 23,
+        ///<summary>Set output value to Preset 23</summary>
+        Preset23 = 24,
+        ///<summary>Set output value to Preset 24</summary>
+        Preset24 = 25,
+        ///<summary>Set output value to Preset 32</summary>
+        Preset32 = 26,
+        ///<summary>Set output value to Preset 33</summary>
+        Preset33 = 27,
+        ///<summary>Set output value to Preset 34</summary>
+        Preset34 = 28,
+        ///<summary>Set output value to Preset 42</summary>
+        Preset42 = 29,
+        ///<summary>Set output value to Preset 43</summary>
+        Preset43 = 30,
+        ///<summary>Set output value to Preset 44</summary>
+        Preset44 = 31,
+        ///<summary>Set output value to Preset 10 (Default: Off)</summary>
+        Preset10 = 32,
+        ///<summary>Set output value to Preset 11 (Default: On)</summary>
+        Preset11 = 33,
+        ///<summary>Set output value to Preset 20 (Default: Off)</summary>
+        Preset20 = 34,
+        ///<summary>Set output value to Preset 21 (Default: On)</summary>
+        Preset21 = 35,
+        ///<summary>Set output value to Preset 30 (Default: Off)</summary>
+        Preset30 = 36,
+        ///<summary>Set output value to Preset 31 (Default: On)</summary>
+        Preset31 = 37,
+        ///<summary>Set output value to Preset 40 (Default: Off)</summary>
+        Preset40 = 38,
+        ///<summary>Set output value to Preset 41 (Default: On)</summary>
+        Preset41 = 39,
+        ///<summary>Slowly fade down to off value</summary>
+        AutoOff = 40,
+        ///<summary>Short impulse on the output</summary>
+        Impulse = 41,
+        ///<summary>Initial command to decrement output value</summary>
+        Area1Decrement = 42,
+        ///<summary>Initial command to increment output value</summary>
+        Area1Increment = 43,
+        ///<summary>Initial command to decrement output value</summary>
+        Area2Decrement = 44,
+        ///<summary>Initial command to increment output value</summary>
+        Area2Increment = 45,
+        ///<summary>Initial command to decrement output value</summary>
+        Area3Decrement = 46,
+        ///<summary>Initial command to increment output value</summary>
+        Area3Increment = 47,
+        ///<summary>Initial command to decrement output value</summary>
+        Area4Decrement = 48,
+        ///<summary>Initial command to increment output value</summary>
+        Area4Increment = 49,
+        ///<summary>Local off Device</summary>
+        DeviceOff = 50,
+        ///<summary>Local on Device</summary>
+        DeviceOn = 51,
+        ///<summary>Stop output value change at current position</summary>
+        Area1Stop = 52,
+        ///<summary>Stop output value change at current position</summary>
+        Area2Stop = 53,
+        ///<summary>Stop output value change at current position</summary>
+        Area3Stop = 54,
+        ///<summary>Stop output value change at current position</summary>
+        Area4Stop = 55,
+        ///<summary>Sun Protection</summary>
+        SunProtection = 56,
+        ///<summary>Reserved for future use</summary>
+        Reserved2 = 57,
+        ///<summary>Reserved for future use</summary>
+        Reserved3 = 58,
+        ///<summary>Reserved for future use</summary>
+        Reserved4 = 59,
+        ///<summary>Reserved for future use</summary>
+        Reserved5 = 60,
+        ///<summary>Reserved for future use</summary>
+        Reserved6 = 61,
+        ///<summary>Reserved for future use</summary>
+        Reserved7 = 62,
+        ///<summary>Reserved for future use</summary>
+        Reserved8 = 63,
+        ///<summary>Auto Standby</summary>
+        AutoStandby = 64,
+        ///<summary>Panic</summary>
+        Panic = 65,
+        ///<summary>Reserved for future use</summary>
+        Reserved9 = 66,
+        ///<summary>Standby</summary>
+        Standby = 67,
+        ///<summary>Depp Off</summary>
+        DeepOff = 68,
+        ///<summary>Sleeping</summary>
+        Sleeping = 69,
+        ///<summary>Wakeup</summary>
+        Wakeup = 70,
+        ///<summary>Present</summary>
+        Present = 71,
+        ///<summary>Absent</summary>
+        Absent = 72,
+        ///<summary>Door Bell</summary>
+        DoorBell = 73,
+        ///<summary>Alarm 1</summary>
+        Alarm1 = 74,
+        ///<summary>Zone Active</summary>
+        ZoneActive = 75,
+        ///<summary>Fire</summary>
+        Fire = 76,
+        ///<summary>Smoke Alarm</summary>
+        Smoke = 77,
+        ///<summary>Water Alarm</summary>
+        Water = 78,
+        ///<summary>Gas Alarm</summary>
+        Gas = 79,
+        ///<summary>Reserved for future use</summary>
+        Reserved10 = 80,
+        ///<summary>Reserved for future use</summary>
+        Reserved11 = 81,
+        ///<summary>Reserved for future use</summary>
+        Reserved12 = 82,
+        ///<summary>Alarm 2</summary>
+        Alarm2 = 83,
+        ///<summary>Alarm 3</summary>
+        Alarm3 = 84,
+        ///<summary>Alarm 4</summary>
+        Alarm4 = 85,
+        ///<summary>Wind</summary>
+        Wind = 86,
+        ///<summary>No Wind</summary>
+        NoWind = 87,
+        ///<summary>Rain</summary>
+        Rain = 88,
+        ///<summary>No Rain</summary>
+        NoRain = 89,
+        ///<summary>Hail</summary>
+        Hail = 90,
+        ///<summary>No Hail</summary>
+        NoHail = 91,
+        ///<summary>Unknown - the value was out of range while parsing</summary>
+        Unknown = 92
+    }
+
     public class Scene
     {
-        /// <summary>
-        /// All scene commands supported by the DSS.
-        /// </summary>
-        public enum SceneCommand {
-            ///<summary>Set output value to Preset 0 (Default: Off)</summary>
-            Preset0 = 0,
-            ///<summary>Set output value to Preset Area 1 Off (Default: Off)</summary>
-            Area1Off = 1,
-            ///<summary>Set output value to Area 2 Off (Default: Off)</summary>
-            Area2Off = 2,
-            ///<summary>Set output value to Area 3 Off (Default: Off)</summary>
-            Area3Off = 3,
-            ///<summary>Set output value to Area 4 Off (Default: Off)</summary>
-            Area4Off = 4,
-            ///<summary>Set output value to Preset 1 (Default: On)</summary>
-            Preset1 = 5,
-            ///<summary>Set output value to Preset Area 1 On (Default: On)</summary>
-            Area1On = 6,
-            ///<summary>Set output value to Area 2 On (Default: On)</summary>
-            Area2On = 7,
-            ///<summary>Set output value to Area 3 On (Default: On)</summary>
-            Area3On = 8,
-            ///<summary>Set output value to Area 4 On (Default: On)</summary>
-            Area4On = 9,
-            ///<summary>Next step to increment or decrement</summary>
-            AreaSteppingContinue = 10,
-            ///<summary>Decrement output value</summary>
-            Decrement = 11,
-            ///<summary>Increment output value</summary>
-            Increment = 12,
-            ///<summary>Minimum output value</summary>
-            Minimum = 13,
-            ///<summary>Maximum output value</summary>
-            Maximum = 14,
-            ///<summary>Stop output value change at current position</summary>
-            Stop = 15,
-            ///<summary>Reserved for future use</summary>
-            Reserved = 16,
-            ///<summary>Set output value to Preset 2</summary>
-            Preset2 = 17,
-            ///<summary>Set output value to Preset 3</summary>
-            Preset3 = 18,
-            ///<summary>Set output value to Preset 4</summary>
-            Preset4 = 19,
-            ///<summary>Set output value to Preset 12</summary>
-            Preset12 = 20,
-            ///<summary>Set output value to Preset 13</summary>
-            Preset13 = 21,
-            ///<summary>Set output value to Preset 14</summary>
-            Preset14 = 22,
-            ///<summary>Set output value to Preset 22</summary>
-            Preset22 = 23,
-            ///<summary>Set output value to Preset 23</summary>
-            Preset23 = 24,
-            ///<summary>Set output value to Preset 24</summary>
-            Preset24 = 25,
-            ///<summary>Set output value to Preset 32</summary>
-            Preset32 = 26,
-            ///<summary>Set output value to Preset 33</summary>
-            Preset33 = 27,
-            ///<summary>Set output value to Preset 34</summary>
-            Preset34 = 28,
-            ///<summary>Set output value to Preset 42</summary>
-            Preset42 = 29,
-            ///<summary>Set output value to Preset 43</summary>
-            Preset43 = 30,
-            ///<summary>Set output value to Preset 44</summary>
-            Preset44 = 31,
-            ///<summary>Set output value to Preset 10 (Default: Off)</summary>
-            Preset10 = 32,
-            ///<summary>Set output value to Preset 11 (Default: On)</summary>
-            Preset11 = 33,
-            ///<summary>Set output value to Preset 20 (Default: Off)</summary>
-            Preset20 = 34,
-            ///<summary>Set output value to Preset 21 (Default: On)</summary>
-            Preset21 = 35,
-            ///<summary>Set output value to Preset 30 (Default: Off)</summary>
-            Preset30 = 36,
-            ///<summary>Set output value to Preset 31 (Default: On)</summary>
-            Preset31 = 37,
-            ///<summary>Set output value to Preset 40 (Default: Off)</summary>
-            Preset40 = 38,
-            ///<summary>Set output value to Preset 41 (Default: On)</summary>
-            Preset41 = 39,
-            ///<summary>Slowly fade down to off value</summary>
-            AutoOff = 40,
-            ///<summary>Short impulse on the output</summary>
-            Impulse = 41,
-            ///<summary>Initial command to decrement output value</summary>
-            Area1Decrement = 42,
-            ///<summary>Initial command to increment output value</summary>
-            Area1Increment = 43,
-            ///<summary>Initial command to decrement output value</summary>
-            Area2Decrement = 44,
-            ///<summary>Initial command to increment output value</summary>
-            Area2Increment = 45,
-            ///<summary>Initial command to decrement output value</summary>
-            Area3Decrement = 46,
-            ///<summary>Initial command to increment output value</summary>
-            Area3Increment = 47,
-            ///<summary>Initial command to decrement output value</summary>
-            Area4Decrement = 48,
-            ///<summary>Initial command to increment output value</summary>
-            Area4Increment = 49,
-            ///<summary>Local off Device</summary>
-            DeviceOff = 50,
-            ///<summary>Local on Device</summary>
-            DeviceOn = 51,
-            ///<summary>Stop output value change at current position</summary>
-            Area1Stop = 52,
-            ///<summary>Stop output value change at current position</summary>
-            Area2Stop = 53,
-            ///<summary>Stop output value change at current position</summary>
-            Area3Stop = 54,
-            ///<summary>Stop output value change at current position</summary>
-            Area4Stop = 55,
-            ///<summary>Sun Protection</summary>
-            SunProtection = 56,
-            ///<summary>Reserved for future use</summary>
-            Reserved2 = 57,
-            ///<summary>Reserved for future use</summary>
-            Reserved3 = 58,
-            ///<summary>Reserved for future use</summary>
-            Reserved4 = 59,
-            ///<summary>Reserved for future use</summary>
-            Reserved5 = 60,
-            ///<summary>Reserved for future use</summary>
-            Reserved6 = 61,
-            ///<summary>Reserved for future use</summary>
-            Reserved7 = 62,
-            ///<summary>Reserved for future use</summary>
-            Reserved8 = 63,
-            ///<summary>Auto Standby</summary>
-            AutoStandby = 64,
-            ///<summary>Panic</summary>
-            Panic = 65,
-            ///<summary>Reserved for future use</summary>
-            Reserved9 = 66,
-            ///<summary>Standby</summary>
-            Standby = 67,
-            ///<summary>Depp Off</summary>
-            DeepOff = 68,
-            ///<summary>Sleeping</summary>
-            Sleeping = 69,
-            ///<summary>Wakeup</summary>
-            Wakeup = 70,
-            ///<summary>Present</summary>
-            Present = 71,
-            ///<summary>Absent</summary>
-            Absent = 72,
-            ///<summary>Door Bell</summary>
-            DoorBell = 73,
-            ///<summary>Alarm 1</summary>
-            Alarm1 = 74,
-            ///<summary>Zone Active</summary>
-            ZoneActive = 75,
-            ///<summary>Fire</summary>
-            Fire = 76,
-            ///<summary>Smoke Alarm</summary>
-            Smoke = 77,
-            ///<summary>Water Alarm</summary>
-            Water = 78,
-            ///<summary>Gas Alarm</summary>
-            Gas = 79,
-            ///<summary>Reserved for future use</summary>
-            Reserved10 = 80,
-            ///<summary>Reserved for future use</summary>
-            Reserved11 = 81,
-            ///<summary>Reserved for future use</summary>
-            Reserved12 = 82,
-            ///<summary>Alarm 2</summary>
-            Alarm2 = 83,
-            ///<summary>Alarm 3</summary>
-            Alarm3 = 84,
-            ///<summary>Alarm 4</summary>
-            Alarm4 = 85,
-            ///<summary>Wind</summary>
-            Wind = 86,
-            ///<summary>No Wind</summary>
-            NoWind = 87,
-            ///<summary>Rain</summary>
-            Rain = 88,
-            ///<summary>No Rain</summary>
-            NoRain = 89,
-            ///<summary>Hail</summary>
-            Hail = 90,
-            ///<summary>No Hail</summary>
-            NoHail = 91,
-            ///<summary>Unknown - the value was out of range while parsing</summary>
-            Unknown = 92
-        }
-
         private SceneCommand _scene;
 
         public Scene(SceneCommand scene)
@@ -206,6 +207,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         public static implicit operator Scene(SceneCommand scene)
         {
             return new Scene(scene);
+        }
+
+        public static implicit operator Scene(long sceneNumber)
+        {
+            return (int)sceneNumber;
         }
 
         public static implicit operator Scene(int sceneNumber)

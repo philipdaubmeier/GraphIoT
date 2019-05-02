@@ -1,19 +1,20 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model;
-using PhilipDaubmeier.DigitalstromClient.Model.Apartment;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Energy;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Model.Heating;
 using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
+using PhilipDaubmeier.DigitalstromClient.Model.SensorData;
 using PhilipDaubmeier.DigitalstromClient.Model.Structure;
 using PhilipDaubmeier.DigitalstromClient.Model.ZoneData;
+using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Network
+namespace PhilipDaubmeier.DigitalstromClient
 {
-    public class DigitalstromWebserviceClient : AbstractDigitalstromClient
+    public class DigitalstromWebserviceClient : DigitalstromWebserviceClientBase
     {
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
@@ -60,9 +61,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// Returns an object containing the structure of the apartment. This
         /// includes detailed information about all zones, groups and devices.
         /// </summary>
-        public async Task<StructureResponse> GetStructure()
+        public async Task<Apartment> GetStructure()
         {
-            return await Load<StructureResponse>(new Uri("/json/apartment/getStructure", UriKind.Relative));
+            return (await Load<StructureResponse>(new Uri("/json/apartment/getStructure", UriKind.Relative)))?.Apartment;
         }
 
         /// <summary>
@@ -227,7 +228,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         public async Task Subscribe(IEventName name, int subscriptionID)
         {
             await Load(new Uri("/json/event/subscribe", UriKind.Relative)
-                .AddQuery("name", name.name).AddQuery("subscriptionID", subscriptionID));
+                .AddQuery("name", name.Name).AddQuery("subscriptionID", subscriptionID));
         }
 
         /// <summary>
@@ -239,7 +240,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         public async Task Unsubscribe(IEventName name, int subscriptionID)
         {
             await Load(new Uri("/json/event/unsubscribe", UriKind.Relative)
-                .AddQuery("name", name.name).AddQuery("subscriptionID", subscriptionID));
+                .AddQuery("name", name.Name).AddQuery("subscriptionID", subscriptionID));
         }
 
         /// <summary>
@@ -272,7 +273,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         public async Task RaiseEvent(IEventName name, List<KeyValuePair<string, string>> parameters = null)
         {
             await Load(new Uri("/json/event/raise", UriKind.Relative)
-                .AddQuery("name", name.name).AddQuery("parameter", parameters));
+                .AddQuery("name", name.Name).AddQuery("parameter", parameters));
         }
     }
 }

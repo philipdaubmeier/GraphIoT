@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System.Collections.Generic;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
 {
     public class HeatingValuesZone
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public string ControlDSUID { get; set; }
+        public Zone Id { get; set; }
+        public string Name { get; set; }
+        public DSUID ControlDSUID { get; set; }
         public bool IsConfigured { get; set; }
         public double? Off { get; set; }
         public double? Comfort { get; set; }
@@ -20,6 +21,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
 
     public class TemperatureControlValuesResponse : IWiremessagePayload<TemperatureControlValuesResponse>
     {
-        public List<HeatingValuesZone> zones { get; set; }
+        public List<HeatingValuesZone> Zones { get; set; }
     }
 }

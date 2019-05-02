@@ -3,110 +3,109 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 {
+    public enum SystemEvent
+    {
+        ModelReady,
+        Running,
+        CallScene,
+        CallSceneBus,
+        UndoScene,
+        Blink,
+        ButtonClick,
+        ButtonDeviceAction,
+        DeviceBinaryInputEvent,
+        DeviceSensorEvent,
+        DeviceSensorValue,
+        DeviceActionEvent,
+        DeviceEventEvent,
+        DeviceStateEvent,
+        ZoneSensorValue,
+        StateChange,
+        Sunshine,
+        FrostProtection,
+        HeatingModeSwitch,
+        BuildingService,
+        Sendmail,
+        OperationLock,
+        ClusterConfigLock,
+        DevicesFirstSeen,
+        ActionExecute,
+        Highlevelevent,
+        ApartmentModelChanged,
+        UserDefinedActionChanged,
+        AddonStateChange,
+        TimedEventChanged,
+        ExecutionDenied,
+        ExecutionDeniedDigestCheck,
+        Unknown
+    }
+
     public class SystemEventName : IEventName
     {
-        public enum EventType
-        {
-            ModelReady,
-            Running,
-            CallScene,
-            CallSceneBus,
-            UndoScene,
-            Blink,
-            ButtonClick,
-            ButtonDeviceAction,
-            DeviceBinaryInputEvent,
-            DeviceSensorEvent,
-            DeviceSensorValue,
-            DeviceActionEvent,
-            DeviceEventEvent,
-            DeviceStateEvent,
-            ZoneSensorValue,
-            StateChange,
-            Sunshine,
-            FrostProtection,
-            HeatingModeSwitch,
-            BuildingService,
-            Sendmail,
-            OperationLock,
-            ClusterConfigLock,
-            DevicesFirstSeen,
-            ActionExecute,
-            Highlevelevent,
-            ApartmentModelChanged,
-            UserDefinedActionChanged,
-            AddonStateChange,
-            TimedEventChanged,
-            ExecutionDenied,
-            ExecutionDeniedDigestCheck,
-            Unknown
-        }
+        public SystemEvent Type { get; }
 
-        public EventType type { get { return _type; } }
-
-        private EventType _type;
-        public string name
+        public string Name
         {
             get
             {
-                switch (_type)
+                switch (Type)
                 {
-                    case EventType.ModelReady: return "model_ready";
-                    case EventType.Running: return "running";
-                    case EventType.CallScene: return "callScene";
-                    case EventType.CallSceneBus: return "callSceneBus";
-                    case EventType.UndoScene: return "undoScene";
-                    case EventType.Blink: return "blink";
-                    case EventType.ButtonClick: return "buttonClick";
-                    case EventType.ButtonDeviceAction: return "buttonDeviceAction";
-                    case EventType.DeviceBinaryInputEvent: return "deviceBinaryInputEvent";
-                    case EventType.DeviceSensorEvent: return "deviceSensorEvent";
-                    case EventType.DeviceSensorValue: return "deviceSensorValue";
-                    case EventType.DeviceActionEvent: return "deviceActionEvent";
-                    case EventType.DeviceEventEvent: return "deviceEventEvent";
-                    case EventType.DeviceStateEvent: return "deviceStateEvent";
-                    case EventType.ZoneSensorValue: return "zoneSensorValue";
-                    case EventType.StateChange: return "stateChange";
-                    case EventType.Sunshine: return "sunshine";
-                    case EventType.FrostProtection: return "frostprotection";
-                    case EventType.HeatingModeSwitch: return "heating_mode_switch";
-                    case EventType.BuildingService: return "building_service";
-                    case EventType.Sendmail: return "sendmail";
-                    case EventType.OperationLock: return "operation_lock";
-                    case EventType.ClusterConfigLock: return "cluster_config_lock";
-                    case EventType.DevicesFirstSeen: return "devices_first_seen";
-                    case EventType.ActionExecute: return "action_execute";
-                    case EventType.Highlevelevent: return "highlevelevent";
-                    case EventType.ApartmentModelChanged: return "apartmentModelChanged";
-                    case EventType.UserDefinedActionChanged: return "userDefinedActionChanged";
-                    case EventType.AddonStateChange: return "addonStateChange";
-                    case EventType.TimedEventChanged: return "timedEventChanged";
-                    case EventType.ExecutionDenied: return "executionDenied";
-                    case EventType.ExecutionDeniedDigestCheck: return "execution_denied_digest_check";
+                    case SystemEvent.ModelReady: return "model_ready";
+                    case SystemEvent.Running: return "running";
+                    case SystemEvent.CallScene: return "callScene";
+                    case SystemEvent.CallSceneBus: return "callSceneBus";
+                    case SystemEvent.UndoScene: return "undoScene";
+                    case SystemEvent.Blink: return "blink";
+                    case SystemEvent.ButtonClick: return "buttonClick";
+                    case SystemEvent.ButtonDeviceAction: return "buttonDeviceAction";
+                    case SystemEvent.DeviceBinaryInputEvent: return "deviceBinaryInputEvent";
+                    case SystemEvent.DeviceSensorEvent: return "deviceSensorEvent";
+                    case SystemEvent.DeviceSensorValue: return "deviceSensorValue";
+                    case SystemEvent.DeviceActionEvent: return "deviceActionEvent";
+                    case SystemEvent.DeviceEventEvent: return "deviceEventEvent";
+                    case SystemEvent.DeviceStateEvent: return "deviceStateEvent";
+                    case SystemEvent.ZoneSensorValue: return "zoneSensorValue";
+                    case SystemEvent.StateChange: return "stateChange";
+                    case SystemEvent.Sunshine: return "sunshine";
+                    case SystemEvent.FrostProtection: return "frostprotection";
+                    case SystemEvent.HeatingModeSwitch: return "heating_mode_switch";
+                    case SystemEvent.BuildingService: return "building_service";
+                    case SystemEvent.Sendmail: return "sendmail";
+                    case SystemEvent.OperationLock: return "operation_lock";
+                    case SystemEvent.ClusterConfigLock: return "cluster_config_lock";
+                    case SystemEvent.DevicesFirstSeen: return "devices_first_seen";
+                    case SystemEvent.ActionExecute: return "action_execute";
+                    case SystemEvent.Highlevelevent: return "highlevelevent";
+                    case SystemEvent.ApartmentModelChanged: return "apartmentModelChanged";
+                    case SystemEvent.UserDefinedActionChanged: return "userDefinedActionChanged";
+                    case SystemEvent.AddonStateChange: return "addonStateChange";
+                    case SystemEvent.TimedEventChanged: return "timedEventChanged";
+                    case SystemEvent.ExecutionDenied: return "executionDenied";
+                    case SystemEvent.ExecutionDeniedDigestCheck: return "execution_denied_digest_check";
                     default: return "unknown_event_type";
                 }
             }
         }
 
-        public SystemEventName(EventType type)
+        public SystemEventName(SystemEvent type)
         {
-            _type = type;
+            this.Type = type;
         }
 
-        public static implicit operator SystemEventName(EventType type)
+        public static implicit operator SystemEventName(SystemEvent type)
         {
             return new SystemEventName(type);
         }
 
         public static implicit operator SystemEventName(string name)
         {
-            var matchingEvent = ((EventType[])Enum.GetValues(typeof(EventType)))
+            var matchingEvent = ((SystemEvent[])Enum.GetValues(typeof(SystemEvent)))
                 .Select(x => new SystemEventName(x))
-                .Where(x => x.name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                .Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
             if (matchingEvent == null)
-                return new SystemEventName(EventType.Unknown);
+                return new SystemEventName(SystemEvent.Unknown);
             return matchingEvent;
         }
 
@@ -119,17 +118,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
         {
             if ((object)name1 == null || (object)name2 == null)
                 return ReferenceEquals(name1, name2);
-            return name1._type == name2._type;
+            return name1.Type == name2.Type;
         }
 
         public override bool Equals(object obj)
         {
-            return ((SystemEventName)obj)._type == _type;
+            return ((SystemEventName)obj).Type == Type;
         }
 
         public override int GetHashCode()
         {
-            return _type.GetHashCode();
+            return Type.GetHashCode();
         }
     }
 }
