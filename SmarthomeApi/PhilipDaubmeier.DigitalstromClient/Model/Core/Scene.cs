@@ -210,6 +210,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Scene(int sceneNumber)
         {
+            if (sceneNumber < 0 || sceneNumber >= (int)SceneCommand.Unknown || sceneNumber == (int)SceneCommand.Reserved)
+                return new Scene(SceneCommand.Unknown);
+
             return new Scene((SceneCommand)sceneNumber);
         }
 
