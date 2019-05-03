@@ -17,15 +17,25 @@ namespace PhilipDaubmeier.DigitalstromClient
     public class DigitalstromWebserviceClient : DigitalstromWebserviceClientBase
     {
         /// <summary>
-        /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
-        /// app and user credentials given via the authentication data object. If
-        /// a valid application token is given in the auth data, it is used directly.
+        /// Connects to the Digitalstrom DSS REST webservice with the given connection
+        /// provider uris and credentials.
         /// </summary>
         /// <param name="connectionProvider">All necessary connection infos like uris and
         /// authentication data needed to use for the webservice or to perform a new or
         /// renewed authentication</param>
         public DigitalstromWebserviceClient(IDigitalstromConnectionProvider connectionProvider)
             : base(connectionProvider) { }
+
+        /// <summary>
+        /// Connects to the Digitalstrom DSS REST webservice at the given uri with
+        /// the given app and user credentials given via the authentication data object. If
+        /// a valid application token is given in the auth data, it is used directly.
+        /// </summary>
+        /// <param name="uri">The uri of the Digitalstrom DSS</param>
+        /// <param name="authData">The authentication information needed to use for
+        /// the webservice or to perform a new or renewed authentication</param>
+        public DigitalstromWebserviceClient(Uri uri, IDigitalstromAuth authData)
+            : base(new DigitalstromConnectionProvider(new List<Uri>() { uri }, authData)) { }
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at one of the given uris with
@@ -104,7 +114,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// temperatures, and for operation mode ”Fixed Values” the given values
         /// are absolute control values.
         /// </remarks>
-        /// <param name="id">Zone ID</param>
+        /// <param name="zone">Zone ID</param>
         /// <param name="comfort">Comfort Preset value for operation mode 1: "Comfort"</param>
         /// <param name="economy">Economy Preset value for operation mode 2: "Economy"</param>
         /// <param name="night">Night Preset value for operation mode 4: "Night"</param>
@@ -113,48 +123,48 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// <param name="coolingOff">CoolingOff Preset value for operation mode 7: "CoolingOff"</param>
         /// <param name="off">Off Preset value for operation mode 0: "Off"</param>
         /// <param name="notUsed">NotUsed Preset value for operation mode 3: "Not Used"</param>
-        public async Task SetTemperatureControlValues(int id, int? comfort = null, int? economy = null, int? night = null, int? holiday = null, int? cooling = null, int? coolingOff = null, int? off = null, int? notUsed = null)
+        public async Task SetTemperatureControlValues(Zone zone, int? comfort = null, int? economy = null, int? night = null, int? holiday = null, int? cooling = null, int? coolingOff = null, int? off = null, int? notUsed = null)
         {
             await Load(new Uri("/json/zone/setTemperatureControlValues", UriKind.Relative)
-                .AddQuery("id", id).AddQuery("Off", off).AddQuery("Comfort", comfort).AddQuery("Economy", economy)
+                .AddQuery("id", zone).AddQuery("Off", off).AddQuery("Comfort", comfort).AddQuery("Economy", economy)
                 .AddQuery("NotUsed", notUsed).AddQuery("Night", night).AddQuery("Holiday", holiday)
                 .AddQuery("Cooling", cooling).AddQuery("CoolingOff", coolingOff));
         }
 
         /// <summary>
-        /// Excutes the scene sceneNumber in a zone for a group of devices.
+        /// Excutes the scene in a zone for a group of devices.
         /// </summary>
-        /// <param name="id">Zone ID of the scene to call</param>
-        /// <param name="groupID">Number of the target group</param>
-        /// <param name="sceneNumber">Scene number to call</param>
+        /// <param name="zone">Zone ID of the scene to call</param>
+        /// <param name="group">Target group to call the scene</param>
+        /// <param name="scene">Scene to call</param>
         /// <param name="force">Boolean value, if set a forced scene call is issued. Optional</param>
-        public async Task CallScene(int id, int groupID, int sceneNumber, bool? force = null)
+        public async Task CallScene(Zone zone, Group group, Scene scene, bool? force = null)
         {
             await Load(new Uri("/json/zone/callScene", UriKind.Relative)
-                .AddQuery("id", id).AddQuery("groupID", groupID)
-                .AddQuery("sceneNumber", sceneNumber).AddQuery("force", force));
+                .AddQuery("id", zone).AddQuery("groupID", group)
+                .AddQuery("sceneNumber", scene).AddQuery("force", force));
         }
 
         /// <summary>
-        /// Returns a list of groups which can be controlled by pushbuttons which are actually present in the zone
+        /// Returns a list of scenes which can be called in the given zone
         /// </summary>
-        /// <param name="id">Zone ID</param>
-        /// <param name="groupID">Number of the target group</param>
-        public async Task<ReachableScenesResponse> GetReachableScenes(int id, int groupID)
+        /// <param name="zone">Zone ID</param>
+        /// <param name="group">The target group</param>
+        public async Task<ReachableScenesResponse> GetReachableScenes(Zone zone, Group group)
         {
             return await Load<ReachableScenesResponse>(new Uri("/json/zone/getReachableScenes", UriKind.Relative)
-                .AddQuery("id", id).AddQuery("groupID", groupID));
+                .AddQuery("id", zone).AddQuery("groupID", group ?? (int?)null));
         }
 
         /// <summary>
-        /// Returns the sceneNumber which has been executed last for a group in a zone.
+        /// Returns the scene that has been executed last for a group in a zone.
         /// </summary>
-        /// <param name="id">Zone ID</param>
-        /// <param name="groupID">Number of the target group</param>
-        public async Task<LastCalledScenesResponse> GetLastCalledScene(int id, int? groupID = null)
+        /// <param name="zone">Zone ID</param>
+        /// <param name="group">The target group</param>
+        public async Task<LastCalledScenesResponse> GetLastCalledScene(Zone zone, Group group = null)
         {
             return await Load<LastCalledScenesResponse>(new Uri("/json/zone/getLastCalledScene", UriKind.Relative)
-                .AddQuery("id", id).AddQuery("groupID", groupID));
+                .AddQuery("id", zone).AddQuery("groupID", group ?? (int?)null));
         }
         
         /// <summary>

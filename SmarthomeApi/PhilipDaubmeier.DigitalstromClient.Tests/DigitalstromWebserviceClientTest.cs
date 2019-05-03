@@ -12,7 +12,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 {
     public class DigitalstromWebserviceClientTest
     {
-        private Zone zoneKitchen = 32027;
+        private readonly Zone zoneKitchen = 32027;
 
         [Fact]
         public async Task TestGetSensorValues()
@@ -439,7 +439,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            await dsApiClient.CallScene(zoneKitchen, (Group)Color.Yellow, (Scene)SceneCommand.Preset1, true);
+            await dsApiClient.CallScene(zoneKitchen, Color.Yellow, SceneCommand.Preset1, true);
         }
 
         [Fact]
@@ -460,7 +460,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Color.Yellow);
+            var result = await dsApiClient.GetReachableScenes(zoneKitchen, Color.Yellow);
 
             Assert.Equal(new List<int>() { 0, 5, 17, 18, 19 }.Select(x => (Scene)x), result.ReachableScenes);
             Assert.Equal(new List<string>(), result.UserSceneNames);
@@ -483,7 +483,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Color.Yellow);
+            var result = await dsApiClient.GetLastCalledScene(zoneKitchen, Color.Yellow);
 
             Assert.Equal(5, (int)result.Scene);
         }
@@ -880,13 +880,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             try { await dsApiClient.SetTemperatureControlValues(zoneKitchen, null, null, 22); } catch { }
             UriForMethodName.Add("SetTemperatureControlValues", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.CallScene(zoneKitchen, (Group)Color.Yellow, (Scene)SceneCommand.Preset1, true); } catch { }
+            try { await dsApiClient.CallScene(zoneKitchen, Color.Yellow, SceneCommand.Preset1, true); } catch { }
             UriForMethodName.Add("CallScene", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.GetReachableScenes(zoneKitchen, (Group)Color.Yellow); } catch { }
+            try { await dsApiClient.GetReachableScenes(zoneKitchen, Color.Yellow); } catch { }
             UriForMethodName.Add("GetReachableScenes", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.GetLastCalledScene(zoneKitchen, (Group)Color.Yellow); } catch { }
+            try { await dsApiClient.GetLastCalledScene(zoneKitchen, Color.Yellow); } catch { }
             UriForMethodName.Add("GetLastCalledScene", mockHttp.LastCalledUri);
 
             try { await dsApiClient.GetZonesAndLastCalledScenes(); } catch { }
