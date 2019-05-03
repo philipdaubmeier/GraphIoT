@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
     public abstract class AbstractState<T>
     {

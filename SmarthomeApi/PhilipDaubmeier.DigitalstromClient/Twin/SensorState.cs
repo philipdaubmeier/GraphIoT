@@ -1,6 +1,6 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
     public class SensorState : AbstractState<SensorTypeAndValues>
     {

@@ -1,14 +1,13 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Model.RoomState;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class DigitalstromSceneClient : WebApiWorkerThreadBase<DssEvent>
+    public class DssEventSubscriber : WebApiWorkerThreadBase<DssEvent>
     {
         private const int defaultSubscriptionId = 10;
 
@@ -22,10 +21,10 @@ namespace PhilipDaubmeier.DigitalstromClient
 
         public ApartmentState Scenes { get; set; }
 
-        public DigitalstromSceneClient(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
+        public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, ApartmentState model = null, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
         {
             apiClient = new DigitalstromWebserviceClient(connectionProvider);
-            Scenes = new ApartmentState();
+            Scenes = model ?? new ApartmentState();
             ApiEventRaised += HandleDssApiEvent;
             this.subscriptionId = subscriptionId;
             subscribed = false;

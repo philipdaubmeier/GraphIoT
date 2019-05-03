@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
+using PhilipDaubmeier.DigitalstromClient.Twin;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
     {
         private readonly ILogger _logger;
         private readonly IDigitalstromConnectionProvider _connProvider;
-        private DigitalstromSceneClient _dsSceneClient = null;
+        private DssEventSubscriber _dssEventSubscriber = null;
 
         private CancellationTokenSource _cancellationSource;
         private CancellationToken _cancellationToken;
@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            if (_dsSceneClient != null)
+            if (_dssEventSubscriber != null)
                 throw new InvalidOperationException("Digitalstrom Event Subscriber Service is already started");
 
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Event Subscriber Service is starting.");
@@ -43,9 +43,9 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             _persistenceQueue = new BlockingCollection<DssEvent>();
             Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-            _dsSceneClient = new DigitalstromSceneClient(_connProvider, _plugins.SelectMany(p => p.EventNames));
-            _dsSceneClient.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
-            _dsSceneClient.ErrorOccured += (s, e) => DigitalstromSceneClientError(e.Error);
+            _dssEventSubscriber = new DssEventSubscriber(_connProvider, null, _plugins.SelectMany(p => p.EventNames));
+            _dssEventSubscriber.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
+            _dssEventSubscriber.ErrorOccured += (s, e) => DigitalstromSceneClientError(e.Error);
 
             return Task.CompletedTask;
         }
@@ -54,8 +54,8 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
         {
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Event Subscriber Service is stopping.");
 
-            _dsSceneClient.Dispose();
-            _dsSceneClient = null;
+            _dssEventSubscriber.Dispose();
+            _dssEventSubscriber = null;
 
             _cancellationSource.Cancel();
             _persistenceQueue.CompleteAdding();
@@ -67,7 +67,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
         public void Dispose()
         {
             // DigitalstromSceneClient.Dispose stops all its threads
-            _dsSceneClient?.Dispose();
+            _dssEventSubscriber?.Dispose();
 
             _cancellationSource.Cancel();
             _persistenceQueue?.CompleteAdding();

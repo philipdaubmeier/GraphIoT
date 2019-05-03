@@ -1,6 +1,6 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
     public class SceneState : AbstractState<Scene>
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
     public class RoomState
     {
@@ -52,11 +52,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// <summary>
         /// Returns true if the given sensor type has a valid value.
         /// </summary>
-        public bool HasSensorValue(Core.Sensor sensor)
+        public bool HasSensorValue(Sensor sensor)
         {
             if (!_sensorStates.TryGetValue(sensor, out SensorState state))
                 return false;
-            return state.Value.Type != Core.SensorType.UnknownType;
+            return state.Value.Type != SensorType.UnknownType;
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// </summary>
         /// <param name="sensor">The sensor type, e.g. temperature, humidity, etc.</param>
         /// <returns>The sensor state, e.g. 23°C, 54%, etc.</returns>
-        public SensorState this[Core.Sensor sensor]
+        public SensorState this[Sensor sensor]
         {
             get
             {

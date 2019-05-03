@@ -1,27 +1,25 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
-namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
+namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class ApartmentState
+    public class ApartmentState : ObservableConcurrentDictionary<Zone, RoomState>
     {
-        private Dictionary<Zone, RoomState> _roomStates = new Dictionary<Zone, RoomState>();
-
         public bool IsRoomExisting(Zone zone)
         {
-            return _roomStates.ContainsKey(zone);
+            return ContainsKey(zone);
         }
-        
-        public RoomState this[Zone zone]
+
+        public new RoomState this[Zone zone]
         {
             get
             {
-                _roomStates.TryGetValue(zone, out RoomState state);
+                TryGetValue(zone, out RoomState state);
                 return state;
             }
             set
             {
-                _roomStates[zone] = value;
+                base[zone] = value;
             }
         }
 
