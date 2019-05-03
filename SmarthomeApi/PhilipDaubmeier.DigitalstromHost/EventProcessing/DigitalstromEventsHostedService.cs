@@ -21,7 +21,6 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
         private CancellationTokenSource _cancellationSource;
         private CancellationToken _cancellationToken;
         private BlockingCollection<DssEvent> _persistenceQueue;
-        private Task _persistenceWorkerThread = null;
 
         private IEnumerable<IDigitalstromEventProcessorPlugin> _plugins;
 
@@ -42,7 +41,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             _cancellationSource = new CancellationTokenSource();
             _cancellationToken = _cancellationSource.Token;
             _persistenceQueue = new BlockingCollection<DssEvent>();
-            _persistenceWorkerThread = Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             _dsSceneClient = new DigitalstromSceneClient(_connProvider, _plugins.SelectMany(p => p.EventNames));
             _dsSceneClient.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
@@ -61,7 +60,6 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             _cancellationSource.Cancel();
             _persistenceQueue.CompleteAdding();
             _persistenceQueue = null;
-            _persistenceWorkerThread = null;
 
             return Task.CompletedTask;
         }
