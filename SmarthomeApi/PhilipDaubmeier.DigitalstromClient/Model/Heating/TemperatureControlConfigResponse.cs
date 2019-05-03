@@ -7,7 +7,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
     {
         public Zone Id { get; set; }
         public string Name { get; set; }
-        public DSUID ControlDSUID { get; set; }
+        public Dsuid ControlDSUID { get; set; }
         public bool IsConfigured { get; set; }
         public int? ControlMode { get; set; }
         public int? EmergencyValue { get; set; }

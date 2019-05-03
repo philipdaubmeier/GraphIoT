@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
         public int ApplicationType { get; set; }
         public bool IsPresent { get; set; }
         public bool IsValid { get; set; }
-        public List<DSUID> Devices { get; set; }
+        public List<Dsuid> Devices { get; set; }
         public List<Scene> ActiveBasicScenes { get; set; }
     }
 }

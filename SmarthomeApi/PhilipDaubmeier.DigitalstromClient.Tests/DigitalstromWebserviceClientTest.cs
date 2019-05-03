@@ -740,7 +740,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             var dsApiClient = new DigitalstromWebserviceClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await dsApiClient.GetEnergy(new DSUID("99999942f800000000000f0000deadbeef"), 1, 2);
+            var result = await dsApiClient.GetEnergy(new Dsuid("99999942f800000000000f0000deadbeef"), 1, 2);
 
             Assert.Equal("consumption", result.Type);
             Assert.Equal("W", result.Unit);
@@ -904,7 +904,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             try { await dsApiClient.GetTotalEnergy(1, 600); } catch { }
             UriForMethodName.Add("GetTotalEnergy", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.GetEnergy(new DSUID("99999942f800000000000f0000deadbeef"), 1, 600); } catch { }
+            try { await dsApiClient.GetEnergy(new Dsuid("99999942f800000000000f0000deadbeef"), 1, 600); } catch { }
             UriForMethodName.Add("GetEnergy", mockHttp.LastCalledUri);
 
             try { await dsApiClient.Subscribe((SystemEventName)SystemEvent.CallScene, 42); } catch { }

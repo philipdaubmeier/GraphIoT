@@ -20,15 +20,15 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         public byte[] EnergyCurvesEveryMeter { get; set; }
 
         [NotMapped]
-        public TimeSeriesStreamCollection<DSUID, int> EnergySeriesEveryMeter
+        public TimeSeriesStreamCollection<Dsuid, int> EnergySeriesEveryMeter
         {
-            get => new TimeSeriesStreamCollection<DSUID, int>(EnergyCurvesEveryMeter, DSUID.Size, stream => DSUID.ReadFrom(stream), Span(Day));
+            get => new TimeSeriesStreamCollection<Dsuid, int>(EnergyCurvesEveryMeter, Dsuid.Size, stream => Dsuid.ReadFrom(stream), Span(Day));
             set { EnergyCurvesEveryMeter = value.ToCompressedByteArray(); }
         }
 
-        public static TimeSeriesStreamCollection<DSUID, int> InitialEnergySeriesEveryMeter(DateTime day, IEnumerable<DSUID> dsuids)
+        public static TimeSeriesStreamCollection<Dsuid, int> InitialEnergySeriesEveryMeter(DateTime day, IEnumerable<Dsuid> dsuids)
         {
-            return new TimeSeriesStreamCollection<DSUID, int>(dsuids, DSUID.Size, (dsuid, stream) => dsuid.WriteTo(stream), Span(day));
+            return new TimeSeriesStreamCollection<Dsuid, int>(dsuids, Dsuid.Size, (dsuid, stream) => dsuid.WriteTo(stream), Span(day));
         }
     }
 }

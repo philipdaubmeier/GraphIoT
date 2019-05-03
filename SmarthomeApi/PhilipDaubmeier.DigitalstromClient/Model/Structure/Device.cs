@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
     {
         public string Id { get; set; }
         public string DisplayID { get; set; }
-        public DSUID DSUID { get; set; }
+        public Dsuid DSUID { get; set; }
         public string GTIN { get; set; }
         public string Name { get; set; }
         public int DSUIDIndex { get; set; }
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
         public ModelFeatures ModelFeatures { get; set; }
         public bool IsVdcDevice { get; set; }
         public string MeterDSID { get; set; }
-        public DSUID MeterDSUID { get; set; }
+        public Dsuid MeterDSUID { get; set; }
         public string MeterName { get; set; }
         public int BusID { get; set; }
         public Zone ZoneID { get; set; }

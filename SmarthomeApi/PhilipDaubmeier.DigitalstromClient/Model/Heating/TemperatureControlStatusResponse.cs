@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
         public string Name { get; set; }
         public int ControlMode { get; set; }
         public int ControlState { get; set; }
-        public DSUID ControlDSUID { get; set; }
+        public Dsuid ControlDSUID { get; set; }
         public bool IsConfigured { get; set; }
         public int? OperationMode { get; set; }
         public double? TemperatureValue { get; set; }

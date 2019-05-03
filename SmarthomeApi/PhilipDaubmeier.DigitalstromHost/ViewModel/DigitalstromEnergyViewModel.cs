@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         private readonly TimeSeriesSpan span;
 
-        private readonly Dictionary<DSUID, string> circuitNames;
+        private readonly Dictionary<Dsuid, string> circuitNames;
 
         public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, TimeSeriesSpan span)
         {
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             data = db.DsEnergyHighresDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
 
             // TODO: store and load names of circuits
-            circuitNames = new Dictionary<DSUID, string>();
+            circuitNames = new Dictionary<Dsuid, string>();
         }
 
         public bool IsEmpty => (EnergyGraphs?.Count() ?? 0) <= 0 || !EnergyGraphs.First().Value.Points.Any();
@@ -44,13 +44,13 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
                 yield return graph.Value;
         }
         
-        private Dictionary<DSUID, GraphViewModel> _energyGraphs = null;
-        public Dictionary<DSUID, GraphViewModel> EnergyGraphs
+        private Dictionary<Dsuid, GraphViewModel> _energyGraphs = null;
+        public Dictionary<Dsuid, GraphViewModel> EnergyGraphs
         {
             get
             {
                 LazyLoadEnergyGraphs();
-                return _energyGraphs ?? new Dictionary<DSUID, GraphViewModel>();
+                return _energyGraphs ?? new Dictionary<Dsuid, GraphViewModel>();
             }
         }
 
@@ -59,9 +59,9 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             if (_energyGraphs != null || data == null)
                 return;
 
-            _energyGraphs = new Dictionary<DSUID, GraphViewModel>();
+            _energyGraphs = new Dictionary<Dsuid, GraphViewModel>();
 
-            var resamplers = new Dictionary<DSUID, TimeSeriesResampler<TimeSeriesStream<int>, int>>();
+            var resamplers = new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>();
             foreach (var dbEntry in data.ToList())
             {
                 using (var seriesCollection = dbEntry.EnergySeriesEveryMeter)

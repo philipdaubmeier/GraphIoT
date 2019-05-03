@@ -15,6 +15,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Structure
         public int ProtectionClass { get; set; }
         public bool IsAutomatic { get; set; }
         public bool ConfigurationLock { get; set; }
-        public List<DSUID> Devices { get; set; }
+        public List<Dsuid> Devices { get; set; }
     }
 }

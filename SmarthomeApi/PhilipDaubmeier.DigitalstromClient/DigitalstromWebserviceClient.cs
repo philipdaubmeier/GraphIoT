@@ -221,7 +221,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// <param name="meterDsuid">The circuits digitalstrom unique id</param>
         /// <param name="resolution">The desired resolution in seconds for the values</param>
         /// <param name="count">The requested number of values</param>
-        public async Task<EnergyMeteringResponse> GetEnergy(DSUID meterDsuid, int resolution, int count)
+        public async Task<EnergyMeteringResponse> GetEnergy(Dsuid meterDsuid, int resolution, int count)
         {
             return await Load<EnergyMeteringResponse>(new Uri("/json/metering/getValues", UriKind.Relative)
                 .AddQuery("dsuid", meterDsuid).AddQuery("type", "consumption")

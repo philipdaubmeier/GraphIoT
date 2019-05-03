@@ -44,7 +44,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             var fetchLastValues = (int)TimeSeriesSpan.Spacing.Spacing10Min;
             var days = new TimeSeriesSpan(DateTime.Now.AddSeconds(-1 * fetchLastValues), TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues).IncludedDates();
 
-            Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> timeseriesCollections = null;
+            Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections = null;
             try
             {
                 timeseriesCollections = ReadEnergyValuesFromDb(days, dsuids);
@@ -65,9 +65,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             }
         }
 
-        private Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> ReadEnergyValuesFromDb(IEnumerable<DateTime> days, List<DSUID> dsuids)
+        private Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> ReadEnergyValuesFromDb(IEnumerable<DateTime> days, List<Dsuid> dsuids)
         {
-            var timeseriesCollections = new Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>>();
+            var timeseriesCollections = new Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>>();
             
             foreach (var day in days)
             {
@@ -80,7 +80,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             return timeseriesCollections;
         }
 
-        private void SaveEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<DSUID, int>> timeseriesCollections)
+        private void SaveEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections)
         {
             foreach (var collection in timeseriesCollections)
             {

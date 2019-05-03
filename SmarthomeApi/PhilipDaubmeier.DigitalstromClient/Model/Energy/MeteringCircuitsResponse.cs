@@ -11,14 +11,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
         /// <summary>
         /// Returns the DSUID and name of all circuits that have metering capability
         /// </summary>
-        public Dictionary<DSUID, string> FilteredMeterNames =>
+        public Dictionary<Dsuid, string> FilteredMeterNames =>
                 DSMeters.Where(x => x.Capabilities.FirstOrDefault()?.Metering ?? false)
                 .ToDictionary(x => x.DSUID, x => x.Name);
     }
 
     public class MeteringCapabilities
     {
-        public DSUID DSUID { get; set; }
+        public Dsuid DSUID { get; set; }
         public string Name { get; set; }
         public List<MeteringCapability> Capabilities { get; set; }
     }
