@@ -195,7 +195,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Unknown = 92
     }
 
-    public class Scene
+    public class Scene : IComparable, IComparable<Scene>, IEquatable<Scene>
     {
         private SceneCommand _scene;
 
@@ -255,9 +255,24 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return scene1._scene == scene2._scene;
         }
 
+        public int CompareTo(Scene value)
+        {
+            return _scene.CompareTo(value._scene);
+        }
+
+        public int CompareTo(object value)
+        {
+            return _scene.CompareTo((value as Scene)?._scene ?? value);
+        }
+
+        public bool Equals(Scene scene)
+        {
+            return this == scene;
+        }
+
         public override bool Equals(object obj)
         {
-            return ((Scene)obj)._scene == _scene;
+            return this == (obj as Scene);
         }
 
         public override int GetHashCode()

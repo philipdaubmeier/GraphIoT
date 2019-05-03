@@ -39,9 +39,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         UnknownType = 255,
     };
 
-    public class Sensor
+    public class Sensor : IComparable, IComparable<Sensor>, IEquatable<Sensor>
     {
-        private SensorType _type = SensorType.UnknownType;
+        private readonly SensorType _type = SensorType.UnknownType;
 
         private Sensor(int typeCode)
         {
@@ -79,8 +79,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Sensor(string type)
         {
-            int t;
-            if (!int.TryParse(type, out t))
+            if (!int.TryParse(type, out int t))
                 return new Sensor((int)SensorType.UnknownType);
 
             return new Sensor(t);
@@ -98,7 +97,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static bool operator ==(Sensor type1, Sensor type2)
         {
-            if ((object)type1 == null || (object)type2 == null)
+            if (type1 is null || type2 is null)
                 return ReferenceEquals(type1, type2);
             return type1._type == type2._type;
         }
@@ -110,14 +109,29 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static bool operator ==(Sensor type1, SensorType type2)
         {
-            if ((object)type1 == null)
+            if (type1 is null)
                 return false;
             return type1._type == type2;
         }
 
+        public int CompareTo(Sensor value)
+        {
+            return _type.CompareTo(value._type);
+        }
+
+        public int CompareTo(object value)
+        {
+            return _type.CompareTo((value as Sensor)?._type ?? value);
+        }
+
+        public bool Equals(Sensor sensor)
+        {
+            return this == sensor;
+        }
+
         public override bool Equals(object obj)
         {
-            return ((Sensor)obj)._type == _type;
+            return this == (obj as Sensor);
         }
 
         public override int GetHashCode()

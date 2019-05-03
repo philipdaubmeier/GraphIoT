@@ -64,9 +64,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Joker = 8
     }
 
-    public class Group
+    public class Group : IComparable, IComparable<Group>, IEquatable<Group>
     {
-        private int _group = (int)Color.Yellow;
+        private readonly int _group = (int)Color.Yellow;
 
         private Group(int colorCode)
         {
@@ -92,8 +92,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Group(string groupID)
         {
-            int color;
-            if (!int.TryParse(groupID, out color))
+            if (!int.TryParse(groupID, out int color))
                 return new Group((int)Color.White);
 
             return new Group(color);
@@ -145,14 +144,29 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static bool operator ==(Group group1, Group group2)
         {
-            if ((object)group1 == null || (object)group2 == null)
+            if (group1 is null || group2 is null)
                 return ReferenceEquals(group1, group2);
             return group1._group == group2._group;
         }
 
+        public int CompareTo(Group value)
+        {
+            return _group.CompareTo(value._group);
+        }
+
+        public int CompareTo(object value)
+        {
+            return _group.CompareTo((value as Group)?._group ?? value);
+        }
+
+        public bool Equals(Group group)
+        {
+            return this == group;
+        }
+
         public override bool Equals(object obj)
         {
-            return ((Group)obj)._group == _group;
+            return this == (obj as Group);
         }
 
         public override int GetHashCode()

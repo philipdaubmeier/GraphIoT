@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             Reserved2
         }
 
-        private static Dictionary<string, Name> _mapping = new Dictionary<string, Name>()
+        private static readonly Dictionary<string, Name> _mapping = new Dictionary<string, Name>()
         {
             {"broadcast", Name.Broadcast },
             {"yellow", Name.Yellow },
@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             {"reserved2", Name.Reserved2 }
         };
 
-        private Name _name = Name.Broadcast;
+        private readonly Name _name = Name.Broadcast;
 
         private GroupName(Name name)
         {

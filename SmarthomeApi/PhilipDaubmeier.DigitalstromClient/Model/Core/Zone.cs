@@ -2,9 +2,9 @@
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
-    public class Zone
+    public class Zone : IComparable, IComparable<Zone>, IEquatable<Zone>
     {
-        private int _zone = 0;
+        private readonly int _zone = 0;
 
         private Zone(int zone)
         {
@@ -28,8 +28,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Zone(string zoneID)
         {
-            int zone;
-            if (!int.TryParse(zoneID, out zone))
+            if (!int.TryParse(zoneID, out int zone))
                 return new Zone(0);
 
             return new Zone(zone);
@@ -42,14 +41,29 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static bool operator ==(Zone zone1, Zone zone2)
         {
-            if ((object)zone1 == null || (object)zone2 == null)
+            if (zone1 is null || zone2 is null)
                 return ReferenceEquals(zone1, zone2);
             return zone1._zone == zone2._zone;
         }
 
+        public int CompareTo(Zone value)
+        {
+            return _zone.CompareTo(value._zone);
+        }
+
+        public int CompareTo(object value)
+        {
+            return _zone.CompareTo((value as Zone)?._zone ?? value);
+        }
+
+        public bool Equals(Zone zone)
+        {
+            return this == zone;
+        }
+
         public override bool Equals(object obj)
         {
-            return ((Zone)obj)._zone == _zone;
+            return this == (obj as Zone);
         }
 
         public override int GetHashCode()
