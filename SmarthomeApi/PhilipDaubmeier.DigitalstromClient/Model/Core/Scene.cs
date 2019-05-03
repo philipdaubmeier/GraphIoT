@@ -197,7 +197,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
     public class Scene : IComparable, IComparable<Scene>, IEquatable<Scene>
     {
-        private SceneCommand _scene;
+        private readonly SceneCommand _scene;
 
         public Scene(SceneCommand scene)
         {
@@ -224,9 +224,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static implicit operator Scene(string sceneID)
         {
-            int sceneNumber;
-            if (!int.TryParse(sceneID, out sceneNumber))
+            if (!int.TryParse(sceneID, out int sceneNumber))
                 return new Scene(SceneCommand.Unknown);
+
             if (sceneNumber < 0 || sceneNumber >= (int)SceneCommand.Unknown || sceneNumber == (int)SceneCommand.Reserved)
                 return new Scene(SceneCommand.Unknown);
 
@@ -250,7 +250,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static bool operator ==(Scene scene1, Scene scene2)
         {
-            if ((object)scene1 == null || (object)scene2 == null)
+            if (scene1 is null || scene2 is null)
                 return ReferenceEquals(scene1, scene2);
             return scene1._scene == scene2._scene;
         }
