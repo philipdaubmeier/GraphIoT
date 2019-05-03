@@ -16,8 +16,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         {
             get
             {
-                RoomState state = null;
-                _roomStates.TryGetValue(zone, out state);
+                _roomStates.TryGetValue(zone, out RoomState state);
                 return state;
             }
             set
@@ -37,7 +36,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
             }
         }
 
-        public SensorState this[Zone zone, Core.Sensor sensor]
+        public SensorState this[Zone zone, Sensor sensor]
         {
             get
             {

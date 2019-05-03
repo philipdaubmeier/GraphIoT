@@ -6,7 +6,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
     {
         public SensorState()
         {
-            Value = new SensorTypeAndValues() { Type = 0, Time = 0, Value = 0 };
+            Value = new SensorTypeAndValues()
+            {
+                Type = 0,
+                Time = 0,
+                Value = 0
+            };
         }
     }
 }

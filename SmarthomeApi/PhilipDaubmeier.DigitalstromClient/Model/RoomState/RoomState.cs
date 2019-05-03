@@ -23,8 +23,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// </summary>
         public bool HasSceneValue(Group color)
         {
-            SceneState state;
-            if (!_sceneStates.TryGetValue(color, out state))
+            if (!_sceneStates.TryGetValue(color, out SceneState state))
                 return false;
             return state.Value == _defaultScene;
         }
@@ -40,8 +39,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         {
             get
             {
-                SceneState state;
-                _sceneStates.TryGetValue(color, out state);
+                _sceneStates.TryGetValue(color, out SceneState state);
                 if (state == null)
                 {
                     state = new SceneState();
@@ -56,8 +54,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         /// </summary>
         public bool HasSensorValue(Core.Sensor sensor)
         {
-            SensorState state;
-            if (!_sensorStates.TryGetValue(sensor, out state))
+            if (!_sensorStates.TryGetValue(sensor, out SensorState state))
                 return false;
             return state.Value.Type != Core.SensorType.UnknownType;
         }
@@ -73,8 +70,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.RoomState
         {
             get
             {
-                SensorState state;
-                _sensorStates.TryGetValue(sensor, out state);
+                _sensorStates.TryGetValue(sensor, out SensorState state);
                 if (state == null)
                 {
                     state = new SensorState();
