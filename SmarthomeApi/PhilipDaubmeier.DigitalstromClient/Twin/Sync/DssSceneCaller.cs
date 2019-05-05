@@ -16,19 +16,24 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
             apiClient = client;
             this.model = model;
 
-            model.CollectionChanged += ModelCollectionChanged;
+            model.CollectionChanged += ApartmentCollectionChanged;
         }
 
-        private void ModelCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ApartmentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
                 return;
 
-            var addedItem = e.NewItems[0] as KeyValuePair<Zone, RoomState>?;
-            if (addedItem == null)
+            var roomState = (e.NewItems[0] as KeyValuePair<Zone, RoomState>?)?.Value;
+            if (roomState == null)
                 return;
 
-            // TODO: subscribe to new item
+            roomState.CollectionChanged += RoomStateCollectionChanged;
+        }
+
+        private void RoomStateCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void CallScene(Zone zone, Group group, Scene scene)

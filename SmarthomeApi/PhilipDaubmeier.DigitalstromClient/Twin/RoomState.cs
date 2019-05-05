@@ -1,14 +1,20 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class RoomState
+    public class RoomState : INotifyCollectionChanged
     {
         private readonly SceneCommand _defaultScene = (new SceneState()).Value;
         private readonly Dictionary<Group, SceneState> _sceneStates;
         private readonly Dictionary<Sensor, SensorState> _sensorStates;
+
+        /// <summary>
+        /// Event raised when the collection changes.
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public RoomState()
         {
@@ -44,6 +50,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
                 {
                     state = new SceneState();
                     _sceneStates.Add(color, state);
+                    NotifyCollectionChangedAdded(color, state);
                 }
                 return state;
             }
@@ -75,9 +82,24 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
                 {
                     state = new SensorState();
                     _sensorStates.Add(sensor, state);
+                    NotifyCollectionChangedAdded(sensor, state);
                 }
                 return state;
             }
+        }
+
+        /// <summary>
+        /// Notifies observers of CollectionChanged of an added item to the collection.
+        /// </summary>
+        private void NotifyCollectionChangedAdded<TKey, TState>(TKey key, TState state)
+        {
+            var collectionHandler = CollectionChanged;
+            if (collectionHandler == null)
+                return;
+
+            collectionHandler(this, new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Add,
+                new KeyValuePair<TKey, TState>(key, state)));
         }
     }
 }
