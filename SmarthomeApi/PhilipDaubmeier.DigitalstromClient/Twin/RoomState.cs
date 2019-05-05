@@ -8,21 +8,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
     public class RoomState : INotifyCollectionChanged
     {
         private readonly SceneCommand _defaultScene = (new SceneState()).Value;
-        private readonly Dictionary<Group, SceneState> _sceneStates;
-        private readonly Dictionary<Sensor, SensorState> _sensorStates;
+        private readonly Dictionary<Group, SceneState> _sceneStates = new Dictionary<Group, SceneState>();
+        private readonly Dictionary<Sensor, SensorState> _sensorStates = new Dictionary<Sensor, SensorState>();
+
+        public IEnumerable<KeyValuePair<Group, SceneState>> Groups => _sceneStates;
+
+        public IEnumerable<KeyValuePair<Sensor, SensorState>> Sensors => _sensorStates;
 
         /// <summary>
         /// Event raised when the collection changes.
         /// </summary>
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-        public RoomState()
-        {
-            _sceneStates = Group.GetGroups().ToDictionary(x => x, _ => new SceneState());
-            _sensorStates = Sensor.GetTypes().Where(x => x == SensorType.TemperatureIndoors
-               || x == SensorType.HumidityIndoors
-               || x == SensorType.RoomTemperatureSetpoint).ToDictionary(x => x, _ => new SensorState());
-        }
 
         /// <summary>
         /// Returns true if the given color group has a scene value other than "Unknown"

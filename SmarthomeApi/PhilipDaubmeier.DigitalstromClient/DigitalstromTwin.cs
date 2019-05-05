@@ -17,6 +17,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         public void Dispose()
         {
             _subscriber?.Dispose();
+            _sceneCaller?.Dispose();
         }
     }
 }

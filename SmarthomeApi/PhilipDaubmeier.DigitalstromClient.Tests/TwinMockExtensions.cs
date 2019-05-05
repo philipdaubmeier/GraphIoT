@@ -1,6 +1,5 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Tests;
-using PhilipDaubmeier.DigitalstromClient.Twin;
 using RichardSzalay.MockHttp;
 using System;
 using System.Threading.Tasks;
@@ -21,6 +20,40 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             // give the event polling thread a chance to receive and handle the event, it will set the eventReceived
             while (!eventReceived && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+                await Task.Delay(1);
+        }
+
+        public static async Task WaitForCallSceneAsync(this MockHttpMessageHandler mockHttp, MockedRequest mockedCallScene, int timeoutMillis = 1000)
+        {
+            DateTime start = DateTime.UtcNow;
+            var oldMatchCount = mockHttp.GetMatchCount(mockedCallScene);
+
+            // give the action worker thread a chance to consume the task and request the CallScene API
+            while (oldMatchCount == mockHttp.GetMatchCount(mockedCallScene) && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+                await Task.Delay(1);
+        }
+
+        public static async Task MockDssEventAndWaitAsync(this MockHttpMessageHandler mockHttp, MockedRequest mockedEventResponse, ApartmentState model, Zone zone, Group group, Scene scene, int timeoutMillis = 1000)
+        {
+            DateTime start = DateTime.UtcNow;
+            var oldSceneTimestamp = model[zone, group].Timestamp;
+
+            // set the response and flush it - this will create a response in the long polling request, just like the dss fired an event
+            mockedEventResponse.Respond("application/json", ToMockedSceneEvent(zone, group, scene));
+            mockHttp.Flush();
+
+            // give the event polling thread a chance to receive and handle the event, notify the model and change it accordingly
+            while (oldSceneTimestamp == model[zone, group].Timestamp && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+                await Task.Delay(1);
+        }
+
+        public static async Task WaitForModelChangeAsync(this MockHttpMessageHandler mockHttp, ApartmentState model, Zone zone, Group group, int timeoutMillis = 1000)
+        {
+            DateTime start = DateTime.UtcNow;
+            var oldSceneTimestamp = model[zone, group].Timestamp;
+
+            // give the event polling thread a chance to receive and handle the event, notify the model and change it accordingly
+            while (oldSceneTimestamp == model[zone, group].Timestamp && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
                 await Task.Delay(1);
         }
 
@@ -71,12 +104,22 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                               }");
         }
 
-        public static string ToMockedSceneEvent(this SceneCommand scene)
+        public static MockedRequest AddCallSceneMock(this MockHttpMessageHandler mockHttp, Zone zone, Group group, Scene scene, bool force = false)
         {
-            return ((Scene)scene).ToMockedSceneEvent();
+            var forceStr = force ? "&force=true" : string.Empty;
+            return mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/zone/callScene")
+                    .WithExactQueryString($"id={(int)zone}&groupID={(int)group}&sceneNumber={(int)scene}{forceStr}&token={MockDigitalstromConnection.AppToken}")
+                    .Respond("application/json", @"{
+                                  ""ok"": true
+                              }");
         }
 
-        public static string ToMockedSceneEvent(this Scene scene)
+        public static string ToMockedSceneEvent(this SceneCommand scene)
+        {
+            return ToMockedSceneEvent(32027, 1, scene);
+        }
+
+        public static string ToMockedSceneEvent(Zone zone, Group group, Scene scene)
         {
             return @"{
                          ""result"":
@@ -88,15 +131,15 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                                          ""callOrigin"": ""2"",
                                          ""sceneID"": """ + ((int)scene).ToString() + @""",
                                          ""forced"": ""true"",
-                                         ""groupID"": ""1"",
-                                         ""zoneID"": ""32027"",
+                                         ""groupID"": """ + ((int)group).ToString() + @""",
+                                         ""zoneID"": """ + ((int)zone).ToString() + @""",
                                          ""originToken"": ""5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2"",
                                          ""originDSUID"": ""0000000000000000000000000000000000""
                                      },
                                      ""source"": {
-                                         ""set"": "".zone(32027).group(1)"",
-                                         ""groupID"": 1,
-                                         ""zoneID"": 32027,
+                                         ""set"": "".zone(" + ((int)zone).ToString() + @").group(" + ((int)group).ToString() + @")"",
+                                         ""groupID"": " + ((int)group).ToString() + @",
+                                         ""zoneID"": " + ((int)zone).ToString() + @",
                                          ""isApartment"": false,
                                          ""isGroup"": true,
                                          ""isDevice"": false
