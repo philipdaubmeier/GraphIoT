@@ -1,25 +1,36 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class ApartmentState : ObservableConcurrentDictionary<Zone, RoomState>
+    public class ApartmentState : IEnumerable<KeyValuePair<Zone, RoomState>>, INotifyCollectionChanged
     {
+        private readonly ConcurrentDictionary<Zone, RoomState> _dictionary = new ConcurrentDictionary<Zone, RoomState>();
+
+        /// <summary>
+        /// Event raised when the collection changes.
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
         public bool IsRoomExisting(Zone zone)
         {
-            return ContainsKey(zone);
+            return _dictionary.ContainsKey(zone);
         }
 
-        public new RoomState this[Zone zone]
+        public RoomState this[Zone zone]
         {
             get
             {
-                TryGetValue(zone, out RoomState state);
+                _dictionary.TryGetValue(zone, out RoomState state);
                 return state;
             }
             set
             {
-                base[zone] = value;
+                _dictionary[zone] = value;
+                NotifyCollectionChangedAdded(zone, value);
             }
         }
 
@@ -27,10 +38,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             get
             {
-                var room = this[zone];
-                if (room == null)
-                    return new SceneState();
-                return room[group];
+                _dictionary.TryGetValue(zone, out RoomState state);
+                if (state == null)
+                    this[zone] = state = new RoomState();
+
+                return state[group];
             }
         }
 
@@ -38,11 +50,36 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             get
             {
-                var room = this[zone];
-                if (room == null)
-                    return new SensorState();
-                return room[sensor];
+                _dictionary.TryGetValue(zone, out RoomState state);
+                if (state == null)
+                    this[zone] = state = new RoomState();
+
+                return state[sensor];
             }
+        }
+
+        public IEnumerator<KeyValuePair<Zone, RoomState>> GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        /// <summary>
+        /// Notifies observers of CollectionChanged of an added item to the collection.
+        /// </summary>
+        private void NotifyCollectionChangedAdded(Zone zone, RoomState roomState)
+        {
+            var collectionHandler = CollectionChanged;
+            if (collectionHandler == null)
+                return;
+
+            collectionHandler(this, new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Add,
+                new KeyValuePair<Zone, RoomState>(zone, roomState)));
         }
     }
 }

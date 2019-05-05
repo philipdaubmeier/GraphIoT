@@ -1,5 +1,6 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
@@ -20,7 +21,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         private void ModelCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
+                return;
+
+            var addedItem = e.NewItems[0] as KeyValuePair<Zone, RoomState>?;
+            if (addedItem == null)
+                return;
+
+            // TODO: subscribe to new item
         }
 
         public void CallScene(Zone zone, Group group, Scene scene)
