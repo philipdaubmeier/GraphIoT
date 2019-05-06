@@ -26,21 +26,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
                 // even setting the same value again should result in a scene call
-                twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                twin[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest2);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest2, () =>
+                {
+                    twin[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest2));
@@ -108,8 +114,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 Assert.Equal(1, changedCount);
 
                 // programatically set a new scene on the twin, which should result in a CallScene api request
-                twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset2;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    twin[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset2;
+                });
 
                 Assert.Equal((int)SceneCommand.Preset2, (int)twin[zoneKitchen, Color.Yellow].Value);
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest1));

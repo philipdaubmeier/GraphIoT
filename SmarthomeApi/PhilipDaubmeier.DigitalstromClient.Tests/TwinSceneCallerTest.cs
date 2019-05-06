@@ -26,21 +26,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
                 // even setting the same value again should result in a scene call
-                model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                model[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest2);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest2, () =>
+                {
+                    model[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest2));
@@ -66,21 +72,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
                 // even setting the same value again should result in a scene call
-                model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest1);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest1, () =>
+                {
+                    model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset1;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
-                model[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
-                await mockHttp.WaitForCallSceneAsync(callSceneRequest2);
+                await mockHttp.WaitForCallSceneAsync(callSceneRequest2, () =>
+                {
+                    model[zoneKitchen, Color.Black].Value = SceneCommand.DeepOff;
+                });
 
                 Assert.Equal(2, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(1, mockHttp.GetMatchCount(callSceneRequest2));

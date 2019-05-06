@@ -23,10 +23,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 await Task.Delay(1);
         }
 
-        public static async Task WaitForCallSceneAsync(this MockHttpMessageHandler mockHttp, MockedRequest mockedCallScene, int timeoutMillis = 1000)
+        public static async Task WaitForCallSceneAsync(this MockHttpMessageHandler mockHttp, MockedRequest mockedCallScene, Action setTwinAction, int timeoutMillis = 1000)
         {
             DateTime start = DateTime.UtcNow;
             var oldMatchCount = mockHttp.GetMatchCount(mockedCallScene);
+
+            // execute the action that sets a value on the twin, which should trigger a CallScene request
+            setTwinAction();
 
             // give the action worker thread a chance to consume the task and request the CallScene API
             while (oldMatchCount == mockHttp.GetMatchCount(mockedCallScene) && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
