@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
-                await mockHttp.WaitForModelChangeAsync(twin, zoneKitchen, Color.Yellow);
+                await twin.WaitModelInitializedAsync();
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
@@ -65,7 +65,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
-                await mockHttp.WaitForModelChangeAsync(twin, zoneKitchen, Color.Yellow);
+                await twin.WaitModelInitializedAsync();
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 
@@ -100,9 +100,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             {
                 // subscribe to twin changes of the yellow group in the kitchen
                 var changedCount = 0;
-                twin[zoneKitchen, Color.Yellow].PropertyChanged += (s, e) => { if (e.PropertyName == "Value") changedCount++; };
+                twin[zoneKitchen, Color.Yellow].PropertyChanged += (s, e) =>
+                {
+                    if (e.PropertyName == "Value")
+                        changedCount++;
+                };
 
-                await mockHttp.WaitForModelChangeAsync(twin, zoneKitchen, Color.Yellow);
+                await twin.WaitModelInitializedAsync();
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 

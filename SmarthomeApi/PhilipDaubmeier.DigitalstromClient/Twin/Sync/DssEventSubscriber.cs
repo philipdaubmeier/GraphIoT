@@ -135,7 +135,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
             if (props == null)
                 return;
 
-            Scenes[props.ZoneID, props.GroupID].Value = props.SceneID;
+            Scenes[props.ZoneID, props.GroupID].ValueInternal = props.SceneID;
             OnModelChanged();
         }
 

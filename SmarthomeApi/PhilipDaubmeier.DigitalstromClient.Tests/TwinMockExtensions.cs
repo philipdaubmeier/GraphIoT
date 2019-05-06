@@ -2,6 +2,7 @@
 using PhilipDaubmeier.DigitalstromClient.Tests;
 using RichardSzalay.MockHttp;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
@@ -50,13 +51,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                 await Task.Delay(1);
         }
 
-        public static async Task WaitForModelChangeAsync(this MockHttpMessageHandler mockHttp, ApartmentState model, Zone zone, Group group, int timeoutMillis = 1000)
+        public static async Task WaitModelInitializedAsync(this ApartmentState model, int timeoutMillis = 1000)
         {
             DateTime start = DateTime.UtcNow;
-            var oldSceneTimestamp = model[zone, group].Timestamp;
+            var oldCount = model.Count();
 
             // give the event polling thread a chance to receive and handle the event, notify the model and change it accordingly
-            while (oldSceneTimestamp == model[zone, group].Timestamp && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+            while (oldCount == model.Count() && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
                 await Task.Delay(1);
         }
 

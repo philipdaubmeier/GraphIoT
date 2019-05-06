@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -8,8 +9,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
     public class RoomState : INotifyCollectionChanged
     {
         private readonly SceneCommand _defaultScene = (new SceneState()).Value;
-        private readonly Dictionary<Group, SceneState> _sceneStates = new Dictionary<Group, SceneState>();
-        private readonly Dictionary<Sensor, SensorState> _sensorStates = new Dictionary<Sensor, SensorState>();
+        private readonly ConcurrentDictionary<Group, SceneState> _sceneStates = new ConcurrentDictionary<Group, SceneState>();
+        private readonly ConcurrentDictionary<Sensor, SensorState> _sensorStates = new ConcurrentDictionary<Sensor, SensorState>();
 
         public IEnumerable<KeyValuePair<Group, SceneState>> Groups => _sceneStates;
 
@@ -41,13 +42,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             get
             {
-                _sceneStates.TryGetValue(color, out SceneState state);
-                if (state == null)
-                {
-                    state = new SceneState();
-                    _sceneStates.Add(color, state);
+                bool added = false;
+                var state = _sceneStates.GetOrAdd(color, _ => { added = true; return new SceneState(); });
+                if (added)
                     NotifyCollectionChangedAdded(color, state);
-                }
+
                 return state;
             }
         }
@@ -73,13 +72,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             get
             {
-                _sensorStates.TryGetValue(sensor, out SensorState state);
-                if (state == null)
-                {
-                    state = new SensorState();
-                    _sensorStates.Add(sensor, state);
+                bool added = false;
+                var state = _sensorStates.GetOrAdd(sensor, _ => { added = true; return new SensorState(); });
+                if (added)
                     NotifyCollectionChangedAdded(sensor, state);
-                }
+
                 return state;
             }
         }
