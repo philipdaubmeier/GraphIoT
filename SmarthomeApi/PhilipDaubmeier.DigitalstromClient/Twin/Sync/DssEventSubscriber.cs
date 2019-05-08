@@ -3,6 +3,7 @@ using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
@@ -51,49 +52,23 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         private async Task LoadApartmentScenes()
         {
             var apartment = await apiClient?.GetZonesAndLastCalledScenes();
-            if (apartment == null || apartment.Zones == null)
+            if (apartment?.Zones == null)
                 return;
 
-            foreach (var zone in apartment.Zones)
-            {
-                if (zone == null || zone.Groups == null || zone.Groups.Count <= 0)
-                    continue;
-
-                RoomState roomState = new RoomState();
-                foreach (var groupstructure in zone.Groups)
-                {
-                    if (groupstructure == null)
-                        continue;
-
-                    roomState[groupstructure.Group].Value = groupstructure.LastCalledScene;
-                }
-                Scenes[zone.ZoneID] = roomState;
-            }
+            foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
+                foreach (var groupstructure in zone.Groups.Where(x => x != null))
+                    Scenes[zone.ZoneID, groupstructure.Group].Value = groupstructure.LastCalledScene;
         }
 
         private async Task LoadApartmentSensors()
         {
             var apartment = await apiClient?.GetZonesAndSensorValues();
-            if (apartment == null || apartment.Zones == null)
+            if (apartment?.Zones == null)
                 return;
 
-            foreach (var zone in apartment.Zones)
-            {
-                if (zone == null || zone.Sensor == null || zone.Sensor.Count <= 0)
-                    continue;
-
-                RoomState roomState = Scenes[zone.ZoneID];
-                if (roomState == null)
-                    roomState = new RoomState();
-                foreach (var sensor in zone.Sensor)
-                {
-                    if (sensor == null)
-                        continue;
-
-                    roomState[sensor.Type].Value = sensor;
-                }
-                Scenes[zone.ZoneID] = roomState;
-            }
+            foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
+                foreach (var sensor in zone.Sensor.Where(x => x != null))
+                    Scenes[zone.ZoneID, sensor.Type].Value = sensor;
         }
 
         public void CallScene(Zone zone, Group group, Scene scene)

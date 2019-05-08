@@ -24,39 +24,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             get
             {
-                _dictionary.TryGetValue(zone, out RoomState state);
+                bool added = false;
+                var state = _dictionary.GetOrAdd(zone, _ => { added = true; return new RoomState(); });
+                if (added)
+                    NotifyCollectionChangedAdded(zone, state);
+
                 return state;
             }
-            set
-            {
-                _dictionary[zone] = value;
-                NotifyCollectionChangedAdded(zone, value);
-            }
         }
 
-        public SceneState this[Zone zone, Group group]
-        {
-            get
-            {
-                _dictionary.TryGetValue(zone, out RoomState state);
-                if (state == null)
-                    this[zone] = state = new RoomState();
+        public SceneState this[Zone zone, Group group] => this[zone][group];
 
-                return state[group];
-            }
-        }
-
-        public SensorState this[Zone zone, Sensor sensor]
-        {
-            get
-            {
-                _dictionary.TryGetValue(zone, out RoomState state);
-                if (state == null)
-                    this[zone] = state = new RoomState();
-
-                return state[sensor];
-            }
-        }
+        public SensorState this[Zone zone, Sensor sensor] => this[zone][sensor];
 
         public IEnumerator<KeyValuePair<Zone, RoomState>> GetEnumerator()
         {

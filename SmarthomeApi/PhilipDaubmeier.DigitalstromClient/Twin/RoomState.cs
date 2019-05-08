@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             if (!_sceneStates.TryGetValue(color, out SceneState state))
                 return false;
-            return state.Value == _defaultScene;
+            return state.Value != _defaultScene;
         }
 
         /// <summary>

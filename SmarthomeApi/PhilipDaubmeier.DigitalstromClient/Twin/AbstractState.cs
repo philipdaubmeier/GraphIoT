@@ -51,10 +51,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             var propertyChangedInternalHandler = _propertyChangedInternal;
             if (useInternal && propertyChangedInternalHandler != null)
-            {
                 propertyChangedInternalHandler(this, new PropertyChangedEventArgs(nameof(Value)));
-                return;
-            }
 
             var propertyChangedHandler = PropertyChanged;
             if (propertyChangedHandler == null)

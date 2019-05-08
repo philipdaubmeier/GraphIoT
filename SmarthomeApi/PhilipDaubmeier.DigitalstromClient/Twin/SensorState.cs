@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
@@ -8,7 +9,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         {
             Value = new SensorTypeAndValues()
             {
-                Type = 0,
+                Type = SensorType.UnknownType,
                 Time = 0,
                 Value = 0
             };
