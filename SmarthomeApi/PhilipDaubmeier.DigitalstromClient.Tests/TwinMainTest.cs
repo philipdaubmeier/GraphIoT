@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
-                await twin.WaitModelInitializedAsync();
+                await twin.WaitModelInitializedAsync(2);
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
@@ -65,7 +65,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
-                await twin.WaitModelInitializedAsync();
+                await twin.WaitModelInitializedAsync(3);
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 
@@ -106,7 +106,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                         changedCount++;
                 };
 
-                await twin.WaitModelInitializedAsync();
+                await twin.WaitModelInitializedAsync(3);
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 

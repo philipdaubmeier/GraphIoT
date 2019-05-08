@@ -39,6 +39,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
         public static async Task MockDssEventAndWaitAsync(this MockHttpMessageHandler mockHttp, MockedRequest mockedEventResponse, ApartmentState model, Zone zone, Group group, Scene scene, int timeoutMillis = 1000)
         {
+            int numFlushed = 0;
             DateTime start = DateTime.UtcNow;
             var oldSceneTimestamp = model[zone, group].Timestamp;
 
@@ -47,17 +48,28 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             mockHttp.Flush();
 
             // give the event polling thread a chance to receive and handle the event, notify the model and change it accordingly
-            while (oldSceneTimestamp == model[zone, group].Timestamp && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+            while ((oldSceneTimestamp == model[zone, group].Timestamp || scene != model[zone, group].Value)
+                && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+            {
+                if ((DateTime.UtcNow - start).TotalMilliseconds > (numFlushed + 1) * 50)
+                {
+                    mockHttp.Flush();
+                    numFlushed++;
+                }   
+
                 await Task.Delay(1);
+            }
+                
         }
 
-        public static async Task WaitModelInitializedAsync(this ApartmentState model, int timeoutMillis = 1000)
+        public static async Task WaitModelInitializedAsync(this ApartmentState model, int expectedCount, int timeoutMillis = 1000)
         {
             DateTime start = DateTime.UtcNow;
-            var oldCount = model.Count();
+
+            int countAllItems() => model.Select(room => room.Value.Groups.Count() + room.Value.Sensors.Count()).Sum();
 
             // give the event polling thread a chance to receive and handle the event, notify the model and change it accordingly
-            while (oldCount == model.Count() && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
+            while (expectedCount != countAllItems() && (DateTime.UtcNow - start).TotalMilliseconds < timeoutMillis)
                 await Task.Delay(1);
         }
 
