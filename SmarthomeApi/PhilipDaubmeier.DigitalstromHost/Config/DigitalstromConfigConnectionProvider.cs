@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Network;
-using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.TokenStore;
 using System;
 using System.Collections.Generic;
@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Config
         public X509Certificate2 ServerCertificate { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
 
-        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IDigitalstromDbContext db, IOptions<DigitalstromConfig> config)
+        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
         {
             if (!string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
             {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using PhilipDaubmeier.DigitalstromClient.Twin;
 using System;
 using System.Collections.Concurrent;
