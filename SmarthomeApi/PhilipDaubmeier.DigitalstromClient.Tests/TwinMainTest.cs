@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             var callSceneRequest1 = mockHttp.AddCallSceneMock(zoneKitchen, Color.Yellow, SceneCommand.Preset1);
             var callSceneRequest2 = mockHttp.AddCallSceneMock(zoneKitchen, Color.Black, SceneCommand.DeepOff);
 
-            using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var twin = new DigitalstromDssTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
                 await twin.WaitModelInitializedAsync(2);
 
@@ -63,7 +63,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                     .WithExactQueryString($"subscriptionID=10&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var twin = new DigitalstromDssTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
                 await twin.WaitModelInitializedAsync(3);
                 mockHttp.AutoFlush = false;
@@ -96,7 +96,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                     .WithExactQueryString($"subscriptionID=10&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var twin = new DigitalstromTwin(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var twin = new DigitalstromDssTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
                 await twin.WaitModelInitializedAsync(3);
                 mockHttp.AutoFlush = false;

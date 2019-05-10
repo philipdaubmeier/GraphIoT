@@ -3,12 +3,12 @@ using System;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class DigitalstromTwin : ApartmentState, IDisposable
+    public class DigitalstromDssTwin : ApartmentState, IDisposable
     {
         private readonly DssEventSubscriber _subscriber;
         private readonly DssSceneCaller _sceneCaller;
 
-        public DigitalstromTwin(IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromDssTwin(IDigitalstromConnectionProvider connectionProvider)
         {
             _subscriber = connectionProvider is null ? null : new DssEventSubscriber(connectionProvider, this);
             _sceneCaller = _subscriber is null ? null : new DssSceneCaller(_subscriber, this);
