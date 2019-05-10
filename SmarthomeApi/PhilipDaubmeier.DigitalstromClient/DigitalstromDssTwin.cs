@@ -1,7 +1,8 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Network;
+using PhilipDaubmeier.DigitalstromClient.Twin;
 using System;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromClient
 {
     public class DigitalstromDssTwin : ApartmentState, IDisposable
     {
