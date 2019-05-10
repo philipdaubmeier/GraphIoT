@@ -15,13 +15,13 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     [Route("api/digitalstrom")]
     public class DigitalstromController : Controller
     {
-        private static DigitalstromWebserviceClient dsClient;
+        private static DigitalstromClient.DigitalstromDssClient dsClient;
 
         private readonly PersistenceContext db;
         public DigitalstromController(PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
         {
             db = databaseContext;
-            dsClient = new DigitalstromWebserviceClient(connectionProvider);
+            dsClient = new DigitalstromClient.DigitalstromDssClient(connectionProvider);
         }
 
         // GET api/digitalstrom/sensors

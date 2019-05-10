@@ -1,25 +1,22 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.DigitalstromClient.Model;
+﻿using PhilipDaubmeier.DigitalstromClient.Model;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Token;
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
 {
-    public abstract class DigitalstromWebserviceClientBase : IDisposable
+    public abstract class DigitalstromAuthenticatingClientBase : DigitalstromClientBase
     {
-        protected UriPriorityList _baseUris;
-        private readonly X509Certificate2 _dssCert;
+        /// <summary>
+        /// Needed internally for wiremessages without return value.
+        /// </summary>
+        private class VoidPayload : IWiremessagePayload<VoidPayload> { }
+
         private readonly IDigitalstromAuth _authData;
-        private readonly HttpMessageHandler _clientHandler;
-        private readonly HttpClient _client;
-        private Task _initializeTask;
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
@@ -33,77 +30,34 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// <param name="connectionProvider">All necessary connection infos like uris and
         /// authentication data needed to use for the webservice or to perform a new or
         /// renewed authentication</param>
-        public DigitalstromWebserviceClientBase(IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromAuthenticatingClientBase(IDigitalstromConnectionProvider connectionProvider)
+            : base(connectionProvider.Uris, BuildHttpHandler(connectionProvider))
         {
-            _baseUris = connectionProvider.Uris.DeepClone();
             _authData = connectionProvider.AuthData;
-            _dssCert = connectionProvider.ServerCertificate;
-            
-            _clientHandler = connectionProvider.Handler ?? new HttpClientHandler();
-            if (_clientHandler is HttpClientHandler && _dssCert != null)
+        }
+
+        private static HttpMessageHandler BuildHttpHandler(IDigitalstromConnectionProvider connectionProvider)
+        {
+            var clientHandler = connectionProvider.Handler;
+            if (clientHandler is null || !(clientHandler is HttpClientHandler) || connectionProvider.ServerCertificate is null)
+                return clientHandler;
+
+            var dssCert = connectionProvider.ServerCertificate;
+            (clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
             {
-                (_clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
-                {
-                    if (sslPolicyErrors == SslPolicyErrors.None)
-                        return true; // certificate is valid anyways
-                    if (cert == null)
-                        return false;
-                    if (cert.Issuer != _dssCert.Issuer)
-                        return false;
-                    if (cert.GetSerialNumberString() != _dssCert.GetSerialNumberString())
-                        return false;
-                    if (cert.GetCertHashString() != _dssCert.GetCertHashString())
-                        return false;
-                    return true;
-                };
-            }
-
-            _client = new HttpClient(_clientHandler);
-
-            _initializeTask = Initialize();
-        }
-
-        /// <summary>
-        /// Tries to find the fist working baseUri in the list and if found, fetch a valid token
-        /// </summary>
-        private async Task Initialize()
-        {
-            _baseUris.First();
-            while (!_baseUris.IsLast())
-            {
-                try
-                {
-                    var response = await _client.GetAsync(_baseUris.GetCurrent(), HttpCompletionOption.ResponseHeadersRead);
-                    if (response.IsSuccessStatusCode)
-                    {
-                        await Authenticate();
-                        return;
-                    }
-                }
-                catch (Exception) { }
-
-                _baseUris.MoveNext();
-            }
-        }
-
-        private async Task<Uri> GetBaseUri()
-        {
-            if (_initializeTask == null)
-                return _baseUris.GetCurrent();
-
-            await _initializeTask;
-            _initializeTask = null;
-
-            return _baseUris.GetCurrent();
-        }
-
-        protected async Task<Uri> BuildAbsoluteUri(Uri relativeUri)
-        {
-            var baseUri = await GetBaseUri();
-            if (_baseUris.CurrentHasAuthIncluded())
-                return new Uri($"{baseUri}{WebUtility.UrlEncode(relativeUri.ToString())}");
-            else
-                return new Uri(baseUri, relativeUri);
+                if (sslPolicyErrors == SslPolicyErrors.None)
+                    return true; // certificate is valid anyways
+                if (cert == null)
+                    return false;
+                if (cert.Issuer != dssCert.Issuer)
+                    return false;
+                if (cert.GetSerialNumberString() != dssCert.GetSerialNumberString())
+                    return false;
+                if (cert.GetCertHashString() != dssCert.GetCertHashString())
+                    return false;
+                return true;
+            };
+            return clientHandler;
         }
 
         /// <summary>
@@ -115,30 +69,44 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// </typeparam>
         /// <param name="uri">Uri of the API interface to call</param>
         /// <returns>The deserialized response object</returns>
-        protected async Task<T> Load<T>(UriQueryStringBuilder uri) where T : IWiremessagePayload<T>
+        public async Task<T> Load<T>(UriQueryStringBuilder uri) where T : IWiremessagePayload<T>
         {
             return await Load<T>(uri, true);
         }
-
-        private class VoidPayload : IWiremessagePayload<VoidPayload> { }
 
         /// <summary>
         /// Calls the given API interface, which does not return a response payload.
         /// </summary>
         /// <param name="uri">Uri of the API interface to call</param>
-        protected async Task Load(UriQueryStringBuilder uri)
+        public async Task Load(UriQueryStringBuilder uri)
         {
             await Load<VoidPayload>(uri, false);
+        }
+
+        protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : IWiremessagePayload<T>
+        {
+            await Authenticate();
+
+            if (!SkipAuthentication())
+                uri = uri.AddQuery("token", _authData.SessionToken);
+
+            var result = await base.Load<T>(uri, hasPayload);
+
+            // only touch token if successful
+            if (!SkipAuthentication())
+                await _authData.TouchSessionTokenAsync();
+
+            return result;
         }
 
         /// <summary>
         /// Ensures that after the completion of this task, a valid non-expired session token is
         /// present in the authentication data object, or throws an exception if unsuccessful.
         /// </summary>
-        protected async Task Authenticate()
+        protected override async Task Authenticate()
         {
             // needs no auth, url contains auth info already
-            if (_baseUris.CurrentHasAuthIncluded())
+            if (SkipAuthentication())
                 return;
 
             // we have a valid, not expired session token
@@ -161,7 +129,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private async Task FetchApplicationToken()
         {
-            Uri uri = new Uri(_baseUris.GetCurrent(), "/json/system/requestApplicationToken")
+            Uri uri = new Uri("/json/system/requestApplicationToken", UriKind.Relative)
                 .AddQuery("applicationName", _authData.AppId);
 
             var responseData = await LoadWiremessage<ApplicationTokenResponse>(uri);
@@ -175,7 +143,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private async Task<string> LoginCredentials()
         {
-            Uri uri = new Uri(_baseUris.GetCurrent(), "/json/system/login")
+            Uri uri = new Uri("/json/system/login", UriKind.Relative)
                 .AddQuery("user", _authData.Username)
                 .AddQuery("password", _authData.UserPassword);
 
@@ -193,7 +161,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (_authData.MustFetchApplicationToken() || string.IsNullOrEmpty(loginSessionToken))
                 throw new ArgumentException("Application token and temporary session token must be present before getting a new session token");
 
-            Uri uri = new Uri(_baseUris.GetCurrent(), "/json/system/enableToken")
+            Uri uri = new Uri("/json/system/enableToken", UriKind.Relative)
                 .AddQuery("applicationToken", _authData.ApplicationToken)
                 .AddQuery("token", loginSessionToken);
 
@@ -210,7 +178,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (_authData.MustFetchApplicationToken())
                 throw new ArgumentException("Application token must be present before getting a session token");
 
-            Uri uri = new Uri(_baseUris.GetCurrent(), "/json/system/loginApplication")
+            Uri uri = new Uri("/json/system/loginApplication", UriKind.Relative)
                 .AddQuery("loginToken", _authData.ApplicationToken);
 
             var responseData = await LoadWiremessage<SessionTokenResponse>(uri);
@@ -230,53 +198,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             // In this case, a retry does not seem to be a solution
             throw new IOException("Could not get session token");
-        }
-
-        private async Task<IWiremessagePayload<T>.Wiremessage> LoadWiremessage<T>(Uri uri) where T : IWiremessagePayload<T>
-        {
-            var responseMessage = await _client.GetAsync(uri);
-            var responseStream = await responseMessage.Content.ReadAsStreamAsync();
-            
-            using (var sr = new StreamReader(responseStream))
-            using (var jsonTextReader = new JsonTextReader(sr))
-            {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<IWiremessagePayload<T>.Wiremessage>(jsonTextReader);
-            }
-        }
-
-        private async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload) where T : IWiremessagePayload<T>
-        {
-            await Authenticate();
-
-            if (!_baseUris.CurrentHasAuthIncluded())
-                uri = uri.AddQuery("token", _authData.SessionToken);
-
-            var requestUri = await BuildAbsoluteUri(uri);
-            IWiremessagePayload<T>.Wiremessage responseData = await LoadWiremessage<T>(requestUri);
-
-            if (responseData == null)
-                throw new FormatException("No response data received");
-
-            if (!responseData.Ok)
-            {
-                throw new IOException(string.Format("Received ok=false in DSS API! Message: \"{0}\"",
-                    responseData.Message ?? "null"));
-            }
-
-            if (hasPayload && responseData.Result == null)
-                throw new IOException("Received ok=true but no result object!");
-
-            // only touch token if successful
-            if (!_baseUris.CurrentHasAuthIncluded())
-                await _authData.TouchSessionTokenAsync();
-
-            return responseData.Result;
-        }
-
-        public void Dispose()
-        {
-            _client.Dispose();
         }
     }
 }

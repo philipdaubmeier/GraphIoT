@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient
 {
-    public class DigitalstromWebserviceClient : DigitalstromWebserviceClientBase
+    public class DigitalstromDssClient : DigitalstromAuthenticatingClientBase
     {
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice with the given connection
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// <param name="connectionProvider">All necessary connection infos like uris and
         /// authentication data needed to use for the webservice or to perform a new or
         /// renewed authentication</param>
-        public DigitalstromWebserviceClient(IDigitalstromConnectionProvider connectionProvider)
+        public DigitalstromDssClient(IDigitalstromConnectionProvider connectionProvider)
             : base(connectionProvider) { }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// <param name="uri">The uri of the Digitalstrom DSS</param>
         /// <param name="authData">The authentication information needed to use for
         /// the webservice or to perform a new or renewed authentication</param>
-        public DigitalstromWebserviceClient(Uri uri, IDigitalstromAuth authData)
+        public DigitalstromDssClient(Uri uri, IDigitalstromAuth authData)
             : base(new DigitalstromConnectionProvider(new List<Uri>() { uri }, authData)) { }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// <param name="internetBaseUri">The internet exposed uri of the Digitalstrom DSS</param>
         /// <param name="authData">The authentication information needed to use for
         /// the webservice or to perform a new or renewed authentication</param>
-        public DigitalstromWebserviceClient(Uri localBaseUri, Uri internetBaseUri, IDigitalstromAuth authData)
+        public DigitalstromDssClient(Uri localBaseUri, Uri internetBaseUri, IDigitalstromAuth authData)
             : base(new DigitalstromConnectionProvider(new List<Uri>() { localBaseUri, internetBaseUri }, authData)) { }
 
         /// <summary>

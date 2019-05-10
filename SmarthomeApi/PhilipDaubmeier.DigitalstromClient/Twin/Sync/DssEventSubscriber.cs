@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         private volatile bool subscribed;
         private readonly int subscriptionId;
-        private DigitalstromWebserviceClient apiClient;
+        private DigitalstromDssClient apiClient;
 
         private readonly IEnumerable<IEventName> eventsToSubscribe;
 
@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, ApartmentState model = null, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
         {
-            apiClient = new DigitalstromWebserviceClient(connectionProvider);
+            apiClient = new DigitalstromDssClient(connectionProvider);
             Scenes = model ?? new ApartmentState();
             ApiEventRaised += HandleDssApiEvent;
             this.subscriptionId = subscriptionId;

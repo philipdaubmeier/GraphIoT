@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.DigitalstromHost.DependencyInjection
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
             
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
-            serviceCollection.AddScoped<DigitalstromWebserviceClient>();
+            serviceCollection.AddScoped<DigitalstromDssClient>();
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromEnergyPollingService>();
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromSensorPollingService>();
             serviceCollection.AddTimedPollingHost<IDigitalstromPollingService>(digitalstromConfig.GetSection("PollingService"));
