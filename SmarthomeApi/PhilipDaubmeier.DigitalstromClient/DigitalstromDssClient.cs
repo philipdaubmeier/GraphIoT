@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.Auth;
+﻿using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Energy;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
@@ -172,8 +173,8 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         public async Task<ZonesAndLastCalledScenesResponse> GetZonesAndLastCalledScenes()
         {
-            return await Load<ZonesAndLastCalledScenesResponse>(new Uri(
-                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/*(group,lastCalledScene)", UriKind.Relative));
+            return await QueryPropertyTree<ZonesAndLastCalledScenesResponse>(
+                "/apartment/zones/*(ZoneID)/groups/*(group,lastCalledScene)");
         }
         
         /// <summary>
@@ -181,8 +182,8 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         public async Task<ZonesAndSensorValuesResponse> GetZonesAndSensorValues()
         {
-            return await Load<ZonesAndSensorValuesResponse>(new Uri(
-                "/json/property/query?query=/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)", UriKind.Relative));
+            return await QueryPropertyTree<ZonesAndSensorValuesResponse>(
+                "/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)");
         }
         
         /// <summary>
@@ -190,8 +191,8 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         public async Task<MeteringCircuitsResponse> GetMeteringCircuits()
         {
-            return await Load<MeteringCircuitsResponse>(new Uri(
-                "/json/property/query?query=/apartment/dSMeters/*(dSUID,name)/capabilities(metering)", UriKind.Relative));
+            return await QueryPropertyTree<MeteringCircuitsResponse>(
+                "/apartment/dSMeters/*(dSUID,name)/capabilities(metering)");
         }
 
         /// <summary>
@@ -199,8 +200,16 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         public async Task<CircuitZonesResponse> GetCircuitZones()
         {
-            return await Load<CircuitZonesResponse>(new Uri(
-                "/json/property/query?query=/apartment/dSMeters/*(dSUID)/zones/*(ZoneID)", UriKind.Relative));
+            return await QueryPropertyTree<CircuitZonesResponse>(
+                "/apartment/dSMeters/*(dSUID)/zones/*(ZoneID)");
+        }
+
+        /// <summary>
+        /// Returns the given DSS property tree query result. Type parameter T has to match the queried structure.
+        /// </summary>
+        public async Task<T> QueryPropertyTree<T>(string query) where T : class, IWiremessagePayload
+        {
+            return await Load<T>(new Uri($"/json/property/query?query={query}", UriKind.Relative));
         }
 
         /// <summary>
