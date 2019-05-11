@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    internal class DssSceneCaller : IDisposable
+    internal class TwinChangeAggregator : IDisposable
     {
         private readonly ApartmentState model;
 
@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         internal event SceneChangedEventHandler SceneChangedInternal;
 
-        public DssSceneCaller(ApartmentState model)
+        public TwinChangeAggregator(ApartmentState model)
         {
             this.model = model;
 

@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             var model = new ApartmentState();
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new DssSceneCaller(model))
+            using (var sceneCaller = new TwinChangeAggregator(model))
             {
                 sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
 
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset0;
 
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new DssSceneCaller(model))
+            using (var sceneCaller = new TwinChangeAggregator(model))
             {
                 sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
 
