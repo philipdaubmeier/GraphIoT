@@ -21,8 +21,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             var model = new ApartmentState();
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new DssSceneCaller(subscriber, model))
+            using (var sceneCaller = new DssSceneCaller(model))
             {
+                sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
+
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 
@@ -67,8 +69,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset0;
 
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new DssSceneCaller(subscriber, model))
+            using (var sceneCaller = new DssSceneCaller(model))
             {
+                sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
+
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
 

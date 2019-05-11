@@ -6,7 +6,19 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
     public abstract class AbstractState<T> : INotifyPropertyChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private PropertyChangedEventHandler _propertyChanged;
+        public event PropertyChangedEventHandler PropertyChanged
+        {
+            add
+            {
+                if (!(_propertyChanged?.GetInvocationList()?.Contains(value) ?? false))
+                    _propertyChanged += value;
+            }
+            remove
+            {
+                _propertyChanged -= value;
+            }
+        }
 
         private PropertyChangedEventHandler _propertyChangedInternal;
         internal event PropertyChangedEventHandler PropertyChangedInternal
@@ -53,7 +65,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
             if (useInternal && propertyChangedInternalHandler != null)
                 propertyChangedInternalHandler(this, new PropertyChangedEventArgs(nameof(Value)));
 
-            var propertyChangedHandler = PropertyChanged;
+            var propertyChangedHandler = _propertyChanged;
             if (propertyChangedHandler == null)
                 return;
 

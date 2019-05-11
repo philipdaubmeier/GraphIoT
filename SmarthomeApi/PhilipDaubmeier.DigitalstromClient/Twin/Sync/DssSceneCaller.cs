@@ -6,15 +6,16 @@ using System.ComponentModel;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
-    public class DssSceneCaller : IDisposable
+    internal class DssSceneCaller : IDisposable
     {
-        private readonly DssEventSubscriber apiClient;
-
         private readonly ApartmentState model;
 
-        public DssSceneCaller(DssEventSubscriber client, ApartmentState model)
+        public event SceneChangedEventHandler SceneChanged;
+
+        internal event SceneChangedEventHandler SceneChangedInternal;
+
+        public DssSceneCaller(ApartmentState model)
         {
-            apiClient = client;
             this.model = model;
 
             SubscribeApartment(model);
@@ -36,10 +37,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
         private void SubscribeChangesRoom(RoomState room)
         {
             foreach (var item in room.Groups)
-                item.Value.PropertyChangedInternal += StatePropertyChanged;
+            {
+                item.Value.PropertyChanged += StatePropertyChanged;
+                item.Value.PropertyChangedInternal += StatePropertyChangedInternal;
+            }
 
             foreach (var item in room.Sensors)
-                item.Value.PropertyChangedInternal += StatePropertyChanged;
+            {
+                item.Value.PropertyChanged += StatePropertyChanged;
+                item.Value.PropertyChangedInternal += StatePropertyChangedInternal;
+            }
         }
 
         private void ApartmentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -62,11 +69,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
             var sensorState = (e.NewItems[0] as KeyValuePair<Sensor, SensorState>?)?.Value;
             if (sensorState != null)
-                sensorState.PropertyChangedInternal += StatePropertyChanged;
+            {
+                sensorState.PropertyChanged += StatePropertyChanged;
+                sensorState.PropertyChangedInternal += StatePropertyChangedInternal;
+            }
 
             var sceneState = (e.NewItems[0] as KeyValuePair<Group, SceneState>?)?.Value;
             if (sceneState != null)
-                sceneState.PropertyChangedInternal += StatePropertyChanged;
+            {
+                sceneState.PropertyChanged += StatePropertyChanged;
+                sceneState.PropertyChangedInternal += StatePropertyChangedInternal;
+            }
         }
 
         private void StatePropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -76,10 +89,35 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
             if (sceneState is null)
                 return;
 
+            if (e.PropertyName != nameof(SceneState.Value))
+                return;
+
             if (!TryFindZoneAndGroup(sceneState, out Zone zone, out Group group))
                 return;
 
-            apiClient.CallScene(zone, group, sceneState.Value);
+            SceneChanged?.Invoke(model, new SceneChangedEventArgs()
+            {
+                Zone = zone,
+                Group = group,
+                Scene = sceneState.Value
+            });
+        }
+
+        private void StatePropertyChangedInternal(object sender, PropertyChangedEventArgs e)
+        {
+            var sceneState = sender as SceneState;
+            if (sceneState is null)
+                return;
+
+            if (!TryFindZoneAndGroup(sceneState, out Zone zone, out Group group))
+                return;
+
+            SceneChangedInternal?.Invoke(model, new SceneChangedEventArgs()
+            {
+                Zone = zone,
+                Group = group,
+                Scene = sceneState.Value
+            });
         }
 
         private bool TryFindZoneAndGroup(SceneState sceneState, out Zone zone, out Group group)

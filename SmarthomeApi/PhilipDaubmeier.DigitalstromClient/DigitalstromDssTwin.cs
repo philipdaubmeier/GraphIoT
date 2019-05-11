@@ -1,5 +1,4 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Network;
-using PhilipDaubmeier.DigitalstromClient.Twin;
+﻿using PhilipDaubmeier.DigitalstromClient.Twin;
 using System;
 
 namespace PhilipDaubmeier.DigitalstromClient
@@ -12,7 +11,9 @@ namespace PhilipDaubmeier.DigitalstromClient
         public DigitalstromDssTwin(IDigitalstromConnectionProvider connectionProvider)
         {
             _subscriber = connectionProvider is null ? null : new DssEventSubscriber(connectionProvider, this);
-            _sceneCaller = _subscriber is null ? null : new DssSceneCaller(_subscriber, this);
+            _sceneCaller = _subscriber is null ? null : new DssSceneCaller(this);
+
+            _sceneCaller.SceneChangedInternal += (s, e) => _subscriber.CallScene(e.Zone, e.Group, e.Scene);
         }
 
         public void Dispose()
