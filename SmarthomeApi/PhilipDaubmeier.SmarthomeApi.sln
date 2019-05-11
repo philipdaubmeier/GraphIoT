@@ -35,7 +35,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.Digitalstro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TokenStore.Tests", "PhilipDaubmeier.TokenStore.Tests\PhilipDaubmeier.TokenStore.Tests.csproj", "{E22B7F48-F3B0-4187-8C18-D5430DD2F413}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.TimeseriesHostCommon.Tests", "PhilipDaubmeier.TimeseriesHostCommon.Tests\PhilipDaubmeier.TimeseriesHostCommon.Tests.csproj", "{B13144EA-FE45-423E-960D-7E1F5BF12987}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.TimeseriesHostCommon.Tests", "PhilipDaubmeier.TimeseriesHostCommon.Tests\PhilipDaubmeier.TimeseriesHostCommon.Tests.csproj", "{B13144EA-FE45-423E-960D-7E1F5BF12987}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromClientConsole", "PhilipDaubmeier.DigitalstromClientConsole\PhilipDaubmeier.DigitalstromClientConsole.csproj", "{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -99,6 +101,10 @@ Global
 		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B13144EA-FE45-423E-960D-7E1F5BF12987}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,12 +124,13 @@ Global
 		{93ABD061-9584-4B7B-B8FB-E1A9EAC40F7E} = {65C89DCA-5096-479C-82F3-F33BF729FDE5}
 		{E22B7F48-F3B0-4187-8C18-D5430DD2F413} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
 		{B13144EA-FE45-423E-960D-7E1F5BF12987} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
+		{BA710090-A7D1-4DD8-8F9C-012B8F82EF4E} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 15
+		SccNumberOfProjects = 16
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -183,5 +190,9 @@ Global
 		SccProjectTopLevelParentUniqueName14 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName14 = PhilipDaubmeier.TimeseriesHostCommon.Tests
 		SccLocalPath14 = PhilipDaubmeier.TimeseriesHostCommon.Tests
+		SccProjectUniqueName15 = PhilipDaubmeier.DigitalstromClientConsole\\PhilipDaubmeier.DigitalstromClientConsole.csproj
+		SccProjectTopLevelParentUniqueName15 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName15 = PhilipDaubmeier.DigitalstromClientConsole
+		SccLocalPath15 = PhilipDaubmeier.DigitalstromClientConsole
 	EndGlobalSection
 EndGlobal
