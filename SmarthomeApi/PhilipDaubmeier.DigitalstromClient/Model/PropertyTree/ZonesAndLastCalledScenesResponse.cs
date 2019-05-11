@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
 {
-    public class ZonesAndLastCalledScenesResponse : IWiremessagePayload<ZonesAndLastCalledScenesResponse>
+    public class ZonesAndLastCalledScenesResponse : IWiremessagePayload
     {
         public List<ZoneAndLastCalledScenes> Zones { get; set; }
     }

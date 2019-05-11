@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// <summary>
         /// Needed internally for wiremessages without return value.
         /// </summary>
-        private class VoidPayload : IWiremessagePayload<VoidPayload> { }
+        private class VoidPayload : IWiremessagePayload { }
 
         private readonly IDigitalstromAuth _authData;
 
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// </typeparam>
         /// <param name="uri">Uri of the API interface to call</param>
         /// <returns>The deserialized response object</returns>
-        public async Task<T> Load<T>(UriQueryStringBuilder uri) where T : IWiremessagePayload<T>
+        public async Task<T> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
             return await Load<T>(uri, true);
         }
@@ -83,7 +83,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             await Load<VoidPayload>(uri, false);
         }
 
-        protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : IWiremessagePayload<T>
+        protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
             await Authenticate();
 

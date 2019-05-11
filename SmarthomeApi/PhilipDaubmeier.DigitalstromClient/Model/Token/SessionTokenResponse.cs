@@ -1,6 +1,6 @@
 ﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Token
 {
-    public class SessionTokenResponse : IWiremessagePayload<SessionTokenResponse>
+    internal class SessionTokenResponse : IWiremessagePayload
     {
         public string Token { get; set; }
     }

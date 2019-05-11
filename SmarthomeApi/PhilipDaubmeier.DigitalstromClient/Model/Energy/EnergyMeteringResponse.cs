@@ -5,7 +5,7 @@ using NodaTime;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 {
-    public class EnergyMeteringResponse : IWiremessagePayload<EnergyMeteringResponse>
+    public class EnergyMeteringResponse : IWiremessagePayload
     {
         public string Type { get; set; }
         public string Unit { get; set; }

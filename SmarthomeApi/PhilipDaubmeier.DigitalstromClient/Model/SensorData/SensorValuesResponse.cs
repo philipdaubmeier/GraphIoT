@@ -2,7 +2,7 @@
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.SensorData
 {
-    public class SensorValuesResponse : IWiremessagePayload<SensorValuesResponse>
+    public class SensorValuesResponse : IWiremessagePayload
     {
         public Weather Weather { get; set; }
         public Outdoor Outdoor { get; set; }

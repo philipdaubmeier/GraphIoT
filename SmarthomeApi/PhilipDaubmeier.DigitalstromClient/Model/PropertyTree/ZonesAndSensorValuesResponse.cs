@@ -5,7 +5,7 @@ using NodaTime;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
 {
-    public class ZonesAndSensorValuesResponse : IWiremessagePayload<ZonesAndSensorValuesResponse>
+    public class ZonesAndSensorValuesResponse : IWiremessagePayload
     {
         public List<ZonesAndSensorValues> Zones { get; set; }
     }

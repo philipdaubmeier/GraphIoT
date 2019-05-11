@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
         public double? CoolingOff { get; set; }
     }
 
-    public class TemperatureControlValuesResponse : IWiremessagePayload<TemperatureControlValuesResponse>
+    public class TemperatureControlValuesResponse : IWiremessagePayload
     {
         public List<HeatingValuesZone> Zones { get; set; }
     }

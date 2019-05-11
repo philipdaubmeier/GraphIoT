@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
         public DateTime? ControlValueTime { get; set; }
     }
 
-    public class TemperatureControlStatusResponse : IWiremessagePayload<TemperatureControlStatusResponse>
+    public class TemperatureControlStatusResponse : IWiremessagePayload
     {
         public List<HeatingStatusZone> Zones { get; set; }
     }

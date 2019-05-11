@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
         public int? CtrlOffset { get; set; }
     }
 
-    public class TemperatureControlConfigResponse : IWiremessagePayload<TemperatureControlConfigResponse>
+    public class TemperatureControlConfigResponse : IWiremessagePayload
     {
         public List<HeatingConfigZone> Zones { get; set; }
     }

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 {
-    public class MeteringCircuitsResponse : IWiremessagePayload<MeteringCircuitsResponse>
+    public class MeteringCircuitsResponse : IWiremessagePayload
     {
         public List<MeteringCapabilities> DSMeters { get; set; }
 

@@ -83,9 +83,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 return new Uri(baseUri, relativeUri);
         }
 
-        protected async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : IWiremessagePayload<T>
+        protected async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
-            IWiremessagePayload<T>.Wiremessage responseData = await LoadWiremessage<T>(uri);
+            Wiremessage<T> responseData = await LoadWiremessage<T>(uri);
 
             if (responseData == null)
                 throw new FormatException("No response data received");
@@ -102,7 +102,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             return responseData.Result;
         }
 
-        protected async Task<IWiremessagePayload<T>.Wiremessage> LoadWiremessage<T>(UriQueryStringBuilder uri) where T : IWiremessagePayload<T>
+        private protected async Task<Wiremessage<T>> LoadWiremessage<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
             var responseMessage = await _client.GetAsync(await BuildAbsoluteUri(uri));
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
@@ -111,7 +111,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             using (var jsonTextReader = new JsonTextReader(sr))
             {
                 var serializer = new JsonSerializer();
-                return serializer.Deserialize<IWiremessagePayload<T>.Wiremessage>(jsonTextReader);
+                return serializer.Deserialize<Wiremessage<T>>(jsonTextReader);
             }
         }
 

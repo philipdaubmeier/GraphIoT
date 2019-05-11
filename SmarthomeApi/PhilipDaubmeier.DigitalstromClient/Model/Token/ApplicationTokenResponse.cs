@@ -1,6 +1,6 @@
 ﻿namespace PhilipDaubmeier.DigitalstromClient.Model.Token
 {
-    public class ApplicationTokenResponse : IWiremessagePayload<ApplicationTokenResponse>
+    internal class ApplicationTokenResponse : IWiremessagePayload
     {
         public string ApplicationToken { get; set; }
     }

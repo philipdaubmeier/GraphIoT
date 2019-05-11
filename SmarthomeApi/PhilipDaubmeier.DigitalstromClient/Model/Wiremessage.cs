@@ -1,6 +1,6 @@
 ﻿namespace PhilipDaubmeier.DigitalstromClient.Model
 {
-    public abstract class Wiremessage<T> where T : class
+    internal class Wiremessage<T> where T : class, IWiremessagePayload
     {
         private bool? _ok;
         private string _message;
