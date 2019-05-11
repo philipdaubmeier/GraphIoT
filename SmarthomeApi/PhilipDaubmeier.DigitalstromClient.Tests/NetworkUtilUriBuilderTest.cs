@@ -22,6 +22,29 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
         }
 
         [Fact]
+        public void TestChainedConversions()
+        {
+            Uri baseUri = new Uri("/subpath/subsubpath/", UriKind.Relative);
+
+            Uri newUri1 = baseUri.AddQuery("key1", "val1")
+                .AddQuery("key2", "val2")
+                .AddQuery("key3", "val3")
+                .AddQuery("key4", "val4");
+
+            Uri newUri2 = 
+                (
+                    (Uri)
+                        ((Uri)baseUri.AddQuery("key1", "val1").AddQuery("key2", "val2")
+                    )
+                    .AddQuery("key3", "val3")
+                )
+                .AddQuery("key4", "val4");
+
+            Assert.Equal(newUri2, newUri1);
+            Assert.Equal(newUri2.ToString(), newUri1.ToString());
+        }
+
+        [Fact]
         public void TestExtensionMethods()
         {
             Uri uri1 = new Uri("https://www.domain.tld/", UriKind.Absolute);
