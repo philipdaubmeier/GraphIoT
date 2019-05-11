@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
 {
-    public static class UriExtensions
+    internal static class UriExtensions
     {
         public static UriQueryStringBuilder AddQuery(this Uri uri, string key, string value)
         {

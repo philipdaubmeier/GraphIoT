@@ -6,10 +6,14 @@ using System.Text;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
 {
-    public class UriQueryStringBuilder
+    internal class UriQueryStringBuilder
     {
         private readonly Uri _uri;
         private readonly NameValueCollection _values;
+
+        public UriQueryStringBuilder(Uri uri)
+            : this(uri, new NameValueCollection())
+        { }
 
         public UriQueryStringBuilder(Uri uri, NameValueCollection values)
         {
@@ -57,7 +61,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public static implicit operator UriQueryStringBuilder(Uri uri)
         {
-            return new UriQueryStringBuilder(uri, new NameValueCollection());
+            return new UriQueryStringBuilder(uri);
         }
 
         public static implicit operator Uri(UriQueryStringBuilder builder)

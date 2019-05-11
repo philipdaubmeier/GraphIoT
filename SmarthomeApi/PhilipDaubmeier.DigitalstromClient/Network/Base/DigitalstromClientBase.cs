@@ -83,7 +83,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 return new Uri(baseUri, relativeUri);
         }
 
-        protected async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
+        protected async Task<T> Load<T>(Uri uri, bool hasPayload = true) where T : class, IWiremessagePayload
+        {
+            return await Load<T>(uri, hasPayload);
+        }
+
+        private protected async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
             Wiremessage<T> responseData = await LoadWiremessage<T>(uri);
 

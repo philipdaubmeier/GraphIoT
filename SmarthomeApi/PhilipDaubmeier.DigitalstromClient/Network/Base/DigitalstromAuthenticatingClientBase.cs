@@ -69,21 +69,31 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// </typeparam>
         /// <param name="uri">Uri of the API interface to call</param>
         /// <returns>The deserialized response object</returns>
-        public async Task<T> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
+        protected async Task<T> Load<T>(Uri uri) where T : class, IWiremessagePayload
         {
-            return await Load<T>(uri, true);
+            return await Load<T>(new UriQueryStringBuilder(uri));
         }
 
         /// <summary>
         /// Calls the given API interface, which does not return a response payload.
         /// </summary>
         /// <param name="uri">Uri of the API interface to call</param>
-        public async Task Load(UriQueryStringBuilder uri)
+        protected async Task Load(Uri uri)
+        {
+            await Load(new UriQueryStringBuilder(uri));
+        }
+
+        private protected async Task<T> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
+        {
+            return await Load<T>(uri, true);
+        }
+
+        private protected async Task Load(UriQueryStringBuilder uri)
         {
             await Load<VoidPayload>(uri, false);
         }
 
-        protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
+        private protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
             await Authenticate();
 
