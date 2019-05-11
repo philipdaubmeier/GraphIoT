@@ -14,6 +14,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         internal event SceneChangedEventHandler SceneChangedInternal;
 
+        /// <summary>
+        /// Creates a new TwinChangeAggregator instance for the given twin model. It subscribes
+        /// to all CollectionChanged and PropertyChanged events deep down the whole model tree
+        /// and keeps the subscriptions up-to-date (i.e. if a new room is added, this addition of
+        /// the room will trigger a CollectionChanged which will in turn be used to subscribe to
+        /// all child elements and their PropertyChanged events). Any change to a sceene in the
+        /// model is therefore aggregated into a single SceneChanged event.
+        /// </summary>
         public TwinChangeAggregator(ApartmentState model)
         {
             this.model = model;
