@@ -1,5 +1,6 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Network;
+using System;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 
@@ -27,6 +28,12 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// any valid cert is accepted but no self-signed ones of a Digitalstrom server.
         /// </summary>
         X509Certificate2 ServerCertificate { get; }
+
+        /// <summary>
+        /// Gets or sets a callback method to validate the server certificate, which
+        /// is called if no ServerCertificate is set.
+        /// </summary>
+        Func<X509Certificate2, bool> ServerCertificateValidationCallback { get; }
 
         /// <summary>
         /// A HttpMessageHandler to inject for the connection to the Digitalstrom server,

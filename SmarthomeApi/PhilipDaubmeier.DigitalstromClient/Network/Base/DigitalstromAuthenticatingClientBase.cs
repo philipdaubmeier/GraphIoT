@@ -39,7 +39,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private static HttpMessageHandler BuildHttpHandler(IDigitalstromConnectionProvider connectionProvider)
         {
             var clientHandler = connectionProvider.Handler;
-            if (clientHandler is null || !(clientHandler is HttpClientHandler) || connectionProvider.ServerCertificate is null)
+            if (clientHandler is null || !(clientHandler is HttpClientHandler) || 
+                (connectionProvider.ServerCertificate is null && connectionProvider.ServerCertificateValidationCallback is null))
                 return clientHandler;
 
             var dssCert = connectionProvider.ServerCertificate;
@@ -47,7 +48,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             {
                 if (sslPolicyErrors == SslPolicyErrors.None)
                     return true; // certificate is valid anyways
-                if (cert == null)
+
+                if (dssCert is null && !(connectionProvider.ServerCertificateValidationCallback is null))
+                    return connectionProvider.ServerCertificateValidationCallback(cert);
+
+                if (cert is null)
                     return false;
                 if (cert.Issuer != dssCert.Issuer)
                     return false;

@@ -36,12 +36,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             if (!(mockHandler is TestGenerationHttpMessageHandler))
                 throw new ArgumentException("TestGenerationHttpMessageHandler type expected", nameof(mockHandler));
 
-            return new DigitalstromConnectionProvider(testGenerationUris, auth, null, mockHandler);
+            return new DigitalstromConnectionProvider(testGenerationUris, auth, null, null, mockHandler);
         }
 
         public static DigitalstromConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler)
         {
-            return new DigitalstromConnectionProvider(mockUris, auth, null, mockHandler);
+            return new DigitalstromConnectionProvider(mockUris, auth, null, null, mockHandler);
         }
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)

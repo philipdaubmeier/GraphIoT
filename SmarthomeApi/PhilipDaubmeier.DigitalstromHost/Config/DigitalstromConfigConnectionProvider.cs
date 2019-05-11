@@ -16,6 +16,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Config
         public UriPriorityList Uris { get; private set; }
         public IDigitalstromAuth AuthData { get; private set; }
         public X509Certificate2 ServerCertificate { get; private set; }
+        public Func<X509Certificate2, bool> ServerCertificateValidationCallback { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
 
         public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
@@ -31,6 +32,8 @@ namespace PhilipDaubmeier.DigitalstromHost.Config
 
             if (!string.IsNullOrWhiteSpace(config.Value.DssCertificate))
                 ServerCertificate = new X509Certificate2(Convert.FromBase64String(config.Value.DssCertificate));
+
+            ServerCertificateValidationCallback = null;
 
             if (config.Value.UseCloudredir)
                 Uris = new UriPriorityList(new List<Uri>() { config.Value.UriCloudredir }, new List<bool>() { true });
