@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 {
-    public class TwinSceneCallerTest
+    public class TwinChangeAggregatorTest
     {
         private readonly Zone zoneKitchen = 32027;
 
@@ -21,9 +21,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             var model = new ApartmentState();
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new TwinChangeAggregator(model))
+            using (var aggregator = new TwinChangeAggregator(model))
             {
-                sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
+                aggregator.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
@@ -69,9 +69,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset0;
 
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
-            using (var sceneCaller = new TwinChangeAggregator(model))
+            using (var aggregator = new TwinChangeAggregator(model))
             {
-                sceneCaller.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
+                aggregator.SceneChangedInternal += (s, e) => subscriber.CallScene(e.Zone, e.Group, e.Scene);
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
