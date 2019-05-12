@@ -38,8 +38,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private static HttpMessageHandler BuildHttpHandler(IDigitalstromConnectionProvider connectionProvider)
         {
-            var clientHandler = connectionProvider.Handler;
-            if (clientHandler is null || !(clientHandler is HttpClientHandler) || 
+            var clientHandler = connectionProvider.Handler ?? new HttpClientHandler();
+            if (!(clientHandler is HttpClientHandler) || 
                 (connectionProvider.ServerCertificate is null && connectionProvider.ServerCertificateValidationCallback is null))
                 return clientHandler;
 

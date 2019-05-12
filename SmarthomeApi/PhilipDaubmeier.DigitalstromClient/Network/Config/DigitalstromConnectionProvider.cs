@@ -24,6 +24,7 @@ namespace PhilipDaubmeier.DigitalstromClient
             Uris = uris;
             AuthData = authData;
             ServerCertificate = cert;
+            ServerCertificateValidationCallback = certCallback;
             Handler = handler;
         }
     }
