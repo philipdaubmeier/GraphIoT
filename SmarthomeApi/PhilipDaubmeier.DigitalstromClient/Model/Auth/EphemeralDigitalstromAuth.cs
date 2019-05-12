@@ -8,16 +8,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
         public string ApplicationToken { get; private set; }
         public string SessionToken { get; private set; }
         public DateTime SessionExpiration { get; private set; }
-        
-        public string AppId { get; private set; }
-        public string Username { get; private set; }
-        public string UserPassword { get; private set; }
+
+        private string _appId = null;
+        private string _username = null;
+        private string _userPassword = null;
+        private Func<IDigitalstromAuth> _credentialsCallback;
+
+        public string AppId { get { CheckCallback(); return _appId; } }
+        public string Username { get { CheckCallback(); return _username; } }
+        public string UserPassword { get { CheckCallback(); return _userPassword; } }
+
+        public EphemeralDigitalstromAuth(Func<IDigitalstromAuth> credentialsCallback)
+        {
+            _credentialsCallback = credentialsCallback;
+        }
 
         public EphemeralDigitalstromAuth(string appId, string username, string password)
         {
-            AppId = appId;
-            Username = username;
-            UserPassword = password;
+            _credentialsCallback = null;
+            _appId = appId;
+            _username = username;
+            _userPassword = password;
         }
 
         public bool MustFetchApplicationToken()
@@ -58,6 +69,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
             return ApplicationToken == other.ApplicationToken && SessionToken == other.SessionToken
                 && SessionExpiration == other.SessionExpiration && AppId == other.AppId
                 && Username == other.Username && UserPassword == other.UserPassword;
+        }
+
+        private void CheckCallback()
+        {
+            if (!(_appId is null || _username is null || _userPassword is null) || _credentialsCallback is null)
+                return;
+
+            var credentials = _credentialsCallback();
+            _appId = credentials?.AppId;
+            _username = credentials?.Username;
+            _userPassword = credentials?.UserPassword;
         }
     }
 }

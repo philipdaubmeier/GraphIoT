@@ -15,8 +15,16 @@ namespace PhilipDaubmeier.DigitalstromClient
         public Func<X509Certificate2, bool> ServerCertificateValidationCallback { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
 
-        public DigitalstromConnectionProvider(Uri uri, IDigitalstromAuth authData, X509Certificate2 cert = null, Func<X509Certificate2, bool> certCallback = null, HttpMessageHandler handler = null)
-            : this(new UriPriorityList(new List<Uri>() { uri }), authData, cert, certCallback, handler)
+        public DigitalstromConnectionProvider(Uri uri, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
+            : this(new UriPriorityList(new List<Uri>() { uri }), credentialCallback, certCallback, handler)
+        { }
+
+        public DigitalstromConnectionProvider(Uri uri, IDigitalstromAuth authData, X509Certificate2 cert = null, HttpMessageHandler handler = null)
+            : this(new UriPriorityList(new List<Uri>() { uri }), authData, cert, null, handler)
+        { }
+
+        public DigitalstromConnectionProvider(UriPriorityList uris, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
+            : this(uris, new EphemeralDigitalstromAuth(credentialCallback), null, certCallback, handler)
         { }
 
         public DigitalstromConnectionProvider(UriPriorityList uris, IDigitalstromAuth authData, X509Certificate2 cert = null, Func<X509Certificate2, bool> certCallback = null, HttpMessageHandler handler = null)
