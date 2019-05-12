@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             if (args == null)
                 throw new ArgumentNullException(nameof(args));
 
-            Uri uri = ConsoleUtil.ReadUri("Enter DSS uri: (e.g. 'https://dss.local')");
+            Uri uri = ConsoleUtil.ReadUri("Enter DSS uri: (e.g. 'https://dss.local:8080')");
 
             Func<IDigitalstromAuth> loginUser = () =>
             {
