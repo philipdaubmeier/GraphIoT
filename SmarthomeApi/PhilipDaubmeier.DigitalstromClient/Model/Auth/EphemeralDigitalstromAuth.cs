@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
@@ -71,15 +72,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
                 && Username == other.Username && UserPassword == other.UserPassword;
         }
 
+        private readonly Semaphore loginSemaphore = new Semaphore(1, 1);
         private void CheckCallback()
         {
-            if (!(_appId is null || _username is null || _userPassword is null) || _credentialsCallback is null)
-                return;
+            try
+            {
+                loginSemaphore.WaitOne();
+                if (!(_appId is null || _username is null || _userPassword is null) || _credentialsCallback is null)
+                    return;
 
-            var credentials = _credentialsCallback();
-            _appId = credentials?.AppId;
-            _username = credentials?.Username;
-            _userPassword = credentials?.UserPassword;
+                var credentials = _credentialsCallback();
+                _appId = credentials?.AppId;
+                _username = credentials?.Username;
+                _userPassword = credentials?.UserPassword;
+            }
+            finally { loginSemaphore.Release(); }
         }
     }
 }

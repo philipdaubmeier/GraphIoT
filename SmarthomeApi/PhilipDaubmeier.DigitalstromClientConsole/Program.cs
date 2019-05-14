@@ -44,6 +44,17 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             };
 
             var conn = new DigitalstromConnectionProvider(uri, loginUser, validateCert);
+
+            //using (var twin = new DigitalstromDssTwin(conn))
+            //{
+            //    twin.SceneChanged += (s, e) =>
+            //    {
+            //        Console.WriteLine($"Scene called: zone '{e.Zone}', group '{e.Group}', scene '{e.Scene}");
+            //    };
+            //    while (true)
+            //        await Task.Delay(10);
+            //}
+
             using (var client = new DigitalstromDssClient(conn))
             {
                 var zone = ConsoleUtil.ReadZone("Enter a room id (zone):");

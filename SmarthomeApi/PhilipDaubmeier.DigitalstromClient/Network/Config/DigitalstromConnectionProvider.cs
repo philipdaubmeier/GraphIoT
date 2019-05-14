@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.DigitalstromClient
     {
         public UriPriorityList Uris { get; private set; }
         public IDigitalstromAuth AuthData { get; private set; }
-        public X509Certificate2 ServerCertificate { get; private set; }
+        public X509Certificate2 ServerCertificate { get; set; }
         public Func<X509Certificate2, bool> ServerCertificateValidationCallback { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
 

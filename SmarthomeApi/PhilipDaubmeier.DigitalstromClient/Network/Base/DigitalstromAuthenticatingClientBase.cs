@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Security;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
@@ -43,6 +44,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 (connectionProvider.ServerCertificate is null && connectionProvider.ServerCertificateValidationCallback is null))
                 return clientHandler;
 
+            var callbackSemaphore = new Semaphore(1, 1);
             var dssCert = connectionProvider.ServerCertificate;
             (clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
             {
@@ -50,7 +52,20 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                     return true; // certificate is valid anyways
 
                 if (dssCert is null && !(connectionProvider.ServerCertificateValidationCallback is null))
-                    return connectionProvider.ServerCertificateValidationCallback(cert);
+                {
+                    try
+                    {
+                        callbackSemaphore.WaitOne();
+                        if (dssCert is null)
+                        {
+                            if (!connectionProvider.ServerCertificateValidationCallback(cert))
+                                return false;
+                            connectionProvider.ServerCertificate = cert;
+                            return true;
+                        }
+                    }
+                    finally { callbackSemaphore.Release(); }
+                }
 
                 if (cert is null)
                     return false;

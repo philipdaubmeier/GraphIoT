@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// with the same fingerprint, issuer and serial number. If it returns null,
         /// any valid cert is accepted but no self-signed ones of a Digitalstrom server.
         /// </summary>
-        X509Certificate2 ServerCertificate { get; }
+        X509Certificate2 ServerCertificate { get; set; }
 
         /// <summary>
         /// Gets or sets a callback method to validate the server certificate, which
