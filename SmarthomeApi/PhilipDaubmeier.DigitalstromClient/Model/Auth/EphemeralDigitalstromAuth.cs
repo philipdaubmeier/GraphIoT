@@ -13,6 +13,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
         private string _appId = null;
         private string _username = null;
         private string _userPassword = null;
+        private readonly Semaphore _loginSemaphore = new Semaphore(1, 1);
         private Func<IDigitalstromAuth> _credentialsCallback;
 
         public string AppId { get { CheckCallback(); return _appId; } }
@@ -34,7 +35,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
 
         public bool MustFetchApplicationToken()
         {
-            return string.IsNullOrEmpty(ApplicationToken);
+            try
+            {
+                _loginSemaphore.WaitOne();
+                return string.IsNullOrEmpty(ApplicationToken);
+            }
+            finally { _loginSemaphore.Release(); }
         }
 
         public bool MustFetchSessionToken()
@@ -72,12 +78,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
                 && Username == other.Username && UserPassword == other.UserPassword;
         }
 
-        private readonly Semaphore loginSemaphore = new Semaphore(1, 1);
         private void CheckCallback()
         {
             try
             {
-                loginSemaphore.WaitOne();
+                _loginSemaphore.WaitOne();
                 if (!(_appId is null || _username is null || _userPassword is null) || _credentialsCallback is null)
                     return;
 
@@ -86,7 +91,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
                 _username = credentials?.Username;
                 _userPassword = credentials?.UserPassword;
             }
-            finally { loginSemaphore.Release(); }
+            finally { _loginSemaphore.Release(); }
         }
     }
 }

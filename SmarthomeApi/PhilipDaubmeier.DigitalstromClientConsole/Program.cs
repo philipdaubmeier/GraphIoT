@@ -29,31 +29,31 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
 
             Uri uri = ConsoleUtil.ReadUri("Enter DSS uri: (e.g. 'https://dss.local:8080')");
 
-            Func<IDigitalstromAuth> loginUser = () =>
+            IDigitalstromAuth loginUser()
             {
                 var username = ConsoleUtil.ReadNonWhitespace("Enter DSS username:");
                 var password = ConsoleUtil.ReadPassword("Enter DSS password:");
                 return new EphemeralDigitalstromAuth("ConsoleSample", username, password);
-            };
+            }
 
-            Func<X509Certificate2, bool> validateCert = (cert) =>
+            bool validateCert(X509Certificate2 cert)
             {
                 Console.WriteLine($"Certificate fingerprint: {cert.GetCertHashString()}");
                 Console.WriteLine("Trust this certificate? (y/n)");
                 return Console.ReadLine().ToLowerInvariant().Trim().StartsWith('y');
-            };
+            }
 
             var conn = new DigitalstromConnectionProvider(uri, loginUser, validateCert);
 
-            //using (var twin = new DigitalstromDssTwin(conn))
-            //{
-            //    twin.SceneChanged += (s, e) =>
-            //    {
-            //        Console.WriteLine($"Scene called: zone '{e.Zone}', group '{e.Group}', scene '{e.Scene}");
-            //    };
-            //    while (true)
-            //        await Task.Delay(10);
-            //}
+            using (var twin = new DigitalstromDssTwin(conn))
+            {
+                twin.SceneChanged += (s, e) =>
+                {
+                    Console.WriteLine($"Scene called: zone '{e.Zone}', group '{e.Group}', scene '{e.Scene}");
+                };
+                while (true)
+                    await Task.Delay(10);
+            }
 
             using (var client = new DigitalstromDssClient(conn))
             {
