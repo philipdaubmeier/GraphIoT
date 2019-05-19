@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.DigitalstromClient;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using PhilipDaubmeier.DigitalstromHost.Config;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.EventProcessing;
