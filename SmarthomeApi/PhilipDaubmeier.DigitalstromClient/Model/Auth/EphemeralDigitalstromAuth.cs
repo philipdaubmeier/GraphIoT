@@ -6,9 +6,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
 {
     public class EphemeralDigitalstromAuth : IDigitalstromAuth, IEquatable<EphemeralDigitalstromAuth>
     {
-        public string ApplicationToken { get; private set; }
-        public string SessionToken { get; private set; }
-        public DateTime SessionExpiration { get; private set; }
+        public virtual string ApplicationToken { get; private set; }
+        public virtual string SessionToken { get; private set; }
+        public virtual DateTime SessionExpiration { get; private set; }
 
         private string _appId = null;
         private string _username = null;
@@ -53,12 +53,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
             await UpdateTokenAsync(SessionToken, DateTime.UtcNow.AddSeconds(60), ApplicationToken);
         }
 
-        public Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
+        public virtual async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
         {
             ApplicationToken = applicationToken;
             SessionToken = sessionToken;
             SessionExpiration = sessionExpiration;
-            return Task.CompletedTask;
+            await Task.CompletedTask;
+            return;
         }
 
         public IDigitalstromAuth DeepClone()

@@ -9,16 +9,16 @@ namespace PhilipDaubmeier.DigitalstromHost.Config
     {
         private TokenStore<PersistingDigitalstromAuth> _tokenStore;
 
-        public new string ApplicationToken => _tokenStore.RefreshToken;
-        public new string SessionToken => _tokenStore.AccessToken;
-        public new DateTime SessionExpiration => _tokenStore.AccessTokenExpiry;
+        public override string ApplicationToken => _tokenStore.RefreshToken;
+        public override string SessionToken => _tokenStore.AccessToken;
+        public override DateTime SessionExpiration => _tokenStore.AccessTokenExpiry;
 
         public PersistingDigitalstromAuth(TokenStore<PersistingDigitalstromAuth> tokenStore, string appId, string username, string password) : base(appId, username, password)
         {
             _tokenStore = tokenStore;
         }
 
-        public new async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
+        public override async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
         {
             await _tokenStore.UpdateToken(sessionToken, sessionExpiration, applicationToken);
         }
