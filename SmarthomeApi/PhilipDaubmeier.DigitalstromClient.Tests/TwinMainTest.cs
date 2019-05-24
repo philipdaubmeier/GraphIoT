@@ -63,24 +63,31 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                     .WithExactQueryString($"subscriptionID=10&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
+            var callSceneRequest1 = mockHttp.AddCallSceneMock(zoneKitchen, Color.Yellow, SceneCommand.Preset1);
+
             using (var twin = new DigitalstromDssTwin(mockHttp.AddAuthMock().ToMockProvider()))
             {
                 await twin.WaitModelInitializedAsync(3);
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 
+                Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
+
                 await mockHttp.MockDssEventAndWaitAsync(mockedEvent, twin, zoneKitchen, Color.Yellow, SceneCommand.Preset1);
 
                 Assert.Equal((int)SceneCommand.Preset1, (int)twin[zoneKitchen, Color.Yellow].Value);
+                Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
 
                 // even firing a dss event with the same value again should result in a scene call (due to a new timestamp of the scene state)
                 await mockHttp.MockDssEventAndWaitAsync(mockedEvent, twin, zoneKitchen, Color.Yellow, SceneCommand.Preset1);
 
                 Assert.Equal((int)SceneCommand.Preset1, (int)twin[zoneKitchen, Color.Yellow].Value);
+                Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
 
                 await mockHttp.MockDssEventAndWaitAsync(mockedEvent, twin, zoneKitchen, Color.Yellow, SceneCommand.Preset2);
 
                 Assert.Equal((int)SceneCommand.Preset2, (int)twin[zoneKitchen, Color.Yellow].Value);
+                Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
             }
         }
 
