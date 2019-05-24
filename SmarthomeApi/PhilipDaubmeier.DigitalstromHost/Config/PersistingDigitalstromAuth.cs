@@ -7,7 +7,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Config
 {
     public class PersistingDigitalstromAuth : EphemeralDigitalstromAuth
     {
-        private TokenStore<PersistingDigitalstromAuth> _tokenStore;
+        private readonly TokenStore<PersistingDigitalstromAuth> _tokenStore;
 
         public override string ApplicationToken => _tokenStore.RefreshToken;
         public override string SessionToken => _tokenStore.AccessToken;

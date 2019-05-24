@@ -8,8 +8,8 @@ namespace PhilipDaubmeier.TokenStore
 {
     public class TokenStore<T>
     {
-        private string _serviceName;
-        private ITokenStoreDbContext _dbContext;
+        private readonly string _serviceName;
+        private readonly ITokenStoreDbContext _dbContext;
 
         public TokenStore(ITokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
@@ -21,9 +21,9 @@ namespace PhilipDaubmeier.TokenStore
             _dbContext = databaseContext;
         }
         
-        private string _accessTokenId => $"{_serviceName}.access_token";
-        private string _accessTokenExpiryId => $"{_serviceName}.access_token_expiry";
-        private string _refreshTokenId => $"{_serviceName}.refresh_token";
+        private string AccessTokenId => $"{_serviceName}.access_token";
+        private string AccessTokenExpiryId => $"{_serviceName}.access_token_expiry";
+        private string RefreshTokenId => $"{_serviceName}.refresh_token";
 
         private string _accessToken = null;
         private DateTime? _accessTokenExpiry = null;
@@ -38,17 +38,17 @@ namespace PhilipDaubmeier.TokenStore
             if (_accessToken != null && _accessTokenExpiry.HasValue)
                 return true;
             
-            _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenId)?.DataContent;
-            _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _accessTokenExpiryId)?.DataContent);
-            _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == _refreshTokenId)?.DataContent;
+            _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenId)?.DataContent;
+            _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenExpiryId)?.DataContent);
+            _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == RefreshTokenId)?.DataContent;
             return true;
         }
 
         public async Task UpdateToken(string accessToken, DateTime accessTokenExpiry, string refreshToken)
         {
-            UpdateValue(_accessTokenId, _accessToken, accessToken);
-            UpdateValue(_accessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
-            UpdateValue(_refreshTokenId, _refreshToken, refreshToken);
+            UpdateValue(AccessTokenId, _accessToken, accessToken);
+            UpdateValue(AccessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
+            UpdateValue(RefreshTokenId, _refreshToken, refreshToken);
 
             _accessToken = accessToken;
             _accessTokenExpiry = accessTokenExpiry;
@@ -67,8 +67,7 @@ namespace PhilipDaubmeier.TokenStore
             if (str == null)
                 return DateTime.MinValue;
 
-            long time;
-            if (!long.TryParse(str, out time))
+            if (!long.TryParse(str, out long time))
                 return DateTime.MinValue;
 
             return DateTime.FromBinary(time);

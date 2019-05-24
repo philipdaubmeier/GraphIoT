@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
         private string _username = null;
         private string _userPassword = null;
         private readonly Semaphore _loginSemaphore = new Semaphore(1, 1);
-        private Func<IDigitalstromAuth> _credentialsCallback;
+        private readonly Func<IDigitalstromAuth> _credentialsCallback;
 
         public string AppId { get { CheckCallback(); return _appId; } }
         public string Username { get { CheckCallback(); return _username; } }
