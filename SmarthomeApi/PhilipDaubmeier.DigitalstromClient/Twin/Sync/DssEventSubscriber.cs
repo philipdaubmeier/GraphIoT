@@ -57,7 +57,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
             foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
                 foreach (var groupstructure in zone.Groups.Where(x => x != null))
-                    Scenes[zone.ZoneID, groupstructure.Group].Value = groupstructure.LastCalledScene;
+                    Scenes[zone.ZoneID, groupstructure.Group].ValueInternal = groupstructure.LastCalledScene;
         }
 
         private async Task LoadApartmentSensors()
@@ -68,7 +68,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
             foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
                 foreach (var sensor in zone.Sensor.Where(x => x != null))
-                    Scenes[zone.ZoneID, sensor.Type].Value = sensor;
+                    Scenes[zone.ZoneID, sensor.Type].ValueInternal = sensor;
         }
 
         public void CallScene(Zone zone, Group group, Scene scene)
