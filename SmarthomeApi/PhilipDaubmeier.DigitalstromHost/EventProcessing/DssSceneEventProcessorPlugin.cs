@@ -138,12 +138,12 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
                 return;
 
             // We have reached the day boundary - save the current event stream and create a new one for the new day
+            if (_eventStream != null && !Span.IsIncluded(date))
+                SaveEventStreamToDb();
+
             using (var scope = _services.CreateScope())
             using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
             {
-                if (_eventStream != null && !Span.IsIncluded(date))
-                    SaveEventStreamToDb();
-
                 var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
                 if (dbSceneEvents != null)
                     _eventStream = dbSceneEvents.EventStream;

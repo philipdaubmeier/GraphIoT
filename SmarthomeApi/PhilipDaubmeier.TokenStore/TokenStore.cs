@@ -2,6 +2,7 @@
 using PhilipDaubmeier.TokenStore.Database;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.TokenStore
@@ -10,6 +11,7 @@ namespace PhilipDaubmeier.TokenStore
     {
         private readonly string _serviceName;
         private readonly ITokenStoreDbContext _dbContext;
+        private readonly Semaphore _dbSemaphore = new Semaphore(1, 1);
 
         public TokenStore(ITokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
@@ -37,24 +39,35 @@ namespace PhilipDaubmeier.TokenStore
         {
             if (_accessToken != null && _accessTokenExpiry.HasValue)
                 return true;
-            
-            _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenId)?.DataContent;
-            _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenExpiryId)?.DataContent);
-            _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == RefreshTokenId)?.DataContent;
-            return true;
+
+            try
+            {
+                _dbSemaphore.WaitOne();
+                _accessToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenId)?.DataContent;
+                _accessTokenExpiry = FromBinaryString(_dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == AccessTokenExpiryId)?.DataContent);
+                _refreshToken = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == RefreshTokenId)?.DataContent;
+                return true;
+            }
+            finally { _dbSemaphore.Release(); }
         }
 
         public async Task UpdateToken(string accessToken, DateTime accessTokenExpiry, string refreshToken)
         {
-            UpdateValue(AccessTokenId, _accessToken, accessToken);
-            UpdateValue(AccessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
-            UpdateValue(RefreshTokenId, _refreshToken, refreshToken);
+            try
+            {
+                _dbSemaphore.WaitOne();
 
-            _accessToken = accessToken;
-            _accessTokenExpiry = accessTokenExpiry;
-            _refreshToken = refreshToken;
+                UpdateValue(AccessTokenId, _accessToken, accessToken);
+                UpdateValue(AccessTokenExpiryId, _accessTokenExpiry.GetValueOrDefault().ToBinary().ToString(), accessTokenExpiry.ToBinary().ToString());
+                UpdateValue(RefreshTokenId, _refreshToken, refreshToken);
 
-            await _dbContext.SaveChangesAsync();
+                _accessToken = accessToken;
+                _accessTokenExpiry = accessTokenExpiry;
+                _refreshToken = refreshToken;
+
+                await _dbContext.SaveChangesAsync();
+            }
+            finally { _dbSemaphore.Release(); }
         }
 
         public bool IsAccessTokenValid()
@@ -77,7 +90,7 @@ namespace PhilipDaubmeier.TokenStore
         {
             if (oldValue == newValue)
                 return;
-
+            
             var entity = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == key);
             if (entity == null)
                 _dbContext.AuthDataSet.Add(new AuthData() { AuthDataId = key, DataContent = newValue });
