@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,6 +19,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private class VoidPayload : IWiremessagePayload { }
 
         private readonly IDigitalstromAuth _authData;
+
+        private static readonly Semaphore _trustCertificateSemaphore = new Semaphore(1, 1);
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
@@ -44,40 +47,46 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 (connectionProvider.ServerCertificate is null && connectionProvider.ServerCertificateValidationCallback is null))
                 return clientHandler;
 
-            var callbackSemaphore = new Semaphore(1, 1);
-            var dssCert = connectionProvider.ServerCertificate;
             (clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
-            {
-                if (sslPolicyErrors == SslPolicyErrors.None)
-                    return true; // certificate is valid anyways
-
-                if (dssCert is null && !(connectionProvider.ServerCertificateValidationCallback is null))
-                {
-                    try
-                    {
-                        callbackSemaphore.WaitOne();
-                        if (dssCert is null)
-                        {
-                            if (!connectionProvider.ServerCertificateValidationCallback(cert))
-                                return false;
-                            connectionProvider.ServerCertificate = cert;
-                            return true;
-                        }
-                    }
-                    finally { callbackSemaphore.Release(); }
-                }
-
-                if (cert is null)
-                    return false;
-                if (cert.Issuer != dssCert.Issuer)
-                    return false;
-                if (cert.GetSerialNumberString() != dssCert.GetSerialNumberString())
-                    return false;
-                if (cert.GetCertHashString() != dssCert.GetCertHashString())
-                    return false;
-                return true;
-            };
+                sslPolicyErrors == SslPolicyErrors.None || ValidateCertificate(connectionProvider, cert);
             return clientHandler;
+        }
+
+        private static bool ValidateCertificate(IDigitalstromConnectionProvider connectionProvider, X509Certificate2 cert)
+        {
+            if (!QueryCertificateTrusted(connectionProvider, cert))
+                return false;
+            if (cert is null || connectionProvider.ServerCertificate is null)
+                return false;
+            if (cert.Issuer != connectionProvider.ServerCertificate.Issuer)
+                return false;
+            if (cert.GetSerialNumberString() != connectionProvider.ServerCertificate.GetSerialNumberString())
+                return false;
+            if (cert.GetCertHashString() != connectionProvider.ServerCertificate.GetCertHashString())
+                return false;
+            return true;
+        }
+
+        private static bool QueryCertificateTrusted(IDigitalstromConnectionProvider connectionProvider, X509Certificate2 cert)
+        {
+            if (!(connectionProvider.ServerCertificate is null))
+                return true;
+            if (connectionProvider.ServerCertificateValidationCallback is null)
+                return true;
+
+            try
+            {
+                _trustCertificateSemaphore.WaitOne();
+                if (!(connectionProvider.ServerCertificate is null))
+                    return true;
+                
+                if (!connectionProvider.ServerCertificateValidationCallback(cert))
+                    return false;
+
+                connectionProvider.ServerCertificate = cert;
+                return true;
+            }
+            finally { _trustCertificateSemaphore.Release(); }
         }
 
         /// <summary>
