@@ -21,6 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private readonly IDigitalstromAuth _authData;
 
         private static readonly Semaphore _trustCertificateSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
@@ -144,26 +145,35 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// </summary>
         protected override async Task Authenticate()
         {
-            // needs no auth, url contains auth info already
-            if (SkipAuthentication())
-                return;
-
-            // we have a valid, not expired session token
-            if (!_authData.MustFetchSessionToken())
-                return;
-
-            // fetch an application token first, if not present already
-            if (_authData.MustFetchApplicationToken())
+            try
             {
-                await FetchApplicationToken();
-                await ActivateApplicationToken(await LoginCredentials());
+                _renewTokenSemaphore.WaitOne();
+
+                // needs no auth, url contains auth info already
+                if (SkipAuthentication())
+                    return;
+
+                // we have a valid, not expired session token
+                if (!_authData.MustFetchSessionToken())
+                    return;
+
+                // fetch an application token first, if not present already
+                if (_authData.MustFetchApplicationToken())
+                {
+                    await FetchApplicationToken();
+                    await ActivateApplicationToken(await LoginCredentials());
+                }
+
+                // try to refresh the session token if the application token is activated
+                if (await RefreshSessionToken() && !_authData.MustFetchSessionToken())
+                    return;
+
+                throw new IOException("Could not authenticate");
             }
-
-            // try to refresh the session token if the application token is activated
-            if (await RefreshSessionToken() && !_authData.MustFetchSessionToken())
-                return;
-
-            throw new IOException("Could not authenticate");
+            finally
+            {
+                _renewTokenSemaphore.Release();
+            }
         }
 
         private async Task FetchApplicationToken()
