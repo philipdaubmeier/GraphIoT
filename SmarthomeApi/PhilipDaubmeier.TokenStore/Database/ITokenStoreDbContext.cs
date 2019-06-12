@@ -9,6 +9,6 @@ namespace PhilipDaubmeier.TokenStore.Database
     {
         DbSet<AuthData> AuthDataSet { get; set; }
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken));
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

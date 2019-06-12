@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using System;
 using System.Collections.Generic;
@@ -43,16 +42,13 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             
             foreach (var zone in sensorValues)
                 if (zone != null && zone.Sensor != null)
-                    SaveZoneSensorValues(zone.ZoneID, zone.Sensor.ToDictionary((Func<SensorTypeAndValues, Sensor>)(x => (Sensor)x.Type), x => x.Value));
+                    SaveZoneSensorValues(zone.ZoneID, zone.Sensor.ToDictionary(x => x.Type, x => x.Value));
 
             _dbContext.SaveChanges();
         }
         
         private void SaveZoneSensorValues(int zoneId, Dictionary<Sensor, double> sensorValues)
         {
-            int temperatureType = 9;
-            int humidityType = 13;
-
             var time = DateTime.Now;
             var day = time.Date;
             var dbSensorSeries = _dbContext.DsSensorDataSet.Where(x => x.ZoneId == zoneId && x.Day == day).FirstOrDefault();
@@ -65,17 +61,17 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
                 _dbContext.DsSensorDataSet.Add(dbSensorSeries = new DigitalstromZoneSensorData() { ZoneId = zoneId, Zone = dbZone, Day = day });
             }
 
-            if (sensorValues.ContainsKey(temperatureType))
+            if (sensorValues.ContainsKey(SensorType.TemperatureIndoors))
             {
                 var series = dbSensorSeries.TemperatureSeries;
-                series[time] = sensorValues[temperatureType];
+                series[time] = sensorValues[SensorType.TemperatureIndoors];
                 dbSensorSeries.TemperatureSeries = series;
             }
 
-            if (sensorValues.ContainsKey(humidityType))
+            if (sensorValues.ContainsKey(SensorType.HumidityIndoors))
             {
                 var series = dbSensorSeries.HumiditySeries;
-                series[time] = sensorValues[humidityType];
+                series[time] = sensorValues[SensorType.HumidityIndoors];
                 dbSensorSeries.HumiditySeries = series;
             }
         }

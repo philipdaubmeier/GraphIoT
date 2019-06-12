@@ -1,3 +1,4 @@
+using NodaTime;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using RichardSzalay.MockHttp;
@@ -17,46 +18,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetSensorValues()
         {
-            var mockHttp = new MockHttpMessageHandler();
-
-            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/apartment/getSensorValues")
-                    .WithExactQueryString($"token={MockDigitalstromConnection.AppToken}")
-                    .Respond("application/json", @"{
-                                  ""result"":
-                                  {
-                                      ""weather"": {
-                                          ""WeatherIconId"": ""01n"",
-                                          ""WeatherConditionId"": ""800"",
-                                          ""WeatherServiceId"": ""7"",
-                                          ""WeatherServiceTime"": ""2019-05-01T21:15:07.560Z""
-                                      },
-                                      ""outdoor"": {},
-                                      ""zones"": [
-                                          {
-                                              ""id"": 65534,
-                                              ""name"": """",
-                                              ""values"": []
-                                          },
-                                          {
-                                              ""id"": 32027,
-                                              ""name"": ""Kitchen"",
-                                              ""values"": [
-                                                  {
-                                                      ""TemperatureValue"": 20.05,
-                                                      ""TemperatureValueTime"": ""2019-05-01T21:17:01.319Z""
-                                                  },
-                                                  {
-                                                      ""HumidityValue"": 42.475,
-                                                      ""HumidityValueTime"": ""2019-05-01T21:02:12.988Z""
-                                                  }
-                                              ]
-                                          }
-                                      ]
-                                  },
-                                  ""ok"": true
-                              }");
-
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddSensorMocks(1, 1)
+                .ToMockProvider());
 
             var result = await dsApiClient.GetSensorValues();
 
@@ -537,41 +502,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetZonesAndSensorValues()
         {
-            var mockHttp = new MockHttpMessageHandler();
-
-            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/property/query")
-                    .WithExactQueryString($"query=/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)&token={MockDigitalstromConnection.AppToken}")
-                    .Respond("application/json", @"{
-                                  ""result"":
-                                  {
-                                      ""zones"": [
-                                          {
-                                              ""ZoneID"": 0
-                                          },
-                                          {
-                                              ""ZoneID"": 1
-                                          },
-                                          {
-                                              ""ZoneID"": 32027,
-                                              ""sensor"": [
-                                                  {
-                                                      ""type"": 9,
-                                                      ""value"": 21.3,
-                                                      ""time"": 1556789036
-                                                  },
-                                                  {
-                                                      ""type"": 13,
-                                                      ""value"": 45.975,
-                                                      ""time"": 1556787850
-                                                  }
-                                              ]
-                                          }
-                                      ]
-                                  },
-                                  ""ok"": true
-                              }");
-
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddSensorMocks()
+                .ToMockProvider());
 
             var result = await dsApiClient.GetZonesAndSensorValues();
 
@@ -581,52 +515,25 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             Assert.Equal(32027, (int)result.Zones[2].ZoneID);
             Assert.Equal(9, (int)result.Zones[2].Sensor[0].Type);
             Assert.Equal(21.3, result.Zones[2].Sensor[0].Value);
-            Assert.Equal(1556789036, result.Zones[2].Sensor[0].Time);
         }
 
         [Fact]
         public async Task TestGetMeteringCircuits()
         {
-            var mockHttp = new MockHttpMessageHandler();
-
-            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/property/query")
-                    .WithExactQueryString($"query=/apartment/dSMeters/*(dSUID,name)/capabilities(metering)&token={MockDigitalstromConnection.AppToken}")
-                    .Respond("application/json", @"{
-                                  ""result"":
-                                  {
-                                      ""dSMeters"": [
-                                          {
-                                              ""dSUID"": ""99999942f800000000000f0000deadbeef"",
-                                              ""name"": ""dss meter"",
-                                              ""capabilities"": [
-                                                  {
-                                                      ""metering"": true
-                                                  }
-                                              ]
-                                          },
-                                          {
-                                              ""dSUID"": ""111111111800000000000f00000000abcd"",
-                                              ""name"": ""vdc meter"",
-                                              ""capabilities"": [
-                                                  {
-                                                      ""metering"": false
-                                                  }
-                                              ]
-                                          }
-                                      ]
-                                  },
-                                  ""ok"": true
-                              }");
-
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddEnergyMeteringMocks()
+                .ToMockProvider());
 
             var result = await dsApiClient.GetMeteringCircuits();
 
             Assert.Equal("99999942f800000000000f0000deadbeef", result.DSMeters[0].DSUID);
             Assert.True(result.DSMeters[0].Capabilities[0].Metering);
-            Assert.False(result.DSMeters[1].Capabilities[0].Metering);
+            Assert.Equal("77777742f800000000000c0000cafecafe", result.DSMeters[1].DSUID);
+            Assert.True(result.DSMeters[1].Capabilities[0].Metering);
+            Assert.False(result.DSMeters[2].Capabilities[0].Metering);
 
-            Assert.Single(result.FilteredMeterNames);
+            Assert.Equal(2, result.FilteredMeterNames.Count);
         }
 
         [Fact]
@@ -713,42 +620,20 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetEnergy()
         {
-            var mockHttp = new MockHttpMessageHandler();
+            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddEnergyMeteringMocks(1, 50)
+                .ToMockProvider());
 
-            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/metering/getValues")
-                    .WithExactQueryString($"dsuid=99999942f800000000000f0000deadbeef&type=consumption&resolution=1&valueCount=2&token={MockDigitalstromConnection.AppToken}")
-                    .Respond("application/json", @"{
-                                  ""result"":
-                                  {
-                                      ""meterID"": ""99999942f800000000000f0000deadbeef"",
-                                      ""type"": ""consumption"",
-                                      ""unit"": ""W"",
-                                      ""resolution"": ""1"",
-                                      ""values"": [
-                                          [
-                                              1556748119,
-                                              6
-                                          ],
-                                          [
-                                              1556748120,
-                                              6
-                                          ]
-                                      ]
-                                  },
-                                  ""ok"": true
-                              }");
-
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
-
-            var result = await dsApiClient.GetEnergy(new Dsuid("99999942f800000000000f0000deadbeef"), 1, 2);
+            var result = await dsApiClient.GetEnergy(new Dsuid("99999942f800000000000f0000deadbeef"), 1, 50);
 
             Assert.Equal("consumption", result.Type);
             Assert.Equal("W", result.Unit);
             Assert.Equal(1, result.Resolution);
-            Assert.Equal(2, result.Values.Count);
+            Assert.Equal(50, result.Values.Count);
             Assert.Equal(2, result.Values[0].Count);
-            Assert.Equal(1556748119, result.Values[0][0]);
-            Assert.Equal(6, result.Values[0][1]);
+            Assert.Equal(Instant.FromDateTimeUtc(DateTime.UtcNow.AddSeconds(-50)).ToUnixTimeSeconds(), result.Values[0][0]);
+            Assert.Equal(89, result.Values[0][1]);
         }
 
         [Fact]

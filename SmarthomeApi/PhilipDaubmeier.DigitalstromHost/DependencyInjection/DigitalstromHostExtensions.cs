@@ -15,24 +15,31 @@ namespace PhilipDaubmeier.DigitalstromHost.DependencyInjection
 {
     public static class DigitalstromHostExtensions
     {
-        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
+        public static IServiceCollection AddDigitalstromHost(this IServiceCollection serviceCollection, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig)
         {
-            serviceCollection.AddDbContext<IDigitalstromDbContext, TDbContext>(dbConfig);
-
             serviceCollection.Configure<DigitalstromConfig>(digitalstromConfig);
 
-            serviceCollection.ConfigureTokenStore<TDbContext>(dbConfig, tokenStoreConfig);
+            serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
-            
+
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
             serviceCollection.AddScoped<DigitalstromDssClient>();
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromEnergyPollingService>();
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromSensorPollingService>();
             serviceCollection.AddTimedPollingHost<IDigitalstromPollingService>(digitalstromConfig.GetSection("PollingService"));
+            serviceCollection.Configure<DigitalstromEventProcessingConfig>(digitalstromConfig.GetSection("EventProcessor"));
 
             serviceCollection.AddScoped<IDigitalstromEventProcessorPlugin, DssSceneEventProcessorPlugin>();
             serviceCollection.AddHostedService<DigitalstromEventsHostedService>();
             return serviceCollection;
+        }
+
+        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
+        {
+            serviceCollection.AddDbContext<IDigitalstromDbContext, TDbContext>(dbConfig);
+            serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
+
+            return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig);
         }
     }
 }

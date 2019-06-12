@@ -14,11 +14,11 @@ namespace PhilipDaubmeier.CompactTimeSeries
         where TEvent : class
         where TSerializer : IEventSerializer<TEvent>, new()
     {
-        private Stream _stream;
-        private bool _isStreamManaged = false;
-        private int _startPosition = 0;
+        private readonly Stream _stream;
+        private readonly bool _isStreamManaged = false;
+        private readonly int _startPosition = 0;
         private int _count = 0;
-        private TSerializer _serializer = new TSerializer();
+        private readonly TSerializer _serializer = new TSerializer();
 
         /// <summary>
         /// Creates a new EventTimeSeriesStream object with the start time and max number of events given in the span
@@ -134,7 +134,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 if (millis < 0)
                     return null;
 
-                var timestamp = Span.Begin.AddMilliseconds(millis);
+                var timestamp = Span.Begin.ToUniversalTime().AddMilliseconds(millis);
                 return _serializer.Deserialize(reader, timestamp);
             }
         }

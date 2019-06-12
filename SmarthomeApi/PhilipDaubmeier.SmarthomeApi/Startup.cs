@@ -77,7 +77,8 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
-            services.ConfigureTokenStore<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("TokenStoreConfig"));
+            services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
+            services.AddTokenStoreDbContext<PersistenceContext>(smarthomeSqlServer);
             services.AddTokenStore<SonnenPortalClient>();
             services.AddTokenStore<WithingsClient>();
             services.AddTokenStore<DynDnsController.DynDnsIpv4>();

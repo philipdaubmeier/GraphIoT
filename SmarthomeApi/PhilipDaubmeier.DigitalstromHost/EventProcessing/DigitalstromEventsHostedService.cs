@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Twin;
@@ -15,18 +16,21 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
     public class DigitalstromEventsHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
+        private readonly IOptions<DigitalstromEventProcessingConfig> _config;
         private readonly IDigitalstromConnectionProvider _connProvider;
         private DssEventSubscriber _dssEventSubscriber = null;
 
+        private Task _executingThread;
         private CancellationTokenSource _cancellationSource;
         private CancellationToken _cancellationToken;
         private BlockingCollection<DssEvent> _persistenceQueue;
 
-        private IEnumerable<IDigitalstromEventProcessorPlugin> _plugins;
+        private readonly IEnumerable<IDigitalstromEventProcessorPlugin> _plugins;
 
-        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, IDigitalstromConnectionProvider connectionProvider, IEnumerable<IDigitalstromEventProcessorPlugin> plugins)
+        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, IOptions<DigitalstromEventProcessingConfig> config, IDigitalstromConnectionProvider connectionProvider, IEnumerable<IDigitalstromEventProcessorPlugin> plugins)
         {
             _logger = logger;
+            _config = config;
             _connProvider = connectionProvider;
             _plugins = plugins;
         }
@@ -41,7 +45,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             _cancellationSource = new CancellationTokenSource();
             _cancellationToken = _cancellationSource.Token;
             _persistenceQueue = new BlockingCollection<DssEvent>();
-            Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            _executingThread = Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             _dssEventSubscriber = new DssEventSubscriber(_connProvider, null, _plugins.SelectMany(p => p.EventNames));
             _dssEventSubscriber.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
@@ -50,23 +54,35 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
+            // Stop called without start
+            if (_executingThread == null)
+                return;
+
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Event Subscriber Service is stopping.");
 
             _dssEventSubscriber.Dispose();
             _dssEventSubscriber = null;
 
-            _cancellationSource.Cancel();
             _persistenceQueue.CompleteAdding();
             _persistenceQueue = null;
 
-            return Task.CompletedTask;
+            try
+            {
+                // Signal cancellation to the executing method
+                _cancellationSource.Cancel();
+            }
+            finally
+            {
+                // Wait until the thread completes or the stop token triggers
+                await Task.WhenAny(_executingThread, Task.Delay(Timeout.Infinite, cancellationToken));
+            }
         }
 
         public void Dispose()
         {
-            // DigitalstromSceneClient.Dispose stops all its threads
+            // Disposing the event subscriber stops all its onderlying threads
             _dssEventSubscriber?.Dispose();
 
             _cancellationSource.Cancel();
@@ -99,12 +115,12 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
         {
             Thread.CurrentThread.Name = "Digitalstrom Scene Event Persistence Thread";
 
+            int collectItemsMs = (int)_config.Value.ItemCollectionTimeSpan.TotalMilliseconds;
+
             while (!_cancellationToken.IsCancellationRequested)
             {
                 try
                 {
-                    const int collectItemsMs = 5000;
-
                     DequeueAndPipeToEventStream(-1);
 
                     var dateFirstReceived = DateTime.UtcNow;
@@ -148,8 +164,8 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             {
                 plugin.ReadOrCreateEventStream(dsEvent.TimestampUtc.ToLocalTime().Date);
 
-                // We have already written the same event the last second or sooner
-                if (plugin.HasDuplicate(dsEvent, 1000))
+                // We have already written the same event the last (configurable) interval or sooner
+                if (plugin.HasDuplicate(dsEvent, (int)_config.Value.DuplicateDetectionTimeSpan.TotalMilliseconds))
                     continue;
 
                 plugin.WriteToEventStream(dsEvent);

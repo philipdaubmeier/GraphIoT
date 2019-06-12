@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
         public IConfiguration Configuration { get; }
         public IHostingEnvironment Environment { get; }
         
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public virtual IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
 
@@ -53,14 +53,16 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                 .BuildServiceProvider();
         }
         
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
             app.UseMvc();
-            
-            serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database.Migrate();
+
+            var database = serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database;
+            if (!database.IsInMemory())
+                database.Migrate();
         }
     }
 }

@@ -21,7 +21,8 @@ namespace PhilipDaubmeier.ViessmannHost.DependencyInjection
             
             serviceCollection.Configure<ViessmannConfig>(viessmannConfig);
 
-            serviceCollection.ConfigureTokenStore<TDbContext>(dbConfig, tokenStoreConfig);
+            serviceCollection.ConfigureTokenStore(tokenStoreConfig);
+            serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
             serviceCollection.AddTokenStore<ViessmannEstrellaClient>();
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
             serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
