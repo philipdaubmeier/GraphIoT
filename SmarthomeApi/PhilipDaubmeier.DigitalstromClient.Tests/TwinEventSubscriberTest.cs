@@ -12,8 +12,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 {
     public class TwinEventSubscriberTest
     {
-        private readonly Zone zoneKitchen = 32027;
-
         [Fact]
         public async Task TestEventSubscription()
         {
@@ -33,7 +31,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
         }
 
         [Fact]
-        public async Task TestReadUpdatedSceneModel()
+        public async Task TestEventsNoErrors()
         {
             var mockHttp = new MockHttpMessageHandler();
             mockHttp.AddInitialAndSubscribeMocks();
@@ -42,7 +40,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
+            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
             {
                 await Task.Delay(100);
                 mockHttp.AutoFlush = false;
@@ -55,15 +53,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
                 await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 
-                Assert.Equal((int)SceneCommand.Preset1, (int)subscriber.Scenes[zoneKitchen, Color.Yellow].Value);
-
                 await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset2.ToMockedSceneEvent());
 
-                Assert.Equal((int)SceneCommand.Preset2, (int)subscriber.Scenes[zoneKitchen, Color.Yellow].Value);
-
                 await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
-
-                Assert.Equal((int)SceneCommand.Preset1, (int)subscriber.Scenes[zoneKitchen, Color.Yellow].Value);
 
                 Assert.NotEmpty(events.Where(e => e.SystemEvent == SystemEvent.CallScene));
                 Assert.Empty(errors);
@@ -80,14 +72,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, null, 42))
+            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
             {
                 await Task.Delay(100);
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 
                 int numChangedEvents = 0;
-                subscriber.ModelChanged += (s, e) => { numChangedEvents++; };
+                subscriber.ApiEventRaised += (s, e) => { numChangedEvents++; };
 
                 await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 

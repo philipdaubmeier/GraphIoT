@@ -47,7 +47,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             _persistenceQueue = new BlockingCollection<DssEvent>();
             _executingThread = Task.Factory.StartNew(() => PersistenceWorkerThread(), _cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
-            _dssEventSubscriber = new DssEventSubscriber(_connProvider, null, _plugins.SelectMany(p => p.EventNames));
+            _dssEventSubscriber = new DssEventSubscriber(_connProvider, _plugins.SelectMany(p => p.EventNames));
             _dssEventSubscriber.ApiEventRaised += (s, e) => DigitalstromEventReceived(e.ApiEvent);
             _dssEventSubscriber.ErrorOccured += (s, e) => DigitalstromSceneClientError(e.Error);
 

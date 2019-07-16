@@ -1,9 +1,9 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Model.Events;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
@@ -12,21 +12,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
     {
         private const int defaultSubscriptionId = 10;
 
-        public event EventHandler ModelChanged;
-
+        private readonly Semaphore initializedSempahore = new Semaphore(0, 1);
         private volatile bool subscribed;
         private readonly int subscriptionId;
         private DigitalstromDssClient apiClient;
 
         private readonly IEnumerable<IEventName> eventsToSubscribe;
 
-        public ApartmentState Scenes { get; set; }
-
-        public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, ApartmentState model = null, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
+        public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
         {
             apiClient = new DigitalstromDssClient(connectionProvider);
-            Scenes = model ?? new ApartmentState();
-            ApiEventRaised += HandleDssApiEvent;
             this.subscriptionId = subscriptionId;
             subscribed = false;
 
@@ -36,48 +31,20 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
                 (SystemEventName)SystemEvent.CallSceneBus
             };
             if (eventsToSubscribe != null)
-                ((List<IEventName>)this.eventsToSubscribe).AddRange(eventsToSubscribe);
+                ((List<IEventName>)this.eventsToSubscribe).AddRange(eventsToSubscribe.Except(this.eventsToSubscribe));
 
-            LoadApartment();
+            initializedSempahore.Release();
         }
 
-        private async void LoadApartment()
+        public void CallDss(Func<DigitalstromDssClient, Task> callAction)
         {
-            await LoadApartmentScenes();
-            await LoadApartmentSensors();
-
-            OnModelChanged();
-        }
-
-        private async Task LoadApartmentScenes()
-        {
-            var apartment = await apiClient?.GetZonesAndLastCalledScenes();
-            if (apartment?.Zones == null)
-                return;
-
-            foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
-                foreach (var groupstructure in zone.Groups.Where(x => x != null))
-                    Scenes[zone.ZoneID, groupstructure.Group].ValueInternal = groupstructure.LastCalledScene;
-        }
-
-        private async Task LoadApartmentSensors()
-        {
-            var apartment = await apiClient?.GetZonesAndSensorValues();
-            if (apartment?.Zones == null)
-                return;
-
-            foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
-                foreach (var sensor in zone.Sensor.Where(x => x != null))
-                    Scenes[zone.ZoneID, sensor.Type].ValueInternal = sensor;
-        }
-
-        public void CallScene(Zone zone, Group group, Scene scene)
-        {
-            QueueAction(async () => await apiClient?.CallScene(zone, group, scene));
+            QueueAction(async () => await callAction(apiClient));
         }
 
         protected override async Task<IEnumerable<DssEvent>> ProcessEventPolling()
         {
+            initializedSempahore.WaitOne();
+
             if (!subscribed)
             {
                 foreach (var eventName in eventsToSubscribe)
@@ -89,37 +56,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
                 return new List<DssEvent>();
 
             return events.Events;
-        }
-
-        private void HandleDssApiEvent(object sender, ApiEventRaisedEventArgs<DssEvent> args)
-        {
-            if (args.ApiEvent == null)
-                return;
-
-            switch (args.ApiEvent.SystemEvent.Type)
-            {
-                case SystemEvent.CallSceneBus: goto case SystemEvent.CallScene;
-                case SystemEvent.CallScene:
-                    HandleDssCallSceneEvent(args.ApiEvent); break;
-            }
-        }
-
-        private void HandleDssCallSceneEvent(DssEvent dssEvent)
-        {
-            var props = dssEvent.Properties;
-            if (props == null)
-                return;
-
-            Scenes[props.ZoneID, props.GroupID].ValueInternal = props.SceneID;
-            OnModelChanged();
-        }
-
-        private void OnModelChanged()
-        {
-            if (ModelChanged == null)
-                return;
-
-            ModelChanged(this, null);
         }
 
         public new void Dispose()

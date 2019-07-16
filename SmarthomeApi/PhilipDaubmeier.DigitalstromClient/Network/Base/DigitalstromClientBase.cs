@@ -109,7 +109,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private protected async Task<Wiremessage<T>> LoadWiremessage<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
-            var responseMessage = await _client.GetAsync(await BuildAbsoluteUri(uri));
+            var requestUri = await BuildAbsoluteUri(uri);
+            var responseMessage = await _client.GetAsync(requestUri);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
             using (var sr = new StreamReader(responseStream))

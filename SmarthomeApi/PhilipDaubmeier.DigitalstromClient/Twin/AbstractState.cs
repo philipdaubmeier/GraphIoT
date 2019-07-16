@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 
 namespace PhilipDaubmeier.DigitalstromClient.Twin
 {
@@ -36,25 +37,65 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin
 
         public DateTime Timestamp { get; set; }
 
+        private Semaphore _stateSemaphore = new Semaphore(1, 1);
+
         private T _value;
         public T Value
         {
-            get { return _value; }
+            get
+            {
+                _stateSemaphore.WaitOne();
+                try
+                {
+                    return _value;
+                }
+                finally
+                {
+                    _stateSemaphore.Release();
+                }
+            }
             set
             {
-                _value = value;
-                Timestamp = DateTime.UtcNow;
+                _stateSemaphore.WaitOne();
+                try
+                {
+                    _value = value;
+                    Timestamp = DateTime.UtcNow;
+                }
+                finally
+                {
+                    _stateSemaphore.Release();
+                }
                 NotifyChanged();
             }
         }
 
         internal T ValueInternal
         {
-            get { return _value; }
+            get
+            {
+                _stateSemaphore.WaitOne();
+                try
+                {
+                    return _value;
+                }
+                finally
+                {
+                    _stateSemaphore.Release();
+                }
+            }
             set
             {
-                _value = value;
-                Timestamp = DateTime.UtcNow;
+                _stateSemaphore.WaitOne();
+                try
+                {
+                    _value = value;
+                    Timestamp = DateTime.UtcNow;
+                }
+                finally
+                {
+                    _stateSemaphore.Release();
+                }
                 NotifyChanged(false);
             }
         }
