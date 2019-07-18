@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         public TApiEvent ApiEvent { get; set; }
     }
 
-    public abstract class WebApiWorkerThreadBase<TApiEvent> : IDisposable
+    public abstract class LongPollingClientBase<TApiEvent> : IDisposable
     {
         public event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
 
@@ -24,40 +23,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private readonly Task eventWorkerThread = null;
 
-        private readonly BlockingCollection<Func<Task>> actionQueue = new BlockingCollection<Func<Task>>();
-        private readonly Task actionWorkerThread = null;
-
         private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
         private readonly CancellationToken cancellationToken;
 
-        public WebApiWorkerThreadBase()
+        public LongPollingClientBase()
         {
             cancellationToken = cancellationSource.Token;
-            actionWorkerThread = Task.Factory.StartNew(() => ActionWorkerThread(), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             eventWorkerThread = Task.Factory.StartNew(() => EventWorkerThread(), cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-        }
-        
-        protected void QueueAction(Func<Task> action)
-        {
-            actionQueue.TryAdd(action);
         }
 
         protected abstract Task<IEnumerable<TApiEvent>> ProcessEventPolling();
-
-        private async void ActionWorkerThread()
-        {
-            foreach (var action in actionQueue.GetConsumingEnumerable())
-            {
-                try
-                {
-                    await action();
-                }
-                catch (Exception ex)
-                {
-                    OnErrorOccured(ex, actionWorkerThread);
-                }
-            }
-        }
 
         private async void EventWorkerThread()
         {
@@ -70,7 +45,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 }
                 catch (Exception ex)
                 {
-                    OnErrorOccured(ex, eventWorkerThread);
+                    OnErrorOccured(ex);
                 }
             }
         }
@@ -84,31 +59,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             Task task = eventWorkerThread.ContinueWith((t) => ApiEventRaised(this, eventargs));
         }
 
-        private void OnErrorOccured(Exception exception, Task workerContext)
+        private void OnErrorOccured(Exception exception)
         {
             if (ErrorOccured == null)
                 return;
 
             var eventargs = new ErrorOccuredEventArgs() { Error = exception };
-            Task task = workerContext.ContinueWith((t) => ErrorOccured(this, eventargs));
+            Task task = eventWorkerThread.ContinueWith((t) => ErrorOccured(this, eventargs));
         }
 
         #region IDisposable Support
-        private bool disposedValue = false;
+        private bool isDisposed = false;
         
         public void Dispose()
         {
-            if (!disposedValue)
-            {
-                // This ends the ConsumingEnumerable and lets the action worker
-                // thread exit the loop and end the thread
-                actionQueue.CompleteAdding();
+            if (isDisposed)
+                return;
 
-                // This sets the cancellation token and ends the event long polling thread
-                cancellationSource.Cancel();
+            // This sets the cancellation token and ends the event long polling thread
+            cancellationSource.Cancel();
 
-                disposedValue = true;
-            }
+            isDisposed = true;
         }
         #endregion
     }

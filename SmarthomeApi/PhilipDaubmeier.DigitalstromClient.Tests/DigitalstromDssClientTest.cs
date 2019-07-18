@@ -500,6 +500,133 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         }
 
         [Fact]
+        public async Task TestGetDevicesAndOutputChannelTypes()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/property/query")
+                    .WithExactQueryString($"query=/apartment/zones/*(ZoneID)/devices/*(dSID)/outputChannels/*(id)&token={MockDigitalstromConnection.AppToken}")
+                    .Respond("application/json", @"{
+                                  ""result"":
+                                  {
+                                      ""zones"":
+                                      [
+                                          {
+                                              ""ZoneID"": 32027,
+                                              ""devices"":
+                                              [
+                                                  {
+                                                      ""dSID"": ""1337234200000e80deadbeef"",
+                                                      ""outputChannels"":
+                                                      [
+                                                          {
+                                                              ""id"": ""brightness""
+                                                          }
+                                                      ]
+                                                  },
+                                                  {
+                                                      ""dSID"": ""4242000aaa000fa0deadbeef"",
+                                                      ""outputChannels"":
+                                                      [
+                                                          {
+                                                              ""id"": ""shadePositionOutside""
+                                                          }
+                                                      ]
+                                                  },
+                                                  {
+                                                      ""dSID"": ""f00f000aaa000120beefbeef"",
+                                                      ""outputChannels"": []
+                                                  }
+                                              ]
+                                          }
+                                      ]
+                                  },
+                                  ""ok"": true
+                              }");
+
+            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var zonesScenes = await dsApiClient.GetDevicesAndOutputChannelTypes();
+            Assert.NotEmpty(zonesScenes.Zones);
+
+            Assert.Equal("brightness", zonesScenes.Zones[0].Devices[0].OutputChannels[0].Id);
+            Assert.Equal("shadePositionOutside", zonesScenes.Zones[0].Devices[1].OutputChannels[0].Id);
+            Assert.Empty(zonesScenes.Zones[0].Devices[2].OutputChannels);
+        }
+
+        [Fact]
+        public async Task TestGetDevicesAndLastOutputValues()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/property/query")
+                    .WithExactQueryString($"query=/apartment/zones/*(ZoneID)/devices/*(dSID)/status(lastChanged)/outputs/*(value,targetValue)&token={MockDigitalstromConnection.AppToken}")
+                    .Respond("application/json", @"{
+                                  ""result"":
+                                  {
+                                      ""zones"":
+                                      [
+                                          {
+                                              ""ZoneID"": 32027,
+                                              ""devices"":
+                                              [
+                                                  {
+                                                      ""dSID"": ""1337234200000e80deadbeef"",
+                                                      ""status"":
+                                                      [
+                                                          {
+                                                              ""lastChanged"": ""\""2019-01-15T03:56:29.800Z\"""",
+                                                              ""outputs"":
+                                                              [
+                                                                  {
+                                                                      ""value"": 0,
+                                                                      ""targetValue"": 0
+                                                                  }
+                                                              ]
+                                                          }
+                                                      ]
+                                                  },
+                                                  {
+                                                      ""dSID"": ""4242000aaa000fa0deadbeef"",
+                                                      ""status"":
+                                                      [
+                                                          {
+                                                              ""lastChanged"": ""\""2019-01-18T17:15:30.249Z\"""",
+                                                              ""outputs"":
+                                                              [
+                                                                  {
+                                                                      ""value"": 21.6404131546947,
+                                                                      ""targetValue"": 21.6404131546947
+                                                                  }
+                                                              ]
+                                                          }
+                                                      ]
+                                                  },
+                                                  {
+                                                      ""dSID"": ""f00f000aaa000120beefbeef"",
+                                                      ""status"": []
+                                                  }
+                                              ]
+                                          }
+                                      ]
+                                  },
+                                  ""ok"": true
+                              }");
+
+            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var zonesScenes = await dsApiClient.GetDevicesAndLastOutputValues();
+            Assert.NotEmpty(zonesScenes.Zones);
+
+            Assert.Equal(DateTime.Parse("2019-01-15T03:56:29.800Z"), zonesScenes.Zones[0].Devices[0].Status[0].LastChangedTime);
+            Assert.Equal(0d, zonesScenes.Zones[0].Devices[0].Status[0].Outputs[0].Value);
+            Assert.Equal(0d, zonesScenes.Zones[0].Devices[0].Status[0].Outputs[0].TargetValue);
+            Assert.Equal(21.6404131546947d, zonesScenes.Zones[0].Devices[1].Status[0].Outputs[0].Value);
+            Assert.Equal(21.6404131546947d, zonesScenes.Zones[0].Devices[1].Status[0].Outputs[0].TargetValue);
+            Assert.Empty(zonesScenes.Zones[0].Devices[2].Status);
+        }
+
+        [Fact]
         public async Task TestGetZonesAndSensorValues()
         {
             var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
@@ -776,6 +903,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
 
             try { await dsApiClient.GetZonesAndLastCalledScenes(); } catch { }
             UriForMethodName.Add("GetZonesAndLastCalledScenes", mockHttp.LastCalledUri);
+
+            try { await dsApiClient.GetDevicesAndOutputChannelTypes(); } catch { }
+            UriForMethodName.Add("GetDevicesAndOutputChannelTypes", mockHttp.LastCalledUri);
+
+            try { await dsApiClient.GetDevicesAndLastOutputValues(); } catch { }
+            UriForMethodName.Add("GetDevicesAndLastOutputValues", mockHttp.LastCalledUri);
 
             try { await dsApiClient.GetZonesAndSensorValues(); } catch { }
             UriForMethodName.Add("GetZonesAndSensorValues", mockHttp.LastCalledUri);

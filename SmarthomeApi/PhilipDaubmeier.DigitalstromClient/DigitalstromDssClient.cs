@@ -176,7 +176,26 @@ namespace PhilipDaubmeier.DigitalstromClient
             return await QueryPropertyTree<ZonesAndLastCalledScenesResponse>(
                 "/apartment/zones/*(ZoneID)/groups/*(group,lastCalledScene)");
         }
-        
+
+        /// <summary>
+        /// Returns a list of all devices of all zones, each with their supported output channel types.
+        /// </summary>
+        public async Task<DevicesAndOutputChannelTypesResponse> GetDevicesAndOutputChannelTypes()
+        {
+            return await QueryPropertyTree<DevicesAndOutputChannelTypesResponse>(
+                "/apartment/zones/*(ZoneID)/devices/*(dSID)/outputChannels/*(id)");
+        }
+
+        /// <summary>
+        /// Returns a list of all devices of all zones, each with the last cached output value,
+        /// e.g. the exact brightness value or exact shade position per device.
+        /// </summary>
+        public async Task<DevicesAndLastOutputValuesResponse> GetDevicesAndLastOutputValues()
+        {
+            return await QueryPropertyTree<DevicesAndLastOutputValuesResponse>(
+                "/apartment/zones/*(ZoneID)/devices/*(dSID)/status(lastChanged)/outputs/*(value,targetValue)");
+        }
+
         /// <summary>
         /// Returns a list of all zones, each with all sensors and their last sensor values.
         /// </summary>

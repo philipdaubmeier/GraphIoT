@@ -17,6 +17,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             // set the response and flush it - this will create a response in the long polling request in the event subscriber
             mockedEventResponse.Respond("application/json", responseContent);
+            await Task.Delay(100);
             mockHttp.Flush();
 
             // give the event polling thread a chance to receive and handle the event, it will set the eventReceived

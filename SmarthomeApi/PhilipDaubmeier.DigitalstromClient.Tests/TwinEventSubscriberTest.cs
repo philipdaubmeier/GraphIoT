@@ -74,7 +74,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
 
             using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
             {
-                await Task.Delay(100);
+                await Task.Delay(300);
                 mockHttp.AutoFlush = false;
                 try { mockHttp.Flush(); } catch { }
 

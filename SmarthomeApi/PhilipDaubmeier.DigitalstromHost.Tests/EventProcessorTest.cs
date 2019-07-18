@@ -34,7 +34,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Tests
 
             // After 100ms (see configured ItemCollectionInterval, plus buffer) the event processor hosted service
             // should have written all ds events to the database that we have mocked with the test setup
-            await Task.Delay(200);
+            await Task.Delay(1000);
             Assert.NotNull(db.DsSceneEventDataSet.FirstOrDefault()?.EventStreamEncoded);
 
             var storedEvents = db.DsSceneEventDataSet.FirstOrDefault()?.EventStream;

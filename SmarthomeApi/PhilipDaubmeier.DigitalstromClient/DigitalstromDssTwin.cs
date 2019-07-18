@@ -9,6 +9,7 @@ namespace PhilipDaubmeier.DigitalstromClient
 {
     public class DigitalstromDssTwin : ApartmentState, IDisposable
     {
+        private readonly DigitalstromDssClient _dssClient;
         private readonly DssEventSubscriber _subscriber;
         private readonly TwinChangeAggregator _changeAggregator;
 
@@ -20,8 +21,12 @@ namespace PhilipDaubmeier.DigitalstromClient
 
         public DigitalstromDssTwin(IDigitalstromConnectionProvider connectionProvider)
         {
-            _subscriber = connectionProvider is null ? null : new DssEventSubscriber(connectionProvider);
+            _dssClient = connectionProvider is null ? null : new DigitalstromDssClient(connectionProvider);
+            _subscriber = _dssClient is null ? null : new DssEventSubscriber(_dssClient);
             _changeAggregator = _subscriber is null ? null : new TwinChangeAggregator(this);
+
+            if (_changeAggregator == null)
+                return;
 
             _subscriber.ApiEventRaised += HandleDssApiEvent;
             _changeAggregator.SceneChangedInternal += (s, e) => CallScene(e.Zone, e.Group, e.Scene);
@@ -31,37 +36,31 @@ namespace PhilipDaubmeier.DigitalstromClient
             LoadApartmentSensors();
         }
 
-        private void LoadApartmentScenes()
+        private async void LoadApartmentScenes()
         {
-            _subscriber.CallDss(async dssClient =>
-            {
-                var apartment = await dssClient?.GetZonesAndLastCalledScenes();
-                if (apartment?.Zones == null)
-                    return;
+            var apartment = await _dssClient?.GetZonesAndLastCalledScenes();
+            if (apartment?.Zones == null)
+                return;
 
-                foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
-                    foreach (var groupstructure in zone.Groups.Where(x => x != null))
-                        this[zone.ZoneID, groupstructure.Group].ValueInternal = groupstructure.LastCalledScene;
-            });
+            foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
+                foreach (var groupstructure in zone.Groups.Where(x => x != null))
+                    this[zone.ZoneID, groupstructure.Group].ValueInternal = groupstructure.LastCalledScene;
         }
 
-        private void LoadApartmentSensors()
+        private async void LoadApartmentSensors()
         {
-            _subscriber.CallDss(async dssClient =>
-            {
-                var apartment = await dssClient?.GetZonesAndSensorValues();
-                if (apartment?.Zones == null)
-                    return;
+            var apartment = await _dssClient?.GetZonesAndSensorValues();
+            if (apartment?.Zones == null)
+                return;
 
-                foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
-                    foreach (var sensor in zone.Sensor.Where(x => x != null))
-                        this[zone.ZoneID, sensor.Type].ValueInternal = sensor;
-            });
+            foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
+                foreach (var sensor in zone.Sensor.Where(x => x != null))
+                    this[zone.ZoneID, sensor.Type].ValueInternal = sensor;
         }
 
-        private void CallScene(Zone zone, Group group, Scene scene)
+        private async void CallScene(Zone zone, Group group, Scene scene)
         {
-            _subscriber.CallDss(async dssClient => await dssClient?.CallScene(zone, group, scene));
+            await _dssClient?.CallScene(zone, group, scene);
         }
 
         private void HandleDssApiEvent(object sender, ApiEventRaisedEventArgs<DssEvent> args)
@@ -88,8 +87,9 @@ namespace PhilipDaubmeier.DigitalstromClient
 
         public void Dispose()
         {
-            _subscriber?.Dispose();
             _changeAggregator?.Dispose();
+            _subscriber?.Dispose();
+            _dssClient?.Dispose();
         }
     }
 }

@@ -20,10 +20,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             var callSceneRequest2 = mockHttp.AddCallSceneMock(zoneKitchen, Color.Black, SceneCommand.DeepOff);
 
             var model = new ApartmentState();
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
+            using (var dssClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var subscriber = new DssEventSubscriber(dssClient, null, 42))
             using (var aggregator = new TwinChangeAggregator(model))
             {
-                aggregator.SceneChangedInternal += (s, e) => subscriber.CallDss(async dssClient => await dssClient?.CallScene(e.Zone, e.Group, e.Scene));
+                aggregator.SceneChangedInternal += (s, e) => dssClient.CallScene(e.Zone, e.Group, e.Scene).Wait();
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
@@ -68,10 +69,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
             model[zoneKitchen, Color.Yellow].Value = SceneCommand.Preset0;
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset0;
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
+            using (var dssClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var subscriber = new DssEventSubscriber(dssClient, null, 42))
             using (var aggregator = new TwinChangeAggregator(model))
             {
-                aggregator.SceneChangedInternal += (s, e) => subscriber.CallDss(async dssClient => await dssClient?.CallScene(e.Zone, e.Group, e.Scene));
+                aggregator.SceneChangedInternal += (s, e) => dssClient.CallScene(e.Zone, e.Group, e.Scene).Wait();
 
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest1));
                 Assert.Equal(0, mockHttp.GetMatchCount(callSceneRequest2));
