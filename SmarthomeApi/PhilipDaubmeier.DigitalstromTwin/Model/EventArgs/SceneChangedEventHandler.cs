@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.DigitalstromClient.Twin
+﻿namespace PhilipDaubmeier.DigitalstromTwin
 {
     /// <summary>
     /// Represents the method that will handle the event raised when a scene is changed in the twin model.

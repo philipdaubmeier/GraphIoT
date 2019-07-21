@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Twin;
+using PhilipDaubmeier.DigitalstromTwin;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

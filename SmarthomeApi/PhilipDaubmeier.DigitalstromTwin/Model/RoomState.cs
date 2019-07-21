@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class RoomState : INotifyCollectionChanged
     {

@@ -1,12 +1,12 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.Events;
+﻿using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class DssEventSubscriber : LongPollingClientBase<DssEvent>
     {

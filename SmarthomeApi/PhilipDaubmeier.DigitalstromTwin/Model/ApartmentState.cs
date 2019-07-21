@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class ApartmentState : IEnumerable<KeyValuePair<Zone, RoomState>>, INotifyCollectionChanged
     {

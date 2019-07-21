@@ -1,7 +1,7 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class SceneChangedEventArgs : EventArgs
     {

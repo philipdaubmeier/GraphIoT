@@ -1,7 +1,7 @@
 ﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.PropertyTree;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class SensorState : AbstractState<SensorTypeAndValues>
     {

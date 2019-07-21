@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin.Tests
+namespace PhilipDaubmeier.DigitalstromTwin.Tests
 {
     public static class TwinMockExtensions
     {

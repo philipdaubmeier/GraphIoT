@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 
-namespace PhilipDaubmeier.DigitalstromClient.Twin
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public abstract class AbstractState<T> : INotifyPropertyChanged
     {
