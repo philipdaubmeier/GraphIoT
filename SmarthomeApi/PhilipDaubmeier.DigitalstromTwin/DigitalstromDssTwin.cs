@@ -3,6 +3,7 @@ using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromTwin
@@ -22,7 +23,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         public DigitalstromDssTwin(IDigitalstromConnectionProvider connectionProvider)
         {
             _dssClient = connectionProvider is null ? null : new DigitalstromDssClient(connectionProvider);
-            _subscriber = _dssClient is null ? null : new DssEventSubscriber(_dssClient);
+            _subscriber = _dssClient is null ? null : new DssEventSubscriber(_dssClient, SubscribedEventNames);
             _changeAggregator = _subscriber is null ? null : new TwinChangeAggregator(this);
 
             if (_changeAggregator == null)
@@ -61,6 +62,15 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private async void CallScene(Zone zone, Group group, Scene scene)
         {
             await _dssClient?.CallScene(zone, group, scene);
+        }
+
+        private IEnumerable<IEventName> SubscribedEventNames
+        {
+            get
+            {
+                yield return (SystemEventName)SystemEvent.CallScene;
+                yield return (SystemEventName)SystemEvent.CallSceneBus;
+            }
         }
 
         private void HandleDssApiEvent(object sender, ApiEventRaisedEventArgs<DssEvent> args)

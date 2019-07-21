@@ -10,12 +10,14 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CalendarHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
-using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database;
+using PhilipDaubmeier.SmarthomeApi.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
+using PhilipDaubmeier.SonnenClient;
+using PhilipDaubmeier.SonnenClient.Model;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannHost.DependencyInjection;
 using ProxyKit;
@@ -74,19 +76,21 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddOptions();
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
             services.Configure<NetatmoConfig>(Configuration.GetSection("NetatmoConfig"));
-            services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
             services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
             services.AddTokenStoreDbContext<PersistenceContext>(smarthomeSqlServer);
-            services.AddTokenStore<SonnenPortalClient>();
             services.AddTokenStore<WithingsClient>();
             services.AddTokenStore<DynDnsController.DynDnsIpv4>();
             services.AddTokenStore<DynDnsController.DynDnsIpv6>();
 
             services.AddScoped<WithingsClient>();
+
+            services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
+            services.AddTokenStore<SonnenPortalClient>();
+            services.AddScoped<ISonnenConnectionProvider, SonnenConfigConnectionProvider>();
             services.AddScoped<SonnenPortalClient>();
-            
+
             services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), Configuration.GetSection("TokenStoreConfig"));

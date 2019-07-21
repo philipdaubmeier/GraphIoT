@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromTwin\PhilipDaubmeier.DigitalstromTwin.csproj" />
   </ItemGroup>
 
 </Project>

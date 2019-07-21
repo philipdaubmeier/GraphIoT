@@ -1,7 +1,9 @@
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromDssMock;
 using RichardSzalay.MockHttp;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,7 +24,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             var model = new ApartmentState();
             using (var dssClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider()))
-            using (var subscriber = new DssEventSubscriber(dssClient, null, 42))
+            using (var subscriber = new DssEventSubscriber(dssClient, new List<SystemEventName>() { SystemEvent.CallScene }, 42))
             using (var aggregator = new TwinChangeAggregator(model))
             {
                 aggregator.SceneChangedInternal += (s, e) => dssClient.CallScene(e.Zone, e.Group, e.Scene).Wait();
@@ -71,7 +73,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset0;
 
             using (var dssClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider()))
-            using (var subscriber = new DssEventSubscriber(dssClient, null, 42))
+            using (var subscriber = new DssEventSubscriber(dssClient, new List<SystemEventName>() { SystemEvent.CallScene }, 42))
             using (var aggregator = new TwinChangeAggregator(model))
             {
                 aggregator.SceneChangedInternal += (s, e) => dssClient.CallScene(e.Zone, e.Group, e.Scene).Wait();

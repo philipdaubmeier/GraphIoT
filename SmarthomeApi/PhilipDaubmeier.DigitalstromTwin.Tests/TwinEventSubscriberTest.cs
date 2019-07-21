@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                                        .WithQueryString($"token={MockDigitalstromConnection.AppToken}")
                                        .Respond("application/json", @"{ ""ok"": true }");
 
-            using (var eventSubscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider()))
+            using (var eventSubscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene, SystemEvent.CallSceneBus }))
             {
                 // Wait for the threads to start and make the subscriptions
                 await Task.Delay(100);
@@ -40,7 +40,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
+            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42))
             {
                 await Task.Delay(100);
                 mockHttp.AutoFlush = false;
@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), null, 42))
+            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42))
             {
                 await Task.Delay(300);
                 mockHttp.AutoFlush = false;

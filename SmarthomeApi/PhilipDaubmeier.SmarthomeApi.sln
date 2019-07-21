@@ -41,11 +41,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.Digitalstro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromHost.Tests", "PhilipDaubmeier.DigitalstromHost.Tests\PhilipDaubmeier.DigitalstromHost.Tests.csproj", "{3079544A-CA40-4C79-96DE-A2766F12C305}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromDssMock", "PhilipDaubmeier.DigitalstromDssMock\PhilipDaubmeier.DigitalstromDssMock.csproj", "{D755D53F-1A2F-48CC-8F8D-421043BD42D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromDssMock", "PhilipDaubmeier.DigitalstromDssMock\PhilipDaubmeier.DigitalstromDssMock.csproj", "{D755D53F-1A2F-48CC-8F8D-421043BD42D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromTwin", "PhilipDaubmeier.DigitalstromTwin\PhilipDaubmeier.DigitalstromTwin.csproj", "{81C52A27-8199-4714-8313-224BB11FCF1A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromTwin", "PhilipDaubmeier.DigitalstromTwin\PhilipDaubmeier.DigitalstromTwin.csproj", "{81C52A27-8199-4714-8313-224BB11FCF1A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.DigitalstromTwin.Tests", "PhilipDaubmeier.DigitalstromTwin.Tests\PhilipDaubmeier.DigitalstromTwin.Tests.csproj", "{C643615D-AB84-454A-8A45-B08C6C4D40C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromTwin.Tests", "PhilipDaubmeier.DigitalstromTwin.Tests\PhilipDaubmeier.DigitalstromTwin.Tests.csproj", "{C643615D-AB84-454A-8A45-B08C6C4D40C8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.SonnenClient", "PhilipDaubmeier.SonnenClient\PhilipDaubmeier.SonnenClient.csproj", "{B8E56034-B4F7-4FA9-B7A8-57746C360062}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -153,12 +159,13 @@ Global
 		{D755D53F-1A2F-48CC-8F8D-421043BD42D4} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{81C52A27-8199-4714-8313-224BB11FCF1A} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{B8E56034-B4F7-4FA9-B7A8-57746C360062} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 20
+		SccNumberOfProjects = 21
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -238,5 +245,9 @@ Global
 		SccProjectTopLevelParentUniqueName19 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName19 = PhilipDaubmeier.DigitalstromTwin.Tests
 		SccLocalPath19 = PhilipDaubmeier.DigitalstromTwin.Tests
+		SccProjectUniqueName20 = PhilipDaubmeier.SonnenClient\\PhilipDaubmeier.SonnenClient.csproj
+		SccProjectTopLevelParentUniqueName20 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName20 = PhilipDaubmeier.SonnenClient
+		SccLocalPath20 = PhilipDaubmeier.SonnenClient
 	EndGlobalSection
 EndGlobal

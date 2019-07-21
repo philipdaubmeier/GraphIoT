@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="NodaTime" Version="2.4.5" />
+    <PackageReference Include="NodaTime" Version="2.4.6" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,6 @@
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,24 +20,17 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private readonly IEnumerable<IEventName> eventsToSubscribe;
 
-        public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
+        public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe, int subscriptionId = defaultSubscriptionId)
             : this(new DigitalstromDssClient(connectionProvider), eventsToSubscribe, subscriptionId)
         {
             ownsClient = true;
         }
 
-        public DssEventSubscriber(DigitalstromDssClient dssClient, IEnumerable<IEventName> eventsToSubscribe = null, int subscriptionId = defaultSubscriptionId)
+        public DssEventSubscriber(DigitalstromDssClient dssClient, IEnumerable<IEventName> eventsToSubscribe, int subscriptionId = defaultSubscriptionId)
         {
             apiClient = dssClient;
             this.subscriptionId = subscriptionId;
-
-            this.eventsToSubscribe = new List<IEventName>()
-            {
-                (SystemEventName)SystemEvent.CallScene,
-                (SystemEventName)SystemEvent.CallSceneBus
-            };
-            if (eventsToSubscribe != null)
-                ((List<IEventName>)this.eventsToSubscribe).AddRange(eventsToSubscribe.Except(this.eventsToSubscribe));
+            this.eventsToSubscribe = eventsToSubscribe;
 
             subscribed = false;
             initializedSempahore.Release();

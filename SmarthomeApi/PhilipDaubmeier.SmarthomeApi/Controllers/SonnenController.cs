@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PhilipDaubmeier.SmarthomeApi.Clients.Sonnen;
+using PhilipDaubmeier.SonnenClient;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,23 +16,16 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             _sonnenClient = sonnenClient;
         }
 
-        // GET api/sonnen/history/week
-        [HttpGet("history/week")]
-        public async Task<JsonResult> GetLastWeekValues()
+        // GET api/sonnen/mysonnentest
+        [HttpGet("mysonnentest")]
+        public async Task<JsonResult> MySonnenTest()
         {
-            var values = await _sonnenClient.GetEnergyStats(DateTime.Now.AddDays(-7));
+            var siteId = (await _sonnenClient.GetSites()).FirstOrDefault();
+            var values = await _sonnenClient.GetEnergyMeasurements(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
 
             return Json(new
             {
-                values = values.Select(x => new
-                {
-                    time = x.Key,
-                    discharge = x.Value.Discharge,
-                    charge = x.Value.Charge,
-                    pvproduction = x.Value.PvProduction,
-                    consumption = x.Value.Consumption,
-                    soc = x.Value.SOC
-                })
+                vals = values
             });
         }
     }

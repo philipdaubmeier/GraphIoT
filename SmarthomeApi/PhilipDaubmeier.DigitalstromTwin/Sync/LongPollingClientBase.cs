@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Network
+namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class ErrorOccuredEventArgs : EventArgs
     {
