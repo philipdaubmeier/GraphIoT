@@ -1,4 +1,4 @@
-using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Network;
 using RichardSzalay.MockHttp;
@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.DigitalstromClient.Tests
+namespace PhilipDaubmeier.DigitalstromDssMock
 {
     public static class MockDigitalstromConnection
     {

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />

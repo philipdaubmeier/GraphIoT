@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-namespace PhilipDaubmeier.DigitalstromClient.Tests
+namespace PhilipDaubmeier.DigitalstromDssMock
 {
     public static class DigitalstromDssMockExtensions
     {

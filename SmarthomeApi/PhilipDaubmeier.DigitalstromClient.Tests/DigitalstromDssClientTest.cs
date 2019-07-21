@@ -1,6 +1,7 @@
 using NodaTime;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
+using PhilipDaubmeier.DigitalstromDssMock;
 using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;

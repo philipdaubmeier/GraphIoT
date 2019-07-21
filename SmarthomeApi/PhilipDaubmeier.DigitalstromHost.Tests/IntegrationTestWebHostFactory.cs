@@ -10,6 +10,7 @@ using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Tests;
 using PhilipDaubmeier.DigitalstromClient.Twin.Tests;
+using PhilipDaubmeier.DigitalstromDssMock;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;

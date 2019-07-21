@@ -1,5 +1,5 @@
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Tests;
+using PhilipDaubmeier.DigitalstromDssMock;
 using RichardSzalay.MockHttp;
 using System.Threading.Tasks;
 using Xunit;
