@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Twin.Tests;
+using PhilipDaubmeier.DigitalstromDssMock;
 using RichardSzalay.MockHttp;
 using System.Linq;
 using System.Threading.Tasks;

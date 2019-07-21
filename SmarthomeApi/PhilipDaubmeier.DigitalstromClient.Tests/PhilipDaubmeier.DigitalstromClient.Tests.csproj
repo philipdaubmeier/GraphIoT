@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient\PhilipDaubmeier.DigitalstromClient.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromDssMock\PhilipDaubmeier.DigitalstromDssMock.csproj" />
   </ItemGroup>
 

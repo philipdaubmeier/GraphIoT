@@ -34,7 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromClient.Tests\PhilipDaubmeier.DigitalstromClient.Tests.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.DigitalstromDssMock\PhilipDaubmeier.DigitalstromDssMock.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj" />
   </ItemGroup>
 
