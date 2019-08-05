@@ -20,7 +20,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("mysonnentest")]
         public async Task<JsonResult> MySonnenTest()
         {
-            var siteId = (await _sonnenClient.GetSites()).FirstOrDefault();
+            var userSites = await _sonnenClient.GetUserSites();
+            var siteId = userSites.SiteIds.FirstOrDefault();
             var values = await _sonnenClient.GetEnergyMeasurements(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
 
             return Json(new
