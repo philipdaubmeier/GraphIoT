@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Model;
+using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.TokenStore;
 using System.Net.Http;
 

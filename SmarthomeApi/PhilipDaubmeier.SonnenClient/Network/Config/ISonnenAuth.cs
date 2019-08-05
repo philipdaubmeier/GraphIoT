@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SonnenClient.Model
+namespace PhilipDaubmeier.SonnenClient.Network
 {
     public interface ISonnenAuth
     {

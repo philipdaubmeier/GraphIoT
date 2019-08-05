@@ -1,5 +1,5 @@
 ﻿using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Model;
+using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.TokenStore;
 using System;
 using System.Threading.Tasks;

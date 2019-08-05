@@ -1,8 +1,10 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using PhilipDaubmeier.SonnenClient.Model;
 using PhilipDaubmeier.SonnenClient.Network;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -21,13 +23,14 @@ namespace PhilipDaubmeier.SonnenClient
         /// </summary>
         public async Task<List<string>> GetSites()
         {
-            return await ParseSites(await CallSonnenApi(new Uri($"{_baseUri}users/me")));
+            return await ParseSites(await RequestSonnenApi(new Uri($"{_baseUri}users/me")));
         }
 
-        public async Task<List<int>> GetEnergyMeasurements(string siteId, DateTime start, DateTime end)
+        public async Task<MeasurementSeries> GetEnergyMeasurements(string siteId, DateTime start, DateTime end)
         {
             var query = $"?filter[start]={start.ToFilterTime()}&filter[end]={end.ToFilterTime()}&";
-            return await ParseEnergyMeasurements(await CallSonnenApi(new Uri($"{_baseUri}sites/{siteId}/measurements?{query}")));
+            var uri = new Uri($"{_baseUri}sites/{siteId}/measurements?{query}");
+            return await CallSonnenApi<MeasurementWiremessage<MeasurementSeries>, MeasurementSeries>(uri);
         }
 
         private async Task<List<string>> ParseSites(HttpResponseMessage response)
@@ -88,37 +91,6 @@ namespace PhilipDaubmeier.SonnenClient
             var sitesRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return sitesRaw.data.relationships.sites.data.Where(d => d.type.Equals("sites", StringComparison.InvariantCultureIgnoreCase))
                 .Select(d => d.id).ToList();
-        }
-
-        private async Task<List<int>> ParseEnergyMeasurements(HttpResponseMessage response)
-        {
-            var definition = new
-            {
-                data = new
-                {
-                    id = "",
-                    type = "",
-                    attributes = new
-                    {
-                        measurement_method = "",
-                        start = "",
-                        end = "",
-                        resolution = "",
-                        production_power = new List<int>(),
-                        consumption_power = new List<int>(),
-                        direct_usage_power = new List<int>(),
-                        battery_charging = new List<int>(),
-                        battery_discharging = new List<int>(),
-                        grid_feedin = new List<int>(),
-                        grid_purchase = new List<int>(),
-                        battery_usoc = new List<double>()
-                    }
-                }
-            };
-            var responseStr = await response.Content.ReadAsStringAsync();
-
-            var measurementsRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
-            return measurementsRaw.data.attributes.consumption_power;
         }
     }
 }

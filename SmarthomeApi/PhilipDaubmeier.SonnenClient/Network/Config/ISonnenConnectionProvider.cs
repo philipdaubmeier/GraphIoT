@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 
-namespace PhilipDaubmeier.SonnenClient.Model
+namespace PhilipDaubmeier.SonnenClient.Network
 {
     public interface ISonnenConnectionProvider
     {

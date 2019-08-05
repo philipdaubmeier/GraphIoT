@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NodaTime;
 using PhilipDaubmeier.SonnenClient.Model;
 using System;
@@ -28,6 +29,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
         private static readonly CookieContainer _cookieContainer = new CookieContainer();
         private static HttpMessageHandler _clientHandler;
         private static HttpClient _client;
+
+        private static readonly IContractResolver _jsonResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
+        private static readonly JsonSerializer _jsonSerializer = new JsonSerializer() { ContractResolver = _jsonResolver };
 
         private class AuthState
         {
@@ -69,7 +73,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// the token with a refresh token if present. The access token will automatically be added
         /// as a Bearer in the Authentication header, together with other common headers.
         /// </summary>
-        protected async Task<HttpResponseMessage> CallSonnenApi(Uri uri)
+        protected async Task<HttpResponseMessage> RequestSonnenApi(Uri uri)
         {
             await Authenticate();
 
@@ -82,6 +86,22 @@ namespace PhilipDaubmeier.SonnenClient.Network
             request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {_authData.AccessToken}");
             request.Headers.TryAddWithoutValidation("User-Agent", _userAgent);
             return await _client.SendAsync(request);
+        }
+
+        /// <summary>
+        /// Calls the given endpoint at my-api.sonnen.de and ensures the request is authenticated
+        /// and parses the result afterwards, including unpacking of the wiremessage.
+        /// If no valid access token is present yet, this method will trigger a fresh sign-in
+        /// or refresh the token with a refresh token if present and append it to the request.
+        /// </summary>
+        protected async Task<TData> CallSonnenApi<TWiremessage, TData>(Uri uri)
+            where TWiremessage : IWiremessage<TData> where TData : class
+        {
+            var responseStream = await (await RequestSonnenApi(uri)).Content.ReadAsStreamAsync();
+
+            using (var sr = new StreamReader(responseStream))
+            using (var jsonTextReader = new JsonTextReader(sr))
+                return _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.ContainedData;
         }
 
         /// <summary>

@@ -17,7 +17,7 @@ using PhilipDaubmeier.SmarthomeApi.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
 using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Model;
+using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannHost.DependencyInjection;
 using ProxyKit;

@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
             return Json(new
             {
-                vals = values
+                vals = values.ConsumptionPower
             });
         }
     }
