@@ -23,13 +23,9 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public List<string> SiteIds { get; set; }
     }
 
-    public class UserDataWiremessage
+    public class UserDataWiremessage : DataWiremessage<UserProfile>
     {
-        public string Id { get; set; }
-        public string Type { get; set; }
-        public UserProfile Attributes { get; set; }
         public SiteRelationship Relationships { get; set; }
-        public LinkToSelfOrRelated Links { get; set; }
     }
 
     public class SiteRelationship
@@ -39,7 +35,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
 
     public class SiteRelationshipList
     {
-        public LinkToSelfOrRelated Links { get; set; }
+        public LinkToRelated Links { get; set; }
         public List<Site> Data { get; set; }
     }
 
@@ -49,9 +45,8 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public string Id { get; set; }
     }
 
-    public class LinkToSelfOrRelated
+    public class LinkToRelated
     {
         public string Related { get; set; }
-        public string Self { get; set; }
     }
 }

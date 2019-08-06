@@ -23,6 +23,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             var userSites = await _sonnenClient.GetUserSites();
             var siteId = userSites.SiteIds.FirstOrDefault();
             var values = await _sonnenClient.GetEnergyMeasurements(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
+            var battery = await _sonnenClient.GetBatterySystems(siteId);
+            var stats = await _sonnenClient.GetStatistics(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
 
             return Json(new
             {

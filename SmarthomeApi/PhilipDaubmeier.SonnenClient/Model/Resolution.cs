@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
         {
             _original = resolution;
 
-            var match = Regex.Match(resolution, @"^((?<h>\d+)h)?((?<m>\d+)m)?((?<s>\d+)s)?((?<ms>\d+)ms)?$",
+            var match = Regex.Match(resolution, @"^((?<h>\d+)(h|-hour))?((?<m>\d+)m)?((?<s>\d+)s)?((?<ms>\d+)ms)?$",
                 RegexOptions.ExplicitCapture | RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.RightToLeft);
 
             var h = match.Groups["h"].Success ? int.Parse(match.Groups["h"].Value) : 0;
