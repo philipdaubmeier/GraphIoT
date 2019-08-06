@@ -13,11 +13,9 @@ using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database;
-using PhilipDaubmeier.SmarthomeApi.Model;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
-using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Network;
+using PhilipDaubmeier.SonnenHost.DependencyInjection;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannHost.DependencyInjection;
 using ProxyKit;
@@ -86,10 +84,7 @@ namespace PhilipDaubmeier.SmarthomeApi
 
             services.AddScoped<WithingsClient>();
 
-            services.Configure<SonnenConfig>(Configuration.GetSection("SonnenConfig"));
-            services.AddTokenStore<SonnenPortalClient>();
-            services.AddScoped<ISonnenConnectionProvider, SonnenConfigConnectionProvider>();
-            services.AddScoped<SonnenPortalClient>();
+            services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
 

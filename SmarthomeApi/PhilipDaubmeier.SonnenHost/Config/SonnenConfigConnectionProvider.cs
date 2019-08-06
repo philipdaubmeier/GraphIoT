@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Options;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SonnenClient;
 using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.TokenStore;
 using System.Net.Http;
 
-namespace PhilipDaubmeier.SmarthomeApi.Model
+namespace PhilipDaubmeier.SonnenHost.Config
 {
     public class SonnenConfigConnectionProvider : ISonnenConnectionProvider
     {

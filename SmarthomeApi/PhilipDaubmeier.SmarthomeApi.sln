@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.Digitalstro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.SonnenClient", "PhilipDaubmeier.SonnenClient\PhilipDaubmeier.SonnenClient.csproj", "{B8E56034-B4F7-4FA9-B7A8-57746C360062}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.SonnenHost", "PhilipDaubmeier.SonnenHost\PhilipDaubmeier.SonnenHost.csproj", "{E38112F9-C396-414B-B3F6-E410DF9A837B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,6 +137,10 @@ Global
 		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8E56034-B4F7-4FA9-B7A8-57746C360062}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -160,12 +166,13 @@ Global
 		{81C52A27-8199-4714-8313-224BB11FCF1A} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{B8E56034-B4F7-4FA9-B7A8-57746C360062} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{E38112F9-C396-414B-B3F6-E410DF9A837B} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 21
+		SccNumberOfProjects = 22
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -249,5 +256,9 @@ Global
 		SccProjectTopLevelParentUniqueName20 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName20 = PhilipDaubmeier.SonnenClient
 		SccLocalPath20 = PhilipDaubmeier.SonnenClient
+		SccProjectUniqueName21 = PhilipDaubmeier.SonnenHost\\PhilipDaubmeier.SonnenHost.csproj
+		SccProjectTopLevelParentUniqueName21 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName21 = PhilipDaubmeier.SonnenHost
+		SccLocalPath21 = PhilipDaubmeier.SonnenHost
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.SmarthomeApi.Model.Config
+﻿namespace PhilipDaubmeier.SonnenHost.Config
 {
     public class SonnenConfig
     {

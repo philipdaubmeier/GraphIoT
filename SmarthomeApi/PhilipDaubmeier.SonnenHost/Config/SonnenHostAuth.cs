@@ -4,7 +4,7 @@ using PhilipDaubmeier.TokenStore;
 using System;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Model
+namespace PhilipDaubmeier.SonnenHost.Config
 {
     public class SonnenHostAuth : ISonnenAuth
     {

@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using PhilipDaubmeier.CalendarHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.ViessmannHost.Database;
 
 namespace PhilipDaubmeier.SmarthomeApi.Database
 {
-    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, ICalendarDbContext, IViessmannDbContext
+    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, ICalendarDbContext, IViessmannDbContext, ISonnenDbContext
     {
         #region ITokenStoreDbContext
         public DbSet<AuthData> AuthDataSet { get; set; }
@@ -37,6 +38,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Database
         public DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }
 
         public DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
+        #endregion
+
+
+        #region ISonnenDbContext
+        public DbSet<SonnenEnergyData> SonnenEnergyDataSet { get; set; }
         #endregion
 
 
