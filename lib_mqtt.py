@@ -16,7 +16,7 @@ APPNAME = "carnet"
 
 DEBUG = False
 
-MQTT_HOST = "mediasafe2.fritz.box"
+MQTT_HOST = "<mqtt-server>"
 MQTT_PORT = 1883
 MQTT_CLIENT_ID = APPNAME + "_%d" % os.getpid()
 MQTT_QOS = 0
@@ -83,7 +83,7 @@ def connect():
     # Attempt to connect
     try:
         mqttc.connect(MQTT_HOST, MQTT_PORT, 60)
-    except Exception, e:
+    except Exception:
         sys.exit(2)
 
     # Let the connection run forever
