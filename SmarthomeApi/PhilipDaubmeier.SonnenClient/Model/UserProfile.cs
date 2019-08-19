@@ -18,10 +18,10 @@
         public string Latitude { get; set; }
         public string Longitude { get; set; }
         public string Language { get; set; }
-        public bool Newsletter { get; set; }
+        public bool? Newsletter { get; set; }
         public string TimeZone { get; set; }
         public string PrivacyPolicy { get; set; }
         public string TermsOfService { get; set; }
-        public bool ServicePartnersDataAccess { get; set; }
+        public bool? ServicePartnersDataAccess { get; set; }
     }
 }

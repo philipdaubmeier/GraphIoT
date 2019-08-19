@@ -54,19 +54,17 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         }
 
         private readonly PersistenceContext db;
-        private readonly DigitalstromDbContext dsDb;
-        public GrafanaController(PersistenceContext databaseContext, DigitalstromDbContext dsDatabaseContext)
+        public GrafanaController(PersistenceContext databaseContext)
         {
             db = databaseContext;
-            dsDb = dsDatabaseContext;
         }
 
         private Dictionary<string, IGraphCollectionViewModel> GenerateViewModels(TimeSeriesSpan span)
         {
             return new Dictionary<string, IGraphCollectionViewModel>()
             {
-                { "energy", new DigitalstromEnergyViewModel(dsDb, span) },
-                { "sensors", new DigitalstromZoneSensorViewModel(dsDb, span) },
+                { "energy", new DigitalstromEnergyViewModel(db, span) },
+                { "sensors", new DigitalstromZoneSensorViewModel(db, span) },
                 { "heating", new ViessmannHeatingViewModel(db, span) },
                 { "solar", new ViessmannSolarViewModel(db, span) },
             };
