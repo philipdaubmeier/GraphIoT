@@ -2,7 +2,6 @@
 using Newtonsoft.Json;
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
@@ -67,6 +66,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 { "sensors", new DigitalstromZoneSensorViewModel(db, span) },
                 { "heating", new ViessmannHeatingViewModel(db, span) },
                 { "solar", new ViessmannSolarViewModel(db, span) },
+                { "solarenergy", new SonnenEnergyViewModel(db, span) },
             };
         }
 
