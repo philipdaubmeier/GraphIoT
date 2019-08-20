@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public async Task<JsonResult> MySonnenTest()
         {
             var userSites = await _sonnenClient.GetUserSites();
-            var siteId = userSites.SiteIds.FirstOrDefault();
+            var siteId = userSites.DefaultSiteId;
             var values = await _sonnenClient.GetEnergyMeasurements(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
             var battery = await _sonnenClient.GetBatterySystems(siteId);
             var stats = await _sonnenClient.GetStatistics(siteId, DateTime.Now.Date, DateTime.Now.Date.AddDays(1));
