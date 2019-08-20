@@ -155,19 +155,50 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
         // POST: api/grafana/annotations
         [HttpPost("annotations")]
-        public ActionResult Annotations()
+        public async Task<ActionResult> AnnotationsAsync()
         {
-            return Json(new[]
+            var definition = new
             {
-                new
+                range = new
                 {
-                    annotation = "annotation", // The original annotation sent from Grafana.
-                    time = Instant.FromDateTimeUtc(DateTime.UtcNow).ToUnixTimeMilliseconds(),
-                    title = "tooltip title",
-                    tags = new[] { "tag1", "tag2" },
-                    text = "text for the annotation"
+                    from = "",
+                    to = ""
+                },
+                rangeRaw = new
+                {
+                    from = "",
+                    to = ""
+                },
+                annotation = new
+                {
+                    name = "",
+                    datasource = "",
+                    iconColor = "",
+                    enable = true,
+                    query = ""
                 }
-            });
+            };
+
+            string body = string.Empty;
+            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
+                body = await reader.ReadToEndAsync();
+
+            var annotationQuery = JsonConvert.DeserializeAnonymousType(body, definition);
+
+            if (!DateTime.TryParse(annotationQuery.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationQuery.range.to, out DateTime toDate))
+                return StatusCode(404);
+
+            var eventData = db.DsSceneEventDataSet.Where(x => x.Day >= fromDate.Date && x.Day <= toDate.Date);
+            var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= fromDate && x.TimestampUtc <= toDate).ToList();
+
+            return Json(events.Select(dssEvent => new
+            {
+                annotation = annotationQuery.annotation.name, // The original annotation sent from Grafana.
+                time = Instant.FromDateTimeUtc(dssEvent.TimestampUtc).ToUnixTimeMilliseconds(),
+                title = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
+                tags = new[] { "tag1", "tag2" },
+                text = ""
+            }));
         }
     }
 }
