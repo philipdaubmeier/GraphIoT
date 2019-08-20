@@ -145,6 +145,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// </summary>
         protected override async Task Authenticate()
         {
+            await EnsureInitialized();
+
             try
             {
                 _renewTokenSemaphore.WaitOne();

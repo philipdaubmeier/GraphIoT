@@ -52,15 +52,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 {
                     var response = await _client.GetAsync(_baseUris.GetCurrent(), HttpCompletionOption.ResponseHeadersRead);
                     if (response.IsSuccessStatusCode)
-                    {
-                        await Authenticate();
                         return;
-                    }
                 }
                 catch (Exception) { }
 
                 _baseUris.MoveNext();
             }
+        }
+
+        protected async Task EnsureInitialized()
+        {
+            await GetBaseUri();
         }
 
         private async Task<Uri> GetBaseUri()
