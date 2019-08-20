@@ -41,18 +41,22 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
                 {
                     var errorCode = Marshal.GetLastWin32Error();
                     _logger.LogInformation($"{DateTime.Now} Grafana Backend Service did not start, result code: {errorCode}");
+                    return Task.CompletedTask;
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogInformation($"{DateTime.Now} Grafana Backend Service did not start, exception: {ex.Message}");
+                return Task.CompletedTask;
             }
 
             // redirect stdout, stderr to logger
+            _process.BeginOutputReadLine();
             _process.OutputDataReceived += (s, e) =>
             {
                 _logger.LogInformation(e.Data);
             };
+            _process.BeginErrorReadLine();
             _process.ErrorDataReceived += (s, e) =>
             {
                 _logger.LogError(e.Data);
