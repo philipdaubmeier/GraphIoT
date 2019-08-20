@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.SonnenHost.Polling
             
             try
             {
-                await PollSensorValues(DateTime.Now.AddMinutes(-10), DateTime.Now);
+                await PollSensorValues(DateTime.Now.AddHours(-1), DateTime.Now);
             }
             catch (Exception ex)
             {
@@ -41,14 +41,16 @@ namespace PhilipDaubmeier.SonnenHost.Polling
         {
             if (string.IsNullOrEmpty(_siteId))
             {
-                _siteId = (await _sonnenClient.GetUserSites()).SiteIds.FirstOrDefault();
+                _siteId = (await _sonnenClient.GetUserSites()).DefaultSiteId;
                 if (string.IsNullOrEmpty(_siteId))
                     return;
             }
 
             var energyValues = await _sonnenClient.GetEnergyMeasurements(_siteId, start, end);
+            if (!energyValues.Start.HasValue || !energyValues.End.HasValue)
+                return;
 
-            var span = new TimeSeriesSpan(energyValues.Start, energyValues.End, energyValues.Resolution);
+            var span = new TimeSeriesSpan(energyValues.Start.Value, energyValues.End.Value, energyValues.Resolution);
             var productionPower = new TimeSeries<int>(span);
             var consumptionPower = new TimeSeries<int>(span);
             var directUsagePower = new TimeSeries<int>(span);

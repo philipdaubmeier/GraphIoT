@@ -6,8 +6,8 @@ namespace PhilipDaubmeier.SonnenClient.Model
     public class MeasurementSeries
     {
         public string MeasurementMethod { get; set; }
-        public DateTime Start { get; set; }
-        public DateTime End { get; set; }
+        public DateTime? Start { get; set; }
+        public DateTime? End { get; set; }
         public Resolution Resolution { get; set; }
         public List<int?> ProductionPower { get; set; }
         public List<int?> ConsumptionPower { get; set; }

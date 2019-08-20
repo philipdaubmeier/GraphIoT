@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,6 +12,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public UserSites ContainedData => new UserSites()
         {
             User = Data.Attributes,
+            DefaultSiteId = Data.Relationships?.DefaultSite?.Data?.Id,
             SiteIds = Data.Relationships.Sites.Data
                 .Where(s => s.Type.Equals("sites", StringComparison.InvariantCultureIgnoreCase))
                 .Select(s => s.Id).ToList()
@@ -20,6 +22,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
     public class UserSites
     {
         public UserProfile User { get; set; }
+        public string DefaultSiteId { get; set; }
         public List<string> SiteIds { get; set; }
     }
 
@@ -31,6 +34,15 @@ namespace PhilipDaubmeier.SonnenClient.Model
     public class SiteRelationship
     {
         public SiteRelationshipList Sites { get; set; }
+
+        [JsonProperty("default-site")]
+        public SiteRelationshipSingle DefaultSite { get; set; }
+    }
+
+    public class SiteRelationshipSingle
+    {
+        public LinkToRelated Links { get; set; }
+        public Site Data { get; set; }
     }
 
     public class SiteRelationshipList
