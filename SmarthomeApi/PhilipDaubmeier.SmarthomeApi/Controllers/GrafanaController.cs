@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
@@ -183,21 +184,46 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
                 body = await reader.ReadToEndAsync();
 
-            var annotationQuery = JsonConvert.DeserializeAnonymousType(body, definition);
+            var annotationInfo = JsonConvert.DeserializeAnonymousType(body, definition);
 
-            if (!DateTime.TryParse(annotationQuery.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationQuery.range.to, out DateTime toDate))
+            if (!DateTime.TryParse(annotationInfo.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.range.to, out DateTime toDate))
                 return StatusCode(404);
 
             var eventData = db.DsSceneEventDataSet.Where(x => x.Day >= fromDate.Date && x.Day <= toDate.Date);
-            var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= fromDate && x.TimestampUtc <= toDate).ToList();
+            var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= fromDate.ToUniversalTime() && x.TimestampUtc <= toDate.ToUniversalTime()).ToList();
+            List<DssEvent> filtered;
 
-            return Json(events.Select(dssEvent => new
+            try
             {
-                annotation = annotationQuery.annotation.name, // The original annotation sent from Grafana.
+                var definitionQuery = new
+                {
+                    event_names = new List<string>(),
+                    zone_ids = new List<int>(),
+                    group_ids = new List<int>(),
+                    scene_ids = new List<int>()
+                };
+
+                var query = JsonConvert.DeserializeAnonymousType(annotationInfo.annotation.query, definitionQuery);
+
+                filtered = events
+                    .Where(x => query.event_names.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase))
+                    .Where(x => query.zone_ids.Contains(x.Properties.ZoneID))
+                    .Where(x => query.group_ids.Contains(x.Properties.GroupID))
+                    .Where(x => query.scene_ids.Contains(x.Properties.SceneID))
+                    .ToList();
+            }
+            catch (Exception ex)
+            {
+                filtered = events;
+            }
+            
+            return Json(filtered.Select(dssEvent => new
+            {
+                annotation = annotationInfo.annotation.name,
                 time = Instant.FromDateTimeUtc(dssEvent.TimestampUtc).ToUnixTimeMilliseconds(),
-                title = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
-                tags = new[] { "tag1", "tag2" },
-                text = ""
+                title = $"{dssEvent.SystemEvent.Name}",
+                tags = new[] { dssEvent.SystemEvent.Name, dssEvent.Properties.GroupID.ToString(), dssEvent.Properties.SceneID.ToDisplayString() },
+                text = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}"
             }));
         }
     }
