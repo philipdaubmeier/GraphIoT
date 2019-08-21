@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 
     public class MeterZones
     {
-        public string DSUID { get; set; }
+        public Dsuid DSUID { get; set; }
         public List<MeterZone> Zones { get; set; }
     }
 

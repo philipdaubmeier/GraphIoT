@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database;
@@ -53,10 +55,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             }
         }
 
+        private static Dictionary<Dsuid, List<Zone>> circuitZones = null;
+
         private readonly PersistenceContext db;
-        public GrafanaController(PersistenceContext databaseContext)
+        private readonly DigitalstromDssClient dsClient;
+        public GrafanaController(PersistenceContext databaseContext, DigitalstromDssClient digitalstromClient)
         {
             db = databaseContext;
+            dsClient = digitalstromClient;
         }
 
         private Dictionary<string, IGraphCollectionViewModel> GenerateViewModels(TimeSeriesSpan span)
@@ -198,6 +204,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 var definitionQuery = new
                 {
                     event_names = new List<string>(),
+                    meter_ids = new List<string>(),
                     zone_ids = new List<int>(),
                     group_ids = new List<int>(),
                     scene_ids = new List<int>()
@@ -205,9 +212,19 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
                 var query = JsonConvert.DeserializeAnonymousType(annotationInfo.annotation.query, definitionQuery);
 
+                if (circuitZones == null)
+                {
+                    var res = dsClient.GetCircuitZones().Result;
+                    circuitZones = res.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());
+                }
+
+                var zonesFromMeters = query?.meter_ids?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
+                    ?.SelectMany(x => circuitZones.ContainsKey(x) ? circuitZones[x] : new List<Zone>()).ToList() ?? new List<Zone>();
+                var zones = (query?.zone_ids?.Cast<Zone>()?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
+
                 filtered = events
                     .Where(x => query.event_names.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase))
-                    .Where(x => query.zone_ids.Contains(x.Properties.ZoneID))
+                    .Where(x => zones.Contains(x.Properties.ZoneID))
                     .Where(x => query.group_ids.Contains(x.Properties.GroupID))
                     .Where(x => query.scene_ids.Contains(x.Properties.SceneID))
                     .ToList();
