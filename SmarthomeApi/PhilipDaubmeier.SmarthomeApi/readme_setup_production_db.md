@@ -34,3 +34,15 @@ To set up the SQL Express database on the server, follow these steps
        GO
        sp_addrolemember @rolename = 'db_owner', @membername = 'DotNetCore';
        GO
+
+# Backup Database
+
+Run with sqlcmd.exe (run `cmd` and start it with `sqlcmd -S .\SQLEXPRESS`):
+
+    BACKUP DATABASE [PhilipSmarthome] TO DISK='C:\SubSites\Philip\smarthome_db.bak';
+    GO
+
+And to restore:
+
+	RESTORE DATABASE [PhilipSmarthome] FROM DISK='C:\SubSites\Philip\smarthome_db.bak';
+	GO
