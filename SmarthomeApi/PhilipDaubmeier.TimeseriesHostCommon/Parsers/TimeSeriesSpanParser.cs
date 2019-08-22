@@ -13,13 +13,25 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Parsers
         {
             span = null;
 
-            if (!long.TryParse(begin, out long beginMillis) || !long.TryParse(end, out long endMillis) || !int.TryParse(count, out int countInt))
+            if (!int.TryParse(count, out int countInt))
                 return false;
 
-            span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
-                Instant.FromUnixTimeMilliseconds(endMillis).ToDateTimeUtc(), Math.Min(Math.Max(countInt, minCount), maxCount));
+            var countParsed = Math.Min(Math.Max(countInt, minCount), maxCount);
 
-            return true;
+            if (long.TryParse(begin, out long beginMillis) && long.TryParse(end, out long endMillis))
+            {
+                span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
+                    Instant.FromUnixTimeMilliseconds(endMillis).ToDateTimeUtc(), countParsed);
+                return true;
+            }
+
+            if (DateTime.TryParse(begin, out DateTime beginDate) && DateTime.TryParse(end, out DateTime endDate))
+            {
+                span = new TimeSeriesSpan(beginDate.ToUniversalTime(), endDate.ToUniversalTime(), countParsed);
+                return true;
+            }
+
+            return false;
         }
     }
 }

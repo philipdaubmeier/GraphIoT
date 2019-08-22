@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SonnenClient;
+using PhilipDaubmeier.SonnenHost.Polling;
+using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,10 +13,12 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     public class SonnenController : Controller
     {
         private static SonnenPortalClient _sonnenClient;
+        private static ISonnenPollingService _pollingService;
 
-        public SonnenController(SonnenPortalClient sonnenClient)
+        public SonnenController(SonnenPortalClient sonnenClient, ISonnenPollingService pollingService)
         {
             _sonnenClient = sonnenClient;
+            _pollingService = pollingService;
         }
 
         // GET api/sonnen/mysonnentest
@@ -30,6 +35,19 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             {
                 vals = values.ConsumptionPower
             });
+        }
+
+        // POST api/sonnen/poll
+        [HttpPost("poll")]
+        public async Task<ActionResult> PollManually([FromQuery] string begin, [FromQuery] string end)
+        {
+            if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
+                return StatusCode(404);
+
+            foreach (var day in span.IncludedDates())
+                await _pollingService.PollSensorValues(day, day.AddDays(1));
+
+            return StatusCode(200);
         }
     }
 }

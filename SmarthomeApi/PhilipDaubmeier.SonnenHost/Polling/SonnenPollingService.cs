@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.SonnenHost.Polling
             }
         }
 
-        private async Task PollSensorValues(DateTime start, DateTime end)
+        public async Task PollSensorValues(DateTime start, DateTime end)
         {
             if (string.IsNullOrEmpty(_siteId))
             {
