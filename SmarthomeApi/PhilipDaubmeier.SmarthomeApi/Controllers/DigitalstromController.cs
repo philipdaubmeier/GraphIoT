@@ -84,7 +84,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
             var circuitNames = (await dsClient.GetMeteringCircuits()).FilteredMeterNames;
 
-            Func<ITimeSeries<int>, DateTime> getBegin = ts => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key;
+            DateTime getBegin(ITimeSeries<int> ts) => ts.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key;
 
             return Json(new
             {

@@ -229,7 +229,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     .Where(x => query.scene_ids.Contains(x.Properties.SceneID))
                     .ToList();
             }
-            catch (Exception ex)
+            catch
             {
                 filtered = events;
             }

@@ -4,7 +4,6 @@ using PhilipDaubmeier.SonnenClient;
 using PhilipDaubmeier.SonnenHost.Polling;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
