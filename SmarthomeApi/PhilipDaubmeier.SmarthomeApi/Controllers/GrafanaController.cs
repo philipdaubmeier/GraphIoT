@@ -7,6 +7,7 @@ using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.SmarthomeApi.Database;
+using PhilipDaubmeier.SonnenHost.ViewModel;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.ViewModel;
 using System;

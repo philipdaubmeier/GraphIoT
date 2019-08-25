@@ -246,7 +246,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     new
                     {
                         text = $"{totalYieldToday:0.#} kWh",
-                        icon = "a27283"
+                        icon = "a30793"
                     },
                     new
                     {

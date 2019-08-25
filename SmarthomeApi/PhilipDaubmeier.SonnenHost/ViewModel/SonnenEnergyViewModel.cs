@@ -4,7 +4,7 @@ using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PhilipDaubmeier.ViessmannHost.ViewModel
+namespace PhilipDaubmeier.SonnenHost.ViewModel
 {
     public class SonnenEnergyViewModel : IGraphCollectionViewModel
     {
