@@ -56,6 +56,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         }
 
         private static Dictionary<Dsuid, List<Zone>> circuitZones = null;
+        private static Dictionary<Zone, string> zoneNames = null;
 
         private readonly PersistenceContext db;
         private readonly DigitalstromDssClient dsClient;
@@ -233,13 +234,20 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             {
                 filtered = events;
             }
-            
+
+            if (zoneNames == null)
+            {
+                var res = dsClient.GetStructure().Result;
+                zoneNames = res.Zones.ToDictionary(x => x.Id, x => x.Name);
+            }
+            string GetZoneDisplayString(Zone id) => (zoneNames?.ContainsKey(id) ?? false) ? zoneNames[id] : id.ToString();
+
             return Json(filtered.Select(dssEvent => new
             {
                 annotation = annotationInfo.annotation.name,
                 time = Instant.FromDateTimeUtc(dssEvent.TimestampUtc).ToUnixTimeMilliseconds(),
                 title = $"{dssEvent.SystemEvent.Name}",
-                tags = new[] { dssEvent.SystemEvent.Name, dssEvent.Properties.GroupID.ToString(), dssEvent.Properties.SceneID.ToDisplayString() },
+                tags = new[] { dssEvent.SystemEvent.Name, GetZoneDisplayString(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() },
                 text = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}"
             }));
         }
