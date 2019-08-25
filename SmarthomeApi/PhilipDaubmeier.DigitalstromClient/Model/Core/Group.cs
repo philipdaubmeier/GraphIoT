@@ -178,5 +178,28 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         {
             return $"ID {_group}: {((Color)this).ToString()} - {((GroupType)this).ToString()}";
         }
+
+        public string ToDisplayString()
+        {
+            switch (_group)
+            {
+                case (int)GroupType.Various: return "Weiss - Gerät";
+                case (int)GroupType.Light: return "Gelb - Licht";
+                case (int)GroupType.Shading: return "Grau - Beschattung";
+                case (int)GroupType.Heating: return "Blau - Heizung";
+                case (int)GroupType.Cooling: return "Blau - Kühlung";
+                case (int)GroupType.Ventilation: return "Blau - Lüftung";
+                case (int)GroupType.Window: return "Blau - Fenster";
+                case (int)GroupType.AirRecirculation: return "Blau - Luftzirkulation";
+                case (int)GroupType.ApartmentVentilation: return "Blau - Lüftungssystem";
+                case (int)GroupType.TemperatureControl: return "Blau - Einzelraumregelung";
+                case (int)GroupType.Audio: return "Cyan - Audio";
+                case (int)GroupType.Video: return "Magenta - Video";
+                case (int)GroupType.Security: return "Rot - Sicherheit";
+                case (int)GroupType.Access: return "Grün - Zugang";
+                case (int)GroupType.Joker: return "Schwarz - Joker";
+                default: return string.Format("Unbekannt ({0})", (int)_group);
+            }
+        }
     }
 }
