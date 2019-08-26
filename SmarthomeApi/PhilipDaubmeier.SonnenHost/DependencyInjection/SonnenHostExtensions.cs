@@ -6,6 +6,7 @@ using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.SonnenHost.Config;
 using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.SonnenHost.Polling;
+using PhilipDaubmeier.SonnenHost.ViewModel;
 using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
@@ -26,6 +27,9 @@ namespace PhilipDaubmeier.SonnenHost.DependencyInjection
             serviceCollection.AddScoped<SonnenPortalClient>();
             serviceCollection.AddPollingService<ISonnenPollingService, SonnenPollingService>();
             serviceCollection.AddTimedPollingHost<ISonnenPollingService>(sonnenConfig.GetSection("PollingService"));
+
+            serviceCollection.AddGraphCollectionViewModel<SonnenEnergyViewModel>();
+
             return serviceCollection;
         }
 

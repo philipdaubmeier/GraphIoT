@@ -6,6 +6,8 @@ using PhilipDaubmeier.DigitalstromHost.Config;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.EventProcessing;
 using PhilipDaubmeier.DigitalstromHost.Polling;
+using PhilipDaubmeier.DigitalstromHost.Structure;
+using PhilipDaubmeier.DigitalstromHost.ViewModel;
 using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
@@ -24,6 +26,9 @@ namespace PhilipDaubmeier.DigitalstromHost.DependencyInjection
 
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
             serviceCollection.AddScoped<DigitalstromDssClient>();
+
+            serviceCollection.AddSingleton<IDigitalstromStructureService, DigitalstromStructureService>();
+
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromEnergyPollingService>();
             serviceCollection.AddPollingService<IDigitalstromPollingService, DigitalstromSensorPollingService>();
             serviceCollection.AddTimedPollingHost<IDigitalstromPollingService>(digitalstromConfig.GetSection("PollingService"));
@@ -31,6 +36,10 @@ namespace PhilipDaubmeier.DigitalstromHost.DependencyInjection
 
             serviceCollection.AddScoped<IDigitalstromEventProcessorPlugin, DssSceneEventProcessorPlugin>();
             serviceCollection.AddHostedService<DigitalstromEventsHostedService>();
+
+            serviceCollection.AddGraphCollectionViewModel<DigitalstromEnergyViewModel>();
+            serviceCollection.AddGraphCollectionViewModel<DigitalstromZoneSensorViewModel>();
+
             return serviceCollection;
         }
 

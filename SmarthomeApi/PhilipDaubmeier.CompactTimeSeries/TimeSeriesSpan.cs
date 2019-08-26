@@ -58,7 +58,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// Creates a new TimeSeriesSpan object with the given time period and spacing of time buckets.
         /// </summary>
         public TimeSeriesSpan(DateTime begin, DateTime end, TimeSpan spacing)
-            : this(begin, end, (int)((end - begin) / spacing))
+            : this(begin, end, (int)Math.Ceiling((end - begin) / spacing))
         { }
 
         /// <summary>

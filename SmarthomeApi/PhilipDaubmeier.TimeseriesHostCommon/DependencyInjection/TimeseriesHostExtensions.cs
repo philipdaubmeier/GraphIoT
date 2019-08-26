@@ -1,10 +1,21 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 
 namespace PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection
 {
     public static class TimeseriesHostExtensions
     {
+        public static IServiceCollection AddGraphCollectionViewModel<TGraphCollectionViewModelImplementation>(this IServiceCollection serviceCollection) where TGraphCollectionViewModelImplementation : class, IGraphCollectionViewModel
+        {
+            return serviceCollection.AddGraphCollectionViewModel<IGraphCollectionViewModel, TGraphCollectionViewModelImplementation>();
+        }
+
+        public static IServiceCollection AddGraphCollectionViewModel<TGraphCollectionViewModel, TGraphCollectionViewModelImplementation>(this IServiceCollection serviceCollection) where TGraphCollectionViewModel : class, IGraphCollectionViewModel where TGraphCollectionViewModelImplementation : class, TGraphCollectionViewModel
+        {
+            return serviceCollection.AddScoped<TGraphCollectionViewModel, TGraphCollectionViewModelImplementation>();
+        }
+
         public static IServiceCollection AddPollingService<TPollingService, TPollingServiceImplementation>(this IServiceCollection serviceCollection) where TPollingService : class, IScopedPollingService where TPollingServiceImplementation : class, TPollingService
         {
             return serviceCollection.AddScoped<TPollingService, TPollingServiceImplementation>();

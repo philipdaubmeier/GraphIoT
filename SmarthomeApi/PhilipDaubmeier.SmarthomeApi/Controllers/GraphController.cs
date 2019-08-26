@@ -45,7 +45,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new ViessmannSolarViewModel(db, span);
+            var graphs = new ViessmannSolarViewModel(db) { Span = span };
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
@@ -59,7 +59,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new ViessmannHeatingViewModel(db, span);
+            var graphs = new ViessmannHeatingViewModel(db) { Span = span };
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
@@ -73,7 +73,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new DigitalstromZoneSensorViewModel(dsDb, span);
+            var graphs = new DigitalstromZoneSensorViewModel(dsDb, null) { Span = span };
             if (graphs.IsEmpty)
                 return StatusCode(404);
 
@@ -87,7 +87,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, count, out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            var graphs = new DigitalstromEnergyViewModel(dsDb, span);
+            var graphs = new DigitalstromEnergyViewModel(dsDb, null) { Span = span };
             if (graphs.IsEmpty)
                 return StatusCode(404);
 

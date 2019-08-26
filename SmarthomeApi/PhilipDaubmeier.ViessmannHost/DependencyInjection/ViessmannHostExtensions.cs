@@ -9,6 +9,7 @@ using PhilipDaubmeier.ViessmannClient.Model;
 using PhilipDaubmeier.ViessmannHost.Config;
 using PhilipDaubmeier.ViessmannHost.Database;
 using PhilipDaubmeier.ViessmannHost.Polling;
+using PhilipDaubmeier.ViessmannHost.ViewModel;
 using System;
 
 namespace PhilipDaubmeier.ViessmannHost.DependencyInjection
@@ -38,6 +39,9 @@ namespace PhilipDaubmeier.ViessmannHost.DependencyInjection
             serviceCollection.AddPollingService<IViessmannPollingService, ViessmannSolarPollingService>();
             serviceCollection.AddPollingService<IViessmannPollingService, ViessmannHeatingPollingService>();
             serviceCollection.AddTimedPollingHost<IViessmannPollingService>(viessmannConfig.GetSection("PollingService"));
+
+            serviceCollection.AddGraphCollectionViewModel<ViessmannHeatingViewModel>();
+            serviceCollection.AddGraphCollectionViewModel<ViessmannSolarViewModel>();
 
             return serviceCollection;
         }

@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,15 +10,34 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
     public class ViessmannSolarViewModel : IGraphCollectionViewModel
     {
         private readonly IViessmannDbContext db;
-        private readonly IQueryable<ViessmannSolarData> data;
+        private IQueryable<ViessmannSolarData> data;
 
-        private readonly TimeSeriesSpan span;
-
-        public ViessmannSolarViewModel(IViessmannDbContext databaseContext, TimeSeriesSpan span)
+        public ViessmannSolarViewModel(IViessmannDbContext databaseContext)
         {
             db = databaseContext;
-            this.span = span;
-            data = db.ViessmannSolarTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+
+            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+        }
+
+        public string Key => "solar";
+
+        private TimeSeriesSpan span;
+        public TimeSeriesSpan Span
+        {
+            get { return span; }
+            set
+            {
+                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
+                    return;
+                span = value;
+
+                _solarWh = null;
+                _solarCollectorTemp = null;
+                _solarHotwaterTemp = null;
+                _solarPumpState = null;
+                _solarSuppression = null;
+                data = db.ViessmannSolarTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+            }
         }
 
         public bool IsEmpty => !SolarWh.Points.Any();

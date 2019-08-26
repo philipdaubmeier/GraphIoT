@@ -57,11 +57,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("lametric")]
         public ActionResult GetSonnenLaMetric()
         {
-            var viewModelDetailed = new SonnenEnergyViewModel(_dbContext, new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min));
-            var viewModelResampled = new SonnenEnergyViewModel(_dbContext, new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 37));
+            var viewModel = new SonnenEnergyViewModel(_dbContext)
+            {
+                Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min)
+            };
+            var totalYieldToday = viewModel.ProductionPower.Points.Sum(x => (decimal)x) / 60 / 1000;
 
-            var totalYieldToday = viewModelDetailed.ProductionPower.Points.Sum(x => (decimal)x) / 60 / 1000;
-            var chartSolarYield = viewModelResampled.ProductionPower.Points;
+            viewModel.Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 37);
+            var chartSolarYield = viewModel.ProductionPower.Points;
 
             return Json(new
             {

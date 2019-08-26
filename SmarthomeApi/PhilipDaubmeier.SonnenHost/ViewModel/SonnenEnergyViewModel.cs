@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,15 +10,37 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
     public class SonnenEnergyViewModel : IGraphCollectionViewModel
     {
         private readonly ISonnenDbContext db;
-        private readonly IQueryable<SonnenEnergyData> data;
+        private IQueryable<SonnenEnergyData> data;
 
-        private readonly TimeSeriesSpan span;
-
-        public SonnenEnergyViewModel(ISonnenDbContext databaseContext, TimeSeriesSpan span)
+        public SonnenEnergyViewModel(ISonnenDbContext databaseContext)
         {
             db = databaseContext;
-            this.span = span;
-            data = db.SonnenEnergyDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+
+            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+        }
+
+        public string Key => "solarenergy";
+
+        private TimeSeriesSpan span = null;
+        public TimeSeriesSpan Span
+        {
+            get { return span; }
+            set
+            {
+                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
+                    return;
+                span = value;
+
+                _productionPower = null;
+                _consumptionPower = null;
+                _directUsagePower = null;
+                _batteryCharging = null;
+                _batteryDischarging = null;
+                _gridFeedin = null;
+                _gridPurchase = null;
+                _batteryUsoc = null;
+                data = db.SonnenEnergyDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+            }
         }
 
         public bool IsEmpty => !BatteryUsoc.Points.Any();

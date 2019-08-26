@@ -2,12 +2,13 @@
 using Newtonsoft.Json;
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
+using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.DigitalstromHost.Structure;
 using PhilipDaubmeier.DigitalstromHost.ViewModel;
-using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.SonnenHost.ViewModel;
+using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.ViewModel;
 using System;
@@ -44,39 +45,34 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             get
             {
+                string ToRawId(string name) => Regex.Replace(name.ToLowerInvariant().Replace("ä", "ae").Replace("ö", "oe")
+                    .Replace("ü", "ue").Replace("ß", "ss"), @"[^\u0000-\u007F]+", string.Empty).Replace(' ', '_');
+
                 if (graphIds == null)
                 {
-                    graphIds = GenerateViewModels(new TimeSeriesSpan(DateTime.Now.AddDays(-1), DateTime.Now, 1))
-                        .SelectMany(n => n.Value.Graphs().Zip(Enumerable.Range(0, 100), (g, i) => new Tuple<int, string>(i, g.Name.ToLowerInvariant()))
-                        .Select(t => new Tuple<int, string>(t.Item1, t.Item2.Replace("ä", "ae").Replace("ö", "oe").Replace("ü", "ue").Replace("ß", "ss")))
-                        .Select(t => new Tuple<int, string>(t.Item1, Regex.Replace(t.Item2, @"[^\u0000-\u007F]+", string.Empty)))
-                        .Select(t => $"{n.Key}_{t.Item1}_{t.Item2.Replace(' ', '_')}")).ToList();
+                    graphIds = viewModels
+                        .SelectMany(n => n.Value.Graphs()
+                            .Zip(Enumerable.Range(0, 100), (g, i) => new Tuple<int, string>(i, g.Name))
+                            .SelectMany(t=>new string[]
+                            {
+                                t.Item2,
+                                $"{n.Key}_{t.Item1}_{ToRawId(t.Item2)}"
+                            })
+                        ).ToList();
                 }
                 return graphIds;
             }
         }
 
-        private static Dictionary<Dsuid, List<Zone>> circuitZones = null;
-        private static Dictionary<Zone, string> zoneNames = null;
+        private readonly IDigitalstromDbContext db;
+        private readonly IDigitalstromStructureService dsStructure;
+        private readonly Dictionary<string, IGraphCollectionViewModel> viewModels;
 
-        private readonly PersistenceContext db;
-        private readonly DigitalstromDssClient dsClient;
-        public GrafanaController(PersistenceContext databaseContext, DigitalstromDssClient digitalstromClient)
+        public GrafanaController(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure, IEnumerable<IGraphCollectionViewModel> viewModels)
         {
             db = databaseContext;
-            dsClient = digitalstromClient;
-        }
-
-        private Dictionary<string, IGraphCollectionViewModel> GenerateViewModels(TimeSeriesSpan span)
-        {
-            return new Dictionary<string, IGraphCollectionViewModel>()
-            {
-                { "energy", new DigitalstromEnergyViewModel(db, span) },
-                { "sensors", new DigitalstromZoneSensorViewModel(db, span) },
-                { "heating", new ViessmannHeatingViewModel(db, span) },
-                { "solar", new ViessmannSolarViewModel(db, span) },
-                { "solarenergy", new SonnenEnergyViewModel(db, span) },
-            };
+            dsStructure = digitalstromStructure;
+            this.viewModels = viewModels.ToDictionary(x => x.Key, x => x);
         }
 
         // GET: api/grafana/
@@ -99,7 +95,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             var definition = new
             {
+                timezone = "",
                 panelId = 0,
+                dashboardId = 0,
                 range = new
                 {
                     from = "",
@@ -119,6 +117,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 intervalMs = 0,
                 targets = new[] { new
                 {
+                    data = new
+                    {
+                        rawMetricId = "",
+                        aggregate = ""
+                    },
                     target = "",
                     refId = "",
                     type = "timeserie"
@@ -143,20 +146,30 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 return StatusCode(404);
 
             var span = new TimeSeriesSpan(fromDate, toDate, query.maxDataPoints);
-            var viewModels = GenerateViewModels(span);
 
             var data = new Dictionary<string, List<dynamic[]>>();
             foreach (var target in query.targets)
             {
-                if (target == null || string.IsNullOrEmpty(target.target))
+                var targetId = target?.data?.rawMetricId ?? target?.target;
+                if (string.IsNullOrEmpty(targetId))
                     continue;
 
-                var splitted = target.target.Split('_');
+                // find the parent viewmodel of the target graph
+                var splitted = targetId.Split('_');
                 if (splitted.Length < 2 || !int.TryParse(splitted[1], out int index) || index < 0
                     || !viewModels.ContainsKey(splitted[0]) || index >= viewModels[splitted[0]].GraphCount())
                     continue;
+                var viewModel = viewModels[splitted[0]];
 
-                data.Add(target.target, viewModels[splitted[0]].Graph(index).TimestampedPoints().ToList());
+                // if a custom 'aggregate' was given, take that as time spacing
+                var targetSpan = span;
+                var spanOverride = target?.data?.aggregate?.ToTimeSpan();
+                if (spanOverride.HasValue && spanOverride.Value > span.Duration)
+                    targetSpan = new TimeSeriesSpan(fromDate, toDate, spanOverride.Value);
+                viewModel.Span = targetSpan;
+
+                // add the resampled target graph to the result
+                data.Add(target?.target ?? targetId, viewModel.Graph(index).TimestampedPoints().ToList());
             }
 
             return Json(data.Select(d => new { target = d.Key, datapoints = d.Value }));
@@ -214,14 +227,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
                 var query = JsonConvert.DeserializeAnonymousType(annotationInfo.annotation.query, definitionQuery);
 
-                if (circuitZones == null)
-                {
-                    var res = dsClient.GetCircuitZones().Result;
-                    circuitZones = res.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());
-                }
-
                 var zonesFromMeters = query?.meter_ids?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
-                    ?.SelectMany(x => circuitZones.ContainsKey(x) ? circuitZones[x] : new List<Zone>()).ToList() ?? new List<Zone>();
+                    ?.SelectMany(circuit => dsStructure.GetCircuitZones(circuit)).ToList() ?? new List<Zone>();
                 var zones = (query?.zone_ids?.Cast<Zone>()?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
 
                 filtered = events
@@ -236,19 +243,12 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 filtered = events;
             }
 
-            if (zoneNames == null)
-            {
-                var res = dsClient.GetStructure().Result;
-                zoneNames = res.Zones.ToDictionary(x => x.Id, x => x.Name);
-            }
-            string GetZoneDisplayString(Zone id) => (zoneNames?.ContainsKey(id) ?? false) ? zoneNames[id] : id.ToString();
-
             return Json(filtered.Select(dssEvent => new
             {
                 annotation = annotationInfo.annotation.name,
                 time = Instant.FromDateTimeUtc(dssEvent.TimestampUtc).ToUnixTimeMilliseconds(),
                 title = $"{dssEvent.SystemEvent.Name}",
-                tags = new[] { dssEvent.SystemEvent.Name, GetZoneDisplayString(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() },
+                tags = new[] { dssEvent.SystemEvent.Name, dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() },
                 text = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}"
             }));
         }

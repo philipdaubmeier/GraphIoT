@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -9,15 +10,43 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
     public class ViessmannHeatingViewModel : IGraphCollectionViewModel
     {
         private readonly IViessmannDbContext db;
-        private readonly IQueryable<ViessmannHeatingData> data;
+        private IQueryable<ViessmannHeatingData> data;
 
-        private readonly TimeSeriesSpan span;
-
-        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext, TimeSeriesSpan span)
+        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext)
         {
             db = databaseContext;
-            this.span = span;
-            data = db.ViessmannHeatingTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+
+            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+        }
+
+        public string Key => "heating";
+
+        private TimeSeriesSpan span;
+        public TimeSeriesSpan Span
+        {
+            get { return span; }
+            set
+            {
+                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
+                    return;
+                span = value;
+
+                _burnerMinutes = null;
+                _burnerStarts = null;
+                _burnerModulation = null;
+                _outsideTemp = null;
+                _boilerTemp = null;
+                _boilerTempMain = null;
+                _circuit0Temp = null;
+                _circuit1Temp = null;
+                _dhwTemp = null;
+                _burnerActive = null;
+                _circuit0Pump = null;
+                _circuit1Pump = null;
+                _dhwPrimaryPump = null;
+                _dhwCirculationPump = null;
+                data = db.ViessmannHeatingTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
+            }
         }
 
         public bool IsEmpty => !BurnerMinutes.Points.Any();
