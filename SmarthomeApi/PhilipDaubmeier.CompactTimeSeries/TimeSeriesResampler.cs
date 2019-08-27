@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             get
             {
-                CreateDeferred(Span);
+                CreateDeferred(Span.Duration);
                 return resampled;
             }
             private set
@@ -38,95 +38,65 @@ namespace PhilipDaubmeier.CompactTimeSeries
             Constraint = constraint;
         }
 
-        private void CreateDeferred(TimeSeriesSpan oldSpan)
+        private void CreateDeferred(TimeSpan oldInterval)
         {
             if (resampled != null)
                 return;
 
-            if (Constraint == SamplingConstraint.NoOversampling && Span.Duration < oldSpan.Duration)
-                Span = new TimeSeriesSpan(Span.Begin, Span.End, oldSpan.Duration);
+            if (Constraint == SamplingConstraint.NoOversampling && Span.Duration < oldInterval)
+                Span = new TimeSeriesSpan(Span.Begin, Span.End, oldInterval);
 
             resampled = (ITimeSeries<Tval>)Activator.CreateInstance(typeof(Tseries), Span);
         }
         
-        public void SampleAccumulate(IEnumerable<ITimeSeries<Tval>> timeseries)
-        {
-            foreach (var series in timeseries)
-                SampleAccumulate(series);
-        }
-
-        public void SampleAverage(IEnumerable<ITimeSeries<Tval>> timeseries, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast)
-        {
-            foreach (var series in timeseries)
-                SampleAverage(series, selector, resultCast);
-        }
-
-        public void SampleAggregate(IEnumerable<ITimeSeries<Tval>> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
-        {
-            foreach (var series in timeseries)
-                SampleAggregate(series, aggregate);
-        }
-
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
         {
-            CreateDeferred(timeseries.Span);
+            CreateDeferred(timeseries.Span.Duration);
             foreach (var item in timeseries)
                 if (item.Value.HasValue)
                     Resampled.Accumulate(item.Key, item.Value.Value);
         }
 
-        public void SampleAverage(ITimeSeries<Tval> timeseries, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast)
-        {
-            SampleAggregate(timeseries, x => resultCast(x.Average(selector)));
-        }
-
         public void SampleAggregate(ITimeSeries<Tval> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
         {
-            CreateDeferred(timeseries.Span);
+            SampleAggregate(new List<ITimeSeries<Tval>>() { timeseries }, aggregate);
+        }
 
-            DateTime? lastTimeBucket = null;
-            List<Tval> values = new List<Tval>();
-            bool breakOuter = false;
-            int i = 0;
+        public void SampleAggregate(IEnumerable<ITimeSeries<Tval>> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
+        {
+            var listTimeseries = new List<ITimeSeries<Tval>>(timeseries);
+            if (listTimeseries.Count <= 0)
+                return;
 
-            foreach (var item in timeseries)
+            CreateDeferred(listTimeseries.Min(x => x.Span.Duration));
+
+            for (int i = 0; i < Resampled.Span.Count; i++)
             {
-                if (item.Key < Resampled.Span.Begin)
-                    continue;
-
                 var timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
-                while (timebucket > item.Key || (timebucket + Resampled.Span.Duration) <= item.Key)
+
+                IEnumerable<Tval> ItemsToAggregate(ITimeSeries<Tval> serie)
                 {
-                    i++;
-                    if (i >= Resampled.Span.Count)
+                    foreach (var item in serie)
                     {
-                        breakOuter = true;
-                        break;
+                        if (item.Key < timebucket)
+                            continue;
+
+                        if (item.Key >= (timebucket + Resampled.Span.Duration))
+                            yield break;
+
+                        if (!item.Value.HasValue)
+                            continue;
+
+                        yield return item.Value.Value;
                     }
-                    else
-                        timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
                 }
 
-                if (!lastTimeBucket.HasValue)
-                    lastTimeBucket = timebucket;
+                var values = listTimeseries
+                    .Where(serie => serie.Span.End >= timebucket && serie.Span.Begin <= timebucket + Resampled.Span.Duration)
+                    .SelectMany(serie => ItemsToAggregate(serie));
 
-                if (breakOuter || lastTimeBucket.Value != timebucket)
-                {
-                    if (values.Count > 0)
-                        Resampled[lastTimeBucket.Value] = aggregate(values);
-                    if (breakOuter)
-                        break;
-
-                    values = new List<Tval>();
-                    lastTimeBucket = timebucket;
-                }
-
-                if (item.Value.HasValue)
-                    values.Add(item.Value.Value);
+                Resampled[i] = values.Any() ? aggregate(values) : (Tval?)null;
             }
-
-            if (lastTimeBucket.HasValue && values.Count > 0)
-                Resampled[lastTimeBucket.Value] = aggregate(values);
         }
     }
 }

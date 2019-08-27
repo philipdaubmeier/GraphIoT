@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_productionPower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.ProductionPowerSeries), Aggregator.Average, x => x, x => (int)x);
             _productionPower = new GraphViewModel<int>(resampler.Resampled, "Erzeugung", "# W");
         }
@@ -92,7 +92,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_consumptionPower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.ConsumptionPowerSeries), Aggregator.Average, x => x, x => (int)x);
             _consumptionPower = new GraphViewModel<int>(resampler.Resampled, "Verbrauch", "# W");
         }
@@ -112,7 +112,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_directUsagePower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.DirectUsagePowerSeries), Aggregator.Average, x => x, x => (int)x);
             _directUsagePower = new GraphViewModel<int>(resampler.Resampled, "Eigenverbrauch", "# W");
         }
@@ -132,7 +132,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_batteryCharging != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.BatteryChargingSeries), Aggregator.Average, x => x, x => (int)x);
             _batteryCharging = new GraphViewModel<int>(resampler.Resampled, "Batterieladung", "# W");
         }
@@ -152,7 +152,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_batteryDischarging != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.BatteryDischargingSeries), Aggregator.Average, x => x, x => (int)x);
             _batteryDischarging = new GraphViewModel<int>(resampler.Resampled, "Batterieentladung", "# W");
         }
@@ -172,7 +172,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_gridFeedin != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.GridFeedinSeries), Aggregator.Average, x => x, x => (int)x);
             _gridFeedin = new GraphViewModel<int>(resampler.Resampled, "Netzeinspeisung", "# W");
         }
@@ -192,7 +192,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_gridPurchase != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(Span, SamplingConstraint.NoOversampling);
             Aggregate(resampler, data.Select(x => x.GridPurchaseSeries), Aggregator.Average, x => x, x => (int)x);
             _gridPurchase = new GraphViewModel<int>(resampler.Resampled, "Netzbezug", "# W");
         }

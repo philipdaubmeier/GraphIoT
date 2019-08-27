@@ -78,13 +78,12 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
         public abstract IEnumerable<GraphViewModel> Graphs();
 
-        protected void Aggregate<Tseries, Tval>(TimeSeriesResampler<Tseries, Tval> resampler, IEnumerable<ITimeSeries<Tval>> timeseries, Aggregator defaultFunc, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        protected void Aggregate<Tseries, Tval>(TimeSeriesResampler<Tseries, Tval> resampler, ITimeSeries<Tval> series, Aggregator defaultFunc, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            foreach (var series in timeseries)
-                Aggregate(resampler, series, defaultFunc, selector, resultCast);
+            Aggregate(resampler, new List<ITimeSeries<Tval>>() { series }, defaultFunc, selector, resultCast);
         }
 
-        protected void Aggregate<Tseries, Tval>(TimeSeriesResampler<Tseries, Tval> resampler, ITimeSeries<Tval> series, Aggregator defaultFunc, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        protected void Aggregate<Tseries, Tval>(TimeSeriesResampler<Tseries, Tval> resampler, IEnumerable<ITimeSeries<Tval>> series, Aggregator defaultFunc, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
             switch (AggregatorFunction == Aggregator.Default ? defaultFunc : AggregatorFunction)
             {
@@ -100,19 +99,13 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
                     }
                 case Aggregator.Sum:
                     {
-                        if (CorrectionFactor == 1M && CorrectionOffset == 0M)
-                            resampler.SampleAccumulate(series);
-                        else
-                            resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) * CorrectionFactor + CorrectionOffset));
+                        resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) * CorrectionFactor + CorrectionOffset));
                         break;
                     }
                 case Aggregator.Average: goto default;
                 default:
                     {
-                        if (CorrectionFactor == 1M && CorrectionOffset == 0M)
-                            resampler.SampleAverage(series, selector, resultCast);
-                        else
-                            resampler.SampleAggregate(series, x => resultCast(x.Average(selector) * CorrectionFactor + CorrectionOffset));
+                        resampler.SampleAggregate(series, x => resultCast(x.Average(selector) * CorrectionFactor + CorrectionOffset));
                         break;
                     }
             }

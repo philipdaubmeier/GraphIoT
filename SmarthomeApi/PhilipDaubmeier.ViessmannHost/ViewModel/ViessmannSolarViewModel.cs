@@ -67,15 +67,18 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
                 return;
 
             var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+
+            // Hack: remove first 5 elements due to bug in day-boundaries
+            var preprocessedSeries = new List<TimeSeries<int>>();
             foreach (var series in data)
             {
-                // Hack: remove first 5 elements due to bug in day-boundaries
                 var whseries = series.SolarWhSeries;
                 for (int i = 0; i < 5; i++)
                     whseries[i] = whseries[i].HasValue ? (int?)0 : null;
-
-                Aggregate(resampler, whseries, Aggregator.Sum, x => x, x => (int)x);
+                preprocessedSeries.Add(whseries);
             }
+
+            Aggregate(resampler, preprocessedSeries, Aggregator.Sum, x => x, x => (int)x);
             _solarWh = new GraphViewModel<int>(resampler.Resampled, "Produktion Wh", "# Wh");
         }
 

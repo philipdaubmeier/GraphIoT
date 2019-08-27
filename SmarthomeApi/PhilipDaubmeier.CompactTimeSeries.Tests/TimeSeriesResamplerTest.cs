@@ -140,7 +140,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             timeseries[9] = 10;
 
             var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanDownsampling);
-            resampler.SampleAverage(timeseries, x => x, x => (int)x);
+            resampler.SampleAggregate(timeseries, x => (int)x.Average());
 
             Assert.Equal(new List<int>() { 5, 25, 15, 55, 7 }, resampler.Resampled.Trimmed(-1));
         }
@@ -162,7 +162,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             timeseries[9] = 100000;
 
             var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(spanDownsampling);
-            resampler.SampleAverage(timeseries, x => (decimal)x, x => (double)x);
+            resampler.SampleAggregate(timeseries, x => x.Average());
 
             // results get cropped to 1 decimal place and to a max of short.MaxValue / 10
             Assert.Equal(new List<double>() { 5d, 0.2, 0.0, 55.7, 3276.7 }, resampler.Resampled.Trimmed(-1d));
@@ -182,14 +182,14 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             // Resample with slightly later start and slightly earlier end
             var resampler1 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(
                 new TimeSeriesSpan(begin.AddSeconds(5), end.AddSeconds(-5), 5));
-            resampler1.SampleAverage(timeseries, x => x, x => (int)x);
+            resampler1.SampleAggregate(timeseries, x => (int)x.Average());
 
             Assert.Equal(new List<int>() { 10, 23, -1, 50, 12 }, resampler1.Resampled.Trimmed(-1));
 
             // Resample with slightly earlier start and slightly later end
             var resampler2 = new TimeSeriesResampler<TimeSeriesStream<int>, int>(
                 new TimeSeriesSpan(begin.AddSeconds(-5), end.AddSeconds(5), 5));
-            resampler2.SampleAverage(timeseries, x => x, x => (int)x);
+            resampler2.SampleAggregate(timeseries, x => (int)x.Average());
 
             Assert.Equal(new List<int>() { 7, 10, 36, 12 }, resampler2.Resampled.Trimmed(-1));
         }
@@ -229,10 +229,27 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             }
 
             var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(new TimeSeriesSpan(begin.AddMinutes(15), begin.AddMinutes(25), count));
-            foreach (var series in timeseries)
-                resampler.SampleAggregate(series, x => x.FirstOrDefault());
+            resampler.SampleAggregate(timeseries, x => x.FirstOrDefault());
 
             Assert.Equal(new List<int>() { 51, 61, 71, 81, 91, 2, 12, 22, 32, 42 }, resampler.Resampled.Trimmed(-1));
+        }
+
+        [Fact]
+        public void TestSumMultipleSeriesIntoOneBucket()
+        {
+            var timeseries = new List<TimeSeries<int>>();
+            for (int i = 0; i < 5; i++)
+            {
+                var series = new TimeSeries<int>(new TimeSeriesSpan(begin.AddSeconds(i), begin.AddSeconds(i + 1), count));
+                for (int j = 0; j < 10; j++)
+                    series[j] = 1;
+                timeseries.Add(series);
+            }
+
+            var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(span);
+            resampler.SampleAggregate(timeseries, x => x.Sum());
+
+            Assert.Equal(new List<int>() { 50 }, resampler.Resampled.Trimmed(-1));
         }
     }
 }

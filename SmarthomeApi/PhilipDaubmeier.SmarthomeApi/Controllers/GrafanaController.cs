@@ -127,7 +127,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                         {
                             factor = 0d,
                             offset = 0d
-                        }
+                        },
+                        overrideMaxDataPoints = (int?)0
                     },
                     target = "",
                     refId = "",
@@ -173,11 +174,13 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     continue;
                 var viewModel = viewModels[splitted[0]];
 
-                // if a custom 'aggregate.interval' was given, take that as time spacing
+                // if a custom 'aggregate.interval' or 'overrideMaxDataPoints' was given, take that as time spacing
                 var targetSpan = span;
                 var spanOverride = target?.data?.aggregate?.interval?.ToTimeSpan();
                 if (spanOverride.HasValue && spanOverride.Value > span.Duration)
                     targetSpan = new TimeSeriesSpan(fromDate, toDate, spanOverride.Value);
+                else if (target?.data?.overrideMaxDataPoints.HasValue ?? false)
+                    targetSpan = new TimeSeriesSpan(fromDate, toDate, target.data.overrideMaxDataPoints.Value);
                 viewModel.Span = targetSpan;
 
                 // if a custom 'aggregate.func' was given, take that as aggregation method
