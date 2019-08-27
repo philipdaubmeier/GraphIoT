@@ -1,50 +1,39 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannHost.ViewModel
 {
-    public class ViessmannSolarViewModel : IGraphCollectionViewModel
+    public class ViessmannSolarViewModel : GraphCollectionViewModelBase
     {
         private readonly IViessmannDbContext db;
         private IQueryable<ViessmannSolarData> data;
 
-        public ViessmannSolarViewModel(IViessmannDbContext databaseContext)
+        public ViessmannSolarViewModel(IViessmannDbContext databaseContext) : base()
         {
             db = databaseContext;
-
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            InvalidateData();
         }
 
-        public string Key => "solar";
+        public override string Key => "solar";
 
-        private TimeSeriesSpan span;
-        public TimeSeriesSpan Span
+        protected override void InvalidateData()
         {
-            get { return span; }
-            set
-            {
-                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
-                    return;
-                span = value;
-
-                _solarWh = null;
-                _solarCollectorTemp = null;
-                _solarHotwaterTemp = null;
-                _solarPumpState = null;
-                _solarSuppression = null;
-                data = db.ViessmannSolarTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
-            }
+            _solarWh = null;
+            _solarCollectorTemp = null;
+            _solarHotwaterTemp = null;
+            _solarPumpState = null;
+            _solarSuppression = null;
+            data = db?.ViessmannSolarTimeseries.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
 
         public bool IsEmpty => !SolarWh.Points.Any();
 
-        public int GraphCount() => 5;
+        public override int GraphCount() => 5;
 
-        public GraphViewModel Graph(int index)
+        public override GraphViewModel Graph(int index)
         {
             switch (index)
             {
@@ -57,7 +46,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             }
         }
 
-        public IEnumerable<GraphViewModel> Graphs()
+        public override IEnumerable<GraphViewModel> Graphs()
         {
             return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
@@ -77,7 +66,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_solarWh != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
             foreach (var series in data)
             {
                 // Hack: remove first 5 elements due to bug in day-boundaries
@@ -85,7 +74,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
                 for (int i = 0; i < 5; i++)
                     whseries[i] = whseries[i].HasValue ? (int?)0 : null;
 
-                resampler.SampleAccumulate(whseries);
+                Aggregate(resampler, whseries, Aggregator.Sum, x => x, x => (int)x);
             }
             _solarWh = new GraphViewModel<int>(resampler.Resampled, "Produktion Wh", "# Wh");
         }
@@ -105,8 +94,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_solarCollectorTemp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.SolarCollectorTempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.SolarCollectorTempSeries), Aggregator.Average, x => (decimal)x, x => (double)x);
             _solarCollectorTemp = new GraphViewModel<double>(resampler.Resampled, "Kollektortemperatur °C", "#.# °C");
         }
 
@@ -125,8 +114,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_solarHotwaterTemp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.SolarHotwaterTempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.SolarHotwaterTempSeries), Aggregator.Average, x => (decimal)x, x => (double)x);
             _solarHotwaterTemp = new GraphViewModel<double>(resampler.Resampled, "Warmwassertemperatur °C", "#.# °C");
         }
 
@@ -145,7 +134,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_solarPumpState != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.SolarPumpStateSeries), x => x.Any(b => b));
             _solarPumpState = new GraphViewModel<bool>(resampler.Resampled, "Solarpumpe", "# (aus/ein)");
         }
@@ -165,7 +154,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_solarSuppression != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.SolarPumpStateSeries), x => x.Any(b => b));
             _solarSuppression = new GraphViewModel<bool>(resampler.Resampled, "Nachheizunterdrückung", "# (aus/ein)");
         }

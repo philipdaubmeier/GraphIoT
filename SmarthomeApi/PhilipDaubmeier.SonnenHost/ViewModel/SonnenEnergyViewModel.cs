@@ -1,53 +1,42 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.SonnenHost.ViewModel
 {
-    public class SonnenEnergyViewModel : IGraphCollectionViewModel
+    public class SonnenEnergyViewModel : GraphCollectionViewModelBase
     {
         private readonly ISonnenDbContext db;
         private IQueryable<SonnenEnergyData> data;
 
-        public SonnenEnergyViewModel(ISonnenDbContext databaseContext)
+        public SonnenEnergyViewModel(ISonnenDbContext databaseContext) : base()
         {
             db = databaseContext;
-
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            InvalidateData();
         }
 
-        public string Key => "solarenergy";
+        public override string Key => "solarenergy";
 
-        private TimeSeriesSpan span = null;
-        public TimeSeriesSpan Span
+        protected override void InvalidateData()
         {
-            get { return span; }
-            set
-            {
-                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
-                    return;
-                span = value;
-
-                _productionPower = null;
-                _consumptionPower = null;
-                _directUsagePower = null;
-                _batteryCharging = null;
-                _batteryDischarging = null;
-                _gridFeedin = null;
-                _gridPurchase = null;
-                _batteryUsoc = null;
-                data = db.SonnenEnergyDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
-            }
+            _productionPower = null;
+            _consumptionPower = null;
+            _directUsagePower = null;
+            _batteryCharging = null;
+            _batteryDischarging = null;
+            _gridFeedin = null;
+            _gridPurchase = null;
+            _batteryUsoc = null;
+            data = db?.SonnenEnergyDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
 
         public bool IsEmpty => !BatteryUsoc.Points.Any();
 
-        public int GraphCount() => 8;
+        public override int GraphCount() => 8;
 
-        public GraphViewModel Graph(int index)
+        public override GraphViewModel Graph(int index)
         {
             switch(index)
             {
@@ -63,7 +52,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             }
         }
 
-        public IEnumerable<GraphViewModel> Graphs()
+        public override IEnumerable<GraphViewModel> Graphs()
         {
             return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
@@ -83,8 +72,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_productionPower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.ProductionPowerSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.ProductionPowerSeries), Aggregator.Average, x => x, x => (int)x);
             _productionPower = new GraphViewModel<int>(resampler.Resampled, "Erzeugung", "# W");
         }
 
@@ -103,8 +92,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_consumptionPower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.ConsumptionPowerSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.ConsumptionPowerSeries), Aggregator.Average, x => x, x => (int)x);
             _consumptionPower = new GraphViewModel<int>(resampler.Resampled, "Verbrauch", "# W");
         }
 
@@ -123,8 +112,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_directUsagePower != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.DirectUsagePowerSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.DirectUsagePowerSeries), Aggregator.Average, x => x, x => (int)x);
             _directUsagePower = new GraphViewModel<int>(resampler.Resampled, "Eigenverbrauch", "# W");
         }
 
@@ -143,8 +132,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_batteryCharging != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BatteryChargingSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BatteryChargingSeries), Aggregator.Average, x => x, x => (int)x);
             _batteryCharging = new GraphViewModel<int>(resampler.Resampled, "Batterieladung", "# W");
         }
 
@@ -163,8 +152,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_batteryDischarging != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BatteryDischargingSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BatteryDischargingSeries), Aggregator.Average, x => x, x => (int)x);
             _batteryDischarging = new GraphViewModel<int>(resampler.Resampled, "Batterieentladung", "# W");
         }
 
@@ -183,8 +172,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_gridFeedin != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.GridFeedinSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.GridFeedinSeries), Aggregator.Average, x => x, x => (int)x);
             _gridFeedin = new GraphViewModel<int>(resampler.Resampled, "Netzeinspeisung", "# W");
         }
 
@@ -203,8 +192,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_gridPurchase != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.GridPurchaseSeries), x => (decimal)x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.GridPurchaseSeries), Aggregator.Average, x => x, x => (int)x);
             _gridPurchase = new GraphViewModel<int>(resampler.Resampled, "Netzbezug", "# W");
         }
 
@@ -223,8 +212,8 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             if (_batteryUsoc != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BatteryUsocSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BatteryUsocSeries), Aggregator.Average, x => (decimal)x, x => (double)x);
             _batteryUsoc = new GraphViewModel<double>(resampler.Resampled, "Batterie Ladestand", "#.# %");
         }
     }

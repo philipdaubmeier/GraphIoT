@@ -6,11 +6,8 @@ using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Structure;
-using PhilipDaubmeier.DigitalstromHost.ViewModel;
-using PhilipDaubmeier.SonnenHost.ViewModel;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
-using PhilipDaubmeier.ViessmannHost.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -121,7 +118,16 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     {
                         rawMetricId = "",
                         filterIfNoneOf = new List<string>(),
-                        aggregate = ""
+                        aggregate = new
+                        {
+                            interval = "",
+                            func = ""
+                        },
+                        correction = new
+                        {
+                            factor = 0d,
+                            offset = 0d
+                        }
                     },
                     target = "",
                     refId = "",
@@ -167,12 +173,30 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     continue;
                 var viewModel = viewModels[splitted[0]];
 
-                // if a custom 'aggregate' was given, take that as time spacing
+                // if a custom 'aggregate.interval' was given, take that as time spacing
                 var targetSpan = span;
-                var spanOverride = target?.data?.aggregate?.ToTimeSpan();
+                var spanOverride = target?.data?.aggregate?.interval?.ToTimeSpan();
                 if (spanOverride.HasValue && spanOverride.Value > span.Duration)
                     targetSpan = new TimeSeriesSpan(fromDate, toDate, spanOverride.Value);
                 viewModel.Span = targetSpan;
+
+                // if a custom 'aggregate.func' was given, take that as aggregation method
+                Aggregator ToAggregator(string aggregateRaw)
+                {
+                    switch (aggregateRaw?.Substring(0, Math.Min(3, target.data.aggregate.func.Length))?.ToLowerInvariant())
+                    {
+                        case "min": return Aggregator.Minimum;
+                        case "max": return Aggregator.Maximum;
+                        case "avg": return Aggregator.Average;
+                        case "sum": return Aggregator.Sum;
+                        default: return Aggregator.Default;
+                    }
+                }
+                viewModel.AggregatorFunction = ToAggregator(target?.data?.aggregate?.func);
+
+                // if a custom correction factor and/or offset was given, set them to get them taken into account
+                viewModel.CorrectionFactor = ((decimal?)target?.data?.correction?.factor) ?? 1M;
+                viewModel.CorrectionOffset = ((decimal?)target?.data?.correction?.offset) ?? 0M;
 
                 // add the resampled target graph to the result
                 data.Add(target?.target ?? targetId, viewModel.Graph(index).TimestampedPoints().ToList());

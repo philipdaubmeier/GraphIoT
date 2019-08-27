@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
-    public class DigitalstromZoneSensorViewModel : IGraphCollectionViewModel
+    public class DigitalstromZoneSensorViewModel : GraphCollectionViewModelBase
     {
         private readonly IDigitalstromDbContext db;
         private IQueryable<DigitalstromZoneSensorData> data;
@@ -16,42 +16,32 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         private readonly IDigitalstromStructureService dsStructure;
         private readonly int zoneCount;
 
-        public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure)
+        public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure) : base()
         {
             db = databaseContext;
             dsStructure = digitalstromStructure;
-
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            InvalidateData();
 
             zoneCount = dsStructure.Zones.Count();
         }
 
-        public string Key => "sensors";
+        public override string Key => "sensors";
 
-        private TimeSeriesSpan span;
-        public TimeSeriesSpan Span
+        protected override void InvalidateData()
         {
-            get { return span; }
-            set
-            {
-                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
-                    return;
-                span = value;
-
-                _temperatureGraphs = null;
-                _humidityGraphs = null;
-                data = db.DsSensorDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
-            }
+            _temperatureGraphs = null;
+            _humidityGraphs = null;
+            data = db?.DsSensorDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
 
         public bool IsEmpty => (TemperatureGraphs?.Count() ?? 0) <= 0 || !TemperatureGraphs.First().Value.Points.Any();
 
-        public int GraphCount()
+        public override int GraphCount()
         {
             return zoneCount * 2;
         }
 
-        public GraphViewModel Graph(int index)
+        public override GraphViewModel Graph(int index)
         {
             int i = index / 2;
             if (index % 2 == 0)
@@ -68,7 +58,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             }
         }
 
-        public IEnumerable<GraphViewModel> Graphs()
+        public override IEnumerable<GraphViewModel> Graphs()
         {
             foreach (var graph in TemperatureGraphs)
             {
@@ -102,8 +92,8 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
                 if (index != -1 && index != i)
                     continue;
 
-                var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-                resampler.SampleAverage(series.Select(x => x.TemperatureSeries), x => (decimal)x, x => (double)x);
+                var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+                Aggregate(resampler, series.Select(x => x.TemperatureSeries), Aggregator.Average, x => (decimal)x, x => (double)x);
                 _temperatureGraphs.Add(new Tuple<int, int>(i, series.Key), new GraphViewModel<double>(resampler.Resampled, $"Temperatur {dsStructure?.GetZoneName(series.Key) ?? series.Key.ToString()}", "#.# °C"));
             }
         }
@@ -132,8 +122,8 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
                 if (index != -1 && index != i)
                     continue;
 
-                var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-                resampler.SampleAverage(series.Select(x => x.HumiditySeries), x => (decimal)x, x => (double)x);
+                var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+                Aggregate(resampler, series.Select(x => x.HumiditySeries), Aggregator.Average, x => (decimal)x, x => (double)x);
                 _humidityGraphs.Add(new Tuple<int, int>(i, series.Key), new GraphViewModel<double>(resampler.Resampled, $"Luftfeuchtigkeit {dsStructure?.GetZoneName(series.Key) ?? series.Key.ToString()}", "#.0 '%'"));
             }
         }

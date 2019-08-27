@@ -3,57 +3,46 @@ using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
-    public class DigitalstromEnergyViewModel : IGraphCollectionViewModel
+    public class DigitalstromEnergyViewModel : GraphCollectionViewModelBase
     {
         private readonly IDigitalstromDbContext db;
         private IQueryable<DigitalstromEnergyHighresData> data = null;
 
         private readonly IDigitalstromStructureService dsStructure;
 
-        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure)
+        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure) : base()
         {
             db = databaseContext;
             dsStructure = digitalstromStructure;
-
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            InvalidateData();
         }
 
-        public string Key => "energy";
+        public override string Key => "energy";
 
-        private TimeSeriesSpan span;
-        public TimeSeriesSpan Span
+        protected override void InvalidateData()
         {
-            get { return span; }
-            set
-            {
-                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
-                    return;
-                span = value;
-
-                _energyGraphs = null;
-                data = db.DsEnergyHighresDataSet.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
-            }
+            _energyGraphs = null;
+            data = db?.DsEnergyHighresDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
-
+        
         public bool IsEmpty => (EnergyGraphs?.Count() ?? 0) <= 0 || !EnergyGraphs.First().Value.Points.Any();
 
-        public int GraphCount()
+        public override int GraphCount()
         {
             return EnergyGraphs.Count;
         }
 
-        public GraphViewModel Graph(int index)
+        public override GraphViewModel Graph(int index)
         {
             return Graphs().Skip(index).FirstOrDefault() ?? new GraphViewModel();
         }
 
-        public IEnumerable<GraphViewModel> Graphs()
+        public override IEnumerable<GraphViewModel> Graphs()
         {
             foreach (var graph in EnergyGraphs)
                 yield return graph.Value;
@@ -84,9 +73,9 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
                     foreach (var series in seriesCollection)
                     {
                         if (!resamplers.ContainsKey(series.Key))
-                            resamplers.Add(series.Key, new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling));
+                            resamplers.Add(series.Key, new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling));
 
-                        resamplers[series.Key].SampleAccumulate(series.Value);
+                        Aggregate(resamplers[series.Key], series.Value, Aggregator.Average, x => x, x => (int)x);
                     }
                 }
             }

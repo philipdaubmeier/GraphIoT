@@ -1,61 +1,50 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannHost.ViewModel
 {
-    public class ViessmannHeatingViewModel : IGraphCollectionViewModel
+    public class ViessmannHeatingViewModel : GraphCollectionViewModelBase
     {
         private readonly IViessmannDbContext db;
         private IQueryable<ViessmannHeatingData> data;
 
-        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext)
+        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext) : base()
         {
             db = databaseContext;
-
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            InvalidateData();
         }
 
-        public string Key => "heating";
+        public override string Key => "heating";
 
-        private TimeSeriesSpan span;
-        public TimeSeriesSpan Span
+        protected override void InvalidateData()
         {
-            get { return span; }
-            set
-            {
-                if (value == null || (span != null && span.Begin == value.Begin && span.End == value.End && span.Count == value.Count))
-                    return;
-                span = value;
-
-                _burnerMinutes = null;
-                _burnerStarts = null;
-                _burnerModulation = null;
-                _outsideTemp = null;
-                _boilerTemp = null;
-                _boilerTempMain = null;
-                _circuit0Temp = null;
-                _circuit1Temp = null;
-                _dhwTemp = null;
-                _burnerActive = null;
-                _circuit0Pump = null;
-                _circuit1Pump = null;
-                _dhwPrimaryPump = null;
-                _dhwCirculationPump = null;
-                data = db.ViessmannHeatingTimeseries.Where(x => x.Day >= span.Begin.Date && x.Day <= span.End.Date);
-            }
+            _burnerMinutes = null;
+            _burnerStarts = null;
+            _burnerModulation = null;
+            _outsideTemp = null;
+            _boilerTemp = null;
+            _boilerTempMain = null;
+            _circuit0Temp = null;
+            _circuit1Temp = null;
+            _dhwTemp = null;
+            _burnerActive = null;
+            _circuit0Pump = null;
+            _circuit1Pump = null;
+            _dhwPrimaryPump = null;
+            _dhwCirculationPump = null;
+            data = db?.ViessmannHeatingTimeseries.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
 
         public bool IsEmpty => !BurnerMinutes.Points.Any();
 
-        public int GraphCount() => 14;
+        public override int GraphCount() => 14;
 
-        public GraphViewModel Graph(int index)
+        public override GraphViewModel Graph(int index)
         {
-            switch(index)
+            switch (index)
             {
                 case 0: return BurnerMinutes;
                 case 1: return BurnerStarts;
@@ -75,7 +64,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             }
         }
 
-        public IEnumerable<GraphViewModel> Graphs()
+        public override IEnumerable<GraphViewModel> Graphs()
         {
             return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
@@ -95,8 +84,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_burnerMinutes != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAccumulate(data.Select(x => x.BurnerMinutesSeries));
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BurnerMinutesSeries), Aggregator.Sum, x => (decimal)x, x => (double)x);
             _burnerMinutes = new GraphViewModel<double>(resampler.Resampled, "Betriebsstunden Brenner", "# min");
         }
 
@@ -115,8 +104,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_burnerStarts != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAccumulate(data.Select(x => x.BurnerStartsSeries));
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BurnerStartsSeries), Aggregator.Sum, x => x, x => (int)x);
             _burnerStarts = new GraphViewModel<int>(resampler.Resampled, "Brennerstarts", "# Starts");
         }
 
@@ -135,8 +124,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_burnerModulation != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BurnerModulationSeries), x => x, x => (int)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => x.BurnerModulationSeries), Aggregator.Average, x => x, x => (int)x);
             _burnerModulation = new GraphViewModel<int>(resampler.Resampled, "Brennermodulation", "# (1-255)");
         }
 
@@ -155,8 +144,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_outsideTemp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.OutsideTempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.OutsideTempSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _outsideTemp = new GraphViewModel<double>(resampler.Resampled, "Außentemperatur", "#.# °C");
         }
 
@@ -175,8 +164,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_boilerTemp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BoilerTempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.BoilerTempSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _boilerTemp = new GraphViewModel<double>(resampler.Resampled, "Kesselwassertemperatur", "#.# °C");
         }
 
@@ -195,8 +184,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_boilerTempMain != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.BoilerTempMainSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.BoilerTempMainSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _boilerTempMain = new GraphViewModel<double>(resampler.Resampled, "Kesseltemperatur", "#.# °C");
         }
 
@@ -215,8 +204,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_circuit0Temp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.Circuit0TempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.Circuit0TempSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _circuit0Temp = new GraphViewModel<double>(resampler.Resampled, "Vorlauftemperatur Heizkreis 1", "#.# °C");
         }
 
@@ -235,8 +224,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_circuit1Temp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.Circuit1TempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.Circuit1TempSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _circuit1Temp = new GraphViewModel<double>(resampler.Resampled, "Vorlauftemperatur Heizkreis 2", "#.# °C");
         }
 
@@ -255,8 +244,8 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_dhwTemp != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(span, SamplingConstraint.NoOversampling);
-            resampler.SampleAverage(data.Select(x => x.DhwTempSeries), x => (decimal)x, x => (double)x);
+            var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
+            Aggregate(resampler, data.Select(x => RemoveZeros(x.DhwTempSeries)), Aggregator.Average, x => (decimal)x, x => (double)x);
             _dhwTemp = new GraphViewModel<double>(resampler.Resampled, "Warmwassertemperatur", "#.# °C");
         }
 
@@ -275,7 +264,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_burnerActive != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.BurnerActiveSeries), x => x.Any(b => b));
             _burnerActive = new GraphViewModel<bool>(resampler.Resampled, "Brenner aktiv", "# (aus/ein)");
         }
@@ -295,7 +284,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_circuit0Pump != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.Circuit0PumpSeries), x => x.Any(b => b));
             _circuit0Pump = new GraphViewModel<bool>(resampler.Resampled, "Heizkreispumpe Heizkreis 1", "# (aus/ein)");
         }
@@ -315,7 +304,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_circuit1Pump != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.Circuit1PumpSeries), x => x.Any(b => b));
             _circuit1Pump = new GraphViewModel<bool>(resampler.Resampled, "Heizkreispumpe Heizkreis 2", "# (aus/ein)");
         }
@@ -335,7 +324,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_dhwPrimaryPump != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.DhwPrimaryPumpSeries), x => x.Any(b => b));
             _dhwPrimaryPump = new GraphViewModel<bool>(resampler.Resampled, "Speicherladepumpe Warmwasser", "# (aus/ein)");
         }
@@ -355,9 +344,21 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             if (_dhwCirculationPump != null || data == null)
                 return;
 
-            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(span, SamplingConstraint.NoOversampling);
+            var resampler = new TimeSeriesResampler<TimeSeries<bool>, bool>(Span, SamplingConstraint.NoOversampling);
             resampler.SampleAggregate(data.Select(x => x.DhwCirculationPumpSeries), x => x.Any(b => b));
             _dhwCirculationPump = new GraphViewModel<bool>(resampler.Resampled, "Zirkulationspumpe Warmwasser", "# (aus/ein)");
+        }
+
+        /// <summary>
+        /// Hack for noisy data which contains 0 values where actually no current data was there, should be null really
+        /// </summary>
+        private ITimeSeries<double> RemoveZeros(ITimeSeries<double> input)
+        {
+            var series = input;
+            for (int i = 0; i < series.Count; i++)
+                if (series[i].HasValue && series[i].Value == 0d)
+                    series[i] = null;
+            return series;
         }
     }
 }
