@@ -120,6 +120,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     data = new
                     {
                         rawMetricId = "",
+                        filterIfNoneOf = new List<string>(),
                         aggregate = ""
                     },
                     target = "",
@@ -152,6 +153,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             {
                 var targetId = target?.data?.rawMetricId ?? target?.target;
                 if (string.IsNullOrEmpty(targetId))
+                    continue;
+
+                // filter if the filterIfNoneOf list is present but the target is not contained
+                var filterIfNoneOf = target?.data?.filterIfNoneOf;
+                if (filterIfNoneOf != null && !filterIfNoneOf.Contains(targetId))
                     continue;
 
                 // find the parent viewmodel of the target graph
