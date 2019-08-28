@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 if (item.Value.HasValue)
                     Resampled.Accumulate(item.Key, item.Value.Value);
         }
-
+        
         public void SampleAggregate(ITimeSeries<Tval> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
         {
             SampleAggregate(new List<ITimeSeries<Tval>>() { timeseries }, aggregate);
@@ -72,30 +72,24 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             for (int i = 0; i < Resampled.Span.Count; i++)
             {
-                var timebucket = Resampled.Span.Begin + i * Resampled.Span.Duration;
-
-                IEnumerable<Tval> ItemsToAggregate(ITimeSeries<Tval> serie)
-                {
-                    foreach (var item in serie)
-                    {
-                        if (item.Key < timebucket)
-                            continue;
-
-                        if (item.Key >= (timebucket + Resampled.Span.Duration))
-                            yield break;
-
-                        if (!item.Value.HasValue)
-                            continue;
-
-                        yield return item.Value.Value;
-                    }
-                }
-
-                var values = listTimeseries
-                    .Where(serie => serie.Span.End >= timebucket && serie.Span.Begin <= timebucket + Resampled.Span.Duration)
-                    .SelectMany(serie => ItemsToAggregate(serie));
+                var values = ItemsToAggregate(listTimeseries, Resampled.Span.Begin + i * Resampled.Span.Duration);
 
                 Resampled[i] = values.Any() ? aggregate(values) : (Tval?)null;
+            }
+        }
+
+        private IEnumerable<Tval> ItemsToAggregate(List<ITimeSeries<Tval>> listTimeseries, DateTime timebucket)
+        {
+            foreach (var serie in listTimeseries)
+            {
+                if (!(serie.Span.End >= timebucket && serie.Span.Begin <= timebucket + Resampled.Span.Duration))
+                    continue;
+
+                var startIndex = (int)Math.Ceiling((timebucket - serie.Span.Begin) / serie.Span.Duration);
+                var endIndex = (int)Math.Ceiling((timebucket + Resampled.Span.Duration - serie.Span.Begin) / serie.Span.Duration);
+                for (int i = Math.Max(0, startIndex); i < Math.Min(endIndex, serie.Count); i++)
+                    if (serie[i].HasValue)
+                        yield return serie[i].Value;
             }
         }
     }
