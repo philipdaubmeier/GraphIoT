@@ -111,7 +111,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     to = ""
                 },
                 interval = "",
-                intervalMs = 0,
+                intervalMs = 0L,
                 targets = new[] { new
                 {
                     data = new

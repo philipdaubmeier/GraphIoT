@@ -11,8 +11,10 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
         public GraphCollectionViewModelBase()
         {
-            Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-1), DateTime.Now, 1);
+            Span = new TimeSeriesSpan(DateTime.MinValue, DateTime.MinValue.AddMinutes(1), 1);
         }
+
+        protected bool IsInitialSpan => Span.Begin == DateTime.MinValue && Span.End == DateTime.MinValue.AddMinutes(1) && Span.Count == 1;
 
         private TimeSeriesSpan span;
         public TimeSeriesSpan Span

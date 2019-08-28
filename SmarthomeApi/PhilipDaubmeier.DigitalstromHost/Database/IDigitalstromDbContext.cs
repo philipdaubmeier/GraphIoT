@@ -7,9 +7,13 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
     {
         DbSet<DigitalstromZone> DsZones { get; set; }
 
+        DbSet<DigitalstromCircuit> DsCircuits { get; set; }
+
         DbSet<DigitalstromZoneSensorData> DsSensorDataSet { get; set; }
 
         DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
+
+        DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
 

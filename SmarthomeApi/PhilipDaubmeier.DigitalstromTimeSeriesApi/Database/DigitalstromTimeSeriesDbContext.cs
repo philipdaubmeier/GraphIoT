@@ -13,9 +13,13 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi.Database
         #region IDigitalstromDbContext
         public DbSet<DigitalstromZone> DsZones { get; set; }
 
+        public DbSet<DigitalstromCircuit> DsCircuits { get; set; }
+
         public DbSet<DigitalstromZoneSensorData> DsSensorDataSet { get; set; }
 
         public DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
+
+        public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
         #endregion

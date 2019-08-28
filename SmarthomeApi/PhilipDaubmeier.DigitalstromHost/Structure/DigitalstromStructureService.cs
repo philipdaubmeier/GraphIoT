@@ -12,7 +12,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Structure
         private List<Zone> zones = null;
         private Dictionary<Dsuid, List<Zone>> circuitZones = null;
         private Dictionary<Dsuid, string> circuitNames = null;
+        private HashSet<Dsuid> circuitsWithMetering = null;
         private Dictionary<Zone, string> zoneNames = null;
+        private Dictionary<Zone, List<Sensor>> zoneSensorTypes = null;
 
         private readonly DigitalstromDssClient dsClient;
 
@@ -62,6 +64,13 @@ namespace PhilipDaubmeier.DigitalstromHost.Structure
             return circuit.ToString();
         }
 
+        public bool IsMeteringCircuit(Dsuid circuit)
+        {
+            LazyLoad();
+
+            return circuitsWithMetering.Contains(circuit);
+        }
+
         public string GetZoneName(Zone zone)
         {
             LazyLoad();
@@ -70,6 +79,13 @@ namespace PhilipDaubmeier.DigitalstromHost.Structure
                 return name;
 
             return zone.ToString();
+        }
+
+        public bool HasZoneSensor(Zone zone, Sensor type)
+        {
+            LazyLoad();
+
+            return zoneSensorTypes.ContainsKey(zone) && zoneSensorTypes[zone].Contains(type);
         }
 
         private void LazyLoad()
@@ -87,8 +103,14 @@ namespace PhilipDaubmeier.DigitalstromHost.Structure
                 var circuitNameRes = dsClient.GetMeteringCircuits().Result;
                 circuitNames = circuitNameRes.DSMeters.ToDictionary(x => x.DSUID, x => x.Name);
 
+                var circuitsMetering = dsClient.GetMeteringCircuits().Result;
+                circuitsWithMetering = circuitsMetering.FilteredMeterNames.Select(x => x.Key).ToHashSet();
+
                 var zoneNameRes = dsClient.GetStructure().Result;
                 zoneNames = zoneNameRes.Zones.ToDictionary(x => x.Id, x => x.Name);
+
+                var zoneSensors = dsClient.GetZonesAndSensorValues().Result;
+                zoneSensorTypes = zoneSensors.Zones.ToDictionary(x => x.ZoneID, x => x.Sensor?.Select(s => s.Type)?.ToList() ?? new List<Sensor>());
 
                 circuits = circuitZones.Keys.Union(circuitNames.Keys).Distinct().OrderBy(x => (string)x).ToList();
                 zones = zoneNames.Keys.Union(circuitZones.SelectMany(x => x.Value)).Distinct().OrderBy(x => (int)x).ToList();

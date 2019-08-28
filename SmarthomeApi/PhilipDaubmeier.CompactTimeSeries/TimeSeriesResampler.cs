@@ -12,17 +12,18 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
     public class TimeSeriesResampler<Tseries, Tval> where Tval : struct where Tseries : TimeSeriesBase<Tval>
     {
-        private ITimeSeries<Tval> resampled = null;
-        public ITimeSeries<Tval> Resampled
+        private Tseries resampled = null;
+        public Tseries Resampled
         {
             get
             {
                 CreateDeferred(Span.Duration);
                 return resampled;
             }
-            private set
+            set
             {
                 resampled = value;
+                Span = resampled.Span;
             }
         }
 
@@ -46,7 +47,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             if (Constraint == SamplingConstraint.NoOversampling && Span.Duration < oldInterval)
                 Span = new TimeSeriesSpan(Span.Begin, Span.End, oldInterval);
 
-            resampled = (ITimeSeries<Tval>)Activator.CreateInstance(typeof(Tseries), Span);
+            resampled = (Tseries)Activator.CreateInstance(typeof(Tseries), Span);
         }
         
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
@@ -85,9 +86,9 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 if (!(serie.Span.End >= timebucket && serie.Span.Begin <= timebucket + Resampled.Span.Duration))
                     continue;
 
-                var startIndex = (int)Math.Ceiling((timebucket - serie.Span.Begin) / serie.Span.Duration);
-                var endIndex = (int)Math.Ceiling((timebucket + Resampled.Span.Duration - serie.Span.Begin) / serie.Span.Duration);
-                for (int i = Math.Max(0, startIndex); i < Math.Min(endIndex, serie.Count); i++)
+                var startIndex = Math.Max(0, (int)Math.Ceiling((timebucket - serie.Span.Begin) / serie.Span.Duration));
+                var endIndex = Math.Min(serie.Count, (int)Math.Ceiling((timebucket + Resampled.Span.Duration - serie.Span.Begin) / serie.Span.Duration));
+                for (int i = startIndex; i < endIndex; i++)
                     if (serie[i].HasValue)
                         yield return serie[i].Value;
             }

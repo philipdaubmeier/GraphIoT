@@ -2,8 +2,9 @@
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient;
-using PhilipDaubmeier.DigitalstromClient.Network;
+using PhilipDaubmeier.DigitalstromHost.Polling;
 using PhilipDaubmeier.SmarthomeApi.Database;
+using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -15,13 +16,16 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     [Route("api/digitalstrom")]
     public class DigitalstromController : Controller
     {
-        private static DigitalstromClient.DigitalstromDssClient dsClient;
+        private static DigitalstromDssClient dsClient;
 
         private readonly PersistenceContext db;
-        public DigitalstromController(PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider)
+        private readonly DigitalstromEnergyPollingService _pollingService;
+
+        public DigitalstromController(PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider, IEnumerable<IDigitalstromPollingService> pollingServices)
         {
             db = databaseContext;
-            dsClient = new DigitalstromClient.DigitalstromDssClient(connectionProvider);
+            dsClient = new DigitalstromDssClient(connectionProvider);
+            _pollingService = pollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).FirstOrDefault();
         }
 
         // GET api/digitalstrom/sensors
@@ -121,6 +125,21 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     scene = (int)dssEvent.Properties.SceneID
                 })
             });
+        }
+
+        // POST api/digitalstrom/energy/midres/compute
+        [HttpPost("energy/midres/compute")]
+        public ActionResult ComputeMidResFromHighRes([FromQuery] string begin, [FromQuery] string end)
+        {
+            if (_pollingService == null)
+                return StatusCode(400);
+
+            if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
+                return StatusCode(404);
+
+            _pollingService.GenerateMidResEnergySeries(span.Begin, span.End);
+
+            return StatusCode(200);
         }
     }
 }

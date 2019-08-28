@@ -13,6 +13,10 @@ namespace PhilipDaubmeier.DigitalstromHost.Structure
 
         string GetCircuitName(Dsuid circuit);
 
+        bool IsMeteringCircuit(Dsuid circuit);
+
         string GetZoneName(Zone zone);
+
+        bool HasZoneSensor(Zone zone, Sensor type);
     }
 }

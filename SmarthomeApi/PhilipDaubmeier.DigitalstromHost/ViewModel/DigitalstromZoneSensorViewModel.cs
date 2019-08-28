@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
@@ -29,8 +30,10 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         protected override void InvalidateData()
         {
-            _temperatureGraphs = null;
-            _humidityGraphs = null;
+            _temperatureGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
+            _loadedTemperatureGraphs.Clear();
+            _humidityGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
+            _loadedHumidityGraphs.Clear();
             data = db?.DsSensorDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
 
@@ -46,14 +49,12 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             int i = index / 2;
             if (index % 2 == 0)
             {
-                if (_temperatureGraphs == null || !_temperatureGraphs.Any(x => x.Key.Item1 == i))
-                    LazyLoadTemperatureGraphs(i);
+                LazyLoadTemperatureGraphs(i);
                 return _temperatureGraphs.Where(x => x.Key.Item1 == i).FirstOrDefault().Value ?? new GraphViewModel();
             }
             else
             {
-                if (_humidityGraphs == null || !_humidityGraphs.Any(x => x.Key.Item1 == i))
-                    LazyLoadHumidityGraphs(i);
+                LazyLoadHumidityGraphs(i);
                 return _humidityGraphs?.Where(x => x.Key.Item1 == i).FirstOrDefault().Value ?? new GraphViewModel();
             }
         }
@@ -68,64 +69,75 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             }
         }
         
-        private Dictionary<Tuple<int, int>, GraphViewModel> _temperatureGraphs = null;
-        public Dictionary<int, GraphViewModel> TemperatureGraphs
+        private Dictionary<Tuple<int, Zone>, GraphViewModel> _temperatureGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
+        private readonly HashSet<int> _loadedTemperatureGraphs = new HashSet<int>();
+        public Dictionary<Zone, GraphViewModel> TemperatureGraphs
         {
             get
             {
                 LazyLoadTemperatureGraphs();
-                return _temperatureGraphs?.ToDictionary(x => x.Key.Item2, x => x.Value) ?? new Dictionary<int, GraphViewModel>();
+                return _temperatureGraphs?.ToDictionary(x => x.Key.Item2, x => x.Value);
             }
         }
 
         private void LazyLoadTemperatureGraphs(int index = -1)
         {
-            if ((_temperatureGraphs != null && _temperatureGraphs.Count >= zoneCount) || data == null)
-                return;
-
-            _temperatureGraphs = new Dictionary<Tuple<int, int>, GraphViewModel>();
-
-            int i = -1;
-            foreach (var series in data.ToList().GroupBy(x => x.ZoneId))
-            {
-                i++;
-                if (index != -1 && index != i)
-                    continue;
-
-                var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
-                Aggregate(resampler, series.Select(x => x.TemperatureSeries), Aggregator.Average, x => (decimal)x, x => (double)x);
-                _temperatureGraphs.Add(new Tuple<int, int>(i, series.Key), new GraphViewModel<double>(resampler.Resampled, $"Temperatur {dsStructure?.GetZoneName(series.Key) ?? series.Key.ToString()}", "#.# °C"));
-            }
+            var resamplers = ResampleIfIndex(data?.ToList()?.GroupBy(x => (Zone)x.ZoneId), x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors), x => x.TemperatureSeries, _loadedTemperatureGraphs, index);
+            foreach (var resampler in resamplers ?? new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>())
+                _temperatureGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Temperatur {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", "#.# °C"));
         }
 
-        private Dictionary<Tuple<int, int>, GraphViewModel> _humidityGraphs = null;
-        public Dictionary<int, GraphViewModel> HumidityGraphs
+        private Dictionary<Tuple<int, Zone>, GraphViewModel> _humidityGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
+        private readonly HashSet<int> _loadedHumidityGraphs = new HashSet<int>();
+        public Dictionary<Zone, GraphViewModel> HumidityGraphs
         {
             get
             {
                 LazyLoadHumidityGraphs();
-                return _humidityGraphs.ToDictionary(x => x.Key.Item2, x => x.Value) ?? new Dictionary<int, GraphViewModel>();
+                return _humidityGraphs.ToDictionary(x => x.Key.Item2, x => x.Value);
             }
         }
 
         private void LazyLoadHumidityGraphs(int index = -1)
         {
-            if ((_humidityGraphs != null && _humidityGraphs.Count >= zoneCount) || data == null)
-                return;
+            var resamplers = ResampleIfIndex(data?.ToList()?.GroupBy(x => (Zone)x.ZoneId), x => dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors), x => x.HumiditySeries, _loadedHumidityGraphs, index);
+            foreach (var resampler in resamplers ?? new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>())
+                _humidityGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Luftfeuchtigkeit {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", "#.0 '%'"));
+        }
 
-            _humidityGraphs = new Dictionary<Tuple<int, int>, GraphViewModel>();
+        private Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>> ResampleIfIndex<T>(IEnumerable<IGrouping<Zone, T>> loadedData, Func<Zone, bool> zoneFilter, Func<T, TimeSeries<double>> seriesSelector, HashSet<int> loadedIndexSet, int index = -1)
+        {
+            var indices = Enumerable.Range(0, dsStructure.Zones.Count()).Zip(dsStructure.Zones.Where(zoneFilter).OrderBy(x => x), (i, z) => new Tuple<int, Zone>(i, z));
 
-            int i = -1;
-            foreach (var series in data.ToList().GroupBy(x => x.ZoneId))
+            // nothing to load
+            if (loadedData == null)
+                return null;
+
+            // everything already loaded
+            if (loadedIndexSet.Count >= indices.Count())
+                return null;
+
+            // the requested index is already loaded
+            if (index >= 0 && loadedIndexSet.Contains(index))
+                return null;
+
+            // only an initial mock span is given, load nothing, build empty result
+            if (IsInitialSpan)
+                return indices.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span));
+
+            var resamplers = new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>();
+            foreach (var series in loadedData)
             {
-                i++;
-                if (index != -1 && index != i)
+                var currentIndex = indices.Where(x => x.Item2 == series.Key).FirstOrDefault() ?? new Tuple<int, Zone>(-1, 0);
+                if (currentIndex.Item1 < 0 || (index != -1 && currentIndex.Item1 != index))
                     continue;
 
                 var resampler = new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span, SamplingConstraint.NoOversampling);
-                Aggregate(resampler, series.Select(x => x.HumiditySeries), Aggregator.Average, x => (decimal)x, x => (double)x);
-                _humidityGraphs.Add(new Tuple<int, int>(i, series.Key), new GraphViewModel<double>(resampler.Resampled, $"Luftfeuchtigkeit {dsStructure?.GetZoneName(series.Key) ?? series.Key.ToString()}", "#.0 '%'"));
+                Aggregate(resampler, series.Select(seriesSelector), Aggregator.Average, x => (decimal)x, x => (double)x);
+                resamplers.Add(currentIndex, resampler);
+                loadedIndexSet.Add(currentIndex.Item1);
             }
+            return resamplers;
         }
     }
 }

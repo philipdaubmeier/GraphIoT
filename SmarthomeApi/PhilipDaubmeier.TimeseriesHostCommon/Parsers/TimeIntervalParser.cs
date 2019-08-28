@@ -7,6 +7,9 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Parsers
     {
         public static TimeSpan ToTimeSpan(this string interval)
         {
+            if (interval == null)
+                return new TimeSpan();
+
             var match = Regex.Match(interval, @"^((?<w>\d+)w)?((?<d>\d+)d)?((?<h>\d+)h)?((?<m>\d+)m)?((?<s>\d+)s)?((?<ms>\d+)ms)?$",
                 RegexOptions.ExplicitCapture | RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.RightToLeft);
 
