@@ -243,7 +243,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!DateTime.TryParse(annotationInfo.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.range.to, out DateTime toDate))
                 return StatusCode(404);
 
-            var eventData = db.DsSceneEventDataSet.Where(x => x.Day >= fromDate.Date && x.Day <= toDate.Date);
+            var eventData = db.DsSceneEventDataSet.Where(x => x.Day >= fromDate.Date && x.Day <= toDate.Date).ToList();
             var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= fromDate.ToUniversalTime() && x.TimestampUtc <= toDate.ToUniversalTime()).ToList();
             List<DssEvent> filtered;
 
