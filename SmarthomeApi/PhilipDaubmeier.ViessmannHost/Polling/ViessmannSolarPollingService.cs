@@ -42,37 +42,37 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
             var time = data.First().Item3;
             var day = time.Date;
             
-            var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Day == day).FirstOrDefault();
+            var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
             if (dbSolarSeries == null)
-                _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarData() { Day = day });
+                _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarData() { Key = day });
 
             var item = data.First(d => d.Item1 == 7895.ToString());
             var newValue = int.Parse(item.Item2);
-            var oldValue = dbSolarSeries.SolarWhTotal.HasValue ? dbSolarSeries.SolarWhTotal.Value : 0;
+            var oldValue = dbSolarSeries.SolarWhTotal ?? 0;
             var series1 = dbSolarSeries.SolarWhSeries;
             series1.Accumulate(time, newValue - oldValue);
-            dbSolarSeries.SolarWhSeries = series1;
+            dbSolarSeries.SetSeries(0, series1);
             dbSolarSeries.SolarWhTotal = newValue;
 
             item = data.First(d => d.Item1 == 5272.ToString());
             var series2 = dbSolarSeries.SolarCollectorTempSeries;
             series2[time] = double.Parse(item.Item2, CultureInfo.InvariantCulture);
-            dbSolarSeries.SolarCollectorTempSeries = series2;
+            dbSolarSeries.SetSeries(1, series2);
 
             item = data.First(d => d.Item1 == 5276.ToString());
             var series3 = dbSolarSeries.SolarHotwaterTempSeries;
             series3[time] = double.Parse(item.Item2, CultureInfo.InvariantCulture);
-            dbSolarSeries.SolarHotwaterTempSeries = series3;
+            dbSolarSeries.SetSeries(2, series3);
 
             item = data.First(d => d.Item1 == 5274.ToString());
             var series4 = dbSolarSeries.SolarPumpStateSeries;
             series4[time] = item.Item2.Trim() != "0";
-            dbSolarSeries.SolarPumpStateSeries = series4;
+            dbSolarSeries.SetSeries(3, series4);
 
             item = data.First(d => d.Item1 == 5273.ToString());
             var series5 = dbSolarSeries.SolarSuppressionSeries;
             series5[time] = item.Item2.Trim() != "0";
-            dbSolarSeries.SolarSuppressionSeries = series5;
+            dbSolarSeries.SetSeries(4, series5);
 
             _dbContext.SaveChanges();
         }

@@ -75,7 +75,8 @@ namespace PhilipDaubmeier.CompactTimeSeries
             {
                 var values = ItemsToAggregate(listTimeseries, Resampled.Span.Begin + i * Resampled.Span.Duration);
 
-                Resampled[i] = values.Any() ? aggregate(values) : (Tval?)null;
+                if (values.Any())
+                    Resampled[i] = aggregate(values);
             }
         }
 

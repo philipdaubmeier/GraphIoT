@@ -12,6 +12,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
     public class DigitalstromEnergyViewModel : GraphCollectionViewModelBase
     {
         private readonly IDigitalstromDbContext db;
+        private IQueryable<DigitalstromEnergyLowresData> dataLow = null;
         private IQueryable<DigitalstromEnergyMidresData> dataMid = null;
         private IQueryable<DigitalstromEnergyHighresData> dataHigh = null;
 
@@ -19,10 +20,13 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         private enum Resolution
         {
+            InitialNone,
+            LowRes,
             MidRes,
             HighRes
         }
-        private Resolution DataResolution => Span.Duration.TotalSeconds >= 30 ? Resolution.MidRes : Resolution.HighRes;
+        private Resolution DataResolution => IsInitialSpan ? Resolution.InitialNone : Span.Duration.TotalMinutes >= 15 ? Resolution.LowRes :
+                                                                  Span.Duration.TotalSeconds >= 30 ? Resolution.MidRes : Resolution.HighRes;
 
         private readonly IDigitalstromStructureService dsStructure;
 
@@ -38,9 +42,14 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         protected override void InvalidateData()
         {
+            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            var beginMonth = FirstOfMonth(Span.Begin.Date);
+            var endMonth = FirstOfMonth(Span.End.Date);
+
             _energyGraphs = new Dictionary<Dsuid, GraphViewModel>();
             _loadedEnergyGraphs.Clear();
-            dataMid = db?.DsEnergyMidresDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
+            dataLow = db?.DsEnergyLowresDataSet.Where(x => x.Key >= beginMonth && x.Key <= endMonth);
+            dataMid = db?.DsEnergyMidresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
             dataHigh = db?.DsEnergyHighresDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
         }
         
@@ -84,14 +93,25 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             if (_loadedEnergyGraphs.Count >= indices.Count())
                 return;
 
-            var resamplers = IsInitialSpan ? indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span))
-                : DataResolution == Resolution.MidRes ? LazyLoadMidResEnergyGraphs(index) : LazyLoadHighResEnergyGraphs();
+            var resamplers = SelectEnergyGraphResolution(index);
 
             if (IsInitialSpan)
                 _loadedEnergyGraphs.UnionWith(indices.Values);
 
             foreach (var resampler in resamplers ?? new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>())
                 _energyGraphs.Add(resampler.Key, new GraphViewModel<int>(resampler.Value.Resampled, $"Stromverbrauch {dsStructure?.GetCircuitName(resampler.Key) ?? resampler.Key.ToString()}", $"stromverbrauch_{resampler.Key.ToString()}", "# Ws"));
+        }
+
+        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> SelectEnergyGraphResolution(int index = -1)
+        {
+            switch (DataResolution)
+            {
+                case Resolution.LowRes: return LazyLoadMidLowResEnergyGraphs(dataLow, index);
+                case Resolution.MidRes: return LazyLoadMidLowResEnergyGraphs(dataMid, index);
+                case Resolution.HighRes: return LazyLoadHighResEnergyGraphs();
+                case Resolution.InitialNone: goto default;
+                default: return indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span));
+            }
         }
 
         private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadHighResEnergyGraphs()
@@ -131,12 +151,12 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             return resamplers;
         }
 
-        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadMidResEnergyGraphs(int index = -1)
+        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadMidLowResEnergyGraphs<T>(IQueryable<T> data, int index = -1) where T : class, IDigitalstromEnergyMidLowresData
         {
-            var filterDsuid = (string)indices.FirstOrDefault(x => x.Value == index).Key ?? string.Empty;
-            var query = index < 0 ? dataMid : dataMid.Where(x => x.CircuitId == filterDsuid);
+            var filterDsuid = indices.FirstOrDefault(x => x.Value == index).Key?.ToString() ?? string.Empty;
+            var query = index < 0 ? data : data.Where(x => x.CircuitId == filterDsuid);
             var resamplers = new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>();
-            foreach (var series in dataMid.ToList().GroupBy(x => (Dsuid)x.CircuitId))
+            foreach (var series in query.ToList().GroupBy(x => (Dsuid)x.CircuitId))
             {
                 var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
                 Aggregate(resampler, series.Select(x => x.EnergySeries), Aggregator.Average, x => x, x => (int)x);

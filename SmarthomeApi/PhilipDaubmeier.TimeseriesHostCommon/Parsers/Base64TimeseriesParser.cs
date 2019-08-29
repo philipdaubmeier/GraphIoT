@@ -41,6 +41,18 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Parsers
             return timeseries;
         }
 
+        public static string ToBase64<T>(this TimeSeries<T> timeseries, int decimalPlaces = defaultDecimalPlaces) where T : struct
+        {
+            if (typeof(T) == typeof(int))
+                return (timeseries as TimeSeries<int>).ToBase64();
+            else if (typeof(T) == typeof(double))
+                return (timeseries as TimeSeries<double>).ToBase64(decimalPlaces);
+            else if (typeof(T) == typeof(bool))
+                return (timeseries as TimeSeries<bool>).ToBase64();
+            else
+                return string.Empty;
+        }
+
         public static string ToBase64(this TimeSeries<double> timeseries, int decimalPlaces = defaultDecimalPlaces)
         {
             return ToBase64(timeseries.Select(d => d.Value.HasValue ? 

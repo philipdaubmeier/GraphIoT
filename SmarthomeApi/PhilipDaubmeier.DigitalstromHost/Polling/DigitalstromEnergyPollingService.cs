@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
@@ -59,6 +60,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
 
                 SaveHighResEnergyValuesToDb(timeseriesCollections);
                 SaveMidResEnergyValuesToDb(timeseriesCollections);
+                SaveLowResEnergyValuesToDb(timeseriesCollections);
 
                 _dbContext.SaveChanges();
             }
@@ -71,14 +73,16 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             }
         }
 
-        public void GenerateMidResEnergySeries(DateTime start, DateTime end)
+        public void GenerateMidLowResEnergySeries(DateTime start, DateTime end)
         {
             foreach (var day in new TimeSeriesSpan(start, end, 1).IncludedDates())
             {
                 Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections = null;
                 try
                 {
-                    SaveMidResEnergyValuesToDb(timeseriesCollections = ReadHighResEnergyValuesFromDb(new List<DateTime>() { day }));
+                    timeseriesCollections = ReadHighResEnergyValuesFromDb(new List<DateTime>() { day });
+                    SaveMidResEnergyValuesToDb(timeseriesCollections);
+                    SaveLowResEnergyValuesToDb(timeseriesCollections);
                     _dbContext.SaveChanges();
                 }
                 catch { throw; }
@@ -115,30 +119,43 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
 
         private void SaveMidResEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections)
         {
-            foreach (var collection in timeseriesCollections)
+            SaveMidLowResEnergyValuesToDb(timeseriesCollections.GroupBy(x => x.Key), db => db.DsEnergyMidresDataSet);
+        }
+
+        private void SaveLowResEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections)
+        {
+            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            SaveMidLowResEnergyValuesToDb(timeseriesCollections.GroupBy(x => FirstOfMonth(x.Key)), db => db.DsEnergyLowresDataSet);
+        }
+
+        private void SaveMidLowResEnergyValuesToDb<T>(IEnumerable<IGrouping<DateTime, KeyValuePair<DateTime, TimeSeriesStreamCollection<Dsuid, int>>>> groupedCollections,
+            Func<IDigitalstromDbContext, DbSet<T>> dbSetSelector) where T : class, IDigitalstromEnergyMidLowresData
+        {
+            foreach (var collection in groupedCollections)
             {
-                var day = collection.Key;
-                foreach (var timeseries in collection.Value)
+                foreach (var timeseries in collection.SelectMany(x => x.Value).GroupBy(x => x.Key))
                 {
                     var circuitDsuid = (string)timeseries.Key;
-                    var dbEnergySeries = _dbContext.DsEnergyMidresDataSet.Where(x => x.CircuitId == circuitDsuid && x.Day == day).FirstOrDefault();
+                    var dbEnergySeries = dbSetSelector(_dbContext).Where(x => x.CircuitId == circuitDsuid && x.Key == collection.Key).FirstOrDefault();
                     if (dbEnergySeries == null)
                     {
                         var dbCircuit = _dbContext.DsCircuits.Where(x => x.Dsuid == circuitDsuid).FirstOrDefault();
                         if (dbCircuit == null)
                             _dbContext.DsCircuits.Add(dbCircuit = new DigitalstromCircuit() { Dsuid = circuitDsuid });
 
-                        _dbContext.DsEnergyMidresDataSet.Add(dbEnergySeries = new DigitalstromEnergyMidresData() { CircuitId = circuitDsuid, Circuit = dbCircuit, Day = day });
+                        dbEnergySeries = Activator.CreateInstance<T>();
+                        dbEnergySeries.Key = collection.Key;
+                        dbEnergySeries.Circuit = dbCircuit;
+                        dbEnergySeries.CircuitId = circuitDsuid;
+                        dbSetSelector(_dbContext).Add(dbEnergySeries);
                     }
 
                     var seriesToWriteInto = dbEnergySeries.EnergySeries;
-                    var seriesToResample = timeseries.Value;
-
                     var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(seriesToWriteInto.Span)
                     {
                         Resampled = seriesToWriteInto
                     };
-                    resampler.SampleAggregate(seriesToResample, x => (int)x.Average());
+                    resampler.SampleAggregate(timeseries.Select(x => x.Value), x => (int)x.Average());
 
                     dbEnergySeries.EnergySeries = resampler.Resampled;
                 }

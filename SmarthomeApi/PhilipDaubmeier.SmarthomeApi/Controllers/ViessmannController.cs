@@ -231,7 +231,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("solar/lametric")]
         public ActionResult GetSolarLaMetric()
         {
-            var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Day == DateTime.Now.Date).FirstOrDefault();
+            var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Key == DateTime.Now.Date).FirstOrDefault();
             if (dbSolarSeries == null)
                 return StatusCode(404);
 
@@ -270,7 +270,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
             
-            var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Day == dayDate.Date).FirstOrDefault();
+            var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (dbSolarSeries == null)
                 return StatusCode(404);
 

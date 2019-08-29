@@ -59,7 +59,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ViessmannSolarData>()
-                .HasIndex(d => d.Day)
+                .HasIndex(d => d.Key)
                 .IsUnique();
         }
     }

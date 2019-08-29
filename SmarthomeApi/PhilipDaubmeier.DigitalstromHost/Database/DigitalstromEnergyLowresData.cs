@@ -6,9 +6,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.DigitalstromHost.Database
 {
-    public class DigitalstromEnergyLowresData
+    public class DigitalstromEnergyLowresData : IDigitalstromEnergyMidLowresData
     {
-        private const int interval30min = 60 * 24 * 30;
+        private int Interval30minThisMonth => (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2);
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -19,8 +19,8 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         [ForeignKey("CircuitId")]
         public DigitalstromCircuit Circuit { get; set; }
 
-        [Required]
-        public DateTime Month { get; set; }
+        [Required, Column("Month")]
+        public DateTime Key { get; set; }
 
         [MaxLength(4000)]
         public string EnergyCurve { get; set; }
@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         [NotMapped]
         public TimeSeries<int> EnergySeries
         {
-            get => EnergyCurve.ToTimeseries<int>(new TimeSeriesSpan(Month, Month.AddMonths(1), interval30min));
+            get => EnergyCurve.ToTimeseries<int>(new TimeSeriesSpan(Key, Key.AddMonths(1), Interval30minThisMonth));
             set { EnergyCurve = value.ToBase64(); }
         }
     }

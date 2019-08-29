@@ -127,9 +127,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             });
         }
 
-        // POST api/digitalstrom/energy/midres/compute
-        [HttpPost("energy/midres/compute")]
-        public ActionResult ComputeMidResFromHighRes([FromQuery] string begin, [FromQuery] string end)
+        // POST api/digitalstrom/energy/midlowres/compute
+        [HttpPost("energy/midlowres/compute")]
+        public ActionResult ComputeMidLowResFromHighRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_pollingService == null)
                 return StatusCode(400);
@@ -137,7 +137,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            _pollingService.GenerateMidResEnergySeries(span.Begin, span.End);
+            _pollingService.GenerateMidLowResEnergySeries(span.Begin, span.End);
 
             return StatusCode(200);
         }
