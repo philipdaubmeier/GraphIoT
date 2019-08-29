@@ -13,6 +13,8 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
         DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
 
+        DbSet<DigitalstromEnergyLowresData> DsEnergyLowresDataSet { get; set; }
+
         DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }

@@ -12,6 +12,8 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
         public DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
 
+        public DbSet<DigitalstromEnergyLowresData> DsEnergyLowresDataSet { get; set; }
+
         public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
