@@ -49,11 +49,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 {
                     graphIds = viewModels
                         .SelectMany(n => n.Value.Graphs()
-                            .Zip(Enumerable.Range(0, 100), (g, i) => new Tuple<int, string>(i, g.Name))
+                            .Zip(Enumerable.Range(0, 100), (g, i) => new Tuple<int, string, string>(i, g.Name, g.Key))
                             .SelectMany(t=>new string[]
                             {
                                 t.Item2,
-                                $"{n.Key}_{t.Item1}_{ToRawId(t.Item2)}"
+                                $"{n.Key}_{t.Item1}_{ToRawId(t.Item3)}"
                             })
                         ).ToList();
                 }

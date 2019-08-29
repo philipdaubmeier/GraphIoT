@@ -15,6 +15,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
         public long SpacingMillis => (long)Spacing.TotalMilliseconds;
 
         public string Name { get; set; }
+        public string Key { get; set; }
         public string Format { get; set; }
         public IEnumerable<dynamic> Points { get; set; }
 
@@ -23,6 +24,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
             Begin = Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc();
             Spacing = TimeSpan.FromMilliseconds(0);
             Name = string.Empty;
+            Key = string.Empty;
             Format = string.Empty;
             Points = new List<dynamic>();
         }
@@ -40,9 +42,13 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
     public class GraphViewModel<T> : GraphViewModel where T : struct
     {
-        public GraphViewModel(ITimeSeries<T> timeseries, string name = null, string format = null)
+        public GraphViewModel(ITimeSeries<T> timeseries, string name, string format)
+            : this(timeseries, name, name, format) { }
+
+        public GraphViewModel(ITimeSeries<T> timeseries, string name, string key, string format)
         {
             Name = name ?? string.Empty;
+            Key = key ?? string.Empty;
             Format = format ?? string.Empty;
             Begin = Max(FindBegin(timeseries), Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc());
             Spacing = timeseries.Span.Duration;

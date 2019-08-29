@@ -84,7 +84,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         {
             var resamplers = ResampleIfIndex(data?.ToList()?.GroupBy(x => (Zone)x.ZoneId), x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors), x => x.TemperatureSeries, _loadedTemperatureGraphs, index);
             foreach (var resampler in resamplers ?? new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>())
-                _temperatureGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Temperatur {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", "#.# °C"));
+                _temperatureGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Temperatur {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", $"temperatur_zone_{(int)resampler.Key.Item2}", "#.# °C"));
         }
 
         private Dictionary<Tuple<int, Zone>, GraphViewModel> _humidityGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
@@ -102,16 +102,12 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         {
             var resamplers = ResampleIfIndex(data?.ToList()?.GroupBy(x => (Zone)x.ZoneId), x => dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors), x => x.HumiditySeries, _loadedHumidityGraphs, index);
             foreach (var resampler in resamplers ?? new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>())
-                _humidityGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Luftfeuchtigkeit {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", "#.0 '%'"));
+                _humidityGraphs.Add(resampler.Key, new GraphViewModel<double>(resampler.Value.Resampled, $"Luftfeuchtigkeit {dsStructure?.GetZoneName(resampler.Key.Item2) ?? resampler.Key.Item2.ToString()}", $"luftfeuchtigkeit_zone_{(int)resampler.Key.Item2}", "#.0 '%'"));
         }
 
         private Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>> ResampleIfIndex<T>(IEnumerable<IGrouping<Zone, T>> loadedData, Func<Zone, bool> zoneFilter, Func<T, TimeSeries<double>> seriesSelector, HashSet<int> loadedIndexSet, int index = -1)
         {
             var indices = Enumerable.Range(0, dsStructure.Zones.Count()).Zip(dsStructure.Zones.Where(zoneFilter).OrderBy(x => x), (i, z) => new Tuple<int, Zone>(i, z));
-
-            // nothing to load
-            if (loadedData == null)
-                return null;
 
             // everything already loaded
             if (loadedIndexSet.Count >= indices.Count())
@@ -123,7 +119,10 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
             // only an initial mock span is given, load nothing, build empty result
             if (IsInitialSpan)
+            {
+                loadedIndexSet.UnionWith(indices.Select(x => x.Item1));
                 return indices.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<double>, double>(Span));
+            }
 
             var resamplers = new Dictionary<Tuple<int, Zone>, TimeSeriesResampler<TimeSeriesStream<double>, double>>();
             foreach (var series in loadedData)

@@ -80,11 +80,18 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             if (index >= 0 && _loadedEnergyGraphs.Contains(index))
                 return;
 
-            var resamplers = IsInitialSpan ? dsStructure.Circuits.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span))
+            // everything already loaded
+            if (_loadedEnergyGraphs.Count >= indices.Count())
+                return;
+
+            var resamplers = IsInitialSpan ? indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span))
                 : DataResolution == Resolution.MidRes ? LazyLoadMidResEnergyGraphs(index) : LazyLoadHighResEnergyGraphs();
 
+            if (IsInitialSpan)
+                _loadedEnergyGraphs.UnionWith(indices.Values);
+
             foreach (var resampler in resamplers ?? new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>())
-                _energyGraphs.Add(resampler.Key, new GraphViewModel<int>(resampler.Value.Resampled, $"Stromverbrauch {dsStructure?.GetCircuitName(resampler.Key) ?? resampler.Key.ToString()}", "# Ws"));
+                _energyGraphs.Add(resampler.Key, new GraphViewModel<int>(resampler.Value.Resampled, $"Stromverbrauch {dsStructure?.GetCircuitName(resampler.Key) ?? resampler.Key.ToString()}", $"stromverbrauch_{resampler.Key.ToString()}", "# Ws"));
         }
 
         private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadHighResEnergyGraphs()
@@ -96,7 +103,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             // in a first pass read all compressed base64 encoded streams and reduce them to a timeseries with the final resolution.
             // with n days and m circuits we have m * n reduced time series after the first pass, but we did that trade because we
             // only need to load and decompress all database values once and we do not have to store all decompressed data in RAM.
-            var reduced = dsStructure.Circuits.ToDictionary(x => x, x => new List<ITimeSeries<int>>());
+            var reduced = indices.Keys.ToDictionary(x => x, x => new List<ITimeSeries<int>>());
             foreach (var dbEntry in dataHigh.ToList())
             {
                 using (var seriesCollection = dbEntry.EnergySeriesEveryMeter)
@@ -117,7 +124,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             }
 
             // in the second pass we can then merge them into the final series - one time series object per circuit
-            var resamplers = dsStructure.Circuits.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling));
+            var resamplers = indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling));
             foreach (var resampler in resamplers)
                 Aggregate(resampler.Value, reduced.Where(x => x.Key == resampler.Key).SelectMany(x => x.Value), Aggregator.Average, x => x, x => (int)x);
             _loadedEnergyGraphs.UnionWith(resamplers.SelectMany(x => indices.Where(i => i.Key == x.Key).Select(i => i.Value)));
@@ -126,24 +133,21 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadMidResEnergyGraphs(int index = -1)
         {
-            // everything already loaded
-            if (_loadedEnergyGraphs.Count >= indices.Count())
-                return null;
-
+            var filterDsuid = (string)indices.FirstOrDefault(x => x.Value == index).Key ?? string.Empty;
+            var query = index < 0 ? dataMid : dataMid.Where(x => x.CircuitId == filterDsuid);
             var resamplers = new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>();
-            foreach (var series in dataMid.ToList().GroupBy(x => (Dsuid)x.CircuitId).OrderBy(x => x.Key))
+            foreach (var series in dataMid.ToList().GroupBy(x => (Dsuid)x.CircuitId))
             {
-                if (!indices.TryGetValue(series.Key, out int currentIndex))
-                    continue;
-
-                if (index != -1 && currentIndex != index)
-                    continue;
-
                 var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
                 Aggregate(resampler, series.Select(x => x.EnergySeries), Aggregator.Average, x => x, x => (int)x);
                 resamplers.Add(series.Key, resampler);
-                _loadedEnergyGraphs.Add(currentIndex);
             }
+
+            if (index < 0)
+                _loadedEnergyGraphs.UnionWith(indices.Values);
+            else
+                _loadedEnergyGraphs.Add(index);
+
             return resamplers;
         }
     }
