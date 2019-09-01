@@ -26,23 +26,24 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
             CurveProperty(index)?.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64() });
         }
 
-        private static List<PropertyInfo> _curveProperties = null;
+        private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();
         private PropertyInfo CurveProperty(int index)
         {
-            if (_curveProperties == null)
+            if (!_curveProperties.ContainsKey(GetType()))
             {
-                _curveProperties = GetType().GetProperties()
+                _curveProperties.Add(GetType(), GetType().GetProperties()
                     .Where(prop => prop.Name.EndsWith("Curve", StringComparison.InvariantCultureIgnoreCase))
                     .Where(prop => Attribute.IsDefined(prop, typeof(MaxLengthAttribute)))
                     .Where(prop => prop.PropertyType == typeof(string))
                     .Where(prop => prop.CanRead && prop.CanWrite)
-                    .ToList();
+                    .ToList());
             }
 
-            if (index < 0 || index >= _curveProperties.Count)
+            var props = _curveProperties[GetType()];
+            if (index < 0 || index >= props.Count)
                 return null;
 
-            return _curveProperties[index];
+            return props[index];
         }
     }
 }
