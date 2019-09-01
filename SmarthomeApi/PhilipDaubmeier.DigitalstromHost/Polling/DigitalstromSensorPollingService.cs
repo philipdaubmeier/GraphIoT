@@ -51,28 +51,28 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         {
             var time = DateTime.Now;
             var day = time.Date;
-            var dbSensorSeries = _dbContext.DsSensorDataSet.Where(x => x.ZoneId == zoneId && x.Day == day).FirstOrDefault();
+            var dbSensorSeries = _dbContext.DsSensorDataSet.Where(x => x.ZoneId == zoneId && x.Key == day).FirstOrDefault();
             if (dbSensorSeries == null)
             {
                 var dbZone = _dbContext.DsZones.Where(x => x.Id == zoneId).FirstOrDefault();
                 if (dbZone == null)
                     _dbContext.DsZones.Add(dbZone = new DigitalstromZone() { Id = zoneId });
                 
-                _dbContext.DsSensorDataSet.Add(dbSensorSeries = new DigitalstromZoneSensorData() { ZoneId = zoneId, Zone = dbZone, Day = day });
+                _dbContext.DsSensorDataSet.Add(dbSensorSeries = new DigitalstromZoneSensorData() { ZoneId = zoneId, Zone = dbZone, Key = day });
             }
 
             if (sensorValues.ContainsKey(SensorType.TemperatureIndoors))
             {
                 var series = dbSensorSeries.TemperatureSeries;
                 series[time] = sensorValues[SensorType.TemperatureIndoors];
-                dbSensorSeries.TemperatureSeries = series;
+                dbSensorSeries.SetSeries(0, series);
             }
 
             if (sensorValues.ContainsKey(SensorType.HumidityIndoors))
             {
                 var series = dbSensorSeries.HumiditySeries;
                 series[time] = sensorValues[SensorType.HumidityIndoors];
-                dbSensorSeries.HumiditySeries = series;
+                dbSensorSeries.SetSeries(1, series);
             }
         }
     }

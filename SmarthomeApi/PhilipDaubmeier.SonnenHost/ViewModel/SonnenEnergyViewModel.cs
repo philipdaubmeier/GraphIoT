@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.SonnenHost.ViewModel
             _gridFeedin = null;
             _gridPurchase = null;
             _batteryUsoc = null;
-            data = db?.SonnenEnergyDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
+            data = db?.SonnenEnergyDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public bool IsEmpty => !BatteryUsoc.Points.Any();

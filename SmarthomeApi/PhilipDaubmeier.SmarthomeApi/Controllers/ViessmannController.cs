@@ -202,7 +202,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
 
-            var dbHeatingSeries = db.ViessmannHeatingTimeseries.Where(x => x.Day == dayDate.Date).FirstOrDefault();
+            var dbHeatingSeries = db.ViessmannHeatingTimeseries.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (dbHeatingSeries == null)
                 return StatusCode(404);
 

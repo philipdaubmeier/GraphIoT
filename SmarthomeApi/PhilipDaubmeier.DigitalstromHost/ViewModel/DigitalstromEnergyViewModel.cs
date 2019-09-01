@@ -50,7 +50,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             _loadedEnergyGraphs.Clear();
             dataLow = db?.DsEnergyLowresDataSet.Where(x => x.Key >= beginMonth && x.Key <= endMonth);
             dataMid = db?.DsEnergyMidresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
-            dataHigh = db?.DsEnergyHighresDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
+            dataHigh = db?.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
         
         public bool IsEmpty => (EnergyGraphs?.Count() ?? 0) <= 0 || !EnergyGraphs.First().Value.Points.Any();

@@ -34,7 +34,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
             _loadedTemperatureGraphs.Clear();
             _humidityGraphs = new Dictionary<Tuple<int, Zone>, GraphViewModel>();
             _loadedHumidityGraphs.Clear();
-            data = db?.DsSensorDataSet.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
+            data = db?.DsSensorDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public bool IsEmpty => (TemperatureGraphs?.Count() ?? 0) <= 0 || !TemperatureGraphs.First().Value.Points.Any();

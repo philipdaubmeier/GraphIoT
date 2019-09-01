@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.TimeseriesHostCommon.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -6,16 +7,19 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.SonnenHost.Database
 {
-    public class SonnenEnergyData
+    public class SonnenEnergyData : TimeSeriesDbEntityBase
     {
-        private const int interval1min = 60 * 24;
-        private const int decimalPlaces = 2;
+        [NotMapped]
+        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+
+        [NotMapped]
+        protected override int DecimalPlaces => 2;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        [Required]
-        public DateTime Day { get; set; }
+        [Required, Column("Day")]
+        public override DateTime Key { get; set; }
 
         [MaxLength(4000)]
         public string ProductionPowerCurve { get; set; }
@@ -42,59 +46,27 @@ namespace PhilipDaubmeier.SonnenHost.Database
         public string BatteryUsocCurve { get; set; }
 
         [NotMapped]
-        public TimeSeries<int> ProductionPowerSeries
-        {
-            get => ProductionPowerCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { ProductionPowerCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> ProductionPowerSeries => ProductionPowerCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> ConsumptionPowerSeries
-        {
-            get => ConsumptionPowerCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { ConsumptionPowerCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> ConsumptionPowerSeries => ConsumptionPowerCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> DirectUsagePowerSeries
-        {
-            get => DirectUsagePowerCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { DirectUsagePowerCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> DirectUsagePowerSeries => DirectUsagePowerCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> BatteryChargingSeries
-        {
-            get => BatteryChargingCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { BatteryChargingCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> BatteryChargingSeries => BatteryChargingCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> BatteryDischargingSeries
-        {
-            get => BatteryDischargingCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { BatteryDischargingCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> BatteryDischargingSeries => BatteryDischargingCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> GridFeedinSeries
-        {
-            get => GridFeedinCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { GridFeedinCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> GridFeedinSeries => GridFeedinCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<int> GridPurchaseSeries
-        {
-            get => GridPurchaseCurve.ToTimeseries<int>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min));
-            set { GridPurchaseCurve = value.ToBase64(); }
-        }
+        public TimeSeries<int> GridPurchaseSeries => GridPurchaseCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<double> BatteryUsocSeries
-        {
-            get => BatteryUsocCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval1min), decimalPlaces);
-            set { BatteryUsocCurve = value.ToBase64(decimalPlaces); }
-        }
+        public TimeSeries<double> BatteryUsocSeries => BatteryUsocCurve.ToTimeseries<double>(Span, DecimalPlaces);
     }
 }

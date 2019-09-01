@@ -83,9 +83,9 @@ namespace PhilipDaubmeier.SonnenHost.Polling
             TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging, 
             TimeSeries<int> gridFeedin, TimeSeries<int> gridPurchase, TimeSeries<double> batteryUsoc)
         {
-            var dbEnergySeries = _dbContext.SonnenEnergyDataSet.Where(x => x.Day == day).FirstOrDefault();
+            var dbEnergySeries = _dbContext.SonnenEnergyDataSet.Where(x => x.Key == day).FirstOrDefault();
             if (dbEnergySeries == null)
-                _dbContext.SonnenEnergyDataSet.Add(dbEnergySeries = new SonnenEnergyData() { Day = day });
+                _dbContext.SonnenEnergyDataSet.Add(dbEnergySeries = new SonnenEnergyData() { Key = day });
 
             var productionPowerSeries = dbEnergySeries.ProductionPowerSeries;
             var consumptionPowerSeries = dbEnergySeries.ConsumptionPowerSeries;
@@ -110,14 +110,14 @@ namespace PhilipDaubmeier.SonnenHost.Polling
                 batteryUsocSeries[time] = batteryUsoc[time];
             }
 
-            dbEnergySeries.ProductionPowerSeries = productionPowerSeries;
-            dbEnergySeries.ConsumptionPowerSeries = consumptionPowerSeries;
-            dbEnergySeries.DirectUsagePowerSeries = directUsagePowerSeries;
-            dbEnergySeries.BatteryChargingSeries = batteryChargingSeries;
-            dbEnergySeries.BatteryDischargingSeries = batteryDischargingSeries;
-            dbEnergySeries.GridFeedinSeries = gridFeedinSeries;
-            dbEnergySeries.GridPurchaseSeries = gridPurchaseSeries;
-            dbEnergySeries.BatteryUsocSeries = batteryUsocSeries;
+            dbEnergySeries.SetSeries(0, productionPowerSeries);
+            dbEnergySeries.SetSeries(1, consumptionPowerSeries);
+            dbEnergySeries.SetSeries(2, directUsagePowerSeries);
+            dbEnergySeries.SetSeries(3, batteryChargingSeries);
+            dbEnergySeries.SetSeries(4, batteryDischargingSeries);
+            dbEnergySeries.SetSeries(5, gridFeedinSeries);
+            dbEnergySeries.SetSeries(6, gridPurchaseSeries);
+            dbEnergySeries.SetSeries(7, batteryUsocSeries);
         }
     }
 }

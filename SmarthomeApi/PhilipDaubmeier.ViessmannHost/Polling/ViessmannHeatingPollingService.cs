@@ -57,71 +57,71 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
             var time = DateTime.Now;
             var day = time.Date;
             
-            var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Day == day).FirstOrDefault();
+            var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Key == day).FirstOrDefault();
             if (dbHeatingSeries == null)
-                _dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingData() { Day = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });
+                _dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingData() { Key = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });
 
             var oldHours = dbHeatingSeries.BurnerHoursTotal;
             var minutes = (burnerHoursTotal - oldHours) * 60;
             var series1 = dbHeatingSeries.BurnerMinutesSeries;
             series1.Accumulate(time, minutes > 10 || minutes < 0 ? 0 : minutes);
-            dbHeatingSeries.BurnerMinutesSeries = series1;
+            dbHeatingSeries.SetSeries(0, series1);
             dbHeatingSeries.BurnerHoursTotal = burnerHoursTotal;
 
             var oldStarts = dbHeatingSeries.BurnerStartsTotal;
             var startsDiff = burnerStartsTotal - oldStarts;
             var series2 = dbHeatingSeries.BurnerStartsSeries;
             series1.Accumulate(time, startsDiff > 10 || startsDiff < 0 ? 0 : startsDiff);
-            dbHeatingSeries.BurnerStartsSeries = series2;
+            dbHeatingSeries.SetSeries(1, series2);
             dbHeatingSeries.BurnerStartsTotal = burnerStartsTotal;
 
             var series3 = dbHeatingSeries.BurnerModulationSeries;
             series3[time] = burnerModulation;
-            dbHeatingSeries.BurnerModulationSeries = series3;
+            dbHeatingSeries.SetSeries(2, series3);
 
             var series4 = dbHeatingSeries.OutsideTempSeries;
             series4[time] = outsideTemp;
-            dbHeatingSeries.OutsideTempSeries = series4;
+            dbHeatingSeries.SetSeries(3, series4);
 
             var series5 = dbHeatingSeries.BoilerTempSeries;
             series5[time] = boilerTemp;
-            dbHeatingSeries.BoilerTempSeries = series5;
+            dbHeatingSeries.SetSeries(4, series5);
 
             var series6 = dbHeatingSeries.BoilerTempMainSeries;
             series6[time] = boilerTempMain;
-            dbHeatingSeries.BoilerTempMainSeries = series6;
+            dbHeatingSeries.SetSeries(5, series6);
 
             var series7 = dbHeatingSeries.Circuit0TempSeries;
             series7[time] = circuit0Temp;
-            dbHeatingSeries.Circuit0TempSeries = series7;
+            dbHeatingSeries.SetSeries(6, series7);
 
             var series8 = dbHeatingSeries.Circuit1TempSeries;
             series8[time] = circuit1Temp;
-            dbHeatingSeries.Circuit1TempSeries = series8;
+            dbHeatingSeries.SetSeries(7, series8);
 
             var series9 = dbHeatingSeries.DhwTempSeries;
             series9[time] = dhwTemp;
-            dbHeatingSeries.DhwTempSeries = series9;
+            dbHeatingSeries.SetSeries(8, series9);
 
             var series10 = dbHeatingSeries.BurnerActiveSeries;
             series10[time] = burnerActive;
-            dbHeatingSeries.BurnerActiveSeries = series10;
+            dbHeatingSeries.SetSeries(8, series10);
 
             var series11 = dbHeatingSeries.Circuit0PumpSeries;
             series11[time] = circuit0Pump;
-            dbHeatingSeries.Circuit0PumpSeries = series11;
+            dbHeatingSeries.SetSeries(10, series11);
 
             var series12 = dbHeatingSeries.Circuit1PumpSeries;
             series12[time] = circuit1Pump;
-            dbHeatingSeries.Circuit1PumpSeries = series12;
+            dbHeatingSeries.SetSeries(11, series12);
 
             var series13 = dbHeatingSeries.DhwPrimaryPumpSeries;
             series13[time] = dhwPrimPump;
-            dbHeatingSeries.DhwPrimaryPumpSeries = series13;
+            dbHeatingSeries.SetSeries(12, series13);
 
             var series14 = dbHeatingSeries.DhwCirculationPumpSeries;
             series14[time] = dhwCircPump;
-            dbHeatingSeries.DhwCirculationPumpSeries = series14;
+            dbHeatingSeries.SetSeries(13, series14);
 
             _dbContext.SaveChanges();
         }

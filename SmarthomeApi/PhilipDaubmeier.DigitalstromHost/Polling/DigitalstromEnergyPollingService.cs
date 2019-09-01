@@ -96,7 +96,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
             
             foreach (var day in days)
             {
-                var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Day == day).FirstOrDefault();
+                var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Key == day).FirstOrDefault();
                 if (dbEnergySeries == null)
                     timeseriesCollections.Add(day, DigitalstromEnergyHighresData.InitialEnergySeriesEveryMeter(day, Dsuids));
                 else
@@ -109,9 +109,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         {
             foreach (var collection in timeseriesCollections)
             {
-                var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Day == collection.Key).FirstOrDefault();
+                var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Key == collection.Key).FirstOrDefault();
                 if (dbEnergySeries == null)
-                    _dbContext.DsEnergyHighresDataSet.Add(dbEnergySeries = new DigitalstromEnergyHighresData() { Day = collection.Key });
+                    _dbContext.DsEnergyHighresDataSet.Add(dbEnergySeries = new DigitalstromEnergyHighresData() { Key = collection.Key });
 
                 dbEnergySeries.EnergySeriesEveryMeter = collection.Value;
             }
@@ -157,7 +157,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
                     };
                     resampler.SampleAggregate(timeseries.Select(x => x.Value), x => (int)x.Average());
 
-                    dbEnergySeries.EnergySeries = resampler.Resampled;
+                    dbEnergySeries.SetSeries(0, resampler.Resampled);
                 }
             }
         }

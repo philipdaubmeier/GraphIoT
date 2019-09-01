@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
             _circuit1Pump = null;
             _dhwPrimaryPump = null;
             _dhwCirculationPump = null;
-            data = db?.ViessmannHeatingTimeseries.Where(x => x.Day >= Span.Begin.Date && x.Day <= Span.End.Date);
+            data = db?.ViessmannHeatingTimeseries.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public bool IsEmpty => !BurnerMinutes.Points.Any();

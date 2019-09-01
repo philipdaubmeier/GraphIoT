@@ -14,9 +14,11 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
 
         protected abstract TimeSeriesSpan Span { get; }
 
+        protected abstract int DecimalPlaces { get; }
+
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
-            return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string)?.ToTimeseries<T>(Span);
+            return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string)?.ToTimeseries<T>(Span, DecimalPlaces);
         }
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct

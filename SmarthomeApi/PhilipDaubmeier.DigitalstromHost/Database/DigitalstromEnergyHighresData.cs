@@ -14,15 +14,15 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
         
-        [Required]
-        public DateTime Day { get; set; }
-        
+        [Required, Column("Day")]
+        public DateTime Key { get; set; }
+
         public byte[] EnergyCurvesEveryMeter { get; set; }
 
         [NotMapped]
         public TimeSeriesStreamCollection<Dsuid, int> EnergySeriesEveryMeter
         {
-            get => new TimeSeriesStreamCollection<Dsuid, int>(EnergyCurvesEveryMeter, Dsuid.Size, stream => Dsuid.ReadFrom(stream), Span(Day));
+            get => new TimeSeriesStreamCollection<Dsuid, int>(EnergyCurvesEveryMeter, Dsuid.Size, stream => Dsuid.ReadFrom(stream), Span(Key));
             set { EnergyCurvesEveryMeter = value.ToCompressedByteArray(); }
         }
 

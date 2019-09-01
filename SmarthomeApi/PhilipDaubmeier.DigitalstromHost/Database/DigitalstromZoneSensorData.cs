@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.TimeseriesHostCommon.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -6,10 +7,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.DigitalstromHost.Database
 {
-    public class DigitalstromZoneSensorData
+    public class DigitalstromZoneSensorData : TimeSeriesDbEntityBase
     {
-        private const int interval5min = 60 / 5 * 24;
-        private const int decimalPlaces = 2;
+        [NotMapped]
+        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+
+        [NotMapped]
+        protected override int DecimalPlaces => 2;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
@@ -19,9 +23,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         [ForeignKey("ZoneId")]
         public DigitalstromZone Zone { get; set; }
 
-        [Required]
-        public DateTime Day { get; set; }
-        
+        [Required, Column("Day")]
+        public override DateTime Key { get; set; }
+
         [MaxLength(800)]
         public string TemperatureCurve { get; set; }
 
@@ -29,17 +33,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
         public string HumidityCurve { get; set; }
 
         [NotMapped]
-        public TimeSeries<double> TemperatureSeries
-        {
-            get => TemperatureCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min), decimalPlaces);
-            set { TemperatureCurve = value.ToBase64(decimalPlaces); }
-        }
+        public TimeSeries<double> TemperatureSeries => TemperatureCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
-        public TimeSeries<double> HumiditySeries
-        {
-            get => HumidityCurve.ToTimeseries<double>(new TimeSeriesSpan(Day, Day.AddDays(1), interval5min), decimalPlaces);
-            set { HumidityCurve = value.ToBase64(decimalPlaces); }
-        }
+        public TimeSeries<double> HumiditySeries => HumidityCurve.ToTimeseries<double>(Span, DecimalPlaces);
     }
 }

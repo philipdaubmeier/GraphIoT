@@ -59,7 +59,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
 
-            var sensorData = db.DsSensorDataSet.Where(x => x.Day == dayDate.Date).ToList();
+            var sensorData = db.DsSensorDataSet.Where(x => x.Key == dayDate.Date).ToList();
             if (sensorData == null)
                 return StatusCode(404);
 
@@ -82,7 +82,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
                 return StatusCode(404);
             
-            var energyData = db.DsEnergyHighresDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault();
+            var energyData = db.DsEnergyHighresDataSet.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (energyData == null)
                 return StatusCode(404);
 

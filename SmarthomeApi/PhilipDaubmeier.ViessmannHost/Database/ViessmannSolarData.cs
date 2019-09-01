@@ -12,6 +12,9 @@ namespace PhilipDaubmeier.ViessmannHost.Database
         [NotMapped]
         protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
+        [NotMapped]
+        protected override int DecimalPlaces => 1;
+
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
