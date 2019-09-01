@@ -7,15 +7,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.ViessmannHost.Database
 {
-    public class ViessmannSolarData : ITimeSeriesDbEntity
+    public class ViessmannSolarData : TimeSeriesDbEntityBase
     {
-        private const int interval5min = 60 / 5 * 24;
+        [NotMapped]
+        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
         [Required, Column("Day")]
-        public DateTime Key { get; set; }
+        public override DateTime Key { get; set; }
 
         public int? SolarWhTotal { get; set; }
 
@@ -35,45 +36,18 @@ namespace PhilipDaubmeier.ViessmannHost.Database
         public string SolarSuppressionCurve { get; set; }
 
         [NotMapped]
-        public TimeSeries<int> SolarWhSeries => ToSeries<int>(SolarWhCurve);
+        public TimeSeries<int> SolarWhSeries => SolarWhCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<double> SolarCollectorTempSeries => ToSeries<double>(SolarCollectorTempCurve);
+        public TimeSeries<double> SolarCollectorTempSeries => SolarCollectorTempCurve.ToTimeseries<double>(Span);
 
         [NotMapped]
-        public TimeSeries<double> SolarHotwaterTempSeries => ToSeries<double>(SolarHotwaterTempCurve);
+        public TimeSeries<double> SolarHotwaterTempSeries => SolarHotwaterTempCurve.ToTimeseries<double>(Span);
 
         [NotMapped]
-        public TimeSeries<bool> SolarPumpStateSeries => ToSeries<bool>(SolarPumpStateCurve);
+        public TimeSeries<bool> SolarPumpStateSeries => SolarPumpStateCurve.ToTimeseries<bool>(Span);
 
         [NotMapped]
-        public TimeSeries<bool> SolarSuppressionSeries => ToSeries<bool>(SolarSuppressionCurve);
-
-        public TimeSeries<T> GetSeries<T>(int index) where T : struct
-        {
-            switch (index)
-            {
-                case 0: return ToSeries<T>(SolarWhCurve);
-                case 1: return ToSeries<T>(SolarCollectorTempCurve);
-                case 2: return ToSeries<T>(SolarHotwaterTempCurve);
-                case 3: return ToSeries<T>(SolarPumpStateCurve);
-                case 4: return ToSeries<T>(SolarSuppressionCurve);
-                default: return null;
-            }
-        }
-
-        private TimeSeries<T> ToSeries<T>(string curve) where T : struct => curve.ToTimeseries<T>(new TimeSeriesSpan(Key, Key.AddDays(1), interval5min));
-
-        public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
-        {
-            switch (index)
-            {
-                case 0: SolarWhCurve = series.ToBase64(); break;
-                case 1: SolarCollectorTempCurve = series.ToBase64(); break;
-                case 2: SolarHotwaterTempCurve = series.ToBase64(); break;
-                case 3: SolarPumpStateCurve = series.ToBase64(); break;
-                case 4: SolarSuppressionCurve = series.ToBase64(); break;
-            }
-        }
+        public TimeSeries<bool> SolarSuppressionSeries => SolarSuppressionCurve.ToTimeseries<bool>(Span);
     }
 }
