@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
         {
-            CurveProperty(index)?.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64() });
+            CurveProperty(index)?.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
         }
 
         private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();

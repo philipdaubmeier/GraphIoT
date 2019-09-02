@@ -9,30 +9,28 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 {
     public abstract class GraphCollectionViewModelDeferredLoadBase<Tentity> : GraphCollectionViewModelBase where Tentity : class, ITimeSeriesDbEntity
     {
-        private readonly DbSet<Tentity> _dataTable;
-        private IQueryable<Tentity> data;
+        protected DbSet<Tentity> _dataTable;
+        protected IQueryable<Tentity> data;
 
-        private readonly Dictionary<int, GraphViewModel> _graphs = new Dictionary<int, GraphViewModel>();
-        private readonly HashSet<int> _loadedGraphs = new HashSet<int>();
-        private readonly Dictionary<string, int> _indices;
+        protected readonly Dictionary<int, GraphViewModel> _graphs = new Dictionary<int, GraphViewModel>();
+        protected readonly Dictionary<string, int> _columns;
 
-        public GraphCollectionViewModelDeferredLoadBase(DbSet<Tentity> dataTable, Dictionary<string, int> indices) : base()
+        public GraphCollectionViewModelDeferredLoadBase(DbSet<Tentity> dataTable, Dictionary<string, int> columns) : base()
         {
             _dataTable = dataTable;
-            _indices = indices;
+            _columns = columns;
             InvalidateData();
         }
 
         protected override void InvalidateData()
         {
             _graphs.Clear();
-            _loadedGraphs.Clear();
             data = _dataTable?.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public bool IsEmpty => !Graph(0).Points.Any();
 
-        public override int GraphCount() => _indices.Count;
+        public override int GraphCount() => _columns.Count;
 
         public override IEnumerable<GraphViewModel> Graphs()
         {
@@ -46,12 +44,19 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
                 return new GraphViewModel(); ;
 
             // already loaded
-            if (_loadedGraphs.Contains(index) && _graphs.ContainsKey(index))
+            if (_graphs.ContainsKey(index))
                 return _graphs[index];
 
+            var series = data.Select(x => x.GetSeries<Tval>(index));
+            _graphs.Add(index, BuildGraphViewModel<Tseries, Tval>(series, name, key, format, preprocess));
+            return _graphs[index];
+        }
+
+        protected GraphViewModel BuildGraphViewModel<Tseries, Tval>(IEnumerable<TimeSeries<Tval>> series, string name, string key, string format, Func<TimeSeries<Tval>, TimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        {
             var resampler = new TimeSeriesResampler<Tseries, Tval>(Span, SamplingConstraint.NoOversampling);
 
-            var dataToResample = data.Select(x => x.GetSeries<Tval>(index));
+            var dataToResample = series;
             if (preprocess != null)
                 dataToResample = dataToResample.Select(x => preprocess(x));
 
@@ -72,9 +77,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
             else if (typeof(Tval) == typeof(bool))
                 (resampler as TimeSeriesResampler<TimeSeries<bool>, bool>)?.SampleAggregate(dataToResample.Cast<TimeSeries<bool>>(), x => x.Any(b => b));
 
-            _graphs.Add(index, new GraphViewModel<Tval>(resampler.Resampled, name, key ?? name, format));
-            _loadedGraphs.Add(index);
-            return _graphs[index];
+            return new GraphViewModel<Tval>(resampler.Resampled, name, key ?? name, format);
         }
     }
 }
