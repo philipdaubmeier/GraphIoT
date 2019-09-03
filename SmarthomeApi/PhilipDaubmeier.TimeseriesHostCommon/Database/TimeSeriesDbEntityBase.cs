@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
 
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
-            return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string)?.ToTimeseries<T>(Span, DecimalPlaces);
+            return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string).ToTimeseries<T>(Span, DecimalPlaces);
         }
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
