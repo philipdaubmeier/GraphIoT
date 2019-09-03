@@ -18,7 +18,8 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
                        { Resolution.MidRes, databaseContext?.DsSensorDataSet }
                    },
                    Enumerable.Range(0, 2).ToDictionary(x => x.ToString(), x => x),
-                   dsStructure.Zones.OrderBy(x => x).ToList(),
+                   dsStructure.Zones.Where(x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors)
+                                             || dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors)).OrderBy(x => x).ToList(),
                    x => x.ZoneId)
         {
             _dsStructure = dsStructure;
