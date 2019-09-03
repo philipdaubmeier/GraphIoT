@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.CompactTimeSeries;
+﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.Database;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
         protected readonly Dictionary<Tkey, int> _keys;
         protected readonly Func<Tentity, Tkey> _keySelector;
 
-        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, DbSet<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector)
+        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector)
             : base(dataTables, columns)
         {
             _keys = Enumerable.Range(0, keys.Count()).Zip(keys, (i, c) => new Tuple<Tkey, int>(c, i)).ToDictionary(x => x.Item1, x => x.Item2);
@@ -28,7 +27,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
         public override int GraphCount() => _columns.Count * _keys.Count;
 
-        protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Tkey, string> nameSelector, Func<Tkey, string> strKeySelector, string format, Func<TimeSeries<Tval>, TimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Tkey, string> nameSelector, Func<Tkey, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
             // the requested index is already loaded
             if (_loadedGraphs.ContainsKey(index))

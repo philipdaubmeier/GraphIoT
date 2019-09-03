@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.CompactTimeSeries;
+﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Structure;
@@ -14,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         private readonly IDigitalstromStructureService _dsStructure;
 
         public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
-            : base(new Dictionary<Resolution, DbSet<DigitalstromZoneSensorData>>() {
+            : base(new Dictionary<Resolution, IQueryable<DigitalstromZoneSensorData>>() {
                        { Resolution.MidRes, databaseContext?.DsSensorDataSet }
                    },
                    Enumerable.Range(0, 2).ToDictionary(x => x.ToString(), x => x),

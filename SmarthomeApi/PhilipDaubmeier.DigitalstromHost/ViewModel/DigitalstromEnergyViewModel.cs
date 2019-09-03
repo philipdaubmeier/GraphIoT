@@ -9,166 +9,72 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
-    public class DigitalstromEnergyViewModel : GraphCollectionViewModelBase
+    public class DigitalstromEnergyViewModel : GraphCollectionViewModelKeyedItemBase<IDigitalstromEnergyMidLowresData, Dsuid>
     {
-        private readonly IDigitalstromDbContext db;
-        private IQueryable<DigitalstromEnergyLowresData> dataLow = null;
-        private IQueryable<DigitalstromEnergyMidresData> dataMid = null;
+        private readonly IDigitalstromDbContext _db;
+        private readonly IDigitalstromStructureService _dsStructure;
+
         private IQueryable<DigitalstromEnergyHighresData> dataHigh = null;
 
-        private readonly Dictionary<Dsuid, int> indices;
-
-        private enum Resolution
+        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
+            : base(new Dictionary<Resolution, IQueryable<IDigitalstromEnergyMidLowresData>>() {
+                       { Resolution.LowRes, databaseContext?.DsEnergyLowresDataSet },
+                       { Resolution.MidRes, databaseContext?.DsEnergyMidresDataSet }
+                   },
+                   Enumerable.Range(0, 1).ToDictionary(x => x.ToString(), x => x),
+                   dsStructure.Circuits.Where(x => dsStructure.IsMeteringCircuit(x)).OrderBy(x => x).ToList(),
+                   x => x.CircuitId)
         {
-            InitialNone,
-            LowRes,
-            MidRes,
-            HighRes
-        }
-        private Resolution DataResolution => IsInitialSpan ? Resolution.InitialNone : Span.Duration.TotalMinutes >= 15 ? Resolution.LowRes :
-                                                                  Span.Duration.TotalSeconds >= 30 ? Resolution.MidRes : Resolution.HighRes;
-
-        private readonly IDigitalstromStructureService dsStructure;
-
-        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure) : base()
-        {
-            db = databaseContext;
-            dsStructure = digitalstromStructure;
-            indices = Enumerable.Range(0, dsStructure.Circuits.Count()).Zip(dsStructure.Circuits.Where(x => dsStructure.IsMeteringCircuit(x)).OrderBy(x => x), (i, c) => new Tuple<Dsuid, int>(c, i)).ToDictionary(x => x.Item1, x => x.Item2);
-            InvalidateData();
+            _db = databaseContext;
+            _dsStructure = dsStructure;
         }
 
         public override string Key => "energy";
 
         protected override void InvalidateData()
         {
-            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
-            var beginMonth = FirstOfMonth(Span.Begin.Date);
-            var endMonth = FirstOfMonth(Span.End.Date);
+            base.InvalidateData();
 
-            _energyGraphs = new Dictionary<Dsuid, GraphViewModel>();
-            _loadedEnergyGraphs.Clear();
-            dataLow = db?.DsEnergyLowresDataSet.Where(x => x.Key >= beginMonth && x.Key <= endMonth);
-            dataMid = db?.DsEnergyMidresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
-            dataHigh = db?.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
-        }
-        
-        public bool IsEmpty => (EnergyGraphs?.Count() ?? 0) <= 0 || !EnergyGraphs.First().Value.Points.Any();
-
-        public override int GraphCount()
-        {
-            return indices.Count;
+            dataHigh = _db?.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public override GraphViewModel Graph(int index)
         {
-            LazyLoadEnergyGraphs(index);
-            return _energyGraphs.Where(x => x.Key == indices.Where(i => i.Value == index).FirstOrDefault().Key).Select(x => x.Value).FirstOrDefault() ?? new GraphViewModel();
-        }
-
-        public override IEnumerable<GraphViewModel> Graphs()
-        {
-            foreach (var graph in EnergyGraphs.OrderBy(x => x.Key))
-                yield return graph.Value;
-        }
-        
-        private Dictionary<Dsuid, GraphViewModel> _energyGraphs = new Dictionary<Dsuid, GraphViewModel>();
-        private readonly HashSet<int> _loadedEnergyGraphs = new HashSet<int>();
-        public Dictionary<Dsuid, GraphViewModel> EnergyGraphs
-        {
-            get
+            int column = index % _columns.Count;
+            switch (column)
             {
-                LazyLoadEnergyGraphs();
-                return _energyGraphs ?? new Dictionary<Dsuid, GraphViewModel>();
+                case 0: return DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => $"Stromverbrauch {_dsStructure?.GetCircuitName(k) ?? k.ToString()}", k => $"stromverbrauch_{k.ToString()}", "# Ws");
+                default: return new GraphViewModel();
             }
         }
 
-        private void LazyLoadEnergyGraphs(int index = -1)
+        protected new GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Dsuid, string> nameSelector, Func<Dsuid, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            // the requested index is already loaded
-            if (index >= 0 && _loadedEnergyGraphs.Contains(index))
-                return;
-
-            // everything already loaded
-            if (_loadedEnergyGraphs.Count >= indices.Count())
-                return;
-
-            var resamplers = SelectEnergyGraphResolution(index);
-
-            if (IsInitialSpan)
-                _loadedEnergyGraphs.UnionWith(indices.Values);
-
-            foreach (var resampler in resamplers ?? new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>())
-                _energyGraphs.Add(resampler.Key, new GraphViewModel<int>(resampler.Value.Resampled, $"Stromverbrauch {dsStructure?.GetCircuitName(resampler.Key) ?? resampler.Key.ToString()}", $"stromverbrauch_{resampler.Key.ToString()}", "# Ws"));
-        }
-
-        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> SelectEnergyGraphResolution(int index = -1)
-        {
-            switch (DataResolution)
-            {
-                case Resolution.LowRes: return LazyLoadMidLowResEnergyGraphs(dataLow, index);
-                case Resolution.MidRes: return LazyLoadMidLowResEnergyGraphs(dataMid, index);
-                case Resolution.HighRes: return LazyLoadHighResEnergyGraphs();
-                case Resolution.InitialNone: goto default;
-                default: return indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span));
-            }
-        }
-
-        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadHighResEnergyGraphs()
-        {
+            // initial, low and mid resolution loading is handled by base class
+            if (DataResolution != Resolution.HighRes)
+                return base.DeferredLoadGraph<Tseries, Tval>(index, nameSelector, strKeySelector, format, preprocess);
+            
             // already loaded or nothing to load
-            if (_energyGraphs.Count > 0 || dataHigh == null)
-                return null;
+            if (dataHigh == null || _loadedGraphs.Count > 0)
+                return _loadedGraphs.ContainsKey(index) ? _loadedGraphs[index] : new GraphViewModel();
 
             // in a first pass read all compressed base64 encoded streams and reduce them to a timeseries with the final resolution.
             // with n days and m circuits we have m * n reduced time series after the first pass, but we did that trade because we
             // only need to load and decompress all database values once and we do not have to store all decompressed data in RAM.
-            var reduced = indices.Keys.ToDictionary(x => x, x => new List<ITimeSeries<int>>());
+            var reduced = _keys.Keys.ToDictionary(x => x, x => new List<ITimeSeries<Tval>>());
             foreach (var dbEntry in dataHigh.ToList())
             {
                 using (var seriesCollection = dbEntry.EnergySeriesEveryMeter)
-                {
-                    foreach (var series in seriesCollection)
-                    {
-                        if (!reduced.ContainsKey(series.Key))
-                            continue;
-
-                        var reducedSpan = new TimeSeriesSpan(series.Value.Span.Begin, series.Value.Span.End, Span.Duration);
-                        var reducer = new TimeSeriesResampler<TimeSeries<int>, int>(reducedSpan, SamplingConstraint.NoOversampling);
-
-                        Aggregate(reducer, series.Value, Aggregator.Average, x => x, x => (int)x);
-
-                        reduced[series.Key].Add(reducer.Resampled);
-                    }
-                }
+                    foreach (var series in seriesCollection.Where(s => reduced.ContainsKey(s.Key)))
+                        reduced[series.Key].Add(Resample<Tseries, Tval>(new TimeSeriesSpan(series.Value.Span.Begin, series.Value.Span.End, Span.Duration),
+                                                                        new List<ITimeSeries<Tval>>() { series.Value as ITimeSeries<Tval> }) as ITimeSeries<Tval>);
             }
 
             // in the second pass we can then merge them into the final series - one time series object per circuit
-            var resamplers = indices.Keys.ToDictionary(x => x, x => new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling));
-            foreach (var resampler in resamplers)
-                Aggregate(resampler.Value, reduced.Where(x => x.Key == resampler.Key).SelectMany(x => x.Value), Aggregator.Average, x => x, x => (int)x);
-            _loadedEnergyGraphs.UnionWith(resamplers.SelectMany(x => indices.Where(i => i.Key == x.Key).Select(i => i.Value)));
-            return resamplers;
-        }
+            foreach (var circuit in _keys)
+                _loadedGraphs.Add(circuit.Value, BuildGraphViewModel<Tseries, Tval>(reduced.Where(x => x.Key == circuit.Key).SelectMany(x => x.Value), nameSelector(circuit.Key), strKeySelector(circuit.Key), format));
 
-        private Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>> LazyLoadMidLowResEnergyGraphs<T>(IQueryable<T> data, int index = -1) where T : class, IDigitalstromEnergyMidLowresData
-        {
-            var filterDsuid = indices.FirstOrDefault(x => x.Value == index).Key?.ToString() ?? string.Empty;
-            var query = index < 0 ? data : data.Where(x => x.CircuitId == filterDsuid);
-            var resamplers = new Dictionary<Dsuid, TimeSeriesResampler<TimeSeriesStream<int>, int>>();
-            foreach (var series in query.ToList().GroupBy(x => (Dsuid)x.CircuitId))
-            {
-                var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(Span, SamplingConstraint.NoOversampling);
-                Aggregate(resampler, series.Select(x => x.EnergySeries), Aggregator.Average, x => x, x => (int)x);
-                resamplers.Add(series.Key, resampler);
-            }
-
-            if (index < 0)
-                _loadedEnergyGraphs.UnionWith(indices.Values);
-            else
-                _loadedEnergyGraphs.Add(index);
-
-            return resamplers;
+            return _loadedGraphs.ContainsKey(index) ? _loadedGraphs[index] : new GraphViewModel();
         }
     }
 }

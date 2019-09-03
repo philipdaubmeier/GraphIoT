@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
         public override GraphViewModel Graph(int index)
         {
             // Hack for noisy data which contains 0 values where actually no current data was there, should be null really
-            TimeSeries<double> RemoveZeros(TimeSeries<double> input)
+            ITimeSeries<double> RemoveZeros(ITimeSeries<double> input)
             {
                 for (int i = 0; i < input.Count; i++)
                     if (input[i].HasValue && input[i].Value == 0d)

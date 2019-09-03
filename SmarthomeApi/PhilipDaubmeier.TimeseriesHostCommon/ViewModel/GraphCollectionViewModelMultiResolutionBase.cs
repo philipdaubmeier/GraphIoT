@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.TimeseriesHostCommon.Database;
+﻿using PhilipDaubmeier.TimeseriesHostCommon.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 {
     public abstract class GraphCollectionViewModelMultiResolutionBase<Tentity> : GraphCollectionViewModelDeferredLoadBase<Tentity> where Tentity : class, ITimeSeriesDbEntity
     {
-        protected Dictionary<Resolution, DbSet<Tentity>> _dataTables = null;
+        protected Dictionary<Resolution, IQueryable<Tentity>> _dataTables = null;
 
         protected enum Resolution
         {
@@ -20,7 +19,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
         protected Resolution DataResolution => IsInitialSpan ? Resolution.InitialNone : Span.Duration.TotalMinutes >= 15 ? Resolution.LowRes :
                                                                   Span.Duration.TotalSeconds >= 30 ? Resolution.MidRes : Resolution.HighRes;
 
-        protected GraphCollectionViewModelMultiResolutionBase(Dictionary<Resolution, DbSet<Tentity>> dataTables, Dictionary<string, int> columns)
+        protected GraphCollectionViewModelMultiResolutionBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns)
             : base(dataTables.FirstOrDefault().Value, columns)
         {
             _dataTables = dataTables;
@@ -42,7 +41,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
             }
         }
 
-        private DbSet<Tentity> SelectDataForResolution(Resolution requestedResolution)
+        private IQueryable<Tentity> SelectDataForResolution(Resolution requestedResolution)
         {
             // if the requested resolution is available, use it. If not, use the next higher resolution.
             // If there is no higher resolution use the next lower.

@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.ViessmannHost.ViewModel
         public override GraphViewModel Graph(int index)
         {
             // Hack: remove first 5 elements due to bug in day-boundaries
-            TimeSeries<int> PreprocessSolarProduction(TimeSeries<int> input)
+            ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
             {
                 for (int i = 0; i < 5; i++)
                     input[i] = input[i].HasValue ? (int?)0 : null;
