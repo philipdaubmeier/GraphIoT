@@ -37,19 +37,21 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
             int row = index / _columns.Count;
             int column = index % _columns.Count;
 
-            var key = _keys.Where(x => x.Value == row).Select(x => x.Key).FirstOrDefault();
-            var loadedData = data.Where(x => _keySelector(x).Equals(key)).ToList();
-
-            var groupedLoadedData = loadedData.GroupBy(_keySelector);
-
             // only an initial mock span is given, load nothing, build empty result
             if (IsInitialSpan)
             {
-                foreach (var item in _keys.ToDictionary(x => x.Value, x => BuildGraphViewModel<Tseries, Tval>(new List<TimeSeries<Tval>>(), nameSelector(x.Key), strKeySelector(x.Key), format)))
-                    _loadedGraphs.Add(item.Key, item.Value);
+                if (!_loadedGraphs.ContainsKey(column))
+                    foreach (var item in _keys.ToDictionary(x => column + x.Value * _columns.Count, x => BuildGraphViewModel<Tseries, Tval>(new List<TimeSeries<Tval>>(), nameSelector(x.Key), strKeySelector(x.Key), format)))
+                        _loadedGraphs.Add(item.Key, item.Value);
             }
             else
             {
+                var key = _keys.Where(x => x.Value == row).Select(x => x.Key).FirstOrDefault();
+                var groupedLoadedData = data?.Where(x => _keySelector(x).Equals(key))?.ToList()?.GroupBy(_keySelector);
+
+                if (groupedLoadedData == null)
+                    return new GraphViewModel();
+
                 var resamplers = new Dictionary<int, TimeSeriesResampler<TimeSeriesStream<double>, double>>();
                 foreach (var data in groupedLoadedData)
                 {
@@ -65,7 +67,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
             if (_loadedGraphs.ContainsKey(index))
                 return _loadedGraphs[index];
-            return null;
+            return new GraphViewModel();
         }
     }
 }
