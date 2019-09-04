@@ -9,10 +9,8 @@ namespace PhilipDaubmeier.ViessmannHost.Database
 {
     public class ViessmannHeatingData : TimeSeriesDbEntityBase
     {
-        [NotMapped]
-        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+        protected override TimeSeriesSpan Span => SpanDay5Min;
 
-        [NotMapped]
         protected override int DecimalPlaces => 1;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]

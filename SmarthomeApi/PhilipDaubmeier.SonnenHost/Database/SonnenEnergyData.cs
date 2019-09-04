@@ -9,10 +9,8 @@ namespace PhilipDaubmeier.SonnenHost.Database
 {
     public class SonnenEnergyData : TimeSeriesDbEntityBase
     {
-        [NotMapped]
-        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+        protected override TimeSeriesSpan Span => SpanDay1Min;
 
-        [NotMapped]
         protected override int DecimalPlaces => 2;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
