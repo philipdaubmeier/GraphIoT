@@ -7,12 +7,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.DigitalstromHost.Database
 {
-    public class DigitalstromZoneSensorData : TimeSeriesDbEntityBase
+    public class DigitalstromZoneSensorLowresData : DigitalstromZoneSensorData
     {
-        [NotMapped]
-        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+        protected override TimeSeriesSpan Span => SpanMonth160Min;
 
-        [NotMapped]
+        [Required, Column("Month")]
+        public override DateTime Key { get; set; }
+    }
+
+    public class DigitalstromZoneSensorMidresData : DigitalstromZoneSensorData
+    {
+        protected override TimeSeriesSpan Span => SpanDay5Min;
+
+        [Required, Column("Day")]
+        public override DateTime Key { get; set; }
+    }
+
+    public abstract class DigitalstromZoneSensorData : TimeSeriesDbEntityBase
+    {
         protected override int DecimalPlaces => 2;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -22,9 +34,6 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
         [ForeignKey("ZoneId")]
         public DigitalstromZone Zone { get; set; }
-
-        [Required, Column("Day")]
-        public override DateTime Key { get; set; }
 
         [MaxLength(800)]
         public string TemperatureCurve { get; set; }

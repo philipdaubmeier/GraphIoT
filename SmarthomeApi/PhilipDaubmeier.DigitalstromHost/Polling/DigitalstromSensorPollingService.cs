@@ -58,7 +58,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
                 if (dbZone == null)
                     _dbContext.DsZones.Add(dbZone = new DigitalstromZone() { Id = zoneId });
                 
-                _dbContext.DsSensorDataSet.Add(dbSensorSeries = new DigitalstromZoneSensorData() { ZoneId = zoneId, Zone = dbZone, Key = day });
+                _dbContext.DsSensorDataSet.Add(dbSensorSeries = new DigitalstromZoneSensorMidresData() { ZoneId = zoneId, Zone = dbZone, Key = day });
             }
 
             if (sensorValues.ContainsKey(SensorType.TemperatureIndoors))

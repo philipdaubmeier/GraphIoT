@@ -17,6 +17,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
         protected abstract int DecimalPlaces { get; }
 
         protected TimeSeriesSpan SpanMonth30Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
+        protected TimeSeriesSpan SpanMonth160Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 9));
 
         protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
         protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Min, (int)TimeSeriesSpan.Spacing.Spacing1Day);

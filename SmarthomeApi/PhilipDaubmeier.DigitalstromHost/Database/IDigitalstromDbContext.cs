@@ -9,7 +9,9 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
         DbSet<DigitalstromCircuit> DsCircuits { get; set; }
 
-        DbSet<DigitalstromZoneSensorData> DsSensorDataSet { get; set; }
+        DbSet<DigitalstromZoneSensorLowresData> DsSensorLowresDataSet { get; set; }
+
+        DbSet<DigitalstromZoneSensorMidresData> DsSensorDataSet { get; set; }
 
         DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
 
