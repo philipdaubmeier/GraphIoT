@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhilipDaubmeier.SmarthomeApi.Database;
 
 namespace PhilipDaubmeier.SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
-    partial class PersistenceContextModelSnapshot : ModelSnapshot
+    [Migration("20190905131210_Heating_v2")]
+    partial class Heating_v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -434,13 +436,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Migrations
                     b.ToTable("ViessmannHeatingTimeseries");
                 });
 
-            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarLowresData", b =>
+            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<DateTime>("Key")
-                        .HasColumnName("Month");
+                    b.Property<string>("Discriminator")
+                        .IsRequired();
+
+                    b.Property<DateTime>("Key");
 
                     b.Property<string>("SolarCollectorTempCurve")
                         .HasMaxLength(800);
@@ -459,37 +463,28 @@ namespace PhilipDaubmeier.SmarthomeApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ViessmannSolarLowresTimeseries");
+                    b.HasIndex("Key")
+                        .IsUnique();
+
+                    b.ToTable("ViessmannSolarData");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("ViessmannSolarData");
+                });
+
+            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarLowresData", b =>
+                {
+                    b.HasBaseType("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarData");
+
+                    b.HasDiscriminator().HasValue("ViessmannSolarLowresData");
                 });
 
             modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarMidresData", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("Key")
-                        .HasColumnName("Day");
-
-                    b.Property<string>("SolarCollectorTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("SolarHotwaterTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("SolarPumpStateCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("SolarSuppressionCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("SolarWhCurve")
-                        .HasMaxLength(800);
+                    b.HasBaseType("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarData");
 
                     b.Property<int?>("SolarWhTotal");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("ViessmannSolarTimeseries");
+                    b.HasDiscriminator().HasValue("ViessmannSolarMidresData");
                 });
 
             modelBuilder.Entity("PhilipDaubmeier.CalendarHost.Database.CalendarAppointment", b =>

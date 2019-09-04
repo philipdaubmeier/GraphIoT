@@ -12,7 +12,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
     {
         public abstract DateTime Key { get; set; }
 
-        protected abstract TimeSeriesSpan Span { get; }
+        public abstract TimeSeriesSpan Span { get; }
 
         protected abstract int DecimalPlaces { get; }
 

@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 {
     public class DigitalstromEnergyLowresData : DigitalstromEnergyData
     {
-        protected override TimeSeriesSpan Span => SpanMonth30Min;
+        public override TimeSeriesSpan Span => SpanMonth30Min;
 
         [Required, Column("Month")]
         public override DateTime Key { get; set; }
@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
     public class DigitalstromEnergyMidresData : DigitalstromEnergyData
     {
-        protected override TimeSeriesSpan Span => SpanDay1Min;
+        public override TimeSeriesSpan Span => SpanDay1Min;
 
         [Required, Column("Day")]
         public override DateTime Key { get; set; }

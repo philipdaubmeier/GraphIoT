@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 {
     public class DigitalstromEnergyHighresData : TimeSeriesDbEntityBase
     {
-        protected override TimeSeriesSpan Span => SpanDay1Sec;
+        public override TimeSeriesSpan Span => SpanDay1Sec;
 
         protected override int DecimalPlaces => 1;
 

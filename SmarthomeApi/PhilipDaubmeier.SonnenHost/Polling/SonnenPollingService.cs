@@ -3,6 +3,7 @@ using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SonnenClient;
 using PhilipDaubmeier.SonnenHost.Database;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,19 +74,24 @@ namespace PhilipDaubmeier.SonnenHost.Polling
             }
 
             foreach (var day in span.IncludedDates())
-                SaveEnergyValues(day, productionPower, consumptionPower, directUsagePower,
+            {
+                SaveEnergyMidResValues(day, productionPower, consumptionPower, directUsagePower,
                     batteryCharging, batteryDischarging, gridFeedin, gridPurchase, batteryUsoc);
+
+                SaveEnergyLowResValues(day, productionPower, consumptionPower, directUsagePower,
+                    batteryCharging, batteryDischarging, gridFeedin, gridPurchase, batteryUsoc);
+            }
 
             _dbContext.SaveChanges();
         }
         
-        private void SaveEnergyValues(DateTime day, TimeSeries<int> productionPower, TimeSeries<int> consumptionPower, 
+        private void SaveEnergyMidResValues(DateTime day, TimeSeries<int> productionPower, TimeSeries<int> consumptionPower, 
             TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging, 
             TimeSeries<int> gridFeedin, TimeSeries<int> gridPurchase, TimeSeries<double> batteryUsoc)
         {
             var dbEnergySeries = _dbContext.SonnenEnergyDataSet.Where(x => x.Key == day).FirstOrDefault();
             if (dbEnergySeries == null)
-                _dbContext.SonnenEnergyDataSet.Add(dbEnergySeries = new SonnenEnergyData() { Key = day });
+                _dbContext.SonnenEnergyDataSet.Add(dbEnergySeries = new SonnenEnergyMidresData() { Key = day });
 
             var productionPowerSeries = dbEnergySeries.ProductionPowerSeries;
             var consumptionPowerSeries = dbEnergySeries.ConsumptionPowerSeries;
@@ -118,6 +124,47 @@ namespace PhilipDaubmeier.SonnenHost.Polling
             dbEnergySeries.SetSeries(5, gridFeedinSeries);
             dbEnergySeries.SetSeries(6, gridPurchaseSeries);
             dbEnergySeries.SetSeries(7, batteryUsocSeries);
+        }
+
+        private void SaveEnergyLowResValues(DateTime day, TimeSeries<int> productionPower, TimeSeries<int> consumptionPower,
+            TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging,
+            TimeSeries<int> gridFeedin, TimeSeries<int> gridPurchase, TimeSeries<double> batteryUsoc)
+        {
+            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            var month = FirstOfMonth(day);
+            var dbEnergySeries = _dbContext.SonnenEnergyLowresDataSet.Where(x => x.Key == month).FirstOrDefault();
+            if (dbEnergySeries == null)
+                _dbContext.SonnenEnergyLowresDataSet.Add(dbEnergySeries = new SonnenEnergyLowresData() { Key = month });
+
+            var seriesList = new List<Tuple<TimeSeries<int>, TimeSeries<int>>>(){
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.ProductionPowerSeries, productionPower),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.ConsumptionPowerSeries, consumptionPower),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.DirectUsagePowerSeries, directUsagePower),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.BatteryChargingSeries, batteryCharging),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.BatteryDischargingSeries, batteryDischarging),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.GridFeedinSeries, gridFeedin),
+                new Tuple<TimeSeries<int>, TimeSeries<int>>(dbEnergySeries.GridPurchaseSeries, gridPurchase)
+            };
+
+            foreach (var series in Enumerable.Range(0, seriesList.Count).Zip(seriesList, (i, s) => new Tuple<int, Tuple<TimeSeries<int>, TimeSeries<int>>>(i, s)))
+            {
+                var seriesToWriteInto = series.Item2.Item1;
+                var resampler = new TimeSeriesResampler<TimeSeries<int>, int>(seriesToWriteInto.Span)
+                {
+                    Resampled = seriesToWriteInto
+                };
+                resampler.SampleAggregate(series.Item2.Item2, x => (int)x.Average());
+
+                dbEnergySeries.SetSeries(series.Item1, resampler.Resampled);
+            }
+
+            var seriesDoubleToWriteInto = dbEnergySeries.BatteryUsocSeries;
+            var resamplerDouble = new TimeSeriesResampler<TimeSeries<double>, double>(seriesDoubleToWriteInto.Span)
+            {
+                Resampled = seriesDoubleToWriteInto
+            };
+            resamplerDouble.SampleAggregate(batteryUsoc, x => x.Average());
+            dbEnergySeries.SetSeries(7, resamplerDouble.Resampled);
         }
     }
 }

@@ -7,19 +7,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.ViessmannHost.Database
 {
-    public class ViessmannSolarData : TimeSeriesDbEntityBase
+    public class ViessmannSolarLowresData : ViessmannSolarData
     {
-        protected override TimeSeriesSpan Span => SpanDay5Min;
+        public override TimeSeriesSpan Span => SpanMonth160Min;
 
-        protected override int DecimalPlaces => 1;
+        [Required, Column("Month")]
+        public override DateTime Key { get; set; }
+    }
 
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+    public class ViessmannSolarMidresData : ViessmannSolarData
+    {
+        public override TimeSeriesSpan Span => SpanDay5Min;
 
         [Required, Column("Day")]
         public override DateTime Key { get; set; }
 
         public int? SolarWhTotal { get; set; }
+    }
+
+    public abstract class ViessmannSolarData : TimeSeriesDbEntityBase
+    {
+        protected override int DecimalPlaces => 1;
+
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [MaxLength(800)]
         public string SolarWhCurve { get; set; }

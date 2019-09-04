@@ -5,9 +5,13 @@ namespace PhilipDaubmeier.ViessmannHost.Database
 {
     public interface IViessmannDbContext : IDisposable
     {
-        DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }
+        DbSet<ViessmannHeatingLowresData> ViessmannHeatingLowresTimeseries { get; set; }
 
-        DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
+        DbSet<ViessmannHeatingMidresData> ViessmannHeatingTimeseries { get; set; }
+
+        DbSet<ViessmannSolarLowresData> ViessmannSolarLowresTimeseries { get; set; }
+
+        DbSet<ViessmannSolarMidresData> ViessmannSolarTimeseries { get; set; }
 
         int SaveChanges();
     }

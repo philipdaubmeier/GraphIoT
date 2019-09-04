@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PhilipDaubmeier.SmarthomeApi.Database;
 
 namespace PhilipDaubmeier.SmarthomeApi.Migrations
 {
     [DbContext(typeof(PersistenceContext))]
-    partial class PersistenceContextModelSnapshot : ModelSnapshot
+    [Migration("20190905121429_Sonnen_Energy_v2")]
+    partial class Sonnen_Energy_v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -320,62 +322,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Migrations
                     b.ToTable("AuthDataSet");
                 });
 
-            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannHeatingLowresData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("BoilerTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("BoilerTempMainCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("BurnerActiveCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("BurnerMinutesCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("BurnerModulationCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("BurnerStartsCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("Circuit0PumpCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("Circuit0TempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("Circuit1PumpCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("Circuit1TempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("DhwCirculationPumpCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("DhwPrimaryPumpCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("DhwTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<DateTime>("Key")
-                        .HasColumnName("Month");
-
-                    b.Property<string>("OutsideTempCurve")
-                        .HasMaxLength(800);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ViessmannHeatingLowresTimeseries");
-                });
-
-            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannHeatingMidresData", b =>
+            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannHeatingData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -434,35 +381,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Migrations
                     b.ToTable("ViessmannHeatingTimeseries");
                 });
 
-            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarLowresData", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("Key")
-                        .HasColumnName("Month");
-
-                    b.Property<string>("SolarCollectorTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("SolarHotwaterTempCurve")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("SolarPumpStateCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("SolarSuppressionCurve")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("SolarWhCurve")
-                        .HasMaxLength(800);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ViessmannSolarLowresTimeseries");
-                });
-
-            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarMidresData", b =>
+            modelBuilder.Entity("PhilipDaubmeier.ViessmannHost.Database.ViessmannSolarData", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
@@ -488,6 +407,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Migrations
                     b.Property<int?>("SolarWhTotal");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Key")
+                        .IsUnique();
 
                     b.ToTable("ViessmannSolarTimeseries");
                 });

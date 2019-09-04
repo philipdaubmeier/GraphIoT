@@ -1,14 +1,19 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.SonnenHost.ViewModel
 {
-    public class SonnenEnergyViewModel : GraphCollectionViewModelDeferredLoadBase<SonnenEnergyData>
+    public class SonnenEnergyViewModel : GraphCollectionViewModelMultiResolutionBase<SonnenEnergyData>
     {
         public SonnenEnergyViewModel(ISonnenDbContext databaseContext)
-            : base(databaseContext?.SonnenEnergyDataSet, Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x))
+            : base(new Dictionary<Resolution, IQueryable<SonnenEnergyData>>() {
+                       { Resolution.LowRes, databaseContext?.SonnenEnergyLowresDataSet },
+                       { Resolution.MidRes, databaseContext?.SonnenEnergyDataSet }
+                   },
+                   Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x))
         { }
 
         public override string Key => "solarenergy";

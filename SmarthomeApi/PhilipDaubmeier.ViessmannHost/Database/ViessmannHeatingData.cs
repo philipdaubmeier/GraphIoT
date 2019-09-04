@@ -7,14 +7,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.ViessmannHost.Database
 {
-    public class ViessmannHeatingData : TimeSeriesDbEntityBase
+    public class ViessmannHeatingLowresData : ViessmannHeatingData
     {
-        protected override TimeSeriesSpan Span => SpanDay5Min;
+        public override TimeSeriesSpan Span => SpanMonth160Min;
 
-        protected override int DecimalPlaces => 1;
+        [Required, Column("Month")]
+        public override DateTime Key { get; set; }
+    }
 
-        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
+    public class ViessmannHeatingMidresData : ViessmannHeatingData
+    {
+        public override TimeSeriesSpan Span => SpanDay5Min;
 
         [Required, Column("Day")]
         public override DateTime Key { get; set; }
@@ -24,6 +27,14 @@ namespace PhilipDaubmeier.ViessmannHost.Database
 
         [Required]
         public int BurnerStartsTotal { get; set; }
+    }
+
+    public abstract class ViessmannHeatingData : TimeSeriesDbEntityBase
+    {
+        protected override int DecimalPlaces => 1;
+
+        [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public Guid Id { get; set; }
 
         [MaxLength(800)]
         public string BurnerMinutesCurve { get; set; }

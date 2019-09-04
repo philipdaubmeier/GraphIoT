@@ -43,26 +43,25 @@ namespace PhilipDaubmeier.SmarthomeApi.Database
 
 
         #region IViessmannDbContext
-        public DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }
+        public DbSet<ViessmannHeatingLowresData> ViessmannHeatingLowresTimeseries { get; set; }
 
-        public DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
+        public DbSet<ViessmannHeatingMidresData> ViessmannHeatingTimeseries { get; set; }
+
+        public DbSet<ViessmannSolarLowresData> ViessmannSolarLowresTimeseries { get; set; }
+
+        public DbSet<ViessmannSolarMidresData> ViessmannSolarTimeseries { get; set; }
         #endregion
 
 
         #region ISonnenDbContext
-        public DbSet<SonnenEnergyData> SonnenEnergyDataSet { get; set; }
+        public DbSet<SonnenEnergyLowresData> SonnenEnergyLowresDataSet { get; set; }
+
+        public DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; }
         #endregion
 
 
         public PersistenceContext(DbContextOptions<PersistenceContext> options)
             : base(options)
         { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<ViessmannSolarData>()
-                .HasIndex(d => d.Key)
-                .IsUnique();
-        }
     }
 }

@@ -19,13 +19,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private static DigitalstromDssClient dsClient;
 
         private readonly PersistenceContext db;
-        private readonly DigitalstromEnergyPollingService _pollingService;
+        private readonly DigitalstromEnergyPollingService _energyPollingService;
+        private readonly DigitalstromSensorPollingService _sensorPollingService;
 
         public DigitalstromController(PersistenceContext databaseContext, IDigitalstromConnectionProvider connectionProvider, IEnumerable<IDigitalstromPollingService> pollingServices)
         {
             db = databaseContext;
             dsClient = new DigitalstromDssClient(connectionProvider);
-            _pollingService = pollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).FirstOrDefault();
+            _energyPollingService = pollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).FirstOrDefault();
+            _sensorPollingService = pollingServices.Select(x => x as DigitalstromSensorPollingService).Where(x => x != null).FirstOrDefault();
         }
 
         // GET api/digitalstrom/sensors
@@ -129,15 +131,30 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
         // POST api/digitalstrom/energy/midlowres/compute
         [HttpPost("energy/midlowres/compute")]
-        public ActionResult ComputeMidLowResFromHighRes([FromQuery] string begin, [FromQuery] string end)
+        public ActionResult ComputeEnergyMidLowResFromHighRes([FromQuery] string begin, [FromQuery] string end)
         {
-            if (_pollingService == null)
+            if (_energyPollingService == null)
                 return StatusCode(400);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            _pollingService.GenerateMidLowResEnergySeries(span.Begin, span.End);
+            _energyPollingService.GenerateMidLowResEnergySeries(span.Begin, span.End);
+
+            return StatusCode(200);
+        }
+
+        // POST api/digitalstrom/sensors/midlowres/compute
+        [HttpPost("sensors/midlowres/compute")]
+        public ActionResult ComputeSensorLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
+        {
+            if (_sensorPollingService == null)
+                return StatusCode(400);
+
+            if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
+                return StatusCode(404);
+
+            _sensorPollingService.GenerateLowResSensorSeries(span.Begin, span.End);
 
             return StatusCode(200);
         }

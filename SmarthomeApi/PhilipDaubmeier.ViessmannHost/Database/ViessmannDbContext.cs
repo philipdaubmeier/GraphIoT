@@ -4,9 +4,13 @@ namespace PhilipDaubmeier.ViessmannHost.Database
 {
     public class ViessmannDbContext : DbContext, IViessmannDbContext
     {
-        public DbSet<ViessmannHeatingData> ViessmannHeatingTimeseries { get; set; }
+        public DbSet<ViessmannHeatingLowresData> ViessmannHeatingLowresTimeseries { get; set; }
 
-        public DbSet<ViessmannSolarData> ViessmannSolarTimeseries { get; set; }
+        public DbSet<ViessmannHeatingMidresData> ViessmannHeatingTimeseries { get; set; }
+
+        public DbSet<ViessmannSolarLowresData> ViessmannSolarLowresTimeseries { get; set; }
+
+        public DbSet<ViessmannSolarMidresData> ViessmannSolarTimeseries { get; set; }
 
         public ViessmannDbContext(DbContextOptions<ViessmannDbContext> options)
             : base(options)

@@ -5,7 +5,9 @@ namespace PhilipDaubmeier.SonnenHost.Database
 {
     public interface ISonnenDbContext : IDisposable
     {
-        DbSet<SonnenEnergyData> SonnenEnergyDataSet { get; set; }
+        DbSet<SonnenEnergyLowresData> SonnenEnergyLowresDataSet { get; set; }
+
+        DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; }
 
         int SaveChanges();
     }

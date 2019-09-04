@@ -14,6 +14,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 
         public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
             : base(new Dictionary<Resolution, IQueryable<DigitalstromZoneSensorData>>() {
+                       { Resolution.LowRes, databaseContext?.DsSensorLowresDataSet },
                        { Resolution.MidRes, databaseContext?.DsSensorDataSet }
                    },
                    Enumerable.Range(0, 2).ToDictionary(x => x.ToString(), x => x),

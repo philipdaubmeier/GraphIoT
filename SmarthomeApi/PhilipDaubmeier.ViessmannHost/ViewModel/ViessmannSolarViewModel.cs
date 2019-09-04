@@ -1,14 +1,19 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannHost.ViewModel
 {
-    public class ViessmannSolarViewModel : GraphCollectionViewModelDeferredLoadBase<ViessmannSolarData>
+    public class ViessmannSolarViewModel : GraphCollectionViewModelMultiResolutionBase<ViessmannSolarData>
     {
         public ViessmannSolarViewModel(IViessmannDbContext databaseContext)
-            : base(databaseContext?.ViessmannSolarTimeseries, Enumerable.Range(0, 5).ToDictionary(x => x.ToString(), x => x))
+            : base(new Dictionary<Resolution, IQueryable<ViessmannSolarData>>() {
+                       { Resolution.LowRes, databaseContext?.ViessmannSolarLowresTimeseries },
+                       { Resolution.MidRes, databaseContext?.ViessmannSolarTimeseries }
+                   },
+                   Enumerable.Range(0, 5).ToDictionary(x => x.ToString(), x => x))
         { }
 
         public override string Key => "solar";

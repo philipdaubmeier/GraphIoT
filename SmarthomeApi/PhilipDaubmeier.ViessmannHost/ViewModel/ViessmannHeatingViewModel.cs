@@ -1,14 +1,19 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using PhilipDaubmeier.ViessmannHost.Database;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannHost.ViewModel
 {
-    public class ViessmannHeatingViewModel : GraphCollectionViewModelDeferredLoadBase<ViessmannHeatingData>
+    public class ViessmannHeatingViewModel : GraphCollectionViewModelMultiResolutionBase<ViessmannHeatingData>
     {
         public ViessmannHeatingViewModel(IViessmannDbContext databaseContext)
-            : base(databaseContext?.ViessmannHeatingTimeseries, Enumerable.Range(0, 14).ToDictionary(x => x.ToString(), x => x))
+            : base(new Dictionary<Resolution, IQueryable<ViessmannHeatingData>>() {
+                       { Resolution.LowRes, databaseContext?.ViessmannHeatingLowresTimeseries },
+                       { Resolution.MidRes, databaseContext?.ViessmannHeatingTimeseries }
+                   },
+                   Enumerable.Range(0, 14).ToDictionary(x => x.ToString(), x => x))
         { }
 
         public override string Key => "heating";

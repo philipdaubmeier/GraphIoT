@@ -8,6 +8,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
     public abstract class GraphCollectionViewModelMultiResolutionBase<Tentity> : GraphCollectionViewModelDeferredLoadBase<Tentity> where Tentity : class, ITimeSeriesDbEntity
     {
         protected Dictionary<Resolution, IQueryable<Tentity>> _dataTables = null;
+        protected Dictionary<Resolution, TimeSpan> _spans = null;
 
         protected enum Resolution
         {
@@ -16,13 +17,20 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
             MidRes,
             HighRes
         }
-        protected Resolution DataResolution => IsInitialSpan ? Resolution.InitialNone : Span.Duration.TotalMinutes >= 15 ? Resolution.LowRes :
-                                                                  Span.Duration.TotalSeconds >= 30 ? Resolution.MidRes : Resolution.HighRes;
+
+        private double LowResSeconds => _spans.ContainsKey(Resolution.LowRes) ? _spans[Resolution.LowRes].TotalSeconds / 2d : 15d * 60d;
+        private double MidResSeconds => _spans.ContainsKey(Resolution.MidRes) ? _spans[Resolution.MidRes].TotalSeconds / 2d : 60d;
+
+        protected Resolution DataResolution => IsInitialSpan ? Resolution.InitialNone :
+                 Span.Duration.TotalSeconds >= LowResSeconds ? Resolution.LowRes :
+                 Span.Duration.TotalSeconds >= MidResSeconds ? Resolution.MidRes : Resolution.HighRes;
 
         protected GraphCollectionViewModelMultiResolutionBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns)
             : base(dataTables.FirstOrDefault().Value, columns)
         {
             _dataTables = dataTables;
+            _spans = dataTables.Select(t => new Tuple<Resolution, Type>(t.Key, t.Value.GetType().GenericTypeArguments.FirstOrDefault()))
+                               .ToDictionary(t => t.Item1, t => (Activator.CreateInstance(t.Item2) as TimeSeriesDbEntityBase).Span.Duration);
         }
 
         protected override void InvalidateData()

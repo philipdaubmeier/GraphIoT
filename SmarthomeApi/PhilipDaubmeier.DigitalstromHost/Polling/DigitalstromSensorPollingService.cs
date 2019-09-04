@@ -4,6 +4,7 @@ using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.DigitalstromHost.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,18 +17,20 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         private readonly ILogger _logger;
         private readonly IDigitalstromDbContext _dbContext;
         private readonly DigitalstromDssClient _dsClient;
+        private readonly IDigitalstromStructureService _dsStructure;
 
-        public DigitalstromSensorPollingService(ILogger<DigitalstromSensorPollingService> logger, IDigitalstromDbContext databaseContext, DigitalstromDssClient dsClient)
+        public DigitalstromSensorPollingService(ILogger<DigitalstromSensorPollingService> logger, IDigitalstromDbContext databaseContext, DigitalstromDssClient dsClient, IDigitalstromStructureService dsStructure)
         {
             _logger = logger;
             _dbContext = databaseContext;
             _dsClient = dsClient;
+            _dsStructure = dsStructure;
         }
 
         public async Task PollValues()
         {
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Background Service is polling new sensor values...");
-            
+
             try
             {
                 await PollSensorValues();
@@ -42,31 +45,47 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         {
             var sensorValues = (await _dsClient.GetZonesAndSensorValues()).Zones;
 
+            var timestamp = DateTime.Now;
+            var day = timestamp.Date;
+
             var readMidres = new Dictionary<Zone, Dictionary<Sensor, ITimeSeries<double>>>();
             foreach (var zone in sensorValues)
                 if (zone != null && zone.Sensor != null)
-                    readMidres.Add(zone.ZoneID, ReadAndSaveMidresZoneSensorValues(zone.ZoneID, zone.Sensor.ToDictionary(x => x.Type, x => x.Value)));
+                    readMidres.Add(zone.ZoneID, ReadAndSaveMidresZoneSensorValues(day, zone.ZoneID, zone.Sensor.ToDictionary(x => x.Type, x => x.Value), timestamp));
 
             SaveLowresZoneSensorValues(readMidres);
 
             _dbContext.SaveChanges();
         }
-        
-        private Dictionary<Sensor, ITimeSeries<double>> ReadAndSaveMidresZoneSensorValues(int zoneId, Dictionary<Sensor, double> sensorValues)
+
+        public void GenerateLowResSensorSeries(DateTime start, DateTime end)
         {
+            foreach (var day in new TimeSeriesSpan(start, end, 1).IncludedDates())
+            {
+                var sensorZones = _dsStructure.Zones.Where(x => _dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors) || _dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors));
+                SaveLowresZoneSensorValues(sensorZones.ToDictionary(zone => zone, zone => ReadAndSaveMidresZoneSensorValues(day, zone)));
+
+                _dbContext.SaveChanges();
+            }
+        }
+
+        private Dictionary<Sensor, ITimeSeries<double>> ReadAndSaveMidresZoneSensorValues(DateTime day, int zoneId, Dictionary<Sensor, double> sensorValues = null, DateTime timestampNewValue = default)
+        {
+            var readOnly = sensorValues == null || timestampNewValue == default;
             var readSeries = new Dictionary<Sensor, ITimeSeries<double>>();
 
-            var time = DateTime.Now;
-            var day = time.Date;
             var dbSensorSeries = GetOrCreateEntity(_dbContext.DsSensorDataSet, day, zoneId);
 
             void ReadAndSaveSensor(Sensor sensor, TimeSeries<double> series, int index)
             {
-                if (!sensorValues.ContainsKey(sensor))
-                    return;
-                
-                series[time] = sensorValues[sensor];
-                dbSensorSeries.SetSeries(index, series);
+                if (!readOnly)
+                {
+                    if (!sensorValues.ContainsKey(sensor))
+                        return;
+
+                    series[timestampNewValue] = sensorValues[sensor];
+                    dbSensorSeries.SetSeries(index, series);
+                }
                 readSeries.Add(sensor, series);
             }
 
@@ -93,7 +112,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
                     {
                         Resampled = seriesToWriteInto
                     };
-                    resampler.SampleAggregate(zone.Value[sensor], x => (int)x.Average());
+                    resampler.SampleAggregate(zone.Value[sensor], x => x.Average());
 
                     dbSensorSeries.SetSeries(index, resampler.Resampled);
                 }

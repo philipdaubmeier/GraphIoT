@@ -7,17 +7,28 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.SonnenHost.Database
 {
-    public class SonnenEnergyData : TimeSeriesDbEntityBase
+    public class SonnenEnergyLowresData : SonnenEnergyData
     {
-        protected override TimeSeriesSpan Span => SpanDay1Min;
+        public override TimeSeriesSpan Span => SpanMonth30Min;
 
+        [Required, Column("Month")]
+        public override DateTime Key { get; set; }
+    }
+
+    public class SonnenEnergyMidresData : SonnenEnergyData
+    {
+        public override TimeSeriesSpan Span => SpanDay1Min;
+
+        [Required, Column("Day")]
+        public override DateTime Key { get; set; }
+    }
+
+    public abstract class SonnenEnergyData : TimeSeriesDbEntityBase
+    {
         protected override int DecimalPlaces => 2;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-
-        [Required, Column("Day")]
-        public override DateTime Key { get; set; }
 
         [MaxLength(4000)]
         public string ProductionPowerCurve { get; set; }
