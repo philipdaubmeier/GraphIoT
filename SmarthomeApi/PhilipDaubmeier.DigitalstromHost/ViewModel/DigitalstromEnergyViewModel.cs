@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromHost.ViewModel
 {
-    public class DigitalstromEnergyViewModel : GraphCollectionViewModelKeyedItemBase<IDigitalstromEnergyMidLowresData, Dsuid>
+    public class DigitalstromEnergyViewModel : GraphCollectionViewModelKeyedItemBase<DigitalstromEnergyData, Dsuid>
     {
         private readonly IDigitalstromDbContext _db;
         private readonly IDigitalstromStructureService _dsStructure;
@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.DigitalstromHost.ViewModel
         private IQueryable<DigitalstromEnergyHighresData> dataHigh = null;
 
         public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
-            : base(new Dictionary<Resolution, IQueryable<IDigitalstromEnergyMidLowresData>>() {
+            : base(new Dictionary<Resolution, IQueryable<DigitalstromEnergyData>>() {
                        { Resolution.LowRes, databaseContext?.DsEnergyLowresDataSet },
                        { Resolution.MidRes, databaseContext?.DsEnergyMidresDataSet }
                    },

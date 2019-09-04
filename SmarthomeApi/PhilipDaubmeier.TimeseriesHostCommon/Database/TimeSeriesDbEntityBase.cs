@@ -16,6 +16,10 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
 
         protected abstract int DecimalPlaces { get; }
 
+        protected TimeSeriesSpan SpanMonth => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
+
+        protected TimeSeriesSpan SpanDay => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
             return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string).ToTimeseries<T>(Span, DecimalPlaces);

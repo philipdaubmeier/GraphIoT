@@ -7,11 +7,24 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PhilipDaubmeier.DigitalstromHost.Database
 {
-    public class DigitalstromEnergyLowresData : TimeSeriesDbEntityBase, IDigitalstromEnergyMidLowresData
+    public class DigitalstromEnergyLowresData : DigitalstromEnergyData
     {
-        [NotMapped]
-        protected override TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
+        protected override TimeSeriesSpan Span => SpanMonth;
 
+        [Required, Column("Month")]
+        public override DateTime Key { get; set; }
+    }
+
+    public class DigitalstromEnergyMidresData : DigitalstromEnergyData
+    {
+        protected override TimeSeriesSpan Span => SpanDay;
+
+        [Required, Column("Day")]
+        public override DateTime Key { get; set; }
+    }
+
+    public abstract class DigitalstromEnergyData : TimeSeriesDbEntityBase
+    {
         [NotMapped]
         protected override int DecimalPlaces => 1;
 
@@ -23,9 +36,6 @@ namespace PhilipDaubmeier.DigitalstromHost.Database
 
         [ForeignKey("CircuitId")]
         public DigitalstromCircuit Circuit { get; set; }
-
-        [Required, Column("Month")]
-        public override DateTime Key { get; set; }
 
         [MaxLength(4000)]
         public string EnergyCurve { get; set; }

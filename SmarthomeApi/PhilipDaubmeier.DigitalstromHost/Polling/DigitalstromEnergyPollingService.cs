@@ -129,7 +129,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         }
 
         private void SaveMidLowResEnergyValuesToDb<T>(IEnumerable<IGrouping<DateTime, KeyValuePair<DateTime, TimeSeriesStreamCollection<Dsuid, int>>>> groupedCollections,
-            Func<IDigitalstromDbContext, DbSet<T>> dbSetSelector) where T : class, IDigitalstromEnergyMidLowresData
+            Func<IDigitalstromDbContext, DbSet<T>> dbSetSelector) where T : DigitalstromEnergyData
         {
             foreach (var collection in groupedCollections)
             {
