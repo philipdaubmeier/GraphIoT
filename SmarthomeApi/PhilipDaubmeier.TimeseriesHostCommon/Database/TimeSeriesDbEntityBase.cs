@@ -20,8 +20,8 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
         protected TimeSeriesSpan SpanMonth160Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 9));
 
         protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
-        protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Min, (int)TimeSeriesSpan.Spacing.Spacing1Day);
-        protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing5Min, (int)TimeSeriesSpan.Spacing.Spacing1Day);
+        protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+        protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
