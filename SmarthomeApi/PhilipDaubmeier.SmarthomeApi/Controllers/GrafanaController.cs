@@ -93,8 +93,8 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             var definition = new
             {
                 timezone = "",
-                panelId = 0,
-                dashboardId = 0,
+                panelId = (int?)0,
+                dashboardId = (int?)0,
                 range = new
                 {
                     from = "",
