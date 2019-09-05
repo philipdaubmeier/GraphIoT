@@ -101,9 +101,17 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
             if (dbSolarSeries == null)
                 _dbContext.ViessmannSolarLowresTimeseries.Add(dbSolarSeries = new ViessmannSolarLowresData() { Key = month });
 
+            // Hack: remove first 5 elements due to bug in day-boundaries
+            ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
+            {
+                for (int i = 0; i < 5; i++)
+                    input[i] = input[i].HasValue ? (int?)0 : null;
+                return input;
+            }
+
             var series1 = dbSolarSeries.SolarWhSeries;
             var resampler1 = new TimeSeriesResampler<TimeSeries<int>, int>(series1.Span) { Resampled = series1 };
-            resampler1.SampleAggregate(series1Src, x => (int)x.Average());
+            resampler1.SampleAggregate(PreprocessSolarProduction(series1Src), x => (int)x.Average());
             dbSolarSeries.SetSeries(0, resampler1.Resampled);
 
             var series2 = dbSolarSeries.SolarCollectorTempSeries;
