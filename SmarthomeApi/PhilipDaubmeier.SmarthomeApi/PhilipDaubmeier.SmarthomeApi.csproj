@@ -76,6 +76,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PhilipDaubmeier.CalendarHost\PhilipDaubmeier.CalendarHost.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.DigitalstromHost\PhilipDaubmeier.DigitalstromHost.csproj" />
+    <ProjectReference Include="..\PhilipDaubmeier.NetatmoHost\PhilipDaubmeier.NetatmoHost.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.SonnenClient\PhilipDaubmeier.SonnenClient.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.SonnenHost\PhilipDaubmeier.SonnenHost.csproj" />
     <ProjectReference Include="..\PhilipDaubmeier.ViessmannHost\PhilipDaubmeier.ViessmannHost.csproj" />

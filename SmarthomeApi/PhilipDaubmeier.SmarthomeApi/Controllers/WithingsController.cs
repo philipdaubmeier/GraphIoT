@@ -38,9 +38,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 return StatusCode(403);
 
             var authorization_code = code;
-            var refresh_token = await _withingsClient.AuthenticateLogin(code);
+            var refresh_token = await _withingsClient.AuthenticateLogin(authorization_code);
 
-            Func<string, Task> sendTelegramMessage = async message => await (new HttpClient()).GetStringAsync("https://api.telegram.org/***REMOVED***/sendMessage?chat_id=***REMOVED***&text=" + WebUtility.UrlEncode(message));
+            async Task sendTelegramMessage(string message) => await (new HttpClient()).GetStringAsync("https://api.telegram.org/***REMOVED***/sendMessage?chat_id=***REMOVED***&text=" + WebUtility.UrlEncode(message));
             await sendTelegramMessage("Refresh token: " + refresh_token);
 
             return StatusCode(200);

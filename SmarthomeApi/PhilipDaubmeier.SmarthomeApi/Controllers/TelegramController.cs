@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using PhilipDaubmeier.NetatmoClient;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using PhilipDaubmeier.SmarthomeApi.Clients.Netatmo;
-using PhilipDaubmeier.SmarthomeApi.Model.Config;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
@@ -19,15 +15,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     [Route("api/telegram")]
     public class TelegramController : Controller
     {
-        private NetatmoCameraImage _netatmoClient;
+        private NetatmoWebClient _netatmoClient;
 
         private static readonly HttpClient httpClient = new HttpClient();
         private const string mybot = "***REMOVED***";
         private const string chatId = "***REMOVED***";
 
-        public TelegramController(IOptions<NetatmoConfig> config)
+        public TelegramController(NetatmoWebClient netatmoClient)
         {
-            _netatmoClient = new NetatmoCameraImage(config);
+            _netatmoClient = netatmoClient;
         }
 
         /// <summary>
@@ -38,7 +34,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpGet("{bot}/sendcamera", Name = "sendcamera")]
         public async Task<JsonResult> sendcamera(string bot)
         {
-            await sendTelegramPhoto(bot, chatId, "Es hat geklingelt!", await _netatmoClient.GetLastEventSnapshot());
+            await sendTelegramPhoto(bot, chatId, "Es hat geklingelt!", (await GetCameraPicture()).Item1);
 
             return Json(new { result = "ok" });
         }
@@ -96,20 +92,20 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     {
                         await sendTelegramMessage(bot, chatId, "Ich triggere die linke Garage...");
                         await httpClient.GetStringAsync("***REMOVED***/json/zone/callScene%3Fid%3D31990%26groupID%3D5%26sceneNumber%3D0%26category%3Dmanual");
-                        await sendTelegramPhoto(bot, chatId, "Linke Garage getriggert...", await _netatmoClient.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Linke Garage getriggert...", (await GetCameraPicture()).Item2);
                         await Task.Delay(15000);
                         await sendTelegramMessage(bot, chatId, "Stromverbrauch: xxx W");
-                        await sendTelegramPhoto(bot, chatId, "Linke Garage nach 15 Sekunden...", await _netatmoClient.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Linke Garage nach 15 Sekunden...", (await GetCameraPicture()).Item2);
                         break;
                     }
                 case "gr":
                     {
                         await sendTelegramMessage(bot, chatId, "Ich triggere die linke Garage...");
                         await httpClient.GetStringAsync("***REMOVED***/json/zone/callScene%3Fid%3D31990%26groupID%3D4%26sceneNumber%3D0%26category%3Dmanual");
-                        await sendTelegramPhoto(bot, chatId, "Rechte Garage getriggert...", await _netatmoClient.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Rechte Garage getriggert...", (await GetCameraPicture()).Item2);
                         await Task.Delay(15000);
                         await sendTelegramMessage(bot, chatId, "Stromverbrauch: xxx W");
-                        await sendTelegramPhoto(bot, chatId, "Rechte Garage nach 15 Sekunden...", await _netatmoClient.GetCurrentSnapshot());
+                        await sendTelegramPhoto(bot, chatId, "Rechte Garage nach 15 Sekunden...", (await GetCameraPicture()).Item2);
                         break;
                     }
             }
@@ -161,6 +157,21 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private static async Task sendTelegramPhoto(string bot, string chat, string caption, string picture)
         {
             await httpClient.GetStringAsync("https://api.telegram.org/" + bot + "/sendPhoto?chat_id=" + chat + "&caption=" + WebUtility.UrlEncode(caption) + "&photo=" + WebUtility.UrlEncode(picture));
+        }
+
+        private async Task<Tuple<string, string>> GetCameraPicture()
+        {
+            var rawData = await _netatmoClient.GetHomeData();
+            var home = rawData.Homes.First(x => x.Name.Equals("Karlskron", StringComparison.InvariantCultureIgnoreCase));
+            var camera = home.Cameras.First(x => x.Name.Equals("Phils Presence", StringComparison.InvariantCultureIgnoreCase));
+
+            var events = home.Events.First(x => x.CameraId == camera.Id).EventList.Where(x => !string.IsNullOrWhiteSpace(x.Snapshot.Id) && !string.IsNullOrWhiteSpace(x.Snapshot.Key));
+            var newestSnapshot = events.OrderByDescending(x => x.Time).First().Snapshot;
+            var newestSnapshotUrl = "https://api.netatmo.com/api/getcamerapicture?image_id=" + newestSnapshot.Id + "&key=" + newestSnapshot.Key;
+
+            var currentSnapshotUrl = camera.VpnUrl + "/live/snapshot_720.jpg";
+
+            return new Tuple<string, string>(newestSnapshotUrl, currentSnapshotUrl);
         }
     }
 }

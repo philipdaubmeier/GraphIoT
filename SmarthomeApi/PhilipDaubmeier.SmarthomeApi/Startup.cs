@@ -10,6 +10,7 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CalendarHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
+using PhilipDaubmeier.NetatmoHost.DependencyInjection;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database;
@@ -73,7 +74,6 @@ namespace PhilipDaubmeier.SmarthomeApi
 
             services.AddOptions();
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
-            services.Configure<NetatmoConfig>(Configuration.GetSection("NetatmoConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
             services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
@@ -87,6 +87,8 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
+
+            services.AddNetatmoHost(Configuration.GetSection("NetatmoConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), Configuration.GetSection("TokenStoreConfig"));
 

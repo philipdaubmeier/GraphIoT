@@ -47,9 +47,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.Digitalstro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.DigitalstromTwin.Tests", "PhilipDaubmeier.DigitalstromTwin.Tests\PhilipDaubmeier.DigitalstromTwin.Tests.csproj", "{C643615D-AB84-454A-8A45-B08C6C4D40C8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.SonnenClient", "PhilipDaubmeier.SonnenClient\PhilipDaubmeier.SonnenClient.csproj", "{B8E56034-B4F7-4FA9-B7A8-57746C360062}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.SonnenClient", "PhilipDaubmeier.SonnenClient\PhilipDaubmeier.SonnenClient.csproj", "{B8E56034-B4F7-4FA9-B7A8-57746C360062}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.SonnenHost", "PhilipDaubmeier.SonnenHost\PhilipDaubmeier.SonnenHost.csproj", "{E38112F9-C396-414B-B3F6-E410DF9A837B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.SonnenHost", "PhilipDaubmeier.SonnenHost\PhilipDaubmeier.SonnenHost.csproj", "{E38112F9-C396-414B-B3F6-E410DF9A837B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.NetatmoClient", "PhilipDaubmeier.NetatmoClient\PhilipDaubmeier.NetatmoClient.csproj", "{1F91D208-69DC-4A92-8659-03EDACBBD678}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.NetatmoHost", "PhilipDaubmeier.NetatmoHost\PhilipDaubmeier.NetatmoHost.csproj", "{71767AA1-A195-4371-A0B9-C7D461E8A3C0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,6 +145,14 @@ Global
 		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E38112F9-C396-414B-B3F6-E410DF9A837B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F91D208-69DC-4A92-8659-03EDACBBD678}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F91D208-69DC-4A92-8659-03EDACBBD678}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F91D208-69DC-4A92-8659-03EDACBBD678}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F91D208-69DC-4A92-8659-03EDACBBD678}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -167,12 +179,14 @@ Global
 		{C643615D-AB84-454A-8A45-B08C6C4D40C8} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{B8E56034-B4F7-4FA9-B7A8-57746C360062} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{E38112F9-C396-414B-B3F6-E410DF9A837B} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{1F91D208-69DC-4A92-8659-03EDACBBD678} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{71767AA1-A195-4371-A0B9-C7D461E8A3C0} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 22
+		SccNumberOfProjects = 24
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -260,5 +274,13 @@ Global
 		SccProjectTopLevelParentUniqueName21 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName21 = PhilipDaubmeier.SonnenHost
 		SccLocalPath21 = PhilipDaubmeier.SonnenHost
+		SccProjectUniqueName22 = PhilipDaubmeier.NetatmoClient\\PhilipDaubmeier.NetatmoClient.csproj
+		SccProjectTopLevelParentUniqueName22 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName22 = PhilipDaubmeier.NetatmoClient
+		SccLocalPath22 = PhilipDaubmeier.NetatmoClient
+		SccProjectUniqueName23 = PhilipDaubmeier.NetatmoHost\\PhilipDaubmeier.NetatmoHost.csproj
+		SccProjectTopLevelParentUniqueName23 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName23 = PhilipDaubmeier.NetatmoHost
+		SccLocalPath23 = PhilipDaubmeier.NetatmoHost
 	EndGlobalSection
 EndGlobal
