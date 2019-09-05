@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.SmarthomeApi.Database;
+using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannHost.Polling;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -18,12 +21,17 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         private readonly ViessmannVitotrolClient _vitotrolClient;
         
         private readonly PersistenceContext db;
-        public ViessmannController(PersistenceContext databaseContext, ViessmannEstrellaClient estrellaClient, ViessmannPlatformClient platformClient, ViessmannVitotrolClient vitotrolClient)
+        private readonly ViessmannHeatingPollingService _heatingPollingService;
+        private readonly ViessmannSolarPollingService _solarPollingService;
+
+        public ViessmannController(PersistenceContext databaseContext, ViessmannEstrellaClient estrellaClient, ViessmannPlatformClient platformClient, ViessmannVitotrolClient vitotrolClient, IEnumerable<IViessmannPollingService> pollingServices)
         {
             db = databaseContext;
             _estrellaClient = estrellaClient;
             _platformClient = platformClient;
             _vitotrolClient = vitotrolClient;
+            _heatingPollingService = pollingServices.Select(x => x as ViessmannHeatingPollingService).Where(x => x != null).FirstOrDefault();
+            _solarPollingService = pollingServices.Select(x => x as ViessmannSolarPollingService).Where(x => x != null).FirstOrDefault();
         }
 
         // GET: api/viessmann/installations/names
@@ -300,6 +308,36 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                     suppression = x.Item6
                 })
             });
+        }
+
+        // POST api/viessmann/solar/midlowres/compute
+        [HttpPost("solar/midlowres/compute")]
+        public ActionResult ComputeSolarLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
+        {
+            if (_solarPollingService == null)
+                return StatusCode(400);
+
+            if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
+                return StatusCode(404);
+
+            _solarPollingService.GenerateLowResSolarSeries(span.Begin, span.End);
+
+            return StatusCode(200);
+        }
+
+        // POST api/viessmann/heating/midlowres/compute
+        [HttpPost("heating/midlowres/compute")]
+        public ActionResult ComputeHeatingLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
+        {
+            if (_heatingPollingService == null)
+                return StatusCode(400);
+
+            if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
+                return StatusCode(404);
+
+            _heatingPollingService.GenerateLowResHeatingSeries(span.Begin, span.End);
+
+            return StatusCode(200);
         }
     }
 }
