@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
     public class ModuleData
     {
-        public int TimeUtc { get; set; }
+        [JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime TimeUtc { get; set; }
 
         public double? Temperature { get; set; }
         public string TempTrend { get; set; }
@@ -19,7 +22,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public double? AbsolutePressure { get; set; }
         public int? Noise { get; set; }
 
-        public double Rain { get; set; }
+        public double? Rain { get; set; }
 
         public int? WindAngle { get; set; }
         public int? WindStrength { get; set; }

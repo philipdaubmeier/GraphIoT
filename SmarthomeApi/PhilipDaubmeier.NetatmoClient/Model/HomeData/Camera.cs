@@ -12,7 +12,6 @@ namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
         public string SdStatus { get; set; }
         public string AlimStatus { get; set; }
         public string Name { get; set; }
-        public DateSetup DateSetup { get; set; }
         public string LightModeStatus { get; set; }
     }
 }

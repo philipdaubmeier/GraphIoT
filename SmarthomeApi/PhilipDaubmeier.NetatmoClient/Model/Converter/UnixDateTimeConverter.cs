@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model
     {
         public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
         {
-            writer.WriteValue(Instant.FromDateTimeUtc(((DateTime)value).ToUniversalTime()).ToUnixTimeSeconds());
+            writer.WriteValue(Instant.FromDateTimeUtc(value.ToUniversalTime()).ToUnixTimeSeconds());
         }
 
         public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
