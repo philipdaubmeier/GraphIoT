@@ -12,6 +12,6 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public string Type { get; set; }
         public int Firmware { get; set; }
         public ModuleData DashboardData { get; set; }
-        public List<string> DataType { get; set; }
+        public List<Measure> DataType { get; set; }
     }
 }

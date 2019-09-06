@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.NetatmoClient;
+using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -41,10 +42,10 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
 
             var station = stationdata.Devices.Where(s => s.StationName == "Phils Netatmo").FirstOrDefault();
             var deviceId = station.Id;
-            var moduleId = station.Modules.Where(m => m.DataType.Contains("temperature", StringComparer.InvariantCultureIgnoreCase) &&
-                                                      m.DataType.Contains("co2", StringComparer.InvariantCultureIgnoreCase)).FirstOrDefault().Id;
+            var moduleId = station.Modules.Where(m => m.DataType.Contains(MeasureType.Temperature) &&
+                                                      m.DataType.Contains(MeasureType.CO2)).FirstOrDefault().Id;
 
-            var measures = await _netatmoClient.GetMeasure(deviceId, moduleId, new[] { NetatmoWebClient.MeasureType.Temperature, NetatmoWebClient.MeasureType.CO2 });
+            var measures = await _netatmoClient.GetMeasure(deviceId, moduleId, new Measure[] { MeasureType.Temperature, MeasureType.CO2 });
         }
     }
 }

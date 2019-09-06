@@ -58,74 +58,6 @@ namespace PhilipDaubmeier.NetatmoClient
             }
         }
 
-        public enum MeasureType
-        {
-            Temperature,
-            CO2,
-            Humidity,
-            Pressure,
-            Noise,
-            Rain,
-            WindStrength,
-            WindAngle,
-            Guststrength,
-            GustAngle,
-            MinTemp,
-            MaxTemp,
-            MinHum,
-            MaxHum,
-            MinPressure,
-            MaxPressure,
-            MinNoise,
-            MaxNoise,
-            SumRain,
-            MaxGust,
-            DateMaxHum,
-            DateMinPressure,
-            DateMaxPressure,
-            DateMinNoise,
-            DateMaxNoise,
-            DateMinCo2,
-            DateMaxCo2,
-            DateMaxGust
-        }
-
-        private string MeasureTypeToString(MeasureType type)
-        {
-            switch (type)
-            {
-                case MeasureType.Temperature: return "temperature";
-                case MeasureType.CO2: return "co2";
-                case MeasureType.Humidity: return "humidity";
-                case MeasureType.Pressure: return "pressure";
-                case MeasureType.Noise: return "noise";
-                case MeasureType.Rain: return "rain";
-                case MeasureType.WindStrength: return "windstrength";
-                case MeasureType.WindAngle: return "windangle";
-                case MeasureType.Guststrength: return "guststrength";
-                case MeasureType.GustAngle: return "gustangle";
-                case MeasureType.MinTemp: return "min_temp";
-                case MeasureType.MaxTemp: return "max_temp";
-                case MeasureType.MinHum: return "min_hum";
-                case MeasureType.MaxHum: return "max_hum";
-                case MeasureType.MinPressure: return "min_pressure";
-                case MeasureType.MaxPressure: return "max_pressure";
-                case MeasureType.MinNoise: return "min_noise";
-                case MeasureType.MaxNoise: return "max_noise";
-                case MeasureType.SumRain: return "sum_rain";
-                case MeasureType.MaxGust: return "max_gust";
-                case MeasureType.DateMaxHum: return "date_max_hum";
-                case MeasureType.DateMinPressure: return "date_min_pressure";
-                case MeasureType.DateMaxPressure: return "date_max_pressure";
-                case MeasureType.DateMinNoise: return "date_min_noise";
-                case MeasureType.DateMaxNoise: return "date_max_noise";
-                case MeasureType.DateMinCo2: return "date_min_co2";
-                case MeasureType.DateMaxCo2: return "date_max_co2";
-                case MeasureType.DateMaxGust: return "date_max_gust";
-                default: goto case MeasureType.Temperature;
-            }
-        }
-
         /// <summary>
         /// Retrieve data from a device or module (Weather station and Thermostat only).
         /// </summary>
@@ -138,7 +70,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// <param name="limit">Maximum number of measurements (default and max are 1024)</param>
         /// <param name="realTime">If scale different than max, timestamps are by default offset + scale/2. To get exact timestamps, use true. Default is false.</param>
         /// <returns></returns>
-        public async Task<List<TimestampedMeasureCollection>> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<MeasureType> types, MeasureScale scale = MeasureScale.ScaleMax, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
+        public async Task<List<TimestampedMeasureCollection>> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, MeasureScale scale = MeasureScale.ScaleMax, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
         {
             var uri = new Uri($"{_baseUri}/api/getmeasure");
 
@@ -147,7 +79,7 @@ namespace PhilipDaubmeier.NetatmoClient
                 { "device_id", deviceId },
                 { "module_id", moduleId },
                 { "scale", MeasureScaleToString(scale) },
-                { "type", types == null ? null : string.Join(',', types.Select(t => MeasureTypeToString(t))) },
+                { "type", types == null ? null : string.Join(',', types.Where(t => t != null).Select(t => t.ToString())) },
                 { "date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
                 { "date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
                 { "limit", !limit.HasValue ? null : Math.Max(0, Math.Min(1024, limit.Value)).ToString() },
