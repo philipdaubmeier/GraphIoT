@@ -32,32 +32,6 @@ namespace PhilipDaubmeier.NetatmoClient
             return await CallNetatmoApi<HomeDataResponse, HomeData>(uri);
         }
 
-        public enum MeasureScale
-        {
-            ScaleMax,
-            Scale30Min,
-            Scale1Hour,
-            Scale3Hours,
-            Scale1Day,
-            Scale1Week,
-            Scale1Month
-        }
-
-        private string MeasureScaleToString(MeasureScale scale)
-        {
-            switch (scale)
-            {
-                case MeasureScale.Scale30Min: return "30min";
-                case MeasureScale.Scale1Hour: return "1hour";
-                case MeasureScale.Scale3Hours: return "3hours";
-                case MeasureScale.Scale1Day: return "1day";
-                case MeasureScale.Scale1Week: return "1week";
-                case MeasureScale.Scale1Month: return "1month";
-                case MeasureScale.ScaleMax: goto default;
-                default: return "max";
-            }
-        }
-
         /// <summary>
         /// Retrieve data from a device or module (Weather station and Thermostat only).
         /// </summary>
@@ -70,7 +44,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// <param name="limit">Maximum number of measurements (default and max are 1024)</param>
         /// <param name="realTime">If scale different than max, timestamps are by default offset + scale/2. To get exact timestamps, use true. Default is false.</param>
         /// <returns></returns>
-        public async Task<List<TimestampedMeasureCollection>> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, MeasureScale scale = MeasureScale.ScaleMax, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
+        public async Task<List<TimestampedMeasureCollection>> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, Scale scale = default, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
         {
             var uri = new Uri($"{_baseUri}/api/getmeasure");
 
@@ -78,7 +52,7 @@ namespace PhilipDaubmeier.NetatmoClient
             {
                 { "device_id", deviceId },
                 { "module_id", moduleId },
-                { "scale", MeasureScaleToString(scale) },
+                { "scale", scale?.ToString() ?? new Scale(MeasureScale.ScaleMax).ToString() },
                 { "type", types == null ? null : string.Join(',', types.Where(t => t != null).Select(t => t.ToString())) },
                 { "date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
                 { "date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
