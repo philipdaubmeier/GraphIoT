@@ -2,5 +2,5 @@
 
 namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
 {
-    public class MeasureResponse : Wiremessage<List<TimestampedMeasureCollection>> { }
+    internal class MeasureResponse : Wiremessage<List<MeasureClump>> { }
 }

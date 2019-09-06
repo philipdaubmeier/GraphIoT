@@ -68,8 +68,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public static implicit operator Measure(string measure)
         {
-            if (Mapping.TryGetValue(measure.Trim().ToLowerInvariant(), out MeasureType value))
+            var input = measure.Trim().ToLowerInvariant();
+            if (Mapping.TryGetValue(input, out MeasureType value))
                 return new Measure(value);
+            if (input == "wind")
+                return new Measure(MeasureType.WindStrength);
             return null;
         }
 
