@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation.WeatherStation
+namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
     public class Place
     {

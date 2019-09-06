@@ -1,21 +1,18 @@
 ﻿using Newtonsoft.Json;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
-using System.Collections.Generic;
+using System;
 
-namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation.WeatherStation
+namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
-    public class Module
+    public class Module : ModuleBase
     {
-        [JsonProperty("_id")]
-        public ModuleId Id { get; set; }
-        public string ModuleName { get; set; }
-        public string Type { get; set; }
-        public int Firmware { get; set; }
-        public int LastMessage { get; set; }
-        public int LastSeen { get; set; }
+        [JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime LastMessage { get; set; }
+
+        [JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime LastSeen { get; set; }
+
         public int RfStatus { get; set; }
+        public int BatteryPercent { get; set; }
         public int BatteryVp { get; set; }
-        public ModuleData DashboardData { get; set; }
-        public List<string> DataType { get; set; }
     }
 }

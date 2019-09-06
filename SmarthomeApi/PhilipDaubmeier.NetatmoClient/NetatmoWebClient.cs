@@ -1,7 +1,7 @@
 ﻿using NodaTime;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.HomeData;
-using PhilipDaubmeier.NetatmoClient.Model.WeatherStation.WeatherStation;
+using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
 using PhilipDaubmeier.NetatmoClient.Network;
 using System;
 using System.Collections.Generic;

@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation.WeatherStation
+﻿namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
     public class WindHistoric
     {
