@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SonnenClient.Network
 {
-    public abstract class SonnenAuthBase
+    public abstract class SonnenAuthBase : IDisposable
     {
         private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0";
 
@@ -298,6 +298,11 @@ namespace PhilipDaubmeier.SonnenClient.Network
             {
                 throw new IOException("Unexpected format of access token response, see inner exception.", ex);
             }
+        }
+
+        public void Dispose()
+        {
+            _client.Dispose();
         }
     }
 }

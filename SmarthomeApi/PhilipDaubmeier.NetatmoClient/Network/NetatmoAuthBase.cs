@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.NetatmoClient
 {
-    public abstract class NetatmoAuthBase
+    public abstract class NetatmoAuthBase : IDisposable
     {
         protected const string _baseUri = @"https://api.netatmo.net";
 
@@ -135,6 +135,11 @@ namespace PhilipDaubmeier.NetatmoClient
                 responseData = _jsonSerializer.Deserialize<AccessTokenResponse>(jsonTextReader);
 
             await _authData.UpdateTokenAsync(responseData.AccessToken, DateTime.UtcNow.AddSeconds(responseData.ExpiresIn), responseData.RefreshToken);
+        }
+
+        public void Dispose()
+        {
+            _client.Dispose();
         }
     }
 }
