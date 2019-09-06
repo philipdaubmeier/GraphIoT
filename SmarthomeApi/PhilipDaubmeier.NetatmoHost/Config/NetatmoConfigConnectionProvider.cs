@@ -22,8 +22,6 @@ namespace PhilipDaubmeier.NetatmoHost.Config
             Scope = config.Value.Scope;
 
             AuthData = new NetatmoHostAuth(tokenStore, config.Value.Username, config.Value.Password);
-
-            Handler = new HttpClientHandler() { UseProxy = true, Proxy = new System.Net.WebProxy("127.0.0.1", 8033) };
         }
     }
 }

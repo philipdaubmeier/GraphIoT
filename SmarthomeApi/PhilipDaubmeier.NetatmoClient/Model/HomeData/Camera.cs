@@ -1,8 +1,10 @@
-﻿namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
+﻿using PhilipDaubmeier.NetatmoClient.Model.Core;
+
+namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
 {
     public class Camera
     {
-        public string Id { get; set; }
+        public ModuleId Id { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
         public string VpnUrl { get; set; }

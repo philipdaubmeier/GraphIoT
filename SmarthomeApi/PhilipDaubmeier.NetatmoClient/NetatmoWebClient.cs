@@ -1,4 +1,5 @@
 ﻿using NodaTime;
+using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.HomeData;
 using PhilipDaubmeier.NetatmoClient.Model.WeatherStation.WeatherStation;
 using PhilipDaubmeier.NetatmoClient.Network;
@@ -137,7 +138,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// <param name="limit">Maximum number of measurements (default and max are 1024)</param>
         /// <param name="realTime">If scale different than max, timestamps are by default offset + scale/2. To get exact timestamps, use true. Default is false.</param>
         /// <returns></returns>
-        public async Task<List<TimestampedMeasureCollection>> GetMeasure(string deviceId, string moduleId, IEnumerable<MeasureType> types, MeasureScale scale = MeasureScale.ScaleMax, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
+        public async Task<List<TimestampedMeasureCollection>> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<MeasureType> types, MeasureScale scale = MeasureScale.ScaleMax, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
         {
             var uri = new Uri($"{_baseUri}/api/getmeasure");
 
