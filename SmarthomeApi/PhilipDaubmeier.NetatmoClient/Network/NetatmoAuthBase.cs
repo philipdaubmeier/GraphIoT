@@ -66,7 +66,13 @@ namespace PhilipDaubmeier.NetatmoClient
 
             using (var sr = new StreamReader(responseStream))
             using (var jsonTextReader = new JsonTextReader(sr))
-                return _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader).Body;
+            {
+                var result = _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.Body;
+                if (result == null)
+                    throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+
+                return result;
+            }
         }
 
         /// <summary>

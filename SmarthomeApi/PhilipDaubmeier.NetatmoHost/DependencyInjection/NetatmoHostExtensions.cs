@@ -1,11 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Network;
 using PhilipDaubmeier.NetatmoHost.Config;
+using PhilipDaubmeier.NetatmoHost.Database;
 using PhilipDaubmeier.NetatmoHost.Polling;
+using PhilipDaubmeier.NetatmoHost.Structure;
+using PhilipDaubmeier.NetatmoHost.ViewModel;
 using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
+using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
+using System;
 
 namespace PhilipDaubmeier.NetatmoHost.DependencyInjection
 {
@@ -18,12 +24,24 @@ namespace PhilipDaubmeier.NetatmoHost.DependencyInjection
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<NetatmoWebClient>();
 
+            serviceCollection.AddSingleton<INetatmoDeviceService, NetatmoDeviceService>();
+
             serviceCollection.AddScoped<INetatmoConnectionProvider, NetatmoConfigConnectionProvider>();
             serviceCollection.AddScoped<NetatmoWebClient>();
             serviceCollection.AddPollingService<INetatmoPollingService, NetatmoWeatherPollingService>();
             serviceCollection.AddTimedPollingHost<INetatmoPollingService>(netatmoConfig.GetSection("PollingService"));
 
+            serviceCollection.AddGraphCollectionViewModel<NetatmoMeasureViewModel>();
+
             return serviceCollection;
+        }
+
+        public static IServiceCollection AddNetatmoHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration netatmoConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, INetatmoDbContext, ITokenStoreDbContext
+        {
+            serviceCollection.AddDbContext<INetatmoDbContext, TDbContext>(dbConfig);
+            serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
+
+            return serviceCollection.AddNetatmoHost(netatmoConfig, tokenStoreConfig);
         }
     }
 }

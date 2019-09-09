@@ -1,13 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using PhilipDaubmeier.CalendarHost.Database;
 using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.NetatmoHost.Database;
 using PhilipDaubmeier.SonnenHost.Database;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.ViessmannHost.Database;
 
 namespace PhilipDaubmeier.SmarthomeApi.Database
 {
-    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, ICalendarDbContext, IViessmannDbContext, ISonnenDbContext
+    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, ICalendarDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext
     {
         #region ITokenStoreDbContext
         public DbSet<AuthData> AuthDataSet { get; set; }
@@ -39,6 +40,15 @@ namespace PhilipDaubmeier.SmarthomeApi.Database
         public DbSet<CalendarAppointment> CalendarAppointments { get; set; }
 
         public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
+        #endregion
+
+
+        #region INetatmoDbContext
+        public DbSet<NetatmoModuleMeasure> NetatmoModuleMeasures { get; set; }
+
+        public DbSet<NetatmoMeasureLowresData> NetatmoMeasureLowresDataSet { get; set; }
+
+        public DbSet<NetatmoMeasureMidresData> NetatmoMeasureDataSet { get; set; }
         #endregion
 
 

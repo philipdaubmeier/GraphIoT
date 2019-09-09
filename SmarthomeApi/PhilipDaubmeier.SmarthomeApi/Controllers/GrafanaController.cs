@@ -83,7 +83,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         [HttpPost("search")]
         public ActionResult Search()
         {
-            return Json(GraphIds);
+            return Json(GraphIds.Where(x => !string.IsNullOrWhiteSpace(x)).Distinct());
         }
 
         // POST: api/grafana/query

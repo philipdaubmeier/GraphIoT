@@ -88,7 +88,7 @@ namespace PhilipDaubmeier.SmarthomeApi
 
             services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
 
-            services.AddNetatmoHost(Configuration.GetSection("NetatmoConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), Configuration.GetSection("TokenStoreConfig"));
 

@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
-using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
+using PhilipDaubmeier.NetatmoHost.Database;
+using PhilipDaubmeier.NetatmoHost.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,14 +15,16 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
     public class NetatmoWeatherPollingService : INetatmoPollingService
     {
         private readonly ILogger _logger;
+        private readonly INetatmoDbContext _dbContext;
         private readonly NetatmoWebClient _netatmoClient;
+        private readonly INetatmoDeviceService _netatmoStructure;
 
-        private Dictionary<Tuple<ModuleId, ModuleId>, List<Measure>> _modules = null;
-
-        public NetatmoWeatherPollingService(ILogger<NetatmoWeatherPollingService> logger, NetatmoWebClient netatmoClient)
+        public NetatmoWeatherPollingService(ILogger<NetatmoWeatherPollingService> logger, INetatmoDbContext databaseContext, NetatmoWebClient netatmoClient, INetatmoDeviceService netatmoStructure)
         {
             _logger = logger;
+            _dbContext = databaseContext;
             _netatmoClient = netatmoClient;
+            _netatmoStructure = netatmoStructure;
         }
 
         public async Task PollValues()
@@ -39,67 +43,142 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
 
         public async Task PollSensorValues(DateTime start, DateTime end)
         {
-            if (_modules == null)
-            {
-                var stationdata = await _netatmoClient.GetWeatherStationData();
+            var loadedTimeseries = await LoadMidresSensorValues(start, end);
+            var dbReadTimeseries = ReadAndSaveMidresSensorValues(loadedTimeseries);
+            SaveLowresSensorValues(dbReadTimeseries);
 
-                // TODO: remove hardcoded condition that the station contains "phils"
-                _modules = stationdata.Devices
-                    .Where(s => s.StationName.Contains("phils", StringComparison.InvariantCultureIgnoreCase))
-                    .SelectMany(station => new[] { (ModuleBase)station }
-                        .Union(station.Modules.Cast<ModuleBase>())
-                        .ToDictionary(m => new Tuple<ModuleId, ModuleId>(station.Id, m.Id), m => m.DataType)
-                    )
-                    .ToDictionary(module => module.Key, module => module.Value);
-            }
+            _dbContext.SaveChanges();
 
+            _netatmoStructure.RefreshDbGuids();
+        }
+
+        private async Task<Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>>> LoadMidresSensorValues(DateTime start, DateTime end)
+        {
             var days = new TimeSeriesSpan(start, end, 1).IncludedDates().ToList();
-            var timeseries = new Dictionary<ModuleId, Dictionary<Measure, List<TimeSeries<double>>>>();
-            foreach (var module in _modules)
+            var loadedValues = new Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>>();
+            foreach (var module in _netatmoStructure.Modules)
             {
-                var measures = await _netatmoClient.GetMeasure(module.Key.Item1, module.Key.Item2, module.Value, MeasureScale.ScaleMax, start, end, null, true);
+                var measureTypes = _netatmoStructure.GetModuleMeasures(module.Item2);
+                var measures = await _netatmoClient.GetMeasure(module.Item1, module.Item2, measureTypes, MeasureScale.ScaleMax, start, end, null, true);
 
-                var series = module.Value.Where(m => m != null).ToDictionary(m => m, m => Enumerable.Range(0, days.Count).Select(k =>
+                var series = measureTypes.Where(m => m != null).ToDictionary(m => m, m => Enumerable.Range(0, days.Count).Select(k =>
                         new TimeSeries<double>(new TimeSeriesSpan(days[k], days[k].AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min))).ToList());
                 foreach (var measure in measures)
                     foreach (var originSeries in measure.Value)
                         for (int k = 0; k < series[measure.Key].Count; k++)
-                            series[measure.Key][k][originSeries.Key] = originSeries.Value;
-                timeseries.Add(module.Key.Item2, series);
+                            MapToEquidistantTimeSeries(series[measure.Key][k], originSeries);
+                foreach (var serie in series)
+                    loadedValues.Add(new Tuple<ModuleId, ModuleId, Measure>(module.Item1, module.Item2, serie.Key), serie.Value);
             }
+            return loadedValues;
+        }
 
+        private void MapToEquidistantTimeSeries<T>(ITimeSeries<T> series, KeyValuePair<DateTime, T> valueToMap) where T : struct
+        {
+            if (valueToMap.Key < series.Span.Begin || valueToMap.Key > series.Span.End)
+                return;
+
+            int findBestIndex()
             {
-                // This block is for finding out which decimal places should be taken for each measure
-                // as we have a maximum range of -32768 to 32767 when storing, and 10 times less for each
-                // decimal place we configure
-                var groupedByMeasure = timeseries.SelectMany(m => m.Value.Select(x => new Tuple<Tuple<ModuleId, Measure>, List<TimeSeries<double>>>(new Tuple<ModuleId, Measure>(m.Key, x.Key), x.Value)))
-                                                 .SelectMany(x => x.Item2.Select(m => new Tuple<Measure, TimeSeries<double>>(x.Item1.Item2, m))).GroupBy(x => x.Item1, x => x.Item2);
-                Dictionary<Measure, double> CondenseToSingleValuePerMeasure(Func<IEnumerable<double>, double> aggregatorFunc)
+                var indexDouble = (valueToMap.Key - series.Span.Begin) / series.Span.Duration;
+                var index = Math.Min(series.Count - 1, Math.Max(0, (int)Math.Floor(indexDouble)));
+                if (!series[index].HasValue)
+                    return index;
+
+                var prevIndex = Math.Min(0, index - 1);
+                if (!series[prevIndex].HasValue)
                 {
-                    return groupedByMeasure.ToDictionary(x => x.Key, x => aggregatorFunc(x.SelectMany(t => t.Where(v => v.Value.HasValue).Select(v => v.Value.Value))));
+                    series[prevIndex] = series[index];
+                    return index;
                 }
-                var minValues = CondenseToSingleValuePerMeasure(x => x.Min());
-                var maxValues = CondenseToSingleValuePerMeasure(x => x.Max());
-                var wholeDict = groupedByMeasure.ToDictionary(x => x.Key, x => x.SelectMany(t => t.Where(v => v.Value.HasValue).Select(v => v.Value.Value)));
 
-                // results for the last 10 months, and added knowhow about plausible min/max values:
-                //  measure      minValues maxValues decimalPlaces -> allows for range
-                //  temperature: -50       29.6      1                -3276.8 to 3276.7
-                //  co2:         350       5000      0                -32768 to 32767
-                //  humidity:    46        100       1                -3276.8 to 3276.7
-                //  noise:       33        75        1                -3276.8 to 3276.7
-                //  pressure:    1009.4    1024.1    1                -3276.8 to 3276.7
-                //  rain:        0         2.828     3                -32.768 to 32.767
-                //  windstrength 0         6         1                -3276.8 to 3276.7
-                //  windangle    -1        360       1                -3276.8 to 3276.7
-                //  guststrength 1         12        1                -3276.8 to 3276.7
-                //  gustangle    -1        360       1                -3276.8 to 3276.7
+                var nextIndex = Math.Min(series.Count - 1, index + 1);
+                if ((indexDouble - index) >= 0.5d && !series[nextIndex].HasValue)
+                    return nextIndex;
 
-                // all modules of both locations with all measures combined: 33
+                return index;
             }
 
-            // TODO: store loaded timeseries
-            var do_something_with = timeseries;
+            series[findBestIndex()] = valueToMap.Value;
+        }
+
+        private Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>> ReadAndSaveMidresSensorValues(Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>> loadedValues)
+        {
+            var readSeries = new Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>>();
+
+            foreach (var loaded in loadedValues)
+            {
+                var readList = new List<TimeSeries<double>>();
+                foreach (var timeseries in loaded.Value)
+                {
+                    var dbSensorSeries = GetOrCreateEntity(_dbContext.NetatmoMeasureDataSet, timeseries.Begin, loaded.Key.Item2, loaded.Key.Item3);
+
+                    var series = dbSensorSeries.MeasureSeries;
+                    foreach (var item in timeseries)
+                        if (item.Value.HasValue)
+                            series[item.Key] = item.Value.Value;
+                    dbSensorSeries.SetSeries(0, series);
+                    readList.Add(series);
+                }
+                readSeries.Add(loaded.Key, readList);
+            }
+
+            return readSeries;
+        }
+
+        private void SaveLowresSensorValues(Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>> midresSeries)
+        {
+            foreach (var loaded in midresSeries)
+            {
+                foreach (var timeseries in loaded.Value)
+                {
+                    DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+                    var dbSensorSeries = GetOrCreateEntity(_dbContext.NetatmoMeasureLowresDataSet, FirstOfMonth(timeseries.Begin), loaded.Key.Item2, loaded.Key.Item3);
+
+                    var seriesToWriteInto = dbSensorSeries.MeasureSeries;
+                    var resampler = new TimeSeriesResampler<TimeSeries<double>, double>(seriesToWriteInto.Span)
+                    {
+                        Resampled = seriesToWriteInto
+                    };
+                    resampler.SampleAggregate(timeseries, x => x.Average());
+
+                    dbSensorSeries.SetSeries(0, resampler.Resampled);
+                }
+            }
+        }
+
+        private T GetOrCreateEntity<T>(DbSet<T> set, DateTime key, ModuleId module, Measure measure) where T : NetatmoMeasureData
+        {
+            string moduleId = module, measureKey = measure.ToString();
+            var dbSensorSeries = set.Include(x => x.ModuleMeasure)
+                .Where(x => x.ModuleMeasure.ModuleId == moduleId && x.ModuleMeasure.Measure == measureKey)
+                .Where(x => x.Key == key).FirstOrDefault();
+            if (dbSensorSeries != null)
+                return dbSensorSeries;
+
+            var dbModuleMeasure = _dbContext.NetatmoModuleMeasures.Where(x => x.ModuleId == moduleId && x.Measure == measureKey).FirstOrDefault();
+            if (dbModuleMeasure == null)
+            {
+                var deviceId = _netatmoStructure.Modules.Where(x => x.Item2 == module).FirstOrDefault().Item1;
+                dbModuleMeasure = new NetatmoModuleMeasure()
+                {
+                    DeviceId = deviceId,
+                    ModuleId = moduleId,
+                    Measure = measureKey,
+                    StationName = _netatmoStructure.GetDeviceName(deviceId, 30),
+                    ModuleName = _netatmoStructure.GetModuleName(module, 30)
+                };
+                dbModuleMeasure.SetDecimalsByMeasureType(measure);
+                _dbContext.NetatmoModuleMeasures.Add(dbModuleMeasure);
+            }
+
+            dbSensorSeries = Activator.CreateInstance<T>();
+            dbSensorSeries.ModuleMeasureId = dbModuleMeasure.Id;
+            dbSensorSeries.ModuleMeasure = dbModuleMeasure;
+            dbSensorSeries.Key = key;
+            dbSensorSeries.Decimals = dbModuleMeasure.Decimals;
+            set.Add(dbSensorSeries);
+            return dbSensorSeries;
         }
     }
 }
