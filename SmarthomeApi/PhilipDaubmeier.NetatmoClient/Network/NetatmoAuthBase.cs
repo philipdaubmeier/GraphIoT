@@ -22,11 +22,16 @@ namespace PhilipDaubmeier.NetatmoClient
         private readonly INetatmoConnectionProvider _provider;
         private readonly INetatmoAuth _authData;
 
-        private static HttpMessageHandler _clientHandler;
-        private static HttpClient _client;
+        private HttpMessageHandler _clientHandler;
+        private HttpClient _client;
 
-        private static readonly IContractResolver _jsonResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
-        private static readonly JsonSerializer _jsonSerializer = new JsonSerializer() { ContractResolver = _jsonResolver };
+        private readonly JsonSerializer _jsonSerializer = new JsonSerializer()
+        {
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+            }
+        };
         
         public NetatmoAuthBase(INetatmoConnectionProvider connectionProvider)
         {
