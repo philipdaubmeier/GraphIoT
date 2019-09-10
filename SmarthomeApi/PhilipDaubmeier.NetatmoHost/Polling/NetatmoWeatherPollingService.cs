@@ -44,9 +44,11 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
         public async Task PollSensorValues(DateTime start, DateTime end)
         {
             var loadedTimeseries = await LoadMidresSensorValues(start, end);
-            var dbReadTimeseries = ReadAndSaveMidresSensorValues(loadedTimeseries);
-            SaveLowresSensorValues(dbReadTimeseries);
 
+            var dbReadTimeseries = ReadAndSaveMidresSensorValues(loadedTimeseries);
+            _dbContext.SaveChanges();
+
+            SaveLowresSensorValues(dbReadTimeseries);
             _dbContext.SaveChanges();
 
             _netatmoStructure.RefreshDbGuids();
