@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
 
             try
             {
-                await PollSensorValues(DateTime.Now.AddHours(-1), DateTime.Now);
+                await PollSensorValues(DateTime.UtcNow.AddHours(-1), DateTime.UtcNow);
             }
             catch (Exception ex)
             {
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
 
         private async Task<Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>>> LoadMidresSensorValues(DateTime start, DateTime end)
         {
-            var days = new TimeSeriesSpan(start, end, 1).IncludedDates().ToList();
+            var days = new TimeSeriesSpan(start.ToUniversalTime(), end.ToUniversalTime(), 1).IncludedDates().ToList();
             var loadedValues = new Dictionary<Tuple<ModuleId, ModuleId, Measure>, List<TimeSeries<double>>>();
             foreach (var module in _netatmoStructure.Modules)
             {
@@ -77,12 +77,12 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
 
         private void MapToEquidistantTimeSeries<T>(ITimeSeries<T> series, KeyValuePair<DateTime, T> valueToMap) where T : struct
         {
-            if (valueToMap.Key < series.Span.Begin || valueToMap.Key > series.Span.End)
+            if (valueToMap.Key.ToUniversalTime() < series.Span.Begin.ToUniversalTime() || valueToMap.Key.ToUniversalTime() > series.Span.End.ToUniversalTime())
                 return;
 
             int findBestIndex()
             {
-                var indexDouble = (valueToMap.Key - series.Span.Begin) / series.Span.Duration;
+                var indexDouble = (valueToMap.Key.ToUniversalTime() - series.Span.Begin.ToUniversalTime()) / series.Span.Duration;
                 var index = Math.Min(series.Count - 1, Math.Max(0, (int)Math.Floor(indexDouble)));
                 if (!series[index].HasValue)
                     return index;

@@ -124,16 +124,17 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
 
         private T GetOrCreateEntity<T>(DbSet<T> set, DateTime day, Zone zoneId) where T : DigitalstromZoneSensorData
         {
-            var dbSensorSeries = set.Where(x => x.ZoneId == zoneId && x.Key == day).FirstOrDefault();
+            int zoneIdInt = zoneId;
+            var dbSensorSeries = set.Where(x => x.ZoneId == zoneIdInt && x.Key == day).FirstOrDefault();
             if (dbSensorSeries != null)
                 return dbSensorSeries;
             
-            var dbZone = _dbContext.DsZones.Where(x => x.Id == zoneId).FirstOrDefault();
+            var dbZone = _dbContext.DsZones.Where(x => x.Id == zoneIdInt).FirstOrDefault();
             if (dbZone == null)
-                _dbContext.DsZones.Add(dbZone = new DigitalstromZone() { Id = zoneId });
+                _dbContext.DsZones.Add(dbZone = new DigitalstromZone() { Id = zoneIdInt });
 
             dbSensorSeries = Activator.CreateInstance<T>();
-            dbSensorSeries.ZoneId = zoneId;
+            dbSensorSeries.ZoneId = zoneIdInt;
             dbSensorSeries.Zone = dbZone;
             dbSensorSeries.Key = day;
             set.Add(dbSensorSeries);

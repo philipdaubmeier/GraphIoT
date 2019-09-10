@@ -39,13 +39,17 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
 
         protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, string name, string key, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            // nothing to load
-            if (data == null)
-                return new GraphViewModel(); ;
+            // initial, i.e. empty graph view model
+            if (IsInitialSpan)
+                _graphs.Add(index, new GraphViewModel() { Name = name, Key = key ?? name, Format = format, Begin = Span.Begin, Spacing = Span.Duration, Points = new dynamic[] { } });
 
             // already loaded
             if (_graphs.ContainsKey(index))
                 return _graphs[index];
+
+            // nothing to load
+            if (data == null)
+                return new GraphViewModel();
 
             var series = data.Select(x => x.GetSeries<Tval>(index));
             _graphs.Add(index, BuildGraphViewModel<Tseries, Tval>(series, name, key, format, preprocess));
