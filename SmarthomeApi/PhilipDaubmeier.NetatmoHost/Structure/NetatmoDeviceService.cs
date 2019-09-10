@@ -1,4 +1,6 @@
-﻿using PhilipDaubmeier.NetatmoClient;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
 using PhilipDaubmeier.NetatmoHost.Database;
@@ -19,16 +21,16 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
 
         private Dictionary<ModuleId, string> _moduleNames = null;
 
-        private readonly NetatmoWebClient _netatmoClient;
+        private readonly IServiceProvider _services;
 
-        private readonly INetatmoDbContext _dbContext;
+        private readonly ILogger _logger;
 
         private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
 
-        public NetatmoDeviceService(NetatmoWebClient netatmoClient, INetatmoDbContext databaseContext)
+        public NetatmoDeviceService(IServiceProvider services, ILogger<NetatmoDeviceService> logger)
         {
-            _netatmoClient = netatmoClient;
-            _dbContext = databaseContext;
+            _services = services;
+            _logger = logger;
         }
 
         public IEnumerable<ModuleId> Devices
@@ -61,8 +63,8 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
         {
             LazyLoad();
 
-            var dbId = _moduleDbIds.Where(x => x.Key.Item1 == module && x.Key.Item2 == measure);
-            if (!dbId.Any())
+            var dbId = _moduleDbIds?.Where(x => x.Key.Item1 == module && x.Key.Item2 == measure);
+            if (dbId == null || !dbId.Any())
                 return null;
             return dbId.First().Value;
         }
@@ -81,8 +83,8 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
         {
             LazyLoad();
 
-            var db = _moduleDbIds.Where(x => x.Value == dbId);
-            if (!db.Any())
+            var db = _moduleDbIds?.Where(x => x.Value == dbId);
+            if (dbId == null || !db.Any())
                 return null;
             return db.First().Key.Item1;
         }
@@ -91,8 +93,8 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
         {
             LazyLoad();
 
-            var db = _moduleDbIds.Where(x => x.Value == dbId);
-            if (!db.Any())
+            var db = _moduleDbIds?.Where(x => x.Value == dbId);
+            if (dbId == null || !db.Any())
                 return null;
             return db.First().Key.Item2;
         }
@@ -118,14 +120,6 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
         public void RefreshDbGuids()
         {
             LazyLoad();
-
-            try
-            {
-                _loadSemaphore.WaitOne();
-
-                LoadDbIds();
-            }
-            finally { _loadSemaphore.Release(); }
         }
 
         private void LazyLoad()
@@ -134,37 +128,49 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
             {
                 _loadSemaphore.WaitOne();
 
-                if (_modules != null)
-                    return;
+                using (var scope = _services.CreateScope())
+                {
+                    var netatmoClient = scope.ServiceProvider.GetService<NetatmoWebClient>();
+                    var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
 
-                var stationdata = _netatmoClient.GetWeatherStationData().Result;
-                _modules = stationdata.Devices
-                    .SelectMany(station => new[] { (ModuleBase)station }
-                        .Union(station.Modules.Cast<ModuleBase>())
-                        .ToDictionary(m => new Tuple<ModuleId, ModuleId>(station.Id, m.Id), m => m.DataType)
-                    )
-                    .ToDictionary(module => module.Key, module => module.Value);
+                    if (_modules == null)
+                        LoadStructure(netatmoClient);
 
-                _moduleNames = stationdata.Devices
-                    .SelectMany(station => new[] { (ModuleBase)station }
-                        .Union(station.Modules.Cast<ModuleBase>())
-                        .ToDictionary(m => m.Id, m => m.ModuleName)
-                    ).ToDictionary(x => x.Key, x => x.Value);
-
-                _deviceNames = stationdata.Devices.ToDictionary(x => x.Id, x => x.StationName);
-
-                LoadDbIds();
+                    if (_moduleDbIds == null || (_modules != null && _moduleDbIds.Count < _modules.Count))
+                        LoadDbIds(dbContext);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo Device Service: {ex.Message}");
             }
             finally { _loadSemaphore.Release(); }
         }
 
-        private void LoadDbIds()
+        private void LoadStructure(NetatmoWebClient netatmoClient)
         {
-            if (_moduleDbIds != null && _modules != null && _moduleDbIds.Count >= _modules.Count)
-                return;
+            var stationdata = netatmoClient.GetWeatherStationData().Result;
 
-            var loaded = _dbContext.NetatmoModuleMeasures.ToList();
-            _moduleDbIds = loaded.ToDictionary(x => new Tuple<ModuleId, Measure>(x.ModuleId, x.Measure), x => x.Id);
+            _modules = stationdata.Devices
+                .SelectMany(station => new[] { (ModuleBase)station }
+                    .Union(station.Modules.Cast<ModuleBase>())
+                    .ToDictionary(m => new Tuple<ModuleId, ModuleId>(station.Id, m.Id), m => m.DataType)
+                )
+                .ToDictionary(module => module.Key, module => module.Value);
+
+            _moduleNames = stationdata.Devices
+                .SelectMany(station => new[] { (ModuleBase)station }
+                    .Union(station.Modules.Cast<ModuleBase>())
+                    .ToDictionary(m => m.Id, m => m.ModuleName)
+                ).ToDictionary(x => x.Key, x => x.Value);
+
+            _deviceNames = stationdata.Devices.ToDictionary(x => x.Id, x => x.StationName);
+        }
+
+        private void LoadDbIds(INetatmoDbContext databaseContext)
+        {
+            var loaded = databaseContext.NetatmoModuleMeasures.ToList();
+            _moduleDbIds = loaded.GroupBy(x => new Tuple<ModuleId, Measure>(x.ModuleId, x.Measure)).ToDictionary(x => x.Key, x => x.First().Id);
         }
     }
 }
