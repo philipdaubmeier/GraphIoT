@@ -153,7 +153,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!DateTime.TryParse(query.range.from, out DateTime fromDate) || !DateTime.TryParse(query.range.to, out DateTime toDate))
                 return StatusCode(404);
 
-            var span = new TimeSeriesSpan(fromDate, toDate, query.maxDataPoints);
+            var span = new TimeSeriesSpan(fromDate.ToUniversalTime(), toDate.ToUniversalTime(), query.maxDataPoints);
 
             var data = new Dictionary<string, List<dynamic[]>>();
             foreach (var target in query.targets)
