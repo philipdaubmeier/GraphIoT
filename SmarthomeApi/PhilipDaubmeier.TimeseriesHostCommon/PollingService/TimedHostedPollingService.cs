@@ -49,7 +49,6 @@ namespace PhilipDaubmeier.TimeseriesHostCommon
 
         private async void PollAll(object state)
         {
-            return;
             using (var scope = _services.CreateScope())
             {
                 foreach (var service in scope.ServiceProvider.GetServices<TPollingService>())
