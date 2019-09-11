@@ -41,8 +41,25 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
             }
         }
 
+        private static bool started = false;
         public async Task PollSensorValues(DateTime start, DateTime end)
         {
+            if (started)
+                return;
+            started = true;
+            var startdate = new DateTime(2019, 6, 21, 0, 0, 0, DateTimeKind.Utc);
+            for (int i = 0; true; i++)
+            {
+                var timestamp = startdate.AddDays(-1 * i).ToString("yyyy-MM-dd'Z'", System.Globalization.CultureInfo.InvariantCulture);
+                var code = (await new System.Net.Http.HttpClient().PostAsync($"https://your.domain/smarthome/api/netatmo/poll?begin={timestamp}&end={timestamp}", null)).IsSuccessStatusCode;
+                _logger.LogInformation($"{DateTime.Now} Requested polling for {timestamp}, result {code}");
+                if (!code)
+                {
+                    await Task.Delay(1000);
+                }
+            }
+            return;
+
             var loadedTimeseries = await LoadMidresSensorValues(start, end);
 
             var dbReadTimeseries = ReadAndSaveMidresSensorValues(loadedTimeseries);
@@ -87,7 +104,7 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
                 if (!series[index].HasValue)
                     return index;
 
-                var prevIndex = Math.Min(0, index - 1);
+                var prevIndex = Math.Max(0, index - 1);
                 if (!series[prevIndex].HasValue)
                 {
                     series[prevIndex] = series[index];

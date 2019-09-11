@@ -49,9 +49,9 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
 
             var item = data.First(d => d.Item1 == 7895.ToString());
             var newValue = int.Parse(item.Item2);
-            var oldValue = dbSolarSeries.SolarWhTotal ?? 0;
+            var oldValue = dbSolarSeries.SolarWhTotal;
             var series1 = dbSolarSeries.SolarWhSeries;
-            series1.Accumulate(time, newValue - oldValue);
+            series1.Accumulate(time, oldValue.HasValue ? newValue - oldValue.Value : 0);
             dbSolarSeries.SetSeries(0, series1);
             dbSolarSeries.SolarWhTotal = newValue;
 

@@ -262,7 +262,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
                 var zonesFromMeters = query?.meter_ids?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
                     ?.SelectMany(circuit => dsStructure.GetCircuitZones(circuit)).ToList() ?? new List<Zone>();
-                var zones = (query?.zone_ids?.Cast<Zone>()?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
+                var zones = (query?.zone_ids?.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
 
                 filtered = events
                     .Where(x => query.event_names.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase))
