@@ -97,7 +97,7 @@ namespace PhilipDaubmeier.ViessmannClient
                         d.Descendants().First(x => x.Name.LocalName.Equals("Wert", StringComparison.InvariantCultureIgnoreCase)).Value,
                         DateTime.ParseExact(
                             d.Descendants().First(x => x.Name.LocalName.Equals("Zeitstempel", StringComparison.InvariantCultureIgnoreCase)).Value,
-                            "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal).ToLocalTime()
+                            "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
                     );
                 }).ToList();
         }

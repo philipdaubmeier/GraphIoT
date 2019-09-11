@@ -40,7 +40,7 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
         private async Task PollSolarValues()
         {
             var data = await _vitotrolClient.GetData(new List<int>() { 5272, 5273, 5274, 5276, 7895 });
-            var time = data.First().Item3;
+            var time = data.First().Item3.ToUniversalTime();
             var day = time.Date;
             
             var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();

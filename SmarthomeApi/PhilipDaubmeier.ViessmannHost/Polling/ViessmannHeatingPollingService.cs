@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.ViessmannHost.Polling
             var dhwPrimPump = await _platformClient.GetDhwPrimaryPump();
             var dhwCircPump = await _platformClient.GetDhwCirculationPump();
 
-            var time = DateTime.Now;
+            var time = DateTime.UtcNow;
             var day = time.Date;
             
             var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Key == day).FirstOrDefault();

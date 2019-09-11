@@ -45,7 +45,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
         {
             var sensorValues = (await _dsClient.GetZonesAndSensorValues()).Zones;
 
-            var timestamp = DateTime.Now;
+            var timestamp = DateTime.UtcNow;
             var day = timestamp.Date;
 
             var readMidres = new Dictionary<Zone, Dictionary<Sensor, ITimeSeries<double>>>();

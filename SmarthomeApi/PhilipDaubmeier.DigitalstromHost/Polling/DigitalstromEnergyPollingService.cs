@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.DigitalstromHost.Polling
                 foreach (var dsuid in Dsuids)
                     foreach (var timestampedValue in (await _dsClient.GetEnergy(dsuid, (int)TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues)).TimeSeries)
                         foreach (var timeseries in timeseriesCollections.Select(x => x.Value[dsuid]))
-                            timeseries[timestampedValue.Key.ToLocalTime()] = (int)timestampedValue.Value;
+                            timeseries[timestampedValue.Key.ToUniversalTime()] = (int)timestampedValue.Value;
 
                 SaveHighResEnergyValuesToDb(timeseriesCollections);
                 SaveMidResEnergyValuesToDb(timeseriesCollections);
