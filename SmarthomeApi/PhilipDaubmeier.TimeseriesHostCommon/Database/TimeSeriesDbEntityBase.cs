@@ -16,12 +16,12 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
 
         protected abstract int DecimalPlaces { get; }
 
-        protected TimeSeriesSpan SpanMonth30Min => new TimeSeriesSpan(Key.ToUniversalTime(), Key.ToUniversalTime().AddMonths(1), (int)Math.Floor((Key.ToUniversalTime().AddMonths(1) - Key.ToUniversalTime()).TotalDays * 24 * 2));
-        protected TimeSeriesSpan SpanMonth160Min => new TimeSeriesSpan(Key.ToUniversalTime(), Key.ToUniversalTime().AddMonths(1), (int)Math.Floor((Key.ToUniversalTime().AddMonths(1) - Key.ToUniversalTime()).TotalDays * 9));
+        protected TimeSeriesSpan SpanMonth30Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
+        protected TimeSeriesSpan SpanMonth160Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 9));
 
-        protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key.ToUniversalTime(), TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
-        protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key.ToUniversalTime(), Key.ToUniversalTime().AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
-        protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key.ToUniversalTime(), Key.ToUniversalTime().AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+        protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
+        protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+        protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
