@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.ViewModel
     public class GraphViewModel
     {
         public DateTime Begin { get; set; }
-        public long BeginUnixTimestamp => Instant.FromDateTimeUtc(Begin).ToUnixTimeMilliseconds();
+        public long BeginUnixTimestamp => Instant.FromDateTimeUtc(new DateTime(Begin.Ticks, DateTimeKind.Utc)).ToUnixTimeMilliseconds();
 
         public TimeSpan Spacing { get; set; }
         public long SpacingMillis => (long)Spacing.TotalMilliseconds;
