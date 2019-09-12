@@ -2,6 +2,7 @@
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.NetatmoHost.Polling;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
+using System;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -23,8 +24,32 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
                 return StatusCode(404);
 
-            foreach (var day in span.IncludedDates())
-                await _pollingService.PollSensorValues(day, day.AddDays(1));
+            try
+            {
+                foreach (var day in span.IncludedDates())
+                    await _pollingService.PollSensorValues(day, day.AddDays(1));
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message.Contains("rate limit", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var result = Json(new { ok = false, error = "rate limit reached at netatmo api!" });
+                    result.StatusCode = 429; // 429 rate limit reached
+                    return result;
+                }
+                else if (ex.Message.Contains("authenticate", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    var result = Json(new { ok = false, error = "could not authenticate at netatmo api!" });
+                    result.StatusCode = 502; // 502 bad gateway, server could not authenticate at remote server
+                    return result;
+                }
+                else
+                {
+                    var result = Json(new { ok = false, error = "unknown reason" });
+                    result.StatusCode = 500;
+                    return result;
+                }
+            }
 
             return StatusCode(200);
         }
