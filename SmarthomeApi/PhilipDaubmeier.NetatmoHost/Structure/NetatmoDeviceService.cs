@@ -143,6 +143,7 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
             catch (Exception ex)
             {
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo Device Service: {ex.Message}");
+                throw;
             }
             finally { _loadSemaphore.Release(); }
         }
