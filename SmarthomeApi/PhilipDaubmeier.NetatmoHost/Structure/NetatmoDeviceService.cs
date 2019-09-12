@@ -117,12 +117,17 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
             return crop < 0 ? name : name.Substring(0, Math.Min(name.Length, crop));
         }
 
+        public void ReloadFromNetatmoApi()
+        {
+            LazyLoad(true);
+        }
+
         public void RefreshDbGuids()
         {
             LazyLoad();
         }
 
-        private void LazyLoad()
+        private void LazyLoad(bool forceReloadFromNetatmoApi = false)
         {
             try
             {
@@ -134,7 +139,10 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
                     var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
 
                     if (_modules == null)
-                        LoadStructure(netatmoClient);
+                        LoadStructureFromDb(dbContext);
+
+                    if (_modules == null || forceReloadFromNetatmoApi)
+                        LoadStructureFromNetatmoApi(netatmoClient);
 
                     if (_moduleDbIds == null || (_modules != null && _moduleDbIds.Count < _modules.Count))
                         LoadDbIds(dbContext);
@@ -148,7 +156,29 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
             finally { _loadSemaphore.Release(); }
         }
 
-        private void LoadStructure(NetatmoWebClient netatmoClient)
+        private void LoadDbIds(INetatmoDbContext databaseContext)
+        {
+            var loaded = databaseContext.NetatmoModuleMeasures.ToList();
+            _moduleDbIds = loaded.GroupBy(x => new Tuple<ModuleId, Measure>(x.ModuleId, x.Measure)).ToDictionary(x => x.Key, x => x.First().Id);
+        }
+
+        private void LoadStructureFromDb(INetatmoDbContext databaseContext)
+        {
+            var loaded = databaseContext.NetatmoModuleMeasures.ToList();
+            if (loaded.Count == 0)
+                return;
+
+            _modules = loaded.GroupBy(x => new Tuple<ModuleId, ModuleId>(x.DeviceId, x.ModuleId))
+                .ToDictionary(x => x.Key, x => x.Select(m => (Measure)m.Measure).ToList());
+
+            _moduleNames = loaded.GroupBy(x => x.ModuleId)
+                .ToDictionary(x => (ModuleId)x.Key, x => x.FirstOrDefault()?.ModuleName ?? string.Empty); 
+
+            _deviceNames = loaded.GroupBy(x => x.DeviceId)
+                .ToDictionary(x => (ModuleId)x.Key, x => x.FirstOrDefault()?.StationName ?? string.Empty);
+        }
+
+        private void LoadStructureFromNetatmoApi(NetatmoWebClient netatmoClient)
         {
             var stationdata = netatmoClient.GetWeatherStationData().Result;
 
@@ -166,12 +196,8 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
                 ).ToDictionary(x => x.Key, x => x.Value);
 
             _deviceNames = stationdata.Devices.ToDictionary(x => x.Id, x => x.StationName);
-        }
 
-        private void LoadDbIds(INetatmoDbContext databaseContext)
-        {
-            var loaded = databaseContext.NetatmoModuleMeasures.ToList();
-            _moduleDbIds = loaded.GroupBy(x => new Tuple<ModuleId, Measure>(x.ModuleId, x.Measure)).ToDictionary(x => x.Key, x => x.First().Id);
+            _moduleDbIds = null;
         }
     }
 }

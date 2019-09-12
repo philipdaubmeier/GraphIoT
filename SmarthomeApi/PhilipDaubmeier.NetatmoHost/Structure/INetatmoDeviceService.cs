@@ -24,6 +24,8 @@ namespace PhilipDaubmeier.NetatmoHost.Structure
 
         string GetModuleName(ModuleId module, int crop = -1);
 
+        void ReloadFromNetatmoApi();
+
         void RefreshDbGuids();
     }
 }

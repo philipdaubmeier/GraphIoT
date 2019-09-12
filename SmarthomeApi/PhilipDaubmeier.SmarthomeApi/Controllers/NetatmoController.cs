@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.NetatmoHost.Polling;
+using PhilipDaubmeier.NetatmoHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.Threading.Tasks;
@@ -11,10 +12,20 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     public class NetatmoController : Controller
     {
         private readonly INetatmoPollingService _pollingService;
+        private readonly INetatmoDeviceService _netatmoStructure;
 
-        public NetatmoController(INetatmoPollingService pollingService)
+        public NetatmoController(INetatmoPollingService pollingService, INetatmoDeviceService netatmoStructure)
         {
             _pollingService = pollingService;
+            _netatmoStructure = netatmoStructure;
+        }
+        
+        // POST api/netatmo/structure/reload
+        [HttpPost("structure/reload")]
+        public async Task<ActionResult> ReloadStructure()
+        {
+            _netatmoStructure.ReloadFromNetatmoApi();
+            return StatusCode(200);
         }
 
         // POST api/netatmo/poll
