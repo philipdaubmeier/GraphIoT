@@ -47,7 +47,7 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
             if (started)
                 return;
             started = true;
-            var startdate = new DateTime(2019, 6, 21, 0, 0, 0, DateTimeKind.Utc);
+            var startdate = new DateTime(2017, 8, 7, 0, 0, 0, DateTimeKind.Utc);
             for (int i = 0; true; i++)
             {
                 var timestamp = startdate.AddDays(-1 * i).ToString("yyyy-MM-dd'Z'", System.Globalization.CultureInfo.InvariantCulture);
@@ -55,7 +55,8 @@ namespace PhilipDaubmeier.NetatmoHost.Polling
                 _logger.LogInformation($"{DateTime.Now} Requested polling for {timestamp}, result {code}");
                 if (!code)
                 {
-                    await Task.Delay(1000);
+                    i--;
+                    await Task.Delay(10000);
                 }
             }
             return;
