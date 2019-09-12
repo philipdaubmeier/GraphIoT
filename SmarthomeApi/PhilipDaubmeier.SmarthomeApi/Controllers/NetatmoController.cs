@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.NetatmoClient.Model.Core;
+using PhilipDaubmeier.NetatmoHost.Database;
 using PhilipDaubmeier.NetatmoHost.Polling;
 using PhilipDaubmeier.NetatmoHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -11,15 +14,27 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
     [Route("api/netatmo")]
     public class NetatmoController : Controller
     {
+        private readonly INetatmoDbContext _databaseContext;
         private readonly INetatmoPollingService _pollingService;
         private readonly INetatmoDeviceService _netatmoStructure;
 
-        public NetatmoController(INetatmoPollingService pollingService, INetatmoDeviceService netatmoStructure)
+        public NetatmoController(INetatmoDbContext databaseContext, INetatmoPollingService pollingService, INetatmoDeviceService netatmoStructure)
         {
+            _databaseContext = databaseContext;
             _pollingService = pollingService;
             _netatmoStructure = netatmoStructure;
         }
-        
+
+        // DELETE api/netatmo/structure/modules/{moduleId}
+        [HttpDelete("structure/modules/{moduleId}")]
+        public ActionResult DeleteModule([FromRoute] string moduleId)
+        {
+            var normalizedModuleId = (string)(ModuleId)moduleId;
+            _databaseContext.NetatmoModuleMeasures.RemoveRange(_databaseContext.NetatmoModuleMeasures.Where(x => x.ModuleId == normalizedModuleId));
+            _databaseContext.SaveChanges();
+            return StatusCode(200);
+        }
+
         // POST api/netatmo/structure/reload
         [HttpPost("structure/reload")]
         public async Task<ActionResult> ReloadStructure()
