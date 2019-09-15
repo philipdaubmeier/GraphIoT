@@ -17,6 +17,7 @@ using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
 using PhilipDaubmeier.SmarthomeApi.Services;
 using PhilipDaubmeier.SonnenHost.DependencyInjection;
+using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannHost.DependencyInjection;
 using ProxyKit;
@@ -93,7 +94,9 @@ namespace PhilipDaubmeier.SmarthomeApi
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), Configuration.GetSection("TokenStoreConfig"));
 
             services.AddCalendarHost<PersistenceContext>(smarthomeSqlServer);
-            
+
+            services.AddDatabaseBackupService<PersistenceContext>();
+
             return services.BuildServiceProvider();
         }
 

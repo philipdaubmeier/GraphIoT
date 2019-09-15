@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhilipDaubmeier.TimeseriesHostCommon.Database;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 
 namespace PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection
@@ -14,6 +16,11 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection
         public static IServiceCollection AddGraphCollectionViewModel<TGraphCollectionViewModel, TGraphCollectionViewModelImplementation>(this IServiceCollection serviceCollection) where TGraphCollectionViewModel : class, IGraphCollectionViewModel where TGraphCollectionViewModelImplementation : class, TGraphCollectionViewModel
         {
             return serviceCollection.AddScoped<TGraphCollectionViewModel, TGraphCollectionViewModelImplementation>();
+        }
+
+        public static IServiceCollection AddDatabaseBackupService<TDbContext>(this IServiceCollection serviceCollection) where TDbContext : DbContext
+        {
+            return serviceCollection.AddScoped<DatabaseBackupService<TDbContext>>();
         }
 
         public static IServiceCollection AddPollingService<TPollingService, TPollingServiceImplementation>(this IServiceCollection serviceCollection) where TPollingService : class, IScopedPollingService where TPollingServiceImplementation : class, TPollingService

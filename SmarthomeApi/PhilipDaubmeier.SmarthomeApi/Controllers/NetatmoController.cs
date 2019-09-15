@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
         // POST api/netatmo/structure/reload
         [HttpPost("structure/reload")]
-        public async Task<ActionResult> ReloadStructure()
+        public ActionResult ReloadStructure()
         {
             _netatmoStructure.ReloadFromNetatmoApi();
             return StatusCode(200);
