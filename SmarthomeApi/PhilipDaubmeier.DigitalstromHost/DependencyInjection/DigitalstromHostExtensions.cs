@@ -39,6 +39,7 @@ namespace PhilipDaubmeier.DigitalstromHost.DependencyInjection
 
             serviceCollection.AddGraphCollectionViewModel<DigitalstromEnergyViewModel>();
             serviceCollection.AddGraphCollectionViewModel<DigitalstromZoneSensorViewModel>();
+            serviceCollection.AddEventCollectionViewModel<DigitalstromSceneEventViewModel>();
 
             return serviceCollection;
         }

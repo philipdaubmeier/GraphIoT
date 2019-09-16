@@ -53,7 +53,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.SonnenHost"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.NetatmoClient", "PhilipDaubmeier.NetatmoClient\PhilipDaubmeier.NetatmoClient.csproj", "{1F91D208-69DC-4A92-8659-03EDACBBD678}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.NetatmoHost", "PhilipDaubmeier.NetatmoHost\PhilipDaubmeier.NetatmoHost.csproj", "{71767AA1-A195-4371-A0B9-C7D461E8A3C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhilipDaubmeier.NetatmoHost", "PhilipDaubmeier.NetatmoHost\PhilipDaubmeier.NetatmoHost.csproj", "{71767AA1-A195-4371-A0B9-C7D461E8A3C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PhilipDaubmeier.GrafanaHost", "PhilipDaubmeier.GrafanaHost\PhilipDaubmeier.GrafanaHost.csproj", "{62F71E81-2A08-446F-B478-3820E9A74C2D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +155,10 @@ Global
 		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71767AA1-A195-4371-A0B9-C7D461E8A3C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -181,12 +187,13 @@ Global
 		{E38112F9-C396-414B-B3F6-E410DF9A837B} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{1F91D208-69DC-4A92-8659-03EDACBBD678} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{71767AA1-A195-4371-A0B9-C7D461E8A3C0} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{62F71E81-2A08-446F-B478-3820E9A74C2D} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 24
+		SccNumberOfProjects = 25
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://philipdaubmeier.visualstudio.com/
 		SccLocalPath0 = .
@@ -282,5 +289,9 @@ Global
 		SccProjectTopLevelParentUniqueName23 = PhilipDaubmeier.SmarthomeApi.sln
 		SccProjectName23 = PhilipDaubmeier.NetatmoHost
 		SccLocalPath23 = PhilipDaubmeier.NetatmoHost
+		SccProjectUniqueName24 = PhilipDaubmeier.GrafanaHost\\PhilipDaubmeier.GrafanaHost.csproj
+		SccProjectTopLevelParentUniqueName24 = PhilipDaubmeier.SmarthomeApi.sln
+		SccProjectName24 = PhilipDaubmeier.GrafanaHost
+		SccLocalPath24 = PhilipDaubmeier.GrafanaHost
 	EndGlobalSection
 EndGlobal

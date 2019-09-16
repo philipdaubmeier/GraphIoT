@@ -94,7 +94,7 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
             await db.SaveChangesAsync(cancellationToken);
         }
 
-        private void RestoreBackupRow(IQueryable<ITimeSeriesDbEntity> tableDbSet, List<object> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
+        private void RestoreBackupRow(IQueryable<object> tableDbSet, List<object> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
         {
             var entityType = tableProperty.PropertyType.GenericTypeArguments.First();
             var newEntity = Activator.CreateInstance(entityType);
@@ -108,18 +108,17 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
             methodInfo.Invoke(null, new object[] { tableDbSet, db, newEntity });
         }
 
-        private IEnumerable<Tuple<PropertyInfo, IQueryable<ITimeSeriesDbEntity>>> GetTables(DbContext dbContext, ICollection<string> tableFilter)
+        private IEnumerable<Tuple<PropertyInfo, IQueryable<object>>> GetTables(DbContext dbContext, ICollection<string> tableFilter)
         {
             var tableProperties = dbContext.GetType().GetProperties()
                     .Where(prop => prop.PropertyType.IsSubclassOfGeneric(typeof(DbSet<>)))
-                    .Where(prop => prop.PropertyType.GenericTypeArguments.First().GetInterfaces().Contains(typeof(ITimeSeriesDbEntity)))
                     .Where(prop => tableFilter.Count <= 0 ? true : tableFilter.Contains(prop.Name, StringComparer.InvariantCultureIgnoreCase));
 
-            return tableProperties.Select(prop => new Tuple<PropertyInfo, IQueryable<ITimeSeriesDbEntity>>(prop,
-                prop.GetGetMethod().Invoke(dbContext, null) as IQueryable<ITimeSeriesDbEntity>));
+            return tableProperties.Select(prop => new Tuple<PropertyInfo, IQueryable<object>>(prop,
+                prop.GetGetMethod().Invoke(dbContext, null) as IQueryable<object>));
         }
 
-        private IEnumerable<PropertyInfo> GetColumnProperties(IQueryable<ITimeSeriesDbEntity> table)
+        private IEnumerable<PropertyInfo> GetColumnProperties(IQueryable<object> table)
         {
             return table.GetType().GenericTypeArguments.First().GetProperties()
                 .Where(prop => !Attribute.IsDefined(prop, typeof(NotMappedAttribute)))
@@ -127,15 +126,21 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database
                 .Where(prop => prop.CanRead && prop.CanWrite);
         }
 
-        private List<string> GetColumnNames(IQueryable<ITimeSeriesDbEntity> table)
+        private List<string> GetColumnNames(IQueryable<object> table)
         {
             return GetColumnProperties(table).Select(prop => prop.Name).ToList();
         }
 
-        private List<List<object>> GetColumns(IQueryable<ITimeSeriesDbEntity> table, DateTime start, DateTime end)
+        private List<List<object>> GetColumns(IQueryable<object> table, DateTime start, DateTime end)
         {
             var columnProperties = GetColumnProperties(table);
-            var rows = table.AsNoTracking().Where(x => x.Key >= start && x.Key <= end);
+
+            IQueryable<object> rows;
+            if (table is IQueryable<ITimeSeriesDbEntity> timeSeriesTable)
+                rows = timeSeriesTable.AsNoTracking().Where(x => x.Key >= start && x.Key <= end);
+            else
+                rows = table;
+
             return rows.Select(row => columnProperties.Select(prop => prop.GetGetMethod().Invoke(row, null)).ToList()).ToList();
         }
     }

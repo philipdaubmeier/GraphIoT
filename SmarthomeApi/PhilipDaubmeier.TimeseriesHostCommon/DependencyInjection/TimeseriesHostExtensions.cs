@@ -18,6 +18,16 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection
             return serviceCollection.AddScoped<TGraphCollectionViewModel, TGraphCollectionViewModelImplementation>();
         }
 
+        public static IServiceCollection AddEventCollectionViewModel<TEventCollectionViewModelImplementation>(this IServiceCollection serviceCollection) where TEventCollectionViewModelImplementation : class, IEventCollectionViewModel
+        {
+            return serviceCollection.AddEventCollectionViewModel<IEventCollectionViewModel, TEventCollectionViewModelImplementation>();
+        }
+
+        public static IServiceCollection AddEventCollectionViewModel<TEventCollectionViewModel, TEventCollectionViewModelImplementation>(this IServiceCollection serviceCollection) where TEventCollectionViewModel : class, IEventCollectionViewModel where TEventCollectionViewModelImplementation : class, TEventCollectionViewModel
+        {
+            return serviceCollection.AddScoped<TEventCollectionViewModel, TEventCollectionViewModelImplementation>();
+        }
+
         public static IServiceCollection AddDatabaseBackupService<TDbContext>(this IServiceCollection serviceCollection) where TDbContext : DbContext
         {
             return serviceCollection.AddScoped<DatabaseBackupService<TDbContext>>();

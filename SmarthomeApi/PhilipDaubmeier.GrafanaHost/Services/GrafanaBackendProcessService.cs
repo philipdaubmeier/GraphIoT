@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Services
+namespace PhilipDaubmeier.GrafanaHost.Services
 {
     public class GrafanaBackendProcessService : IHostedService, IDisposable
     {
@@ -18,7 +18,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Services
         public GrafanaBackendProcessService(ILogger<GrafanaBackendProcessService> logger, IHostingEnvironment env)
         {
             _logger = logger;
-            _rootPath = env.ContentRootPath;
+
+            if (env.IsDevelopment())
+                _rootPath = Path.Combine(Path.GetFullPath(Path.Combine(env.ContentRootPath, "..")), "PhilipDaubmeier.GrafanaHost");
+            else
+                _rootPath = env.ContentRootPath;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

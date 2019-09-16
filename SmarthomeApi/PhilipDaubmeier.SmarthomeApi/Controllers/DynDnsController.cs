@@ -32,19 +32,19 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public async Task<ActionResult> Update([FromQuery] string username, [FromQuery] string password, [FromQuery] string domain, [FromQuery] string ipv4, [FromQuery] string ipv6)
         {
             if (username != "philipdaubmeier" || password != "9bb04cf87b69e851")
-                return StatusCode(403); // 403 - Forbidden
+                return StatusCode((int)HttpStatusCode.Forbidden);
 
             if (domain != "karlskron.daubmeier.de")
-                return StatusCode(404); // 404 - Not Found
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             string ipv4ToWrite = null, ipv6ToWrite = null;
             if (!string.IsNullOrEmpty(ipv4))
             {
                 if (!IPAddress.TryParse(ipv4, out IPAddress ip4Address))
-                    return StatusCode(400); // 400 - Bad Request
+                    return StatusCode((int)HttpStatusCode.BadRequest);
 
                 if (ip4Address.AddressFamily != AddressFamily.InterNetwork)
-                    return StatusCode(400); // 400 - Bad Request
+                    return StatusCode((int)HttpStatusCode.BadRequest);
 
                 if (!_tokenStoreIPv4.IsAccessTokenValid() || _tokenStoreIPv4.AccessToken != ip4Address.ToString())
                     ipv4ToWrite = ip4Address.ToString();
@@ -53,17 +53,17 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (!string.IsNullOrEmpty(ipv6))
             {
                 if (!IPAddress.TryParse(ipv6, out IPAddress ip6Address))
-                    return StatusCode(400); // 400 - Bad Request
+                    return StatusCode((int)HttpStatusCode.BadRequest);
 
                 if (ip6Address.AddressFamily != AddressFamily.InterNetworkV6)
-                    return StatusCode(400); // 400 - Bad Request
+                    return StatusCode((int)HttpStatusCode.BadRequest);
 
                 if (!_tokenStoreIPv6.IsAccessTokenValid() || _tokenStoreIPv6.AccessToken != ip6Address.ToString())
                     ipv6ToWrite = ip6Address.ToString();
             }
 
             if (ipv4ToWrite == null && ipv6ToWrite == null)
-                return StatusCode(304); // 304 - Not Modified
+                return StatusCode((int)HttpStatusCode.NotModified);
             
             if (ipv4ToWrite != null)
                 await _tokenStoreIPv4.UpdateToken(ipv4ToWrite, DateTime.Now.AddDays(expiryDays), string.Empty);
@@ -71,7 +71,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             if (ipv6ToWrite != null)
                 await _tokenStoreIPv6.UpdateToken(ipv6ToWrite, DateTime.Now.AddDays(expiryDays), string.Empty);
 
-            return StatusCode(200); // 200 - OK
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // GET api/dyndns/entries

@@ -1,31 +1,22 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CalendarHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
+using PhilipDaubmeier.GrafanaHost.DependencyInjection;
 using PhilipDaubmeier.NetatmoHost.DependencyInjection;
 using PhilipDaubmeier.SmarthomeApi.Clients.Withings;
 using PhilipDaubmeier.SmarthomeApi.Controllers;
 using PhilipDaubmeier.SmarthomeApi.Database;
 using PhilipDaubmeier.SmarthomeApi.Model.Config;
-using PhilipDaubmeier.SmarthomeApi.Services;
 using PhilipDaubmeier.SonnenHost.DependencyInjection;
 using PhilipDaubmeier.TimeseriesHostCommon.DependencyInjection;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannHost.DependencyInjection;
-using ProxyKit;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace PhilipDaubmeier.SmarthomeApi
 {
@@ -43,18 +34,12 @@ namespace PhilipDaubmeier.SmarthomeApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services
-                .AddMvc()
-                .AddRazorPagesOptions(options =>
-                {
-                    options.RootDirectory = "/Views";
-                    options.AllowMappingHeadRequestsToGetHandler = true;
-                })
-                .WithRazorPagesAtContentRoot();
+            services.AddMvc();
 
             Action<DbContextOptionsBuilder> smarthomeSqlServer = options =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
-            
+            var tokenConfig = Configuration.GetSection("TokenStoreConfig");
+
             services.AddDbContext<PersistenceContext>(smarthomeSqlServer);
 
             services.AddLogging(config =>
@@ -70,14 +55,11 @@ namespace PhilipDaubmeier.SmarthomeApi
                 }
             });
 
-            services.AddProxy();
-            services.AddHostedService<GrafanaBackendProcessService>();
-
             services.AddOptions();
             services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
             services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
 
-            services.ConfigureTokenStore(Configuration.GetSection("TokenStoreConfig"));
+            services.ConfigureTokenStore(tokenConfig);
             services.AddTokenStoreDbContext<PersistenceContext>(smarthomeSqlServer);
             services.AddTokenStore<WithingsClient>();
             services.AddTokenStore<DynDnsController.DynDnsIpv4>();
@@ -85,17 +67,19 @@ namespace PhilipDaubmeier.SmarthomeApi
 
             services.AddScoped<WithingsClient>();
 
-            services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig);
 
-            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), tokenConfig);
 
-            services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig);
 
-            services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), Configuration.GetSection("TokenStoreConfig"));
+            services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), tokenConfig);
 
             services.AddCalendarHost<PersistenceContext>(smarthomeSqlServer);
 
             services.AddDatabaseBackupService<PersistenceContext>();
+
+            services.AddGrafanaHost();
 
             return services.BuildServiceProvider();
         }
@@ -104,38 +88,11 @@ namespace PhilipDaubmeier.SmarthomeApi
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
-            {
                 app.UseDeveloperExceptionPage();
-            }
 
-            app.UseMvc();
+            app.UseMvc()
+               .ConfigureGrafanaHost("/smarthome");
 
-            // reverse proxy for grafana
-            var grafanaRegex = @"^(/smarthome)?/grafana($|/.*)";
-            Func<string, string> rewriteFunc = (s) => new PathString(Regex.Matches(s, grafanaRegex).FirstOrDefault()?.Groups.Skip(2).FirstOrDefault()?.Value ?? string.Empty);
-            app.UseWhen(context => Regex.IsMatch(context.Request.Path, grafanaRegex), appInner => appInner
-                .UseRewriter(new RewriteOptions().Add(context => context.HttpContext.Request.Path = rewriteFunc(context.HttpContext.Request.Path)))
-                .RunProxy(context => context.ForwardTo("http://localhost:8088").Send()));
-
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Views", "Style")),
-                RequestPath = new PathString("/style"),
-                ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { ".css", "text/css" },
-                })
-            });
-            app.UseStaticFiles(new StaticFileOptions()
-            {
-                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Views", "Script")),
-                RequestPath = new PathString("/script"),
-                ContentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-                {
-                    { ".js", "application/javascript" },
-                })
-            });
-            
             serviceProvider.GetRequiredService<PersistenceContext>().Database.Migrate();
         }
     }

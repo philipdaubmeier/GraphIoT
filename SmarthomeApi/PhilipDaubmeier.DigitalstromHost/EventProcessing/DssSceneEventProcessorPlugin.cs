@@ -144,7 +144,7 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             using (var scope = _services.CreateScope())
             using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
             {
-                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
+                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
                 if (dbSceneEvents != null)
                     _eventStream = dbSceneEvents.EventStream;
                 else
@@ -165,9 +165,9 @@ namespace PhilipDaubmeier.DigitalstromHost.EventProcessing
             using (var scope = _services.CreateScope())
             using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
             {
-                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Day == date).FirstOrDefault();
+                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
                 if (dbSceneEvents == null)
-                    dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Day = date });
+                    dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Key = date });
 
                 dbSceneEvents.EventStream = _eventStream;
 

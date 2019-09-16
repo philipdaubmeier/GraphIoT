@@ -8,6 +8,7 @@ using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -45,12 +46,12 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public async Task<ActionResult> PollManually([FromQuery] string begin, [FromQuery] string end)
         {
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             foreach (var day in span.IncludedDates())
                 await _pollingService.PollSensorValues(day, day.AddDays(1));
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // GET: api/sonnen/lametric

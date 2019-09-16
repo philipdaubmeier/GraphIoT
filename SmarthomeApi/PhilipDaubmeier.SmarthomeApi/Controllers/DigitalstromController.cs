@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -59,11 +60,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var sensorData = db.DsSensorDataSet.Where(x => x.Key == dayDate.Date).ToList();
             if (sensorData == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             return Json(new
             {
@@ -82,11 +83,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
             
             var energyData = db.DsEnergyHighresDataSet.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (energyData == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var circuitNames = (await dsClient.GetMeteringCircuits()).FilteredMeterNames;
 
@@ -110,11 +111,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
-            var eventData = db.DsSceneEventDataSet.Where(x => x.Day == dayDate.Date).FirstOrDefault();
+            var eventData = db.DsSceneEventDataSet.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (eventData == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
             
             return Json(new
             {
@@ -134,14 +135,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult ComputeEnergyMidLowResFromHighRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_energyPollingService == null)
-                return StatusCode(400);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _energyPollingService.GenerateMidLowResEnergySeries(span.Begin, span.End);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/digitalstrom/sensors/midlowres/compute
@@ -149,14 +150,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult ComputeSensorLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_sensorPollingService == null)
-                return StatusCode(400);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _sensorPollingService.GenerateLowResSensorSeries(span.Begin, span.End);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
     }
 }

@@ -2,6 +2,7 @@
 using PhilipDaubmeier.TokenStore.Database;
 using System;
 using System.Linq;
+using System.Net;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
 {
@@ -19,7 +20,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult Get(string password)
         {
             if (password != "9bb04cf87b69e851")
-                return StatusCode(403);
+                return StatusCode((int)HttpStatusCode.Forbidden);
 
             var authdata = db.AuthDataSet.ToList();
 

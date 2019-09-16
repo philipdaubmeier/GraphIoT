@@ -7,6 +7,7 @@ using PhilipDaubmeier.NetatmoHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using System;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -32,7 +33,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             var normalizedModuleId = (string)(ModuleId)moduleId;
             _databaseContext.NetatmoModuleMeasures.RemoveRange(_databaseContext.NetatmoModuleMeasures.Where(x => x.ModuleId == normalizedModuleId));
             _databaseContext.SaveChanges();
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/netatmo/structure/reload
@@ -40,7 +41,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult ReloadStructure()
         {
             _netatmoStructure.ReloadFromNetatmoApi();
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/netatmo/poll
@@ -48,7 +49,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public async Task<ActionResult> PollManually([FromQuery] string begin, [FromQuery] string end)
         {
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             try
             {
@@ -77,7 +78,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 }
             }
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
     }
 }

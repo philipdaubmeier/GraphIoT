@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
 using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
+using PhilipDaubmeier.GrafanaHost.DependencyInjection;
 using System;
 
 namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
@@ -50,6 +51,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                     Configuration.GetSection("DigitalstromConfig"), 
                     Configuration.GetSection("TokenStoreConfig")
                 )
+                .AddGrafanaHost()
                 .BuildServiceProvider();
         }
         
@@ -58,7 +60,8 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
-            app.UseMvc();
+            app.UseMvc()
+               .ConfigureGrafanaHost("/smarthome");
 
             var database = serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database;
             if (!database.IsInMemory())

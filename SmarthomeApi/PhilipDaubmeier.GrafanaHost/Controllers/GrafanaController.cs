@@ -2,21 +2,18 @@
 using Newtonsoft.Json;
 using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromHost.Database;
-using PhilipDaubmeier.DigitalstromHost.Structure;
 using PhilipDaubmeier.TimeseriesHostCommon.Parsers;
 using PhilipDaubmeier.TimeseriesHostCommon.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.SmarthomeApi.Controllers
+namespace PhilipDaubmeier.GrafanaHost.Controllers
 {
     /// <summary>
     /// More documentation about datasource plugins can be found in the Docs:
@@ -47,7 +44,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
                 if (graphIds == null)
                 {
-                    graphIds = viewModels
+                    graphIds = graphViewModels
                         .SelectMany(n => n.Value.Graphs()
                             .Zip(Enumerable.Range(0, 100), (g, i) => new Tuple<int, string, string>(i, g.Name, g.Key))
                             .SelectMany(t=>new string[]
@@ -61,22 +58,20 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             }
         }
 
-        private readonly IDigitalstromDbContext db;
-        private readonly IDigitalstromStructureService dsStructure;
-        private readonly Dictionary<string, IGraphCollectionViewModel> viewModels;
+        private readonly Dictionary<string, IGraphCollectionViewModel> graphViewModels;
+        private readonly Dictionary<string, IEventCollectionViewModel> eventViewModels;
 
-        public GrafanaController(IDigitalstromDbContext databaseContext, IDigitalstromStructureService digitalstromStructure, IEnumerable<IGraphCollectionViewModel> viewModels)
+        public GrafanaController(IEnumerable<IGraphCollectionViewModel> graphViewModels, IEnumerable<IEventCollectionViewModel> eventViewModels)
         {
-            db = databaseContext;
-            dsStructure = digitalstromStructure;
-            this.viewModels = viewModels.ToDictionary(x => x.Key, x => x);
+            this.graphViewModels = graphViewModels.ToDictionary(x => x.Key, x => x);
+            this.eventViewModels = eventViewModels.ToDictionary(x => x.Key, x => x);
         }
 
         // GET: api/grafana/
         [HttpGet]
         public ActionResult TestConnection()
         {
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST: api/grafana/search
@@ -151,7 +146,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             var query = JsonConvert.DeserializeAnonymousType(body, definition);
 
             if (!DateTime.TryParse(query.range.from, out DateTime fromDate) || !DateTime.TryParse(query.range.to, out DateTime toDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var span = new TimeSeriesSpan(fromDate.ToUniversalTime(), toDate.ToUniversalTime(), query.maxDataPoints);
 
@@ -170,9 +165,9 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 // find the parent viewmodel of the target graph
                 var splitted = targetId.Split('_');
                 if (splitted.Length < 2 || !int.TryParse(splitted[1], out int index) || index < 0
-                    || !viewModels.ContainsKey(splitted[0]) || index >= viewModels[splitted[0]].GraphCount())
+                    || !graphViewModels.ContainsKey(splitted[0]) || index >= graphViewModels[splitted[0]].GraphCount())
                     continue;
-                var viewModel = viewModels[splitted[0]];
+                var viewModel = graphViewModels[splitted[0]];
 
                 // if a custom 'aggregate.interval' or 'overrideMaxDataPoints' was given, take that as time spacing
                 var targetSpan = span;
@@ -241,48 +236,19 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             var annotationInfo = JsonConvert.DeserializeAnonymousType(body, definition);
 
             if (!DateTime.TryParse(annotationInfo.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.range.to, out DateTime toDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
-            var eventData = db.DsSceneEventDataSet.Where(x => x.Day >= fromDate.Date && x.Day <= toDate.Date).ToList();
-            var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= fromDate.ToUniversalTime() && x.TimestampUtc <= toDate.ToUniversalTime()).ToList();
-            List<DssEvent> filtered;
+            var eventViewModel = eventViewModels.FirstOrDefault().Value;
+            eventViewModel.Span = new TimeSeriesSpan(fromDate, toDate, 1);
+            eventViewModel.Query = annotationInfo.annotation.query;
 
-            try
-            {
-                var definitionQuery = new
-                {
-                    event_names = new List<string>(),
-                    meter_ids = new List<string>(),
-                    zone_ids = new List<int>(),
-                    group_ids = new List<int>(),
-                    scene_ids = new List<int>()
-                };
-
-                var query = JsonConvert.DeserializeAnonymousType(annotationInfo.annotation.query, definitionQuery);
-
-                var zonesFromMeters = query?.meter_ids?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
-                    ?.SelectMany(circuit => dsStructure.GetCircuitZones(circuit)).ToList() ?? new List<Zone>();
-                var zones = (query?.zone_ids?.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
-
-                filtered = events
-                    .Where(x => query.event_names.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase))
-                    .Where(x => zones.Contains(x.Properties.ZoneID))
-                    .Where(x => query.group_ids.Contains(x.Properties.GroupID))
-                    .Where(x => query.scene_ids.Contains(x.Properties.SceneID))
-                    .ToList();
-            }
-            catch
-            {
-                filtered = events;
-            }
-
-            return Json(filtered.Select(dssEvent => new
+            return Json(eventViewModel.Events.Select(item => new
             {
                 annotation = annotationInfo.annotation.name,
-                time = Instant.FromDateTimeUtc(dssEvent.TimestampUtc).ToUnixTimeMilliseconds(),
-                title = $"{dssEvent.SystemEvent.Name}",
-                tags = new[] { dssEvent.SystemEvent.Name, dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() },
-                text = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}"
+                time = Instant.FromDateTimeUtc(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
+                title = item.Title,
+                tags = item.Tags,
+                text = item.Text
             }));
         }
     }

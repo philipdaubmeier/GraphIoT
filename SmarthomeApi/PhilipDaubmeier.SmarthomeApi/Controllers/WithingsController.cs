@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public async Task<IActionResult> PostCallback(string code, string state)
         {
             if (state != "f84b57ec")
-                return StatusCode(403);
+                return StatusCode((int)HttpStatusCode.Forbidden);
 
             var authorization_code = code;
             var refresh_token = await _withingsClient.AuthenticateLogin(authorization_code);
@@ -43,14 +43,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
             async Task sendTelegramMessage(string message) => await (new HttpClient()).GetStringAsync("https://api.telegram.org/***REMOVED***/sendMessage?chat_id=***REMOVED***&text=" + WebUtility.UrlEncode(message));
             await sendTelegramMessage("Refresh token: " + refresh_token);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
         
         // HEAD: api/withings/callback
         [HttpHead("callback")]
         public IActionResult HeadCallback()
         {
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // GET: api/withings/measures

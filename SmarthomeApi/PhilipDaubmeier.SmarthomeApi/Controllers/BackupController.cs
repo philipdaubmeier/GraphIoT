@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult LoadBackup([FromQuery] string begin, [FromQuery] string end, [FromQuery] string tablefilter)
         {
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var tableFilterList = ((string.IsNullOrWhiteSpace(tablefilter) ? null : tablefilter)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(name => name.Trim()).ToList()) ?? new List<string>();
 
@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 result.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return result;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var result = Json(new { ok = false, error = "unknown reason" });
                 result.StatusCode = (int)HttpStatusCode.InternalServerError;

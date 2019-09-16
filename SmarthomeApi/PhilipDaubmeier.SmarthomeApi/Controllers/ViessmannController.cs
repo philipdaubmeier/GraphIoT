@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.SmarthomeApi.Controllers
@@ -208,11 +209,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var dbHeatingSeries = db.ViessmannHeatingTimeseries.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (dbHeatingSeries == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             return Json(new
             {
@@ -241,7 +242,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Key == DateTime.Now.Date).FirstOrDefault();
             if (dbSolarSeries == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var totalYieldToday = (double)dbSolarSeries.SolarWhTotal / 1000d;
             var chartSolarYield = dbSolarSeries.SolarWhSeries.Trimmed(0).TakeLast(37);
@@ -276,11 +277,11 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         {
             if (!DateTime.TryParseExact(day, "yyyy'-'MM'-'dd", CultureInfo.InvariantCulture,
                 DateTimeStyles.AssumeLocal, out DateTime dayDate))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
             
             var dbSolarSeries = db.ViessmannSolarTimeseries.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (dbSolarSeries == null)
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             var l1 = dbSolarSeries.SolarWhSeries.ToList();
             var l2 = dbSolarSeries.SolarCollectorTempSeries.ToList();
@@ -292,8 +293,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 zippedValues.Add(new Tuple<DateTime, int?, double?, double?, bool?, bool?>(
                     l1[i].Key, l1[i].Value, l2[i].Value, l3[i].Value, l4[i].Value, l5[i].Value));
 
-            Func<Tuple<DateTime, int?, double?, double?, bool?, bool?>, bool> hasValue = 
-                t => t.Item2.HasValue || t.Item3.HasValue || t.Item4.HasValue || t.Item5.HasValue || t.Item6.HasValue;
+            bool hasValue(Tuple<DateTime, int?, double?, double?, bool?, bool?> t) => t.Item2.HasValue || t.Item3.HasValue || t.Item4.HasValue || t.Item5.HasValue || t.Item6.HasValue;
             var zippedTrimmed = zippedValues.SkipWhile(t => !hasValue(t)).Reverse().SkipWhile(t => !hasValue(t)).Reverse().ToList();
 
             return Json(new
@@ -315,14 +315,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult ComputeSolarLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_solarPollingService == null)
-                return StatusCode(400);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _solarPollingService.GenerateLowResSolarSeries(span.Begin, span.End);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/viessmann/heating/midlowres/compute
@@ -330,14 +330,14 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
         public ActionResult ComputeHeatingLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_heatingPollingService == null)
-                return StatusCode(400);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode(404);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _heatingPollingService.GenerateLowResHeatingSeries(span.Begin, span.End);
 
-            return StatusCode(200);
+            return StatusCode((int)HttpStatusCode.OK);
         }
     }
 }
