@@ -36,7 +36,10 @@ namespace PhilipDaubmeier.TimeseriesHostCommon.Database.Util
             // is it a nullable type?
             var targetType = propertyType.IsNullableType() ? Nullable.GetUnderlyingType(propertyType) : propertyType;
 
-            if (targetType != propertyVal.GetType())
+            if (targetType == typeof(byte[]))
+                propertyVal = Convert.FromBase64String((string)propertyVal);
+
+            if (propertyVal != null && targetType != propertyVal.GetType())
             {
                 // is there an implicit conversion operator?
                 var converter = targetType.GetMethod("op_Implicit", new[] { propertyVal.GetType() });

@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
 
             var tableFilterList = ((string.IsNullOrWhiteSpace(tablefilter) ? null : tablefilter)?.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(name => name.Trim()).ToList()) ?? new List<string>();
 
-            return Json(_backupService.CreateBackup(span.Begin.Date, span.End.Date, tableFilterList));
+            return Json(new { tables = _backupService.CreateBackup(span.Begin.Date, span.End.Date, tableFilterList) });
         }
 
         // PUT api/backup/restore
@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.SmarthomeApi.Controllers
                 result.StatusCode = (int)HttpStatusCode.InternalServerError;
                 return result;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 var result = Json(new { ok = false, error = "unknown reason" });
                 result.StatusCode = (int)HttpStatusCode.InternalServerError;
