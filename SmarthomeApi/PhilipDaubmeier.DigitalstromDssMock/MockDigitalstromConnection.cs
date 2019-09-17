@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
             }
         }
 
-        private static IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "***REMOVED***", "mocksecret");
+        private static IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "dssadmin", "mocksecret");
         private static UriPriorityList testGenerationUris = new UriPriorityList(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
         private static UriPriorityList mockUris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
 
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
                               }");
 
             mockHttp.When($"{BaseUri}/json/system/login")
-                    .WithExactQueryString("user=***REMOVED***&password=mocksecret")
+                    .WithExactQueryString("user=dssadmin&password=mocksecret")
                     .Respond("application/json", @"{
                                   ""result"": {
                                       ""token"": ""eb7a72928_dummy_unittest_token_6bd708977a2beb50278765af04c839217""

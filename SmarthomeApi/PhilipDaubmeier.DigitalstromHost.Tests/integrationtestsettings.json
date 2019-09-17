@@ -39,7 +39,7 @@
       "DuplicateDetectionInterval": "0ms"
     },
     "TokenAppId": "DigitalstromTimeSeriesApi",
-    "DssUsername": "***REMOVED***",
+    "DssUsername": "dssadmin",
     "DssPassword": "your password here",
     "DssCertificate": "",
     "DssUriLocal": "https://127.0.0.1:8080/",
