@@ -1,0 +1,54 @@
+{
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Warning",
+      "Microsoft": "Warning"
+    },
+    "Debug": {
+      "LogLevel": {
+        "Default": "Debug",
+        "System": "Warning",
+        "Microsoft": "Warning"
+      }
+    },
+    "Console": {
+      "LogLevel": {
+        "Default": "Debug",
+        "System": "Warning",
+        "Microsoft": "Warning"
+      }
+    }
+  },
+  "ConnectionStrings": {
+    "DigitalstromTimeSeriesDB": "<sql server connection string>"
+  },
+  "TokenStoreConfig": {
+    "ClassNameMapping": {
+      "PersistingDigitalstromAuth": "digitalstrom.timeseriesapi"
+    }
+  },
+  "DigitalstromConfig": {
+    "PollingService": {
+      "Name": "Digitalstrom",
+      "TimerInterval": "100ms"
+    },
+    "EventProcessor": {
+      "ItemCollectionInterval": "100ms",
+      "DuplicateDetectionInterval": "0ms"
+    },
+    "TokenAppId": "DigitalstromTimeSeriesApi",
+    "DssUsername": "dssadmin",
+    "DssPassword": "your password here",
+    "DssCertificate": "",
+    "DssUriLocal": "https://127.0.0.1:8080/",
+    "DssUriDsNet": "https://{CloudDssId}.test:8080/",
+    "DssUriCloudredir": "https://domain.tld/redir?adr={CloudDssId}&token={CloudredirToken}&path=",
+    "CloudDssId": "mock",
+    "CloudredirToken": "",
+    "UseCloudredir": false,
+    "Proxy": "",
+    "ProxyPort": ""
+  }
+}

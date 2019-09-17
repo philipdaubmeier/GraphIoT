@@ -1,0 +1,71 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <TypeScriptToolsVersion>3.1</TypeScriptToolsVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <NoWin32Manifest>true</NoWin32Manifest>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125193409_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190125223328_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126093820_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.cs" />
+    <Compile Remove="Migrations\20190126094343_Calendar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.cs" />
+    <Compile Remove="Migrations\20190228214644_Solar_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.cs" />
+    <Compile Remove="Migrations\20190309231108_Digitalstrom_Sensors_v1.Designer.cs" />
+    <Compile Remove="Migrations\20190422185631_AuthData_Seperation_Remaining.cs" />
+    <Compile Remove="Migrations\20190422185631_AuthData_Seperation_Remaining.Designer.cs" />
+    <Compile Remove="Migrations\20190829075407_Digitalstrom_Energy_v2.cs" />
+    <Compile Remove="Migrations\20190829075407_Digitalstrom_Energy_v2.Designer.cs" />
+    <Compile Remove="Migrations\20190829082954_Digitalstrom_Energy_v2.cs" />
+    <Compile Remove="Migrations\20190829082954_Digitalstrom_Energy_v2.Designer.cs" />
+    <Compile Remove="Migrations\20190910093208_Netatmo_v1.cs" />
+    <Compile Remove="Migrations\20190910093208_Netatmo_v1.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="readme_setup_production_db.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="readme_setup_production_db.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.2.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.6" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CalendarHost\CalendarHost.csproj" />
+    <ProjectReference Include="..\DigitalstromHost\DigitalstromHost.csproj" />
+    <ProjectReference Include="..\GrafanaHost\GrafanaHost.csproj" />
+    <ProjectReference Include="..\NetatmoHost\NetatmoHost.csproj" />
+    <ProjectReference Include="..\SonnenClient\SonnenClient.csproj" />
+    <ProjectReference Include="..\SonnenHost\SonnenHost.csproj" />
+    <ProjectReference Include="..\ViessmannHost\ViessmannHost.csproj" />
+  </ItemGroup>
+
+</Project>
