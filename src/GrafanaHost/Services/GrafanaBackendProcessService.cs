@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.GrafanaHost.Services
             _logger = logger;
 
             if (env.IsDevelopment())
-                _rootPath = Path.Combine(Path.GetFullPath(Path.Combine(env.ContentRootPath, "..")), "PhilipDaubmeier.GrafanaHost");
+                _rootPath = Path.Combine(Path.GetFullPath(Path.Combine(env.ContentRootPath, "..")), "GrafanaHost");
             else
                 _rootPath = env.ContentRootPath;
         }
@@ -96,12 +96,12 @@ namespace PhilipDaubmeier.GrafanaHost.Services
         /// <param name="cancellationToken">A cancellation token. If invoked, the task will return 
         /// immediately as canceled.</param>
         /// <returns>A Task representing waiting for the process to end.</returns>
-        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default(CancellationToken))
+        public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
         {
             var tcs = new TaskCompletionSource<object>();
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => tcs.TrySetResult(null);
-            if (cancellationToken != default(CancellationToken))
+            if (cancellationToken != default)
                 cancellationToken.Register(tcs.SetCanceled);
 
             return tcs.Task;

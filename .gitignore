@@ -188,3 +188,7 @@ FakesAssemblies/
 /src/GrafanaHost/Grafana/public
 /src/GrafanaHost/Grafana/tools/phantomjs
 /src/GrafanaHost/Grafana/VERSION
+
+# Only check in appsettings template, not actual configurations for dev and prod due to sensitive data
+appsettings.Development.json
+appsettings.Production.json
