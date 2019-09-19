@@ -1,6 +1,6 @@
-# SmarthomeApi
+# GraphIoT
 
-SmarthomeApi is a server application that does two major things:
+GraphIoT is a server application that does two major things:
 
 1. It regularly polls data from other servers, e.g. home servers of smart home systems or cloud apis of smart home device manufacturers. These values are stored and historized in a configurable database. Currently it supports polling from:
     * Digitalstrom DSS (home server)
@@ -14,7 +14,7 @@ SmarthomeApi is a server application that does two major things:
 
 ## Platform Support
 
-SmarthomeApi is compiled for .NET Core 2.2.
+GraphIoT is compiled for .NET Core 2.2.
 
 ## License
 

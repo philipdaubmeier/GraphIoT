@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.DigitalstromHost.Database;
+using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.TokenStore.Database;
 
 namespace PhilipDaubmeier.DigitalstromTimeSeriesApi.Database

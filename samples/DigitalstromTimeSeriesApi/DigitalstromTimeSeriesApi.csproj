@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\DigitalstromHost\DigitalstromHost.csproj" />
-    <ProjectReference Include="..\..\src\GrafanaHost\GrafanaHost.csproj" />
+    <ProjectReference Include="..\..\src\GraphIoT.Digitalstrom\GraphIoT.Digitalstrom.csproj" />
+    <ProjectReference Include="..\..\src\GraphIoT.Grafana\GraphIoT.Grafana.csproj" />
   </ItemGroup>
 
 </Project>

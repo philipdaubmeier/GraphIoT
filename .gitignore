@@ -181,13 +181,13 @@ FakesAssemblies/
 .vs/
 
 # Grafana installation
-/src/GrafanaHost/Grafana/conf/provisioning
-/src/GrafanaHost/Grafana/conf/ldap.toml
-/src/GrafanaHost/Grafana/conf/defaults.ini
-/src/GrafanaHost/Grafana/data
-/src/GrafanaHost/Grafana/public
-/src/GrafanaHost/Grafana/tools/phantomjs
-/src/GrafanaHost/Grafana/VERSION
+/src/GraphIoT.Grafana/Grafana/conf/provisioning
+/src/GraphIoT.Grafana/Grafana/conf/ldap.toml
+/src/GraphIoT.Grafana/Grafana/conf/defaults.ini
+/src/GraphIoT.Grafana/Grafana/data
+/src/GraphIoT.Grafana/Grafana/public
+/src/GraphIoT.Grafana/Grafana/tools/phantomjs
+/src/GraphIoT.Grafana/Grafana/VERSION
 
 # Only check in appsettings template, not actual configurations for dev and prod due to sensitive data
 appsettings.Development.json

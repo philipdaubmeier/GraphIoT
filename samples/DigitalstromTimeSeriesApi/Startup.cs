@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.DigitalstromHost.DependencyInjection;
+using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
-using PhilipDaubmeier.GrafanaHost.DependencyInjection;
+using PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection;
 using System;
 
 namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
