@@ -1,14 +1,13 @@
 using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.CalendarHost.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
-using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
+using PhilipDaubmeier.TokenStore.Database;
 
 namespace PhilipDaubmeier.GraphIoT.App.Database
 {
-    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, ICalendarDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext
+    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext
     {
         #region ITokenStoreDbContext
         public DbSet<AuthData> AuthDataSet { get; set; }
@@ -31,15 +30,6 @@ namespace PhilipDaubmeier.GraphIoT.App.Database
         public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
-        #endregion
-
-
-        #region ICalendarDbContext
-        public DbSet<Calendar> Calendars { get; set; }
-
-        public DbSet<CalendarAppointment> CalendarAppointments { get; set; }
-
-        public DbSet<CalendarOccurence> CalendarOccurances { get; set; }
         #endregion
 
 

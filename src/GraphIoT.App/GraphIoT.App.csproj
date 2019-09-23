@@ -59,7 +59,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CalendarHost\CalendarHost.csproj" />
     <ProjectReference Include="..\GraphIoT.Digitalstrom\GraphIoT.Digitalstrom.csproj" />
     <ProjectReference Include="..\GraphIoT.Grafana\GraphIoT.Grafana.csproj" />
     <ProjectReference Include="..\GraphIoT.Netatmo\GraphIoT.Netatmo.csproj" />

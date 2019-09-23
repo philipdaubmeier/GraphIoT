@@ -4,17 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.CalendarHost.DependencyInjection;
+using PhilipDaubmeier.GraphIoT.App.Database;
+using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection;
-using PhilipDaubmeier.GraphIoT.App.Clients.Withings;
-using PhilipDaubmeier.GraphIoT.App.Controllers;
-using PhilipDaubmeier.GraphIoT.App.Database;
-using PhilipDaubmeier.GraphIoT.App.Model.Config;
 using PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection;
-using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
-using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection;
 using System;
 
@@ -56,17 +51,6 @@ namespace PhilipDaubmeier.GraphIoT.App
             });
 
             services.AddOptions();
-            services.Configure<AudiConnectConfig>(Configuration.GetSection("AudiConnectConfig"));
-            services.Configure<WithingsConfig>(Configuration.GetSection("WithingsConfig"));
-            services.Configure<TelegramConfig>(Configuration.GetSection("TelegramConfig"));
-
-            services.ConfigureTokenStore(tokenConfig);
-            services.AddTokenStoreDbContext<PersistenceContext>(smarthomeSqlServer);
-            services.AddTokenStore<WithingsClient>();
-            services.AddTokenStore<DynDnsController.DynDnsIpv4>();
-            services.AddTokenStore<DynDnsController.DynDnsIpv6>();
-
-            services.AddScoped<WithingsClient>();
 
             services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig);
 
@@ -75,8 +59,6 @@ namespace PhilipDaubmeier.GraphIoT.App
             services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig);
 
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), tokenConfig);
-
-            services.AddCalendarHost<PersistenceContext>(smarthomeSqlServer);
 
             services.AddDatabaseBackupService<PersistenceContext>();
 
