@@ -1,6 +1,5 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
-using PhilipDaubmeier.DigitalstromTwin;
 using System;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -45,16 +44,6 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             }
 
             var conn = new DigitalstromConnectionProvider(uri, loginUser, validateCert);
-
-            using (var twin = new DigitalstromDssTwin(conn))
-            {
-                twin.SceneChanged += (s, e) =>
-                {
-                    Console.WriteLine($"Scene called: zone '{e.Zone}', group '{e.Group}', scene '{e.Scene}");
-                };
-                while (true)
-                    await Task.Delay(10);
-            }
 
             using (var client = new DigitalstromDssClient(conn))
             {
