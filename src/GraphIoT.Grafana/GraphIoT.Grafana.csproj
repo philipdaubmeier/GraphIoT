@@ -19,6 +19,8 @@
   <ItemGroup>
     <None Include="Grafana\**\*" CopyToPublishDirectory="PreserveNewest" />
     <None Remove="Grafana\data\grafana.db" />
+    <None Remove="Grafana\conf\production\custom.ini" />
+    <None Remove="Grafana\conf\custom.ini" />
   </ItemGroup>
 
   <ItemGroup>

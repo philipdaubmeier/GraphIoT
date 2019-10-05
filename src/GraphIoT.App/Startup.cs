@@ -74,7 +74,7 @@ namespace PhilipDaubmeier.GraphIoT.App
                 app.UseDeveloperExceptionPage();
 
             app.UseMvc()
-               .ConfigureGrafanaHost("/smarthome");
+               .ConfigureGrafanaHost("/graphiot");
 
             serviceProvider.GetRequiredService<PersistenceContext>().Database.Migrate();
         }

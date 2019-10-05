@@ -61,7 +61,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                 app.UseDeveloperExceptionPage();
 
             app.UseMvc()
-               .ConfigureGrafanaHost("/smarthome");
+               .ConfigureGrafanaHost("/graphiot");
 
             var database = serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database;
             if (!database.IsInMemory())
