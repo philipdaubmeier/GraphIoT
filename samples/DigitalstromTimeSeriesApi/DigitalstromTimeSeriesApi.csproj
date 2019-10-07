@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.DigitalstromTimeSeriesApi</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.DigitalstromTimeSeriesApi</RootNamespace>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.0.0</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
   </PropertyGroup>

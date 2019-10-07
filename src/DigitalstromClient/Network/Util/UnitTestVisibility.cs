@@ -1,2 +1,2 @@
 ﻿using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("DigitalstromClient.Tests")]
+[assembly: InternalsVisibleTo("PhilipDaubmeier.DigitalstromClient.Tests")]

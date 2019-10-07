@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.CompactTimeSeries.Tests</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.CompactTimeSeries.Tests</RootNamespace>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.3.0</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 

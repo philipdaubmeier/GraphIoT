@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.GraphIoT.App</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.GraphIoT.App</RootNamespace>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.0.0</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>

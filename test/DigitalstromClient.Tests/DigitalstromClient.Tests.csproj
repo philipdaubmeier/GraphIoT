@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.DigitalstromClient.Tests</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.DigitalstromClient.Tests</RootNamespace>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.0.0</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
