@@ -1,16 +1,49 @@
+![GraphIoT logo](doc/graphiot_logo.svg)
+
 # GraphIoT
 
-GraphIoT is a server application that does two major things:
+GraphIoT is a .NET Core project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
 
-1. It regularly polls data from other servers, e.g. home servers of smart home systems or cloud apis of smart home device manufacturers. These values are stored and historized in a configurable database. Currently it supports polling from:
-    * Digitalstrom DSS (home server)
-    * Netatmo (Cloud API)
-    * Sonnen (Cloud API)
-    * Viessmann (Cloud API)
-2. It visualizes the historical time series data via Grafana. For this reason it has
-    * a grafana hosted service that starts and monitors the grafana server process
-    * a reverse proxy middleware that redirects to the grafana server
-    * a RESTful+json api that loads, aggregates and preprocesses the stored data and outputs it in a grafana compatible format
+The main server application consists of these two major parts for this purpose:
+
+1. **Data Gathering**
+    * A set of timed hosted services that regularly poll data from other servers, e.g. home servers of smart home systems or cloud apis of smart home device manufacturers. These values are stored in a configurable database. Currently it supports polling from:
+        * Digitalstrom DSS (home server)
+        * Netatmo (Cloud API)
+        * Sonnen (Cloud API)
+        * Viessmann (Cloud API)
+2. **Data Visualization**
+    * A set of RESTful APIs to retrieve the time series data
+    * Grafana visualization via:
+        * a grafana hosted service that starts and monitors the grafana server process
+        * a reverse proxy middleware that redirects to the grafana server
+        * a REST+json api that loads, aggregates and preprocesses the stored data and outputs it in a grafana JSON datasource compatible format
+
+## Code Structure
+
+GraphIoT consists of several subprojects, some of which are independent of GraphIoT dependencies and can be used within other applications as nuget packages.
+
+It is structured as follows:
+
+* Client libaries for communicating with a specific IoT device type:
+  * DigitalstromClient
+  * DigitalstromTwin
+  * NetatmoClient
+  * SonnenClient
+  * ViessmannClient
+* Shared libraries for common functionality in GraphIoT Host libraries:
+  * GraphIoT.Core
+  * TokenStore
+  * [CompactTimeSeries](src/CompactTimeSeries/README.md)
+* Host Libraries that derive from GraphIoT.Core for a specific IoT device type:
+  * GraphIoT.Digitalstrom
+  * GraphIoT.Netatmo
+  * GraphIoT.Sonnen
+  * GraphIoT.Viessmann
+* Visualization middleware and APIs:
+  * GraphIoT.Grafana
+* Main server application:
+  * GraphIoT.App
 
 ## Platform Support
 
