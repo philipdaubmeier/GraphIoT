@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>In-memory time series library</title>
+    <authors>Philip Daubmeier</authors>
+    <owners>Philip Daubmeier</owners>
+    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/CompactTimeSeries</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Memory efficient storing, processing, resampling and compressing of time series data.</description>
+    <releaseNotes>
+      1.3.0 - Reworked TimeSeriesResampler for correctly address sampling multiple series into a single result time bucket
+      1.2.0 - Added EventTimeSeriesStream for non-equidistant time series
+      1.1.0 - Added TimeSeriesResampler
+      1.0.0 - Initial version after completing unit tests and refactoring class structure
+    </releaseNotes>
+    <copyright>Copyright 2019 Philip Daubmeier</copyright>
+    <tags>timeseries</tags>
+    <dependencies>
+      <group targetFramework="netcoreapp2.2"></group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+  </files>
+</package>

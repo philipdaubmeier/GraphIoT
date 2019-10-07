@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Globals">
     <SccProjectName>SAK</SccProjectName>
@@ -8,7 +8,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.NetatmoClient</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.NetatmoClient</RootNamespace>
+    <PackageId>PhilipDaubmeier.NetatmoClient</PackageId>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.0.0</Version>
     <TargetFramework>netcoreapp2.2</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

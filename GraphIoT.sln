@@ -31,6 +31,7 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "doc", "doc\", "{AB75CF01-6B
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "51071"
+		SlnRelativePath = "doc\"
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphIoT.App", "src\GraphIoT.App\GraphIoT.App.csproj", "{957D571E-8C81-4E83-9AA6-4AB1948630AA}"

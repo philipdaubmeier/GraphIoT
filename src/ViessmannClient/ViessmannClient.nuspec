@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>Client library for communicating to Viessmann servers</title>
+    <authors>Philip Daubmeier</authors>
+    <owners>Philip Daubmeier</owners>
+    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/ViessmannClient</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This class library provides a way to call the Viessmann Server interfaces. It supports RESTful Viessmann Plattform services, the Estrella server as well as the legacy Vitotrol SOAP service. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
+    <releaseNotes>
+      1.0.0 - Initial version with publishing version 1.0 of GraphIoT
+    </releaseNotes>
+    <copyright>Copyright 2019 Philip Daubmeier</copyright>
+    <tags>viessmann heating smarthome httpclient</tags>
+    <dependencies>
+      <group targetFramework="netcoreapp2.2">
+        <dependency id="Newtonsoft.Json" version="12.0.2" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+  </files>
+</package>

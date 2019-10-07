@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>Two-way sync of scene states with a Digitalstrom Server</title>
+    <authors>Philip Daubmeier</authors>
+    <owners>Philip Daubmeier</owners>
+    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/DigitalstromTwin</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This class library provides a DigitalstromDssTwin object as the main class, that automatically synchronizes scene states of all rooms both ways, i.e. if a state is changed programatically it sends a command to the DSS, if a scene is changed within the apartement the event is synched into the twin model.</description>
+    <releaseNotes>
+      1.0.0 - Initial version with publishing version 1.0 of GraphIoT
+    </releaseNotes>
+    <copyright>Copyright 2019 Philip Daubmeier</copyright>
+    <tags>digitalstrom ds smarthome</tags>
+    <dependencies>
+      <group targetFramework="netcoreapp2.2">
+        <dependency id="PhilipDaubmeier.DigitalstromClient" version="1.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
+    <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+  </files>
+</package>
