@@ -5,11 +5,33 @@ VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{C7CE2B7C-9302-4960-88B2-8EB380247CB8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{13E7D5AF-A3B6-4092-B26E-9E99F0A8AE64}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HostsClients", "HostsClients", "{BACF690E-BFC9-4008-9831-FFBA91968BB9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{C3157849-77E5-4E59-9F7F-2AAF51AF4675}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MainWebserver", "MainWebserver", "{65C89DCA-5096-479C-82F3-F33BF729FDE5}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "doc", "doc\", "{AB75CF01-6B54-4BB1-A14A-01A26727FEF2}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_51071"
+		Debug.AspNetCompiler.PhysicalPath = "doc\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51071\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_51071"
+		Release.AspNetCompiler.PhysicalPath = "doc\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51071\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "51071"
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphIoT.App", "src\GraphIoT.App\GraphIoT.App.csproj", "{957D571E-8C81-4E83-9AA6-4AB1948630AA}"
 EndProject
@@ -63,6 +85,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AB75CF01-6B54-4BB1-A14A-01A26727FEF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB75CF01-6B54-4BB1-A14A-01A26727FEF2}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{957D571E-8C81-4E83-9AA6-4AB1948630AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -160,6 +184,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{AB75CF01-6B54-4BB1-A14A-01A26727FEF2} = {13E7D5AF-A3B6-4092-B26E-9E99F0A8AE64}
 		{957D571E-8C81-4E83-9AA6-4AB1948630AA} = {65C89DCA-5096-479C-82F3-F33BF729FDE5}
 		{1E81426A-B0AE-478A-8393-8F7F105DE13A} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
 		{82F35B1B-A22D-4DE5-9061-4447437E2C37} = {C7CE2B7C-9302-4960-88B2-8EB380247CB8}
