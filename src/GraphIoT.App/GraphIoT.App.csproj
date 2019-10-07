@@ -46,14 +46,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="readme_setup_production_db.md" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="readme_setup_production_db.md" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="2.8.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
