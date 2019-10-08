@@ -189,6 +189,10 @@ FakesAssemblies/
 /src/GraphIoT.Grafana/Grafana/tools/phantomjs
 /src/GraphIoT.Grafana/Grafana/VERSION
 
+# Only check in grafana and publish templates not actual configurations
+/src/GraphIoT.Grafana/Grafana/conf/production/custom.ini
+/src/GraphIoT.App/Properties/PublishProfiles/CustomProfile.pubxml
+
 # Only check in appsettings template, not actual configurations for dev and prod due to sensitive data
 appsettings.Development.json
 appsettings.Production.json

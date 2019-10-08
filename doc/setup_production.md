@@ -90,7 +90,9 @@ And set your connection string to the SQL Server Express database instance you j
 
 ## Configure Grafana
 
-Edit `src/GraphIoT.Grafana/Grafana/conf/production/custom.ini` and enter your external URL:
+Go to the grafana prod config folder `src/GraphIoT.Grafana/Grafana/conf/production/` and copy `custom.template.ini` and name it `custom.ini`
+
+Edit this newly created `custom.ini` and enter your external URL:
 
 ```ini
 # The full public facing url you use in browser, used for redirects and emails
@@ -100,9 +102,10 @@ root_url = https://your.domain/path-to-graphiot-website/grafana
 
 ## Deployment
 
-1. In Visual Studio, right click on the main *"GraphIoT.App"* project in folder *"MainWebserver"* and select *"Publish..."*
-2. Edit the *"Custom Profile"* and enter your server, web site name and credentials for WebDeploy
-3. Hit *"Publish"*
+1. Go to the publish profiles folder `src/GraphIoT.App/Properties/PublishProfiles/` and copy `CustomProfile.template.pubxml` and name it `CustomProfile.pubxml`
+2. In Visual Studio, right click on the main *"GraphIoT.App"* project in folder *"MainWebserver"* and select *"Publish..."*
+3. Edit the *"Custom Profile"* and enter your server, web site name and credentials for WebDeploy
+4. Hit *"Publish"*
 
 Check if the application runs and is reachable. The database tables will be created automatically on first run.
 
