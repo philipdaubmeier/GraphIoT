@@ -6,7 +6,7 @@
     <title>OAuth Access and Refresh Token Store</title>
     <authors>Philip Daubmeier</authors>
     <owners>Philip Daubmeier</owners>
-    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE</license>
     <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/TokenStore</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides a means to store and retrieve OAuth access and refresh tokens to/from a configurable entity framework database.</description>
@@ -23,7 +23,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
     <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+    <file src="..\..\LICENSE" />
   </files>
 </package>

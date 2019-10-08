@@ -6,7 +6,7 @@
     <title>Client library for communicating to Viessmann servers</title>
     <authors>Philip Daubmeier</authors>
     <owners>Philip Daubmeier</owners>
-    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE</license>
     <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/ViessmannClient</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Viessmann Server interfaces. It supports RESTful Viessmann Plattform services, the Estrella server as well as the legacy Vitotrol SOAP service. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
@@ -22,7 +22,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
     <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+    <file src="..\..\LICENSE" />
   </files>
 </package>

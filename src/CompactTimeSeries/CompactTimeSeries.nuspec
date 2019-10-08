@@ -6,7 +6,7 @@
     <title>In-memory time series library</title>
     <authors>Philip Daubmeier</authors>
     <owners>Philip Daubmeier</owners>
-    <licenseUrl>https://github.com/philipdaubmeier/GraphIoT/blob/master/LICENSE</licenseUrl>
+    <license type="file">LICENSE</license>
     <projectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/CompactTimeSeries</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Memory efficient storing, processing, resampling and compressing of time series data.</description>
@@ -23,7 +23,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp2.2\$id$.dll" target="lib\netcoreapp2.2" />
     <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+    <file src="..\..\LICENSE" />
   </files>
 </package>
