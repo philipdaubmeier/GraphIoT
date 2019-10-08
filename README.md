@@ -45,6 +45,12 @@ It is structured as follows:
 * Main server application:
   * GraphIoT.App
 
+## Setup
+
+* [Setup dev environment](doc/setup_development.md)
+* [Setup production environment](doc/setup_production.md)
+* [Backup database](doc/backup_database.md)
+
 ## Platform Support
 
 GraphIoT is compiled for .NET Core 2.2.
