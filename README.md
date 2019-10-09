@@ -26,15 +26,15 @@ GraphIoT consists of several subprojects, some of which are independent of Graph
 It is structured as follows:
 
 * Client libaries for communicating with a specific IoT device type:
-  * DigitalstromClient
-  * DigitalstromTwin
-  * NetatmoClient
-  * SonnenClient
-  * ViessmannClient
+  * [DigitalstromClient](src/DigitalstromClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromClient/)
+  * [DigitalstromTwin](src/DigitalstromTwin/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromTwin.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromTwin/)
+  * [NetatmoClient](src/NetatmoClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.NetatmoClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.NetatmoClient/)
+  * [SonnenClient](src/SonnenClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.SonnenClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.SonnenClient/)
+  * [ViessmannClient](src/ViessmannClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.ViessmannClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.ViessmannClient/)
 * Shared libraries for common functionality in GraphIoT Host libraries:
   * GraphIoT.Core
-  * TokenStore
-  * [CompactTimeSeries](src/CompactTimeSeries/README.md)
+  * [TokenStore](src/TokenStore/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.TokenStore.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.TokenStore/)
+  * [CompactTimeSeries](src/CompactTimeSeries/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.CompactTimeSeries.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.CompactTimeSeries/)
 * Host Libraries that derive from GraphIoT.Core for a specific IoT device type:
   * GraphIoT.Digitalstrom
   * GraphIoT.Netatmo
