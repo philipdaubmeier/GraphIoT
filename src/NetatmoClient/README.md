@@ -28,7 +28,7 @@ public class NetatmoConnProvider : INetatmoConnectionProvider
 }
 ```
 
-> **Caution:** in a productive use you may want to load your app id and secret from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `INetatmoAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `INetatmoAuth` class. You can have a look at the respective classes in [`GraphIoT.Netatmo`](src/GraphIoT.Netatmo/Config) as an example.
+> **Caution:** in a productive use you may want to load your app id and secret from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `INetatmoAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `INetatmoAuth` class. You can have a look at the respective classes in [`GraphIoT.Netatmo`](../GraphIoT.Netatmo/Config) as an example.
 
 If you have the connection provider class in place, you can create a `NetatmoWebClient` and query station data and measurements:
 
@@ -48,7 +48,7 @@ var measures = await netatmoClient.GetMeasure(baseStationId, baseStationId,
 
 // Print out all values
 foreach (var measure in measures.First().Value)
-    Console.Write($"timestamp: {measure.Key} temperature: {measure.Value} °C");
+    Console.WriteLine($"timestamp: {measure.Key} temperature: {measure.Value} °C");
 ```
 
 ## Platform Support
