@@ -1,4 +1,4 @@
-![GraphIoT logo](doc/graphiot_logo.svg)
+![GraphIoT logo](doc/img/graphiot_logo.svg)
 
 [![Build status](https://ci.appveyor.com/api/projects/status/mj67oe2c9wfkv2ld/branch/master?svg=true)](https://ci.appveyor.com/project/philipdaubmeier/graphiot/branch/master)
 
@@ -27,31 +27,42 @@ GraphIoT consists of several subprojects, some of which are independent of Graph
 
 It is structured as follows:
 
-* Client libaries for communicating with a specific IoT device type:
-  * [DigitalstromClient](src/DigitalstromClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromClient/)
-  * [DigitalstromTwin](src/DigitalstromTwin/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromTwin.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromTwin/)
-  * [NetatmoClient](src/NetatmoClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.NetatmoClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.NetatmoClient/)
-  * [SonnenClient](src/SonnenClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.SonnenClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.SonnenClient/)
-  * [ViessmannClient](src/ViessmannClient/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.ViessmannClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.ViessmannClient/)
-* Shared libraries for common functionality in GraphIoT Host libraries:
-  * GraphIoT.Core
-  * [TokenStore](src/TokenStore/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.TokenStore.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.TokenStore/)
-  * [CompactTimeSeries](src/CompactTimeSeries/README.md) [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.CompactTimeSeries.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.CompactTimeSeries/)
-* Host Libraries that derive from GraphIoT.Core for a specific IoT device type:
-  * GraphIoT.Digitalstrom
-  * GraphIoT.Netatmo
-  * GraphIoT.Sonnen
-  * GraphIoT.Viessmann
-* Visualization middleware and APIs:
-  * GraphIoT.Grafana
-* Main server application:
-  * GraphIoT.App
+* **Client Libaries** for communicating with a specific IoT device type:
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromClient/) [DigitalstromClient](src/DigitalstromClient)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromTwin.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromTwin/) [DigitalstromTwin](src/DigitalstromTwin)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.NetatmoClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.NetatmoClient/) [NetatmoClient](src/NetatmoClient)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.SonnenClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.SonnenClient/) [SonnenClient](src/SonnenClient)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.ViessmannClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.ViessmannClient/) [ViessmannClient](src/ViessmannClient)
+* **Shared Libraries** for common functionality:
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.CompactTimeSeries.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.CompactTimeSeries/) [CompactTimeSeries](src/CompactTimeSeries)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.TokenStore.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.TokenStore/) [TokenStore](src/TokenStore)
+* **Core Library** for all GraphIoT Host libraries:
+  * [GraphIoT.Core](src/GraphIoT.Core)
+* **Host Libraries** for a specific IoT device type:
+  * [GraphIoT.Digitalstrom](src/GraphIoT.Digitalstrom)
+  * [GraphIoT.Netatmo](src/GraphIoT.Netatmo)
+  * [GraphIoT.Sonnen](src/GraphIoT.Sonnen)
+  * [GraphIoT.Viessmann](src/GraphIoT.Viessmann)
+* **Visualization Library**:
+  * [GraphIoT.Grafana](src/GraphIoT.Grafana)
+* **Main Host Application**:
+  * [GraphIoT.App](src/GraphIoT.App)
 
 ## Setup
 
-* [Setup dev environment](doc/setup_development.md)
-* [Setup production environment](doc/setup_production.md)
-* [Backup database](doc/backup_database.md)
+Follow these steps to set up the development environment, publish the application to your own server and create Grafana dashboards with the actual graphs.
+
+#### Setup application
+
+* [Setup dev environment](doc/setup/setup_development.md)
+* [Setup production environment](doc/setup/setup_production.md)
+* [Backup database](doc/setup/backup_database.md)
+
+#### Configure Grafana
+
+* [Configure datasource](doc/grafana/configure_datasource.md)
+* [Create dashboard and panels](doc/grafana/configure_dashboard.md)
+* [Add variables and annotations](doc/grafana/configure_variables_annotations.md)
 
 ## Platform Support
 
