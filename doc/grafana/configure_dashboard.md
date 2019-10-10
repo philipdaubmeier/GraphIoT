@@ -38,7 +38,7 @@ The full schema of `Additional JSON Data` follows this pattern (all elements are
   },
   "correction":
   {
-    "factor": 0.1
+    "factor": 0.1,
     "offset": 12.5
   },
   "filterIfNoneOf": [ "filter1", "filter2" ],
