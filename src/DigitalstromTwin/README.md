@@ -1,4 +1,5 @@
 ﻿[![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.DigitalstromTwin.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.DigitalstromTwin/)
+[![Build status](https://ci.appveyor.com/api/projects/status/mj67oe2c9wfkv2ld/branch/master?svg=true)](https://ci.appveyor.com/project/philipdaubmeier/graphiot/branch/master)
 
 # DigitalstromTwin
 

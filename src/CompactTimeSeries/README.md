@@ -1,6 +1,5 @@
 ﻿[![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.CompactTimeSeries.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.CompactTimeSeries/)
-
-[![Build status](https://ci.appveyor.com/api/projects/status/4e3h4no2uu818ipb?svg=true)](https://ci.appveyor.com/project/philipdaubmeier/compacttimeseries)
+[![Build status](https://ci.appveyor.com/api/projects/status/mj67oe2c9wfkv2ld/branch/master?svg=true)](https://ci.appveyor.com/project/philipdaubmeier/graphiot/branch/master)
 
 # CompactTimeSeries
 
