@@ -180,6 +180,9 @@ FakesAssemblies/
 .dotnetcli/ 
 .vs/
 
+# Logs
+/src/GraphIoT.App/logs
+
 # Grafana installation
 /src/GraphIoT.Grafana/Grafana/conf/provisioning
 /src/GraphIoT.Grafana/Grafana/conf/ldap.toml

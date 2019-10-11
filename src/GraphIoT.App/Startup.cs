@@ -40,10 +40,13 @@ namespace PhilipDaubmeier.GraphIoT.App
             services.AddLogging(config =>
             {
                 config.ClearProviders();
-                config.AddConfiguration(Configuration.GetSection("Logging"));
+
+                var logConfig = Configuration.GetSection("Logging");
+                config.AddFile(logConfig);
 
                 if (Environment.IsDevelopment())
                 {
+                    config.AddConfiguration(logConfig);
                     config.AddConsole();
                     config.AddDebug();
                     config.AddEventSourceLogger();
