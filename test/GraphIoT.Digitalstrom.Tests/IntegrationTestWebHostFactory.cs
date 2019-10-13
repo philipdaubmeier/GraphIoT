@@ -15,6 +15,7 @@ using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
 using RichardSzalay.MockHttp;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.TestHost;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 {
@@ -44,12 +45,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                 .AddJsonFile("integrationtestsettings.json")
                 .Build();
 
-            builder.ConfigureAppConfiguration(config =>
+            builder
+            .UseSolutionRelativeContentRoot("src/GraphIoT.Digitalstrom")
+            .ConfigureAppConfiguration(config =>
             {
                 config.AddConfiguration(integrationTestConfig);
-            });
-
-            builder.ConfigureServices(services =>
+            })
+            .ConfigureServices(services =>
             {
                 // Build a http mock for requests to the digitalstrom server
                 services.AddSingleton(fac =>
