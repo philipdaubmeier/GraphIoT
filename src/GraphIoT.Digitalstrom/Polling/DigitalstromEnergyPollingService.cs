@@ -59,9 +59,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
                             timeseries[timestampedValue.Key.ToUniversalTime()] = (int)timestampedValue.Value;
 
                 SaveHighResEnergyValuesToDb(timeseriesCollections);
-                SaveMidResEnergyValuesToDb(timeseriesCollections);
-                SaveLowResEnergyValuesToDb(timeseriesCollections);
+                _dbContext.SaveChanges();
 
+                SaveMidResEnergyValuesToDb(timeseriesCollections);
+                _dbContext.SaveChanges();
+                
+                SaveLowResEnergyValuesToDb(timeseriesCollections);
                 _dbContext.SaveChanges();
             }
             catch { throw; }

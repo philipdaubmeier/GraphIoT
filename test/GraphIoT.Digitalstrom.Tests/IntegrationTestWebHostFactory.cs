@@ -58,6 +58,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                 {
                     var mockHttp = new MockHttpMessageHandler();
                     mockHttp.AddAuthMock()
+                        .AddStructureMock()
+                        .AddCircuitZonesMocks(new Zone[] { 4, 32027 })
                         .AddEnergyMeteringMocks()
                         .AddSensorMocks()
                         .AddInitialAndSubscribeMocks();

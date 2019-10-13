@@ -100,10 +100,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
                 var circuitZoneRes = dsClient.GetCircuitZones().Result;
                 circuitZones = circuitZoneRes.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());
 
-                var circuitNameRes = dsClient.GetMeteringCircuits().Result;
-                circuitNames = circuitNameRes.DSMeters.ToDictionary(x => x.DSUID, x => x.Name);
-
                 var circuitsMetering = dsClient.GetMeteringCircuits().Result;
+                circuitNames = circuitsMetering.DSMeters.ToDictionary(x => x.DSUID, x => x.Name);
                 circuitsWithMetering = circuitsMetering.FilteredMeterNames.Select(x => x.Key).ToHashSet();
 
                 var zoneNameRes = dsClient.GetStructure().Result;

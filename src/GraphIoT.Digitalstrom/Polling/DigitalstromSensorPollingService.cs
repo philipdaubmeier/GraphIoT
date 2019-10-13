@@ -52,9 +52,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             foreach (var zone in sensorValues)
                 if (zone != null && zone.Sensor != null)
                     readMidres.Add(zone.ZoneID, ReadAndSaveMidresZoneSensorValues(day, zone.ZoneID, zone.Sensor.ToDictionary(x => x.Type, x => x.Value), timestamp));
+            _dbContext.SaveChanges();
 
             SaveLowresZoneSensorValues(readMidres);
-
             _dbContext.SaveChanges();
         }
 
