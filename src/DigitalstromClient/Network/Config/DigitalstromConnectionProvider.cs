@@ -14,8 +14,8 @@ namespace PhilipDaubmeier.DigitalstromClient
         private static readonly Semaphore trustCertificateSemaphore = new Semaphore(1, 1);
 
         private readonly bool skipDisposingHttpClient = false;
-        private HttpClient httpClient { get; set; }
-        private HttpMessageHandler httpHandler { get; set; }
+        protected HttpClient httpClient { get; set; }
+        protected HttpMessageHandler httpHandler { get; set; }
 
         /// <summary>
         /// See <see cref="IDigitalstromConnectionProvider.Uris"/>

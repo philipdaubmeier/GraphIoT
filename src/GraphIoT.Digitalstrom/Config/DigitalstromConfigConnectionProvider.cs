@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
         {
             HttpClient = client;
 
-            if (HttpClient == null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
+            if (httpClient == null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
             {
                 Handler = new HttpClientHandler()
                 {
