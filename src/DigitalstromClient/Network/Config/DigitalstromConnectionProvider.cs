@@ -78,6 +78,10 @@ namespace PhilipDaubmeier.DigitalstromClient
                 
                 return httpClient = new HttpClient(Handler);
             }
+            protected set
+            {
+                httpClient = value;
+            }
         }
         
         public DigitalstromConnectionProvider(Uri uri, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
@@ -161,14 +165,7 @@ namespace PhilipDaubmeier.DigitalstromClient
                 return;
 
             if (!skipDisposingHttpClient)
-            {
-                // Only dispose handler if HttpClient is not built, because disposing
-                // the client will dispose the underlying handler automatically
-                if (httpClient == null)
-                    httpHandler?.Dispose();
-
                 httpClient?.Dispose();
-            }
 
             disposed = true;
         }

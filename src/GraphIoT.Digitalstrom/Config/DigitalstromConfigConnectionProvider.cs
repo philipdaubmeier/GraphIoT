@@ -13,10 +13,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 {
     public class DigitalstromConfigConnectionProvider : DigitalstromConnectionProvider
     {
-        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
+        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, HttpClient client = null)
             : base(UrisFromConfig(config), AuthFromConfig(tokenStore, config), CertFromConfig(config))
         {
-            if (!string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
+            HttpClient = client;
+
+            if (HttpClient == null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
             {
                 Handler = new HttpClientHandler()
                 {

@@ -12,6 +12,7 @@ using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using System;
+using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 {
@@ -23,8 +24,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
-
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
+
+            serviceCollection.AddHttpClient<DigitalstromConfigConnectionProvider>("HttpClientWithSSLUntrusted")
+                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                    (serviceProvider.GetRequiredService<IDigitalstromConnectionProvider>() as DigitalstromConfigConnectionProvider)?.Handler);
+
             serviceCollection.AddScoped<DigitalstromDssClient>();
 
             serviceCollection.AddSingleton<IDigitalstromStructureService, DigitalstromStructureService>();
