@@ -34,7 +34,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
             // After 100ms (see configured ItemCollectionInterval, plus buffer) the event processor hosted service
             // should have written all ds events to the database that we have mocked with the test setup
-            await Task.Delay(1000);
+            for (int i = 0; i < 100; i++)
+            {
+                await Task.Delay(100);
+                if (db.DsSceneEventDataSet.FirstOrDefault()?.EventStreamEncoded != null)
+                    break;
+            }
             Assert.NotNull(db.DsSceneEventDataSet.FirstOrDefault()?.EventStreamEncoded);
 
             var storedEvents = db.DsSceneEventDataSet.FirstOrDefault()?.EventStream;
@@ -56,7 +61,6 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
             await Task.Delay(200);
 
-            // TODO: expected SceneCommand.Alarm1, somehow does not yet pass
             storedEvents = db.DsSceneEventDataSet.FirstOrDefault()?.EventStream;
             Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents.Last().Properties.SceneID);
         }

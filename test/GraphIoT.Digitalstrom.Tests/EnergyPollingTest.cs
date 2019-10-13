@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
             // After 100ms (see configured TimerInterval, plus buffer) the polling hosted service
             // should have written all values to the database that we have mocked with the test setup
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
                 await Task.Delay(100);
                 if (db.DsEnergyHighresDataSet.FirstOrDefault()?.EnergyCurvesEveryMeter != null)
