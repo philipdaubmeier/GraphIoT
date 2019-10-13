@@ -13,6 +13,9 @@ using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using System;
 using System.Net.Http;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Timeout;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 {
@@ -24,12 +27,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
+
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
-
-            serviceCollection.AddHttpClient<DigitalstromConfigConnectionProvider>("HttpClientWithSSLUntrusted")
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-                    (serviceProvider.GetRequiredService<IDigitalstromConnectionProvider>() as DigitalstromConfigConnectionProvider)?.Handler);
-
+            serviceCollection.AddDssHttpClient();
             serviceCollection.AddScoped<DigitalstromDssClient>();
 
             serviceCollection.AddSingleton<IDigitalstromStructureService, DigitalstromStructureService>();
@@ -55,6 +55,43 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
 
             return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig);
+        }
+
+        public static IServiceCollection AddDssHttpClient(this IServiceCollection serviceCollection)
+        {
+            var retryPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .Or<TimeoutRejectedException>()
+                .WaitAndRetryAsync(sleepDurations: new[]
+                    {
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(10)
+                    });
+
+            var timeoutIndividualTryPolicy = Policy
+                .TimeoutAsync<HttpResponseMessage>(5);
+
+            var circuitBreakerPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromMinutes(2)
+                );
+
+            serviceCollection.AddHttpClient<DigitalstromConfigConnectionProvider>("DssHttpClient", client =>
+                {
+                    client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
+                })
+                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                {
+                    return (serviceProvider.GetRequiredService<IDigitalstromConnectionProvider>() as DigitalstromConfigConnectionProvider)?.Handler;
+                })
+                .AddPolicyHandler(retryPolicy)
+                .AddPolicyHandler(timeoutIndividualTryPolicy)
+                .AddPolicyHandler(circuitBreakerPolicy);
+
+            return serviceCollection;
         }
     }
 }
