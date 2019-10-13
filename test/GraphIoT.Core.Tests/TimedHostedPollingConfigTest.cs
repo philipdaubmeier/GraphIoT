@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Tests
                 new object[] { "foo", TimeSpan.FromSeconds(0) },
                 new object[] { "23s", TimeSpan.FromSeconds(23) },
                 new object[] { "60s", TimeSpan.FromMinutes(1) },
-                new object[] { "1d", TimeSpan.FromSeconds(0) }
+                new object[] { "1d", TimeSpan.FromDays(1) }
             };
         }
     }
