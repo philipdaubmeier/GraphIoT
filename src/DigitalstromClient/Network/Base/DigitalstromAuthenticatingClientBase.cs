@@ -3,9 +3,6 @@ using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Token;
 using System;
 using System.IO;
-using System.Net.Http;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,15 +17,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private readonly IDigitalstromAuth _authData;
 
-        private static readonly Semaphore _trustCertificateSemaphore = new Semaphore(1, 1);
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given
         /// app and user credentials given via the IDigitalstromConnectionProvider object. If
         /// a valid application token is given in the auth data, it is used directly.
-        /// This abstract base class handles establishing the TLS connection with accepting
-        /// the self signed DSS certificate, the authentication flow including fetching and
+        /// This abstract base class handles the authentication flow including fetching and
         /// activating the application token, obtaining a session token as well as deserializing
         /// responses and unpacking the wiremessage.
         /// </summary>
@@ -36,58 +31,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// authentication data needed to use for the webservice or to perform a new or
         /// renewed authentication</param>
         public DigitalstromAuthenticatingClientBase(IDigitalstromConnectionProvider connectionProvider)
-            : base(connectionProvider.Uris, BuildHttpHandler(connectionProvider))
+            : base(connectionProvider)
         {
             _authData = connectionProvider.AuthData;
-        }
-
-        private static HttpMessageHandler BuildHttpHandler(IDigitalstromConnectionProvider connectionProvider)
-        {
-            var clientHandler = connectionProvider.Handler ?? new HttpClientHandler();
-            if (!(clientHandler is HttpClientHandler) || 
-                (connectionProvider.ServerCertificate is null && connectionProvider.ServerCertificateValidationCallback is null))
-                return clientHandler;
-
-            (clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
-                sslPolicyErrors == SslPolicyErrors.None || ValidateCertificate(connectionProvider, cert);
-            return clientHandler;
-        }
-
-        private static bool ValidateCertificate(IDigitalstromConnectionProvider connectionProvider, X509Certificate2 cert)
-        {
-            if (!QueryCertificateTrusted(connectionProvider, cert))
-                return false;
-            if (cert is null || connectionProvider.ServerCertificate is null)
-                return false;
-            if (cert.Issuer != connectionProvider.ServerCertificate.Issuer)
-                return false;
-            if (cert.GetSerialNumberString() != connectionProvider.ServerCertificate.GetSerialNumberString())
-                return false;
-            if (cert.GetCertHashString() != connectionProvider.ServerCertificate.GetCertHashString())
-                return false;
-            return true;
-        }
-
-        private static bool QueryCertificateTrusted(IDigitalstromConnectionProvider connectionProvider, X509Certificate2 cert)
-        {
-            if (!(connectionProvider.ServerCertificate is null))
-                return true;
-            if (connectionProvider.ServerCertificateValidationCallback is null)
-                return true;
-
-            try
-            {
-                _trustCertificateSemaphore.WaitOne();
-                if (!(connectionProvider.ServerCertificate is null))
-                    return true;
-                
-                if (!connectionProvider.ServerCertificateValidationCallback(cert))
-                    return false;
-
-                connectionProvider.ServerCertificate = cert;
-                return true;
-            }
-            finally { _trustCertificateSemaphore.Release(); }
         }
 
         /// <summary>

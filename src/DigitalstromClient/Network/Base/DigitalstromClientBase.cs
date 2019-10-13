@@ -17,12 +17,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// <summary>
         /// Provides fundamental functionality to request the Digitalstrom DSS REST webservice
         /// and parse the response JSON wireframe structure as well as selecting the first reachable
-        /// uri from the given UriPriorityList.
+        /// uri from the UriPriorityList in the given connection provider.
         /// </summary>
-        internal DigitalstromClientBase(UriPriorityList baseUris, HttpMessageHandler clientHandler = null)
+        internal DigitalstromClientBase(IDigitalstromConnectionProvider connectionProvider)
         {
-            _baseUris = baseUris.DeepClone();
-            _client = new HttpClient(clientHandler ?? new HttpClientHandler());
+            _baseUris = connectionProvider.Uris.DeepClone();
+            _client = connectionProvider.HttpClient;
 
             _initializeTask = Initialize();
         }
@@ -125,7 +125,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public void Dispose()
         {
-            _client.Dispose();
+            // explicit no-op. IDisposable is kept for compatibility reasons.
+            // HttpClient must be disposed by IDigitalstromConnectionProvider.
         }
     }
 }
