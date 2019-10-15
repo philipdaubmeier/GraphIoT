@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
         private readonly string _rootPath;
         private Process _process = null;
 
-        public GrafanaBackendProcessService(ILogger<GrafanaBackendProcessService> logger, IHostingEnvironment env)
+        public GrafanaBackendProcessService(ILogger<GrafanaBackendProcessService> logger, IHostEnvironment env)
         {
             _logger = logger;
 

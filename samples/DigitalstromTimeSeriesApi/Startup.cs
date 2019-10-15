@@ -8,26 +8,29 @@ using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
 using PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection;
 using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IHostEnvironment Environment { get; }
         
-        public virtual IServiceProvider ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddControllers()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
             var connectionString = Configuration.GetConnectionString("DigitalstromTimeSeriesDB");
-            return services.AddOptions()
+            services.AddOptions()
                 .AddLogging(config =>
                 {
                     config.ClearProviders();
@@ -47,25 +50,23 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                 .AddDigitalstromHost<DigitalstromTimeSeriesDbContext>(options =>
                     {
                         options.UseSqlServer(connectionString);
-                    }, 
-                    Configuration.GetSection("DigitalstromConfig"), 
+                    },
+                    Configuration.GetSection("DigitalstromConfig"),
                     Configuration.GetSection("TokenStoreConfig")
                 )
-                .AddGrafanaHost()
-                .BuildServiceProvider();
+                .AddGrafanaHost();
         }
         
-        public virtual void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public virtual void Configure(IApplicationBuilder app, IHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
 
-            app.UseMvc()
+            app.UseRouting()
+               .UseEndpoints(endpoints => endpoints.MapControllers())
                .ConfigureGrafanaHost("/graphiot");
 
-            var database = serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database;
-            if (!database.IsInMemory())
-                database.Migrate();
+            serviceProvider.GetRequiredService<DigitalstromTimeSeriesDbContext>().Database.Migrate();
         }
     }
 }

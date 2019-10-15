@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.GraphIoT.App.Database;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
@@ -17,22 +19,23 @@ namespace PhilipDaubmeier.GraphIoT.App
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
-        public IHostingEnvironment Environment { get; }
+        public IHostEnvironment Environment { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddControllers()
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 
-            Action<DbContextOptionsBuilder> smarthomeSqlServer = options =>
+            void smarthomeSqlServer(DbContextOptionsBuilder options) =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
+
             var tokenConfig = Configuration.GetSection("TokenStoreConfig");
 
             services.AddDbContext<PersistenceContext>(smarthomeSqlServer);
@@ -66,17 +69,17 @@ namespace PhilipDaubmeier.GraphIoT.App
             services.AddDatabaseBackupService<PersistenceContext>();
 
             services.AddGrafanaHost();
-
-            return services.BuildServiceProvider();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
+            else
+                app.UseExceptionHandler("/Error");
 
-            app.UseMvc()
+            app.UseRouting()
+               .UseEndpoints(endpoints => endpoints.MapControllers())
                .ConfigureGrafanaHost("/graphiot");
 
             serviceProvider.GetRequiredService<PersistenceContext>().Database.Migrate();
