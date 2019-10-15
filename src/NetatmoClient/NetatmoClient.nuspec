@@ -11,19 +11,20 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Netatmo Cloud RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+      1.1.0 - migrated to .NET Core 3.0
       1.0.0 - Initial version with publishing version 1.0 of GraphIoT
     </releaseNotes>
     <copyright>Copyright 2019 Philip Daubmeier</copyright>
     <tags>netatmo smarthome httpclient</tags>
     <dependencies>
-      <group targetFramework="netcoreapp2.2">
+      <group targetFramework="netcoreapp3.0">
         <dependency id="Newtonsoft.Json" version="12.0.2" />
-        <dependency id="NodaTime" version="2.4.6" />
+        <dependency id="NodaTime" version="2.4.7" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+    <file src="bin\$configuration$\netcoreapp3.0\$id$.deps.json" target="lib\netcoreapp3.0" />
     <file src="..\..\LICENSE" />
   </files>
 </package>

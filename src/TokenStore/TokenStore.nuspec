@@ -11,19 +11,20 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides a means to store and retrieve OAuth access and refresh tokens to/from a configurable entity framework database.</description>
     <releaseNotes>
+      1.1.0 - migrated to .NET Core 3.0
       1.0.0 - Initial version with publishing version 1.0 of GraphIoT
     </releaseNotes>
     <copyright>Copyright 2019 Philip Daubmeier</copyright>
     <tags>oauth token store</tags>
     <dependencies>
-      <group targetFramework="netcoreapp2.2">
-        <dependency id="Microsoft.AspNetCore.App" version="[2.2.0,3)" />
-        <dependency id="Microsoft.EntityFrameworkCore" version="[2.2.0,3)" />
+      <group targetFramework="netcoreapp3.0">
+        <dependency id="Microsoft.EntityFrameworkCore" version="3.0.0" />
+        <dependency id="Microsoft.Extensions.Options.ConfigurationExtensions" version="3.0.0" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp2.2\$id$.deps.json" target="lib\netcoreapp2.2" />
+    <file src="bin\$configuration$\netcoreapp3.0\$id$.deps.json" target="lib\netcoreapp3.0" />
     <file src="..\..\LICENSE" />
   </files>
 </package>
