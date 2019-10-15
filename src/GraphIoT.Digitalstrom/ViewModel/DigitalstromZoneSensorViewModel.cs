@@ -5,6 +5,7 @@ using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 {
@@ -20,7 +21,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                    Enumerable.Range(0, 2).ToDictionary(x => x.ToString(), x => x),
                    dsStructure.Zones.Where(x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors)
                                              || dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors)).OrderBy(x => x).ToList(),
-                   x => x.ZoneId)
+                   x => x.ZoneId,
+                   key => { int keyint = key; return x => x.ZoneId == keyint; })
         {
             _dsStructure = dsStructure;
         }

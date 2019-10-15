@@ -27,7 +27,8 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.ViewModel
                                            .ThenBy(x => netatmoStructure.GetModuleId(x))
                                            .ThenBy(x => netatmoStructure.GetMeasure(x))
                                            .ToList(),
-                   x => x.ModuleMeasureId)
+                   x => x.ModuleMeasureId,
+                   key => x => x.ModuleMeasureId == key)
         {
             _netatmoStructure = netatmoStructure;
         }

@@ -23,7 +23,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                    },
                    Enumerable.Range(0, 1).ToDictionary(x => x.ToString(), x => x),
                    dsStructure.Circuits.Where(x => dsStructure.IsMeteringCircuit(x)).OrderBy(x => x).ToList(),
-                   x => x.CircuitId)
+                   x => x.CircuitId,
+                   key => { string keystr = key; return x => x.CircuitId == keystr; })
         {
             _db = databaseContext;
             _dsStructure = dsStructure;

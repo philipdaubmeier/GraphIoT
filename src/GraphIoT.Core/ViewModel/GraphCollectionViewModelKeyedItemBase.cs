@@ -11,12 +11,14 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         protected readonly Dictionary<int, GraphViewModel> _loadedGraphs = new Dictionary<int, GraphViewModel>();
         protected readonly Dictionary<Tkey, int> _keys;
         protected readonly Func<Tentity, Tkey> _keySelector;
+        protected readonly Func<Tkey, Func<Tentity, bool>> _predicateGenerator;
 
-        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector)
+        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector, Func<Tkey, Func<Tentity, bool>> predicateGenerator)
             : base(dataTables, columns)
         {
             _keys = Enumerable.Range(0, keys.Count()).Zip(keys, (i, c) => new Tuple<Tkey, int>(c, i)).ToDictionary(x => x.Item1, x => x.Item2);
             _keySelector = keySelector;
+            _predicateGenerator = predicateGenerator;
         }
 
         protected override void InvalidateData()
@@ -46,7 +48,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
             else
             {
                 var key = _keys.Where(x => x.Value == row).Select(x => x.Key).FirstOrDefault();
-                var groupedLoadedData = data?.Where(x => _keySelector(x).Equals(key))?.ToList()?.GroupBy(_keySelector);
+                var groupedLoadedData = data?.Where(_predicateGenerator(key))?.ToList()?.GroupBy(_keySelector);
 
                 if (groupedLoadedData == null)
                     return new GraphViewModel();
