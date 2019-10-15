@@ -11,7 +11,9 @@
 
 A detailled documentation to host .NET Core on IIS can be found [here](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/).
 
-1. Create a App Pool in IIS and give it a name, for example *".NET Core"* and set *".NET CLR version"* to *"No managed code"*
+1. Create a App Pool in IIS and give it a name, for example *".NET Core"*
+    * Set *".NET CLR version"* to *"No managed code"*
+    * Go to *"Advanced options..."* and set *"Start Mode"* to *"AlwaysRunning"*, so the background polling hosted services will continue running and not getting killed after a few minutes.
 2. Create a web site and assign the App Pool just created
 3. Configure the Environment Variable for selecting the `appsettings.Production.json` by doing the following steps:
     * Go to your application in IIS and choose Configuration Editor.
