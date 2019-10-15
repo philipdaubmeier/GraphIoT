@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection
         public static IServiceCollection AddGrafanaHost(this IServiceCollection serviceCollection)
         {
             // add grafana json api
-            serviceCollection.AddMvc().AddApplicationPart(typeof(GrafanaController).Assembly);
+            serviceCollection.AddControllers().AddApplicationPart(typeof(GrafanaController).Assembly);
 
             // add grafana hosted service for starting/stopping/restarting the grafana server process
             serviceCollection.AddHostedService<GrafanaBackendProcessService>();
