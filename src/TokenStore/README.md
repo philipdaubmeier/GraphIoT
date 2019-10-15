@@ -40,7 +40,7 @@ Set up the TokenStore for dependency injection in your `Startup.cs`, configuring
 
 ```csharp
 // This method gets called by the runtime. Use this method to add services to the container.
-public IServiceProvider ConfigureServices(IServiceCollection services, IConfiguration configuration)
+public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
 {
     services.ConfigureTokenStore(configuration.GetSection("TokenStoreConfig"));
     services.AddTokenStoreDbContext<MyDbContext>(opt => opt.UseSqlServer("<my_connection_str>"));

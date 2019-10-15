@@ -10,15 +10,15 @@ namespace PhilipDaubmeier.GraphIoT.Core
 {
     public class TimedHostedPollingService<TPollingService> : IHostedService, IDisposable where TPollingService : IScopedPollingService
     {
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ILogger _logger;
         private readonly TimeSpan _interval;
         private readonly string _loggingName;
         private Timer _timer;
 
-        public TimedHostedPollingService(IServiceProvider services, ILogger<TimedHostedPollingService<TPollingService>> logger, IOptions<TimedHostedPollingConfig<TPollingService>> config)
+        public TimedHostedPollingService(IServiceScopeFactory serviceScopeFactory, ILogger<TimedHostedPollingService<TPollingService>> logger, IOptions<TimedHostedPollingConfig<TPollingService>> config)
         {
-            _services = services;
+            _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
             _interval = config?.Value?.TimerIntervalTimeSpan ?? TimeSpan.FromMinutes(1);
             _loggingName = config?.Value?.Name ?? string.Empty;
@@ -49,11 +49,10 @@ namespace PhilipDaubmeier.GraphIoT.Core
 
         private async void PollAll(object state)
         {
-            using (var scope = _services.CreateScope())
-            {
-                foreach (var service in scope.ServiceProvider.GetServices<TPollingService>())
-                    await service.PollValues();
-            }
+            using var scope = _serviceScopeFactory.CreateScope();
+
+            foreach (var service in scope.ServiceProvider.GetServices<TPollingService>())
+                await service.PollValues();
         }
     }
 }

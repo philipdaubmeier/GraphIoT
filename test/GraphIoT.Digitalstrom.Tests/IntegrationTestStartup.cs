@@ -8,17 +8,17 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
     {
         public IntegrationTestStartup() { }
         
-        public IServiceProvider ConfigureServices(IServiceCollection services)
+        public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvcCore();
+            services.AddControllers();
 
-            return services.AddOptions()
-                .BuildServiceProvider();
+            services.AddOptions();
         }
         
         public void Configure(IApplicationBuilder app)
         {
-            app.UseMvc();
+            app.UseRouting()
+               .UseEndpoints(endpoints => endpoints.MapControllers());
         }
     }
 }

@@ -19,15 +19,15 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
         private Dictionary<Zone, string> zoneNames = null;
         private Dictionary<Zone, List<Sensor>> zoneSensorTypes = null;
 
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private readonly ILogger _logger;
 
         private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
 
-        public DigitalstromStructureService(IServiceProvider services, ILogger<DigitalstromStructureService> logger)
+        public DigitalstromStructureService(IServiceScopeFactory serviceScopeFactory, ILogger<DigitalstromStructureService> logger)
         {
-            _services = services;
+            _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
         }
 
@@ -103,7 +103,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
                 if (circuitZones != null && circuitNames != null && zoneNames != null)
                     return;
 
-                using (var scope = _services.CreateScope())
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var dsClient = scope.ServiceProvider.GetService<DigitalstromDssClient>();
 

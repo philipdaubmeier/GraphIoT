@@ -85,13 +85,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
             }
         }
 
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private EventTimeSeriesStream<DssEvent, DssSceneEventSerializer> _eventStream = null;
         private bool _hasChanges = false;
 
-        public DssSceneEventProcessorPlugin(IServiceProvider services)
+        public DssSceneEventProcessorPlugin(IServiceScopeFactory serviceScopeFactory)
         {
-            _services = services;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
             if (_eventStream != null && !Span.IsIncluded(date))
                 SaveEventStreamToDb();
 
-            using (var scope = _services.CreateScope())
+            using (var scope = _serviceScopeFactory.CreateScope())
             using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
             {
                 var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
@@ -162,7 +162,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
 
             var date = Span.Begin.Date;
 
-            using (var scope = _services.CreateScope())
+            using (var scope = _serviceScopeFactory.CreateScope())
             using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
             {
                 var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();

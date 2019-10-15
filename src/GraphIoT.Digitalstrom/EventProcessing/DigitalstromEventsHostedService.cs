@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
@@ -18,6 +19,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         private readonly ILogger _logger;
         private readonly IOptions<DigitalstromEventProcessingConfig> _config;
         private readonly IDigitalstromConnectionProvider _connProvider;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
+        private readonly IServiceScope _serviceScope;
+
         private DssEventSubscriber _dssEventSubscriber = null;
 
         private Task _executingThread;
@@ -27,12 +31,14 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
 
         private readonly IEnumerable<IDigitalstromEventProcessorPlugin> _plugins;
 
-        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, IOptions<DigitalstromEventProcessingConfig> config, IDigitalstromConnectionProvider connectionProvider, IEnumerable<IDigitalstromEventProcessorPlugin> plugins)
+        public DigitalstromEventsHostedService(ILogger<DigitalstromEventsHostedService> logger, IOptions<DigitalstromEventProcessingConfig> config, IServiceScopeFactory serviceScopeFactory)
         {
             _logger = logger;
             _config = config;
-            _connProvider = connectionProvider;
-            _plugins = plugins;
+            _serviceScopeFactory = serviceScopeFactory;
+            _serviceScope = _serviceScopeFactory.CreateScope();
+            _connProvider = _serviceScope.ServiceProvider.GetRequiredService<IDigitalstromConnectionProvider>();
+            _plugins = _serviceScope.ServiceProvider.GetServices<IDigitalstromEventProcessorPlugin>();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -87,6 +93,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
 
             _cancellationSource.Cancel();
             _persistenceQueue?.CompleteAdding();
+
+            // DI Scope ends here
+            _serviceScope.Dispose();
         }
 
         private void DigitalstromEventReceived(DssEvent dsEvent)

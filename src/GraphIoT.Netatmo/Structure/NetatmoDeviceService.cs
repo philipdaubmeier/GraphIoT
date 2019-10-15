@@ -21,15 +21,15 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 
         private Dictionary<ModuleId, string> _moduleNames = null;
 
-        private readonly IServiceProvider _services;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         private readonly ILogger _logger;
 
         private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
 
-        public NetatmoDeviceService(IServiceProvider services, ILogger<NetatmoDeviceService> logger)
+        public NetatmoDeviceService(IServiceScopeFactory serviceScopeFactory, ILogger<NetatmoDeviceService> logger)
         {
-            _services = services;
+            _serviceScopeFactory = serviceScopeFactory;
             _logger = logger;
         }
 
@@ -133,7 +133,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             {
                 _loadSemaphore.WaitOne();
 
-                using (var scope = _services.CreateScope())
+                using (var scope = _serviceScopeFactory.CreateScope())
                 {
                     var netatmoClient = scope.ServiceProvider.GetService<NetatmoWebClient>();
                     var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
