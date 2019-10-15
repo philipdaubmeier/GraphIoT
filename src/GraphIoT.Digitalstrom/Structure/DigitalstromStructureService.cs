@@ -1,5 +1,8 @@
-﻿using PhilipDaubmeier.DigitalstromClient;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -16,13 +19,16 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
         private Dictionary<Zone, string> zoneNames = null;
         private Dictionary<Zone, List<Sensor>> zoneSensorTypes = null;
 
-        private readonly DigitalstromDssClient dsClient;
+        private readonly IServiceProvider _services;
+
+        private readonly ILogger _logger;
 
         private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
 
-        public DigitalstromStructureService(DigitalstromDssClient digitalstromClient)
+        public DigitalstromStructureService(IServiceProvider services, ILogger<DigitalstromStructureService> logger)
         {
-            dsClient = digitalstromClient;
+            _services = services;
+            _logger = logger;
         }
 
         public IEnumerable<Dsuid> Circuits
@@ -97,21 +103,31 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
                 if (circuitZones != null && circuitNames != null && zoneNames != null)
                     return;
 
-                var circuitZoneRes = dsClient.GetCircuitZones().Result;
-                circuitZones = circuitZoneRes.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());
+                using (var scope = _services.CreateScope())
+                {
+                    var dsClient = scope.ServiceProvider.GetService<DigitalstromDssClient>();
 
-                var circuitsMetering = dsClient.GetMeteringCircuits().Result;
-                circuitNames = circuitsMetering.DSMeters.ToDictionary(x => x.DSUID, x => x.Name);
-                circuitsWithMetering = circuitsMetering.FilteredMeterNames.Select(x => x.Key).ToHashSet();
+                    var circuitZoneRes = dsClient.GetCircuitZones().Result;
+                    circuitZones = circuitZoneRes.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());
 
-                var zoneNameRes = dsClient.GetStructure().Result;
-                zoneNames = zoneNameRes.Zones.ToDictionary(x => x.Id, x => x.Name);
+                    var circuitsMetering = dsClient.GetMeteringCircuits().Result;
+                    circuitNames = circuitsMetering.DSMeters.ToDictionary(x => x.DSUID, x => x.Name);
+                    circuitsWithMetering = circuitsMetering.FilteredMeterNames.Select(x => x.Key).ToHashSet();
 
-                var zoneSensors = dsClient.GetZonesAndSensorValues().Result;
-                zoneSensorTypes = zoneSensors.Zones.ToDictionary(x => x.ZoneID, x => x.Sensor?.Select(s => s.Type)?.ToList() ?? new List<Sensor>());
+                    var zoneNameRes = dsClient.GetStructure().Result;
+                    zoneNames = zoneNameRes.Zones.ToDictionary(x => x.Id, x => x.Name);
 
-                circuits = circuitZones.Keys.Union(circuitNames.Keys).Distinct().OrderBy(x => (string)x).ToList();
-                zones = zoneNames.Keys.Union(circuitZones.SelectMany(x => x.Value)).Distinct().OrderBy(x => (int)x).ToList();
+                    var zoneSensors = dsClient.GetZonesAndSensorValues().Result;
+                    zoneSensorTypes = zoneSensors.Zones.ToDictionary(x => x.ZoneID, x => x.Sensor?.Select(s => s.Type)?.ToList() ?? new List<Sensor>());
+
+                    circuits = circuitZones.Keys.Union(circuitNames.Keys).Distinct().OrderBy(x => (string)x).ToList();
+                    zones = zoneNames.Keys.Union(circuitZones.SelectMany(x => x.Value)).Distinct().OrderBy(x => (int)x).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{DateTime.Now} Exception occurred in Digitalstrom Structure Service", ex);
+                throw;
             }
             finally { _loadSemaphore.Release(); }
         }
