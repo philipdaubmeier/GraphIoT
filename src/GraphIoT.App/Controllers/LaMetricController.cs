@@ -60,7 +60,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             {
                 Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min)
             };
-            var totalYieldToday = viewModel.Graph(0).Points.Sum(x => (decimal)x) / 60 / 1000;
+            var totalYieldToday = viewModel.Graph(0).Points.Select(x => (decimal?)x).Where(x => x.HasValue).Sum(x => x.Value) / 60 / 1000;
 
             viewModel.Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 37);
             var chartSolarYield = viewModel.Graph(0).Points;
