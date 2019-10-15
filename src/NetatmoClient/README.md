@@ -54,7 +54,7 @@ foreach (var measure in measures.First().Value)
 
 ## Platform Support
 
-CompactTimeSeries is compiled for .NET Core 2.2.
+CompactTimeSeries is compiled for .NET Core 3.0.
 
 ## License
 
