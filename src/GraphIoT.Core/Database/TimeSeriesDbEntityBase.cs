@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace PhilipDaubmeier.GraphIoT.Core.Database
 {
@@ -33,24 +34,30 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             CurveProperty(index)?.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
         }
 
+        private static readonly Semaphore _loadPropertiesSemaphore = new Semaphore(1, 1);
         private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();
         private PropertyInfo CurveProperty(int index)
         {
-            if (!_curveProperties.ContainsKey(GetType()))
+            try
             {
-                _curveProperties.Add(GetType(), GetType().GetProperties()
-                    .Where(prop => prop.Name.EndsWith("Curve", StringComparison.InvariantCultureIgnoreCase))
-                    .Where(prop => Attribute.IsDefined(prop, typeof(MaxLengthAttribute)))
-                    .Where(prop => prop.PropertyType == typeof(string))
-                    .Where(prop => prop.CanRead && prop.CanWrite)
-                    .ToList());
+                _loadPropertiesSemaphore.WaitOne();
+
+                if (!_curveProperties.TryGetValue(GetType(), out var props))
+                {
+                    _curveProperties.Add(GetType(), props = GetType().GetProperties()
+                        .Where(prop => prop.Name.EndsWith("Curve", StringComparison.InvariantCultureIgnoreCase))
+                        .Where(prop => Attribute.IsDefined(prop, typeof(MaxLengthAttribute)))
+                        .Where(prop => prop.PropertyType == typeof(string))
+                        .Where(prop => prop.CanRead && prop.CanWrite)
+                        .ToList());
+                }
+
+                if (props == null || index < 0 || index >= props.Count)
+                    return null;
+
+                return props[index];
             }
-
-            var props = _curveProperties[GetType()];
-            if (index < 0 || index >= props.Count)
-                return null;
-
-            return props[index];
+            finally { _loadPropertiesSemaphore.Release(); }
         }
     }
 }
