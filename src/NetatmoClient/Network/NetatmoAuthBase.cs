@@ -46,15 +46,12 @@ namespace PhilipDaubmeier.NetatmoClient
         /// If no valid access token is present yet, this method will trigger a fresh sign-in or
         /// refresh the token with a refresh token if present and
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestNetatmoApi(Uri uri, IEnumerable<KeyValuePair<string, string>> parameters = null)
+        protected async Task<HttpResponseMessage> RequestNetatmoApi(Uri uri, IEnumerable<(string, string)> parameters = null)
         {
             await Authenticate();
 
-            var authparam = new[]
-            {
-                new KeyValuePair<string, string>("access_token", _authData.AccessToken)
-            };
-            var postData = new FormUrlEncodedContent(parameters == null ? authparam : authparam.Union(parameters.Where(p => p.Value != null)));
+            var authparam = new[] { ("access_token", _authData.AccessToken) };
+            var postData = FormContentFromList(parameters == null ? authparam : authparam.Union(parameters.Where(p => p.Item2 != null)));
             return await _client.PostAsync(uri, postData);
         }
 
@@ -64,20 +61,23 @@ namespace PhilipDaubmeier.NetatmoClient
         /// will trigger a fresh sign-in or refresh the token with a refresh token if present and
         /// append it to the request.
         /// </summary>
-        protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<KeyValuePair<string, string>> parameters = null)
+        protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<(string, string)> parameters = null)
             where TWiremessage : IWiremessage<TData> where TData : class
         {
             var responseStream = await (await RequestNetatmoApi(uri, parameters)).Content.ReadAsStreamAsync();
 
-            using (var sr = new StreamReader(responseStream))
-            using (var jsonTextReader = new JsonTextReader(sr))
-            {
-                var result = _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.Body;
-                if (result == null)
-                    throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+            using var sr = new StreamReader(responseStream);
+            using var jsonTextReader = new JsonTextReader(sr);
+            var result = _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.Body;
+            if (result == null)
+                throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
 
-                return result;
-            }
+            return result;
+        }
+
+        private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
+        {
+            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
         }
 
         /// <summary>
@@ -114,12 +114,12 @@ namespace PhilipDaubmeier.NetatmoClient
         {
             await LoadAndStoreAccessToken(new[]
             {
-                new KeyValuePair<string, string>("grant_type", "password"),
-                new KeyValuePair<string, string>("client_id", _provider.AppId),
-                new KeyValuePair<string, string>("client_secret", _provider.AppSecret),
-                new KeyValuePair<string, string>("username", _authData.Username),
-                new KeyValuePair<string, string>("password", _authData.UserPassword),
-                new KeyValuePair<string, string>("scope", _provider.Scope)
+                ("grant_type", "password"),
+                ("client_id", _provider.AppId),
+                ("client_secret", _provider.AppSecret),
+                ("username", _authData.Username),
+                ("password", _authData.UserPassword),
+                ("scope", _provider.Scope)
             });
         }
 
@@ -127,16 +127,16 @@ namespace PhilipDaubmeier.NetatmoClient
         {
             await LoadAndStoreAccessToken(new[]
             {
-                new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                new KeyValuePair<string, string>("refresh_token", _authData.RefreshToken),
-                new KeyValuePair<string, string>("client_id", _provider.AppId),
-                new KeyValuePair<string, string>("client_secret", _provider.AppSecret),
+                ("grant_type", "refresh_token"),
+                ("refresh_token", _authData.RefreshToken),
+                ("client_id", _provider.AppId),
+                ("client_secret", _provider.AppSecret),
             });
         }
 
-        private async Task LoadAndStoreAccessToken(IEnumerable<KeyValuePair<string, string>> postParameters)
+        private async Task LoadAndStoreAccessToken(IEnumerable<(string, string)> postParameters)
         {
-            var postData = new FormUrlEncodedContent(postParameters);
+            var postData = FormContentFromList(postParameters);
             var responseMessage = await _client.PostAsync(new Uri(new Uri(_baseUri), "/oauth2/token"), postData);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 

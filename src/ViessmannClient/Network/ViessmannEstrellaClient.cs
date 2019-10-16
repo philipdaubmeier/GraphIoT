@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.ViessmannClient
                 new Uri("https://api.viessmann.io/estrella/rest/v2.0/gateways/")));
         }
 
-        public async Task<List<Tuple<int, string>>> GetControllers(int gatewayId)
+        public async Task<List<(int id, string typeName)>> GetControllers(int gatewayId)
         {
             return await ParseControllersResponse(await GetAsync(
                 new Uri($"https://api.viessmann.io/estrella/rest/v2.0/gateways/{gatewayId}/controllers")));
@@ -99,7 +99,7 @@ namespace PhilipDaubmeier.ViessmannClient
             return gatewaysRaw.data.Select(x => int.Parse(x.id)).ToList();
         }
 
-        private async Task<List<Tuple<int, string>>> ParseControllersResponse(HttpResponseMessage response)
+        private async Task<List<(int id, string typeName)>> ParseControllersResponse(HttpResponseMessage response)
         {
             var definition = new
             {
@@ -119,7 +119,7 @@ namespace PhilipDaubmeier.ViessmannClient
                 } }
             };
             var controllersRaw = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
-            return controllersRaw.data.Select(x => new Tuple<int, string>(int.Parse(x.id), x.typeName)).ToList();
+            return controllersRaw.data.Select(x => (int.Parse(x.id), x.typeName)).ToList();
         }
     }
 }

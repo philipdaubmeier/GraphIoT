@@ -28,10 +28,10 @@ namespace PhilipDaubmeier.NetatmoClient
         public async Task<WeatherStationData> GetWeatherStationData(ModuleId deviceId = default, bool? getFavorites = default)
         {
             var uri = new Uri($"{_baseUri}/api/getstationsdata");
-            return await CallNetatmoApi<WeatherStationResponse, WeatherStationData>(uri, new Dictionary<string, string>()
+            return await CallNetatmoApi<WeatherStationResponse, WeatherStationData>(uri, new[]
             {
-                { "device_id", deviceId?.ToString() },
-                { "get_favorites", getFavorites?.ToString() }
+                ("device_id", deviceId?.ToString()),
+                ("get_favorites", getFavorites?.ToString())
             });
         }
 
@@ -44,10 +44,10 @@ namespace PhilipDaubmeier.NetatmoClient
         public async Task<HomeData> GetHomeData(string homeId = default, int? size = default)
         {
             var uri = new Uri($"{_baseUri}/api/gethomedata");
-            return await CallNetatmoApi<HomeDataResponse, HomeData>(uri, new Dictionary<string, string>()
+            return await CallNetatmoApi<HomeDataResponse, HomeData>(uri, new[]
             {
-                { "home_id", homeId },
-                { "size", !size.HasValue ? null : Math.Max(0, Math.Min(1024, size.Value)).ToString() }
+                ("home_id", homeId),
+                ("size", !size.HasValue ? null : Math.Max(0, Math.Min(1024, size.Value)).ToString())
             });
         }
 
@@ -65,16 +65,16 @@ namespace PhilipDaubmeier.NetatmoClient
         public async Task<TimestampedMeasureCollection> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, Scale scale = default, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
         {
             var uri = new Uri($"{_baseUri}/api/getmeasure");
-            return new TimestampedMeasureCollection(await CallNetatmoApi<MeasureResponse, List<MeasureClump>>(uri, new Dictionary<string, string>()
+            return new TimestampedMeasureCollection(await CallNetatmoApi<MeasureResponse, List<MeasureClump>>(uri, new[]
             {
-                { "device_id", deviceId },
-                { "module_id", moduleId },
-                { "scale", scale?.ToString() ?? new Scale(MeasureScale.ScaleMax).ToString() },
-                { "type", types == null ? null : string.Join(',', types.Where(t => t != null).Select(t => t.ToString())) },
-                { "date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
-                { "date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString() },
-                { "limit", !limit.HasValue ? null : Math.Max(0, Math.Min(1024, limit.Value)).ToString() },
-                { "real_time", realTime?.ToString() }
+                ("device_id", (string)deviceId),
+                ("module_id", (string)moduleId),
+                ("scale", scale?.ToString() ?? new Scale(MeasureScale.ScaleMax).ToString()),
+                ("type", types == null ? null : string.Join(',', types.Where(t => t != null).Select(t => t.ToString()))),
+                ("date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
+                ("date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
+                ("limit", !limit.HasValue ? null : Math.Max(0, Math.Min(1024, limit.Value)).ToString()),
+                ("real_time", realTime?.ToString())
             }), types);
         }
     }

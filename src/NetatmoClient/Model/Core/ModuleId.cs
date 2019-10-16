@@ -27,11 +27,9 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public static ModuleId ReadFrom(Stream stream)
         {
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
-            {
-                byte[] array = reader.ReadBytes(Size);
-                return new ModuleId(BitConverter.ToString(array));
-            }
+            using var reader = new BinaryReader(stream, Encoding.UTF8, true);
+            var array = reader.ReadBytes(Size);
+            return new ModuleId(BitConverter.ToString(array));
         }
 
         public void WriteTo(Stream stream)

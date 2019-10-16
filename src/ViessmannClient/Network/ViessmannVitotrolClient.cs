@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.ViessmannClient
             _connectionProvider = connectionProvider;
         }
 
-        public async Task<List<KeyValuePair<string, string>>> GetTypeInfo()
+        public async Task<List<(string id, string name)>> GetTypeInfo()
         {
             await Authenticate();
 
@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.ViessmannClient
             return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _connectionProvider.AuthData.AccessToken));
         }
 
-        public async Task<List<Tuple<string, string, DateTime>>> GetData(IEnumerable<int> datapoints)
+        public async Task<List<(string id, string value, DateTime timestamp)>> GetData(IEnumerable<int> datapoints)
         {
             await Authenticate();
 
@@ -73,32 +73,28 @@ namespace PhilipDaubmeier.ViessmannClient
             return await _client.SendAsync(request);
         }
 
-        private async Task<List<KeyValuePair<string, string>>> ParseTypeInfo(HttpResponseMessage response)
+        private async Task<List<(string id, string name)>> ParseTypeInfo(HttpResponseMessage response)
         {
             var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
             return elem.Descendants().First(x => x.Name.LocalName.Equals("TypeInfoListe", StringComparison.InvariantCultureIgnoreCase))
                 .Descendants().Where(x => x.Name.LocalName.Equals("DatenpunktTypInfo", StringComparison.InvariantCultureIgnoreCase)).Select(d =>
             {
-                return new KeyValuePair<string, string>(
-                    d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktId", StringComparison.InvariantCultureIgnoreCase)).Value,
-                    d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktName", StringComparison.InvariantCultureIgnoreCase)).Value
-                );
+                return (d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktId", StringComparison.InvariantCultureIgnoreCase)).Value,
+                        d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktName", StringComparison.InvariantCultureIgnoreCase)).Value);
             }).ToList();
         }
 
-        private async Task<List<Tuple<string, string, DateTime>>> ParseData(HttpResponseMessage response)
+        private async Task<List<(string id, string value, DateTime timestamp)>> ParseData(HttpResponseMessage response)
         {
             var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
             return elem.Descendants().First(x => x.Name.LocalName.Equals("DatenwerteListe", StringComparison.InvariantCultureIgnoreCase))
                 .Descendants().Where(x => x.Name.LocalName.Equals("WerteListe", StringComparison.InvariantCultureIgnoreCase)).Select(d =>
                 {
-                    return new Tuple<string, string, DateTime>(
-                        d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktId", StringComparison.InvariantCultureIgnoreCase)).Value,
-                        d.Descendants().First(x => x.Name.LocalName.Equals("Wert", StringComparison.InvariantCultureIgnoreCase)).Value,
-                        DateTime.ParseExact(
-                            d.Descendants().First(x => x.Name.LocalName.Equals("Zeitstempel", StringComparison.InvariantCultureIgnoreCase)).Value,
-                            "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal)
-                    );
+                    return (d.Descendants().First(x => x.Name.LocalName.Equals("DatenpunktId", StringComparison.InvariantCultureIgnoreCase)).Value,
+                            d.Descendants().First(x => x.Name.LocalName.Equals("Wert", StringComparison.InvariantCultureIgnoreCase)).Value,
+                            DateTime.ParseExact(
+                                d.Descendants().First(x => x.Name.LocalName.Equals("Zeitstempel", StringComparison.InvariantCultureIgnoreCase)).Value,
+                                "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal));
                 }).ToList();
         }
     }

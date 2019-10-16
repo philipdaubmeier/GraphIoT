@@ -47,10 +47,10 @@ namespace PhilipDaubmeier.ViessmannClient
             return await (await _authClient.SendAsync(request)).Content.ReadAsStringAsync();
         }
 
-        public async Task<Tuple<string, double>> GetOutsideTemperature()
+        public async Task<(string status, double temperature)> GetOutsideTemperature()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.sensors.temperature.outside"), "status", "value");
-            return new Tuple<string, double>(res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<double> GetBoilerTemperature()
@@ -65,10 +65,10 @@ namespace PhilipDaubmeier.ViessmannClient
             return ((bool?)res) ?? false;
         }
 
-        public async Task<Tuple<double, int>> GetBurnerStatistics()
+        public async Task<(double hours, int starts)> GetBurnerStatistics()
         {
             var res = await ParseFeatureResponse<ClassNullable<double>, ClassNullable<double>>(await GetFeature("heating.burner.statistics"), "hours", "starts");
-            return new Tuple<double, int>(((double?)res.Item1) ?? 0d, (int)(((double?)res.Item2) ?? 0d));
+            return (((double?)res.Item1) ?? 0d, (int)(((double?)res.Item2) ?? 0d));
         }
 
         public async Task<string> GetCircuitOperatingMode(Circuit circuit)
@@ -81,28 +81,28 @@ namespace PhilipDaubmeier.ViessmannClient
             return await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.active"), "value");
         }
 
-        public async Task<Tuple<bool, double>> GetCircuitProgramNormal(Circuit circuit)
+        public async Task<(bool active, double temperature)> GetCircuitProgramNormal(Circuit circuit)
         {
             var res = await ParseFeatureResponse<ClassNullable<bool>, ClassNullable<double>>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.normal"), "active", "temperature");
-            return new Tuple<bool, double>(((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
+            return (((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
         }
 
-        public async Task<Tuple<bool, double>> GetCircuitProgramReduced(Circuit circuit)
+        public async Task<(bool active, double temperature)> GetCircuitProgramReduced(Circuit circuit)
         {
             var res = await ParseFeatureResponse<ClassNullable<bool>, ClassNullable<double>>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.reduced"), "active", "temperature");
-            return new Tuple<bool, double>(((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
+            return (((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
         }
 
-        public async Task<Tuple<bool, double>> GetCircuitProgramComfort(Circuit circuit)
+        public async Task<(bool active, double temperature)> GetCircuitProgramComfort(Circuit circuit)
         {
             var res = await ParseFeatureResponse<ClassNullable<bool>, ClassNullable<double>>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.comfort"), "active", "temperature");
-            return new Tuple<bool, double>(((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
+            return (((bool?)res.Item1) ?? false, ((double?)res.Item2) ?? 0d);
         }
 
-        public async Task<Tuple<string, double>> GetCircuitTemperature(Circuit circuit)
+        public async Task<(string status, double temperature)> GetCircuitTemperature(Circuit circuit)
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.sensors.temperature.supply"), "status", "value");
-            return new Tuple<string, double>(res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<bool> GetCircuitCirculationPump(Circuit circuit)
@@ -110,10 +110,10 @@ namespace PhilipDaubmeier.ViessmannClient
             return (await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.circulation.pump"), "status"))?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
         }
 
-        public async Task<Tuple<string, double>> GetDhwStorageTemperature()
+        public async Task<(string status, double temperature)> GetDhwStorageTemperature()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.dhw.sensors.temperature.hotWaterStorage"), "status", "value");
-            return new Tuple<string, double>(res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<bool> GetDhwPrimaryPump()
@@ -126,10 +126,10 @@ namespace PhilipDaubmeier.ViessmannClient
             return (await ParseFeatureResponse<string>(await GetFeature("heating.dhw.pumps.circulation"), "status"))?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
         }
 
-        public async Task<Tuple<string, double>> GetBoilerTemperatureMain()
+        public async Task<(string status, double temperature)> GetBoilerTemperatureMain()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.boiler.sensors.temperature.main"), "status", "value");
-            return new Tuple<string, double>(res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<int> GetBurnerModulation()

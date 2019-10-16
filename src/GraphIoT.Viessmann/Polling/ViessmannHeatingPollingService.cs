@@ -42,12 +42,12 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             var burnerStartsTotal = burnerStatistics.Item2;
             var burnerModulation = await _platformClient.GetBurnerModulation();
 
-            var outsideTemp = (await _platformClient.GetOutsideTemperature()).Item2;
+            var outsideTemp = (await _platformClient.GetOutsideTemperature()).temperature;
             var boilerTemp = await _platformClient.GetBoilerTemperature();
-            var boilerTempMain = (await _platformClient.GetBoilerTemperatureMain()).Item2;
-            var circuit0Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit0)).Item2;
-            var circuit1Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit1)).Item2;
-            var dhwTemp = (await _platformClient.GetDhwStorageTemperature()).Item2;
+            var boilerTempMain = (await _platformClient.GetBoilerTemperatureMain()).temperature;
+            var circuit0Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit0)).temperature;
+            var circuit1Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit1)).temperature;
+            var dhwTemp = (await _platformClient.GetDhwStorageTemperature()).temperature;
 
             var burnerActive = await _platformClient.GetBurnerActiveStatus();
             var circuit0Pump = await _platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit0);
