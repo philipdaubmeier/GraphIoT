@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// Credential information and a token store object.
         /// </summary>
         ISonnenAuth AuthData { get; }
-        
+
         /// <summary>
         /// A HttpMessageHandler to inject for the connection to the my.sonnen.de server,
         /// either for mocking purposes for testing or also for setting a proxy server etc.

@@ -9,10 +9,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
     {
         public IViessmannAuth AuthData { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
-        
+
         public string VitotrolDeviceId { get; private set; }
         public string VitotrolInstallationId { get; private set; }
-        
+
         public string PlattformInstallationId { get; private set; }
         public string PlattformGatewayId { get; private set; }
         public string PlattformApiClientId { get; private set; }
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
             PlattformGatewayId = config.Value.PlattformGatewayId;
             PlattformApiClientId = config.Value.PlattformApiClientId;
             PlattformApiClientSecret = config.Value.PlattformApiClientSecret;
-            
+
             AuthData = new ViessmannAuth<T>(tokenStore, config.Value.Username, config.Value.Password);
         }
     }

@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 
         public string Proxy { get; set; }
         public string ProxyPort { get; set; }
-        
+
         public Uri UriLocal => string.IsNullOrWhiteSpace(DssUriLocal) ? null : new Uri(DssUriLocal);
         public Uri UriDsNet => new Uri(DssUriDsNet.Replace("{CloudDssId}", CloudDssId));
         public Uri UriCloudredir => new Uri(DssUriCloudredir.Replace("{CloudDssId}", CloudDssId).Replace("{CloudredirToken}", CloudredirToken));

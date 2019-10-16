@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.ViessmannClient;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
+using PhilipDaubmeier.ViessmannClient;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -22,11 +22,11 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             _dbContext = dbContext;
             _vitotrolClient = vitotrolClient;
         }
-        
+
         public async Task PollValues()
         {
             _logger.LogInformation($"{DateTime.Now} Viessmann Background Service is polling new solar values...");
-            
+
             try
             {
                 await PollSolarValues();
@@ -36,13 +36,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in viessmann solar background worker: {ex.Message}");
             }
         }
-        
+
         private async Task PollSolarValues()
         {
             var data = await _vitotrolClient.GetData(new List<int>() { 5272, 5273, 5274, 5276, 7895 });
             var time = data.First().Item3.ToUniversalTime();
             var day = time.Date;
-            
+
             var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
             if (dbSolarSeries == null)
                 _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarMidresData() { Key = day });

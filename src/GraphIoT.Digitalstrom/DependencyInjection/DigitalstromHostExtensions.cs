@@ -2,20 +2,20 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Config;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Polling;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel;
-using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
-using System;
-using System.Net.Http;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
+using System;
+using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 {

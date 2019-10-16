@@ -163,7 +163,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
             // Timeout was triggered, no event was read - leave method and continue in main thread loop
             if (dsEvent == null)
                 return;
-            
+
             if (millisecondsTimeout < 0)
                 _logger.LogInformation($"{DateTime.Now} Dequeued event (first in clump) with timestamp {dsEvent?.TimestampUtc}");
             else

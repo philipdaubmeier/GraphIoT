@@ -75,7 +75,7 @@ namespace PhilipDaubmeier.DigitalstromClient
             {
                 if (httpClient != null)
                     return httpClient;
-                
+
                 return httpClient = new HttpClient(Handler);
             }
             protected set
@@ -83,7 +83,7 @@ namespace PhilipDaubmeier.DigitalstromClient
                 httpClient = value;
             }
         }
-        
+
         public DigitalstromConnectionProvider(Uri uri, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
             : this(new UriPriorityList(new List<Uri>() { uri }), credentialCallback, certCallback, handler)
         { }

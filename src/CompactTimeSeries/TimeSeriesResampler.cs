@@ -49,7 +49,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             resampled = (Tseries)Activator.CreateInstance(typeof(Tseries), Span);
         }
-        
+
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
         {
             CreateDeferred(timeseries.Span.Duration);
@@ -57,7 +57,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 if (item.Value.HasValue)
                     Resampled.Accumulate(item.Key, item.Value.Value);
         }
-        
+
         public void SampleAggregate(ITimeSeries<Tval> timeseries, Func<IEnumerable<Tval>, Tval> aggregate)
         {
             SampleAggregate(new List<ITimeSeries<Tval>>() { timeseries }, aggregate);

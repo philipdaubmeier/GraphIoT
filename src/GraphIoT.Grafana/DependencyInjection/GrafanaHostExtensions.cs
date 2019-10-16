@@ -6,7 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Grafana.Controllers;
 using PhilipDaubmeier.GraphIoT.Grafana.Services;
 using ProxyKit;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;

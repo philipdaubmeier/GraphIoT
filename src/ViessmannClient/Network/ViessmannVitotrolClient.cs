@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.ViessmannClient
         private const string _soapPrefix = @"<?xml version=""1.0"" encoding=""UTF-8""?><soap:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns=""http://www.e-controlnet.de/services/vii/""><soap:Body>";
         private const string _soapSuffix = @"</soap:Body></soap:Envelope>";
         private const string _soapAction = @"http://www.e-controlnet.de/services/vii/";
-        
+
         public ViessmannVitotrolClient(IViessmannConnectionProvider<ViessmannVitotrolClient> connectionProvider)
         {
             _connectionProvider = connectionProvider;
@@ -76,7 +76,7 @@ namespace PhilipDaubmeier.ViessmannClient
         private async Task<List<KeyValuePair<string, string>>> ParseTypeInfo(HttpResponseMessage response)
         {
             var elem = await XElement.LoadAsync(await response.Content.ReadAsStreamAsync(), LoadOptions.None, new CancellationToken());
-            return elem.Descendants().First(x=>x.Name.LocalName.Equals("TypeInfoListe", StringComparison.InvariantCultureIgnoreCase))
+            return elem.Descendants().First(x => x.Name.LocalName.Equals("TypeInfoListe", StringComparison.InvariantCultureIgnoreCase))
                 .Descendants().Where(x => x.Name.LocalName.Equals("DatenpunktTypInfo", StringComparison.InvariantCultureIgnoreCase)).Select(d =>
             {
                 return new KeyValuePair<string, string>(

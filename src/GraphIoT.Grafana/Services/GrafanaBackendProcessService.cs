@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
 
             return Task.CompletedTask;
         }
-        
+
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation($"{DateTime.Now} Grafana Backend Service is stopping.");

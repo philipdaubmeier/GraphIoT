@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
-using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

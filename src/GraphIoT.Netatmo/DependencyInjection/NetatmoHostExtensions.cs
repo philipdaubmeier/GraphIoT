@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PhilipDaubmeier.NetatmoClient;
-using PhilipDaubmeier.NetatmoClient.Network;
+using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Netatmo.Config;
 using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.GraphIoT.Netatmo.Polling;
 using PhilipDaubmeier.GraphIoT.Netatmo.Structure;
 using PhilipDaubmeier.GraphIoT.Netatmo.ViewModel;
-using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
+using PhilipDaubmeier.NetatmoClient;
+using PhilipDaubmeier.NetatmoClient.Network;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using System;

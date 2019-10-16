@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using PhilipDaubmeier.CompactTimeSeries;
+﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.Database;
 using System;
 using System.Collections.Generic;

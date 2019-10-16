@@ -7,7 +7,7 @@
 
         public string VitotrolDeviceId { get; set; }
         public string VitotrolInstallationId { get; set; }
-        
+
         public string PlattformInstallationId { get; set; }
         public string PlattformGatewayId { get; set; }
         public string PlattformApiClientId { get; set; }

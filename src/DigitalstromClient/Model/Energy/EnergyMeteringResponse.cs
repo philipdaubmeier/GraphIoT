@@ -1,7 +1,7 @@
-﻿using System;
+﻿using NodaTime;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using NodaTime;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 {
@@ -12,7 +12,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
         public int Resolution { get; set; }
         public List<List<double>> Values { get; set; }
 
-        public IEnumerable<KeyValuePair<DateTime, double>> TimeSeries => Values.Select(x => 
+        public IEnumerable<KeyValuePair<DateTime, double>> TimeSeries => Values.Select(x =>
                 new KeyValuePair<DateTime, double>(Instant.FromUnixTimeSeconds((long)x.FirstOrDefault()).ToDateTimeUtc(), x.LastOrDefault()));
     }
 }

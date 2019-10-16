@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                 // Wait for the threads to start and make the subscriptions
                 await Task.Delay(100);
             }
-            
+
             Assert.Equal(2, mockHttp.GetMatchCount(subscription));
         }
 

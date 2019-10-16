@@ -242,7 +242,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         {
             return scene._scene;
         }
-        
+
         public static bool operator !=(Scene scene1, Scene scene2)
         {
             return !(scene1 == scene2);
@@ -284,7 +284,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         {
             return Enum.GetName(typeof(SceneCommand), _scene);
         }
-        
+
         public string ToDisplayString()
         {
             switch (_scene)

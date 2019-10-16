@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace PhilipDaubmeier.GraphIoT.App.Migrations
 {
@@ -39,7 +39,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
-            
+
             migrationBuilder.CreateIndex(
                 name: "IX_DsSensorDataSet_ZoneId_Day",
                 table: "DsSensorDataSet",

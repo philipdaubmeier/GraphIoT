@@ -1,8 +1,8 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.GraphIoT.Netatmo.Structure;
-using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

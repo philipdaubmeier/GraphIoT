@@ -1,5 +1,4 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using System;
 using System.Collections.Generic;
 
 namespace PhilipDaubmeier.GraphIoT.Core.ViewModel

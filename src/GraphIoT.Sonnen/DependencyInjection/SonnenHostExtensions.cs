@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Network;
+using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Sonnen.Config;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.GraphIoT.Sonnen.Polling;
 using PhilipDaubmeier.GraphIoT.Sonnen.ViewModel;
-using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
+using PhilipDaubmeier.SonnenClient;
+using PhilipDaubmeier.SonnenClient.Network;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using System;

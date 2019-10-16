@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace PhilipDaubmeier.CompactTimeSeries.Tests
@@ -61,7 +61,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
 
             // Modify
             foreach (var item in timeseriesCollectionOrig)
-                for (int i = 0; i< Math.Min(addValues1.Count, item.Value.Count); i++)
+                for (int i = 0; i < Math.Min(addValues1.Count, item.Value.Count); i++)
                     if (addValues1[i].HasValue)
                         item.Value[i] = addValues1[i];
 

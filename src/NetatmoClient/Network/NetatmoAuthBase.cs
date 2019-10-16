@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.NetatmoClient
                 NamingStrategy = new SnakeCaseNamingStrategy()
             }
         };
-        
+
         public NetatmoAuthBase(INetatmoConnectionProvider connectionProvider)
         {
             _provider = connectionProvider;

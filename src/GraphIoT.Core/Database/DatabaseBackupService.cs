@@ -50,11 +50,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         public IEnumerable<BackupTable> CreateBackup(DateTime start, DateTime end, ICollection<string> tableFilter)
         {
             return GetTables(db, tableFilter).Select(table => new BackupTable()
-                {
-                    Table = table.Item1.Name,
-                    Columns = GetColumnNames(table.Item2),
-                    Rows = GetColumns(table.Item2, start, end)
-                });
+            {
+                Table = table.Item1.Name,
+                Columns = GetColumnNames(table.Item2),
+                Rows = GetColumns(table.Item2, start, end)
+            });
         }
 
         /// <summary>

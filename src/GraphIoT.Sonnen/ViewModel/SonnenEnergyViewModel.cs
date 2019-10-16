@@ -1,6 +1,6 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using System.Collections.Generic;
 using System.Linq;
 

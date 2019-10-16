@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             var eventData = db.DsSceneEventDataSet.Where(x => x.Key == dayDate.Date).FirstOrDefault();
             if (eventData == null)
                 return StatusCode((int)HttpStatusCode.NotFound);
-            
+
             return Json(new
             {
                 events = eventData.EventStream.Select(dssEvent => new

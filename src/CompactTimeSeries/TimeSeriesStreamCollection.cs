@@ -47,7 +47,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             _dict = new Dictionary<TKey, ITimeSeries<T>>();
 
-            _stream = new CompressableMemoryStream(Metrics.StreamSize(keyList.Count));            
+            _stream = new CompressableMemoryStream(Metrics.StreamSize(keyList.Count));
             _stream.SetLength(Metrics.StreamSize(keyList.Count));
 
             using (var writer = new BinaryWriter(_stream, System.Text.Encoding.UTF8, true))

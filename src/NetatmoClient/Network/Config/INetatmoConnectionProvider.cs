@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
         /// Credential information and a token store object.
         /// </summary>
         INetatmoAuth AuthData { get; }
-        
+
         /// <summary>
         /// A HttpMessageHandler to inject for the connection to the netatmo server,
         /// either for mocking purposes for testing or also for setting a proxy server etc.

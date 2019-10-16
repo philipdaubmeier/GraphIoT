@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
-using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -172,7 +172,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
                 .ToDictionary(x => x.Key, x => x.Select(m => (Measure)m.Measure).ToList());
 
             _moduleNames = loaded.GroupBy(x => x.ModuleId)
-                .ToDictionary(x => (ModuleId)x.Key, x => x.FirstOrDefault()?.ModuleName ?? string.Empty); 
+                .ToDictionary(x => (ModuleId)x.Key, x => x.FirstOrDefault()?.ModuleName ?? string.Empty);
 
             _deviceNames = loaded.GroupBy(x => x.DeviceId)
                 .ToDictionary(x => (ModuleId)x.Key, x => x.FirstOrDefault()?.StationName ?? string.Empty);

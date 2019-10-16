@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
-        
+
         [Required, Column("Day")]
         public override DateTime Key { get; set; }
 

@@ -1,5 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
-using NodaTime;
+﻿using NodaTime;
+using PhilipDaubmeier.CompactTimeSeries;
 using System;
 using System.Collections.Generic;
 using System.Linq;

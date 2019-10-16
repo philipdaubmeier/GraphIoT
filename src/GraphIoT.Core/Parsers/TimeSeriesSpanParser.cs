@@ -1,5 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
-using NodaTime;
+﻿using NodaTime;
+using PhilipDaubmeier.CompactTimeSeries;
 using System;
 
 namespace PhilipDaubmeier.GraphIoT.Core.Parsers

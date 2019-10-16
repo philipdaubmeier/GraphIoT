@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
@@ -9,13 +10,12 @@ using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromDssMock;
+using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
-using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
 using RichardSzalay.MockHttp;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.TestHost;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 {

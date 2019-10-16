@@ -88,7 +88,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         public IEnumerator<TEvent> GetEnumerator()
         {
             _stream.Seek(_startPosition, SeekOrigin.Begin);
-            
+
             for (int i = 0; i < Span.Count; i++)
             {
                 var item = ReadEvent();
@@ -125,7 +125,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
             _count++;
         }
-        
+
         private TEvent ReadEvent()
         {
             using (var reader = new BinaryReader(_stream, Encoding.UTF8, true))

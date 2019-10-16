@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
 
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
-        
+
         public DigitalstromDbContext(DbContextOptions<DigitalstromDbContext> options)
             : base(options)
         { }

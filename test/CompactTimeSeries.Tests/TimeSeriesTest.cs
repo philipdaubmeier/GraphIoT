@@ -124,7 +124,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             timeseries[insideRangeOddSecond2] = 43;
             timeseries[begin] = 1;
             timeseries[end] = 99;
-            
+
             var expected = new List<int>() { 1, 77, 77, 42, 77, 23, 77, 43, 77, 99 };
             Assert.Equal(expected, timeseries.Trimmed(77));
         }
@@ -195,7 +195,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         public void TestIntTimeSeriesProperties()
         {
             var timeseries = new TimeSeries<int>(span);
-            
+
             Assert.Equal(begin, timeseries.Begin);
             Assert.Equal(end, timeseries.End);
             Assert.Equal(count, timeseries.Count);

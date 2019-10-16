@@ -42,7 +42,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
                 _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom energy background worker: {ex.Message}");
             }
         }
-        
+
         private async Task PollEnergyValues()
         {
             var fetchLastValues = (int)TimeSeriesSpan.Spacing.Spacing10Min;
@@ -63,7 +63,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
 
                 SaveMidResEnergyValuesToDb(timeseriesCollections);
                 _dbContext.SaveChanges();
-                
+
                 SaveLowResEnergyValuesToDb(timeseriesCollections);
                 _dbContext.SaveChanges();
             }
@@ -96,7 +96,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
         private Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> ReadHighResEnergyValuesFromDb(IEnumerable<DateTime> days)
         {
             var timeseriesCollections = new Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>>();
-            
+
             foreach (var day in days)
             {
                 var dbEnergySeries = _dbContext.DsEnergyHighresDataSet.Where(x => x.Key == day).FirstOrDefault();

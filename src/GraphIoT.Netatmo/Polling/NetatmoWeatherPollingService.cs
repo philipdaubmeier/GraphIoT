@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.NetatmoClient;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.GraphIoT.Netatmo.Structure;
+using PhilipDaubmeier.NetatmoClient;
+using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;

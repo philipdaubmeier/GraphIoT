@@ -1,7 +1,6 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;

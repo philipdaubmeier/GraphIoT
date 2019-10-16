@@ -56,11 +56,11 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                 {
                     mockHttp.Flush();
                     numFlushed++;
-                }   
+                }
 
                 await Task.Delay(1);
             }
-                
+
         }
 
         public static async Task WaitModelInitializedAsync(this ApartmentState model, int expectedCount, int timeoutMillis = 1000)

@@ -42,7 +42,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         private Stream _stream;
         private bool _isStreamManaged = false;
         private int _startPosition = 0;
-        
+
         private int _decimalPlaces;
 
         /// <summary>
@@ -74,12 +74,12 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             if (!stream.CanSeek || !stream.CanRead || !stream.CanWrite)
                 throw new ArgumentException("underlying stream must be readable, writable and seekable");
-            
+
             _stream = stream;
             _startPosition = streamPosition;
             _decimalPlaces = decimalPlaces;
         }
-        
+
         public void Dispose()
         {
             if (_isStreamManaged)
@@ -150,7 +150,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 }
                 yield break;
             }
-            
+
             for (int i = 0; i < _span.Count; i++)
             {
                 var item = ReadKeyValuePair(time);

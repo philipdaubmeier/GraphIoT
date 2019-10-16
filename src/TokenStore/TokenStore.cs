@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.TokenStore
             _serviceName = serviceName;
             _dbContext = databaseContext;
         }
-        
+
         private string AccessTokenId => $"{_serviceName}.access_token";
         private string AccessTokenExpiryId => $"{_serviceName}.access_token_expiry";
         private string RefreshTokenId => $"{_serviceName}.refresh_token";
@@ -30,7 +30,7 @@ namespace PhilipDaubmeier.TokenStore
         private string _accessToken = null;
         private DateTime? _accessTokenExpiry = null;
         private string _refreshToken = null;
-        
+
         public string AccessToken => LoadTokenIfNull() ? _accessToken : null;
         public DateTime AccessTokenExpiry => LoadTokenIfNull() ? _accessTokenExpiry.Value : DateTime.MinValue;
         public string RefreshToken => LoadTokenIfNull() ? _refreshToken : null;
@@ -90,7 +90,7 @@ namespace PhilipDaubmeier.TokenStore
         {
             if (oldValue == newValue)
                 return;
-            
+
             var entity = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == key);
             if (entity == null)
                 _dbContext.AuthDataSet.Add(new AuthData() { AuthDataId = key, DataContent = newValue });

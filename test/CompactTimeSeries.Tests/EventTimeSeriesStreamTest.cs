@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             Assert.Equal(expected1Item, eventstream.ToByteArray());
 
             eventstream.WriteEvent(new Tuple<DateTime, int>(begin.AddSeconds(7), -1));
-            
+
             var expected2Item = Enumerable.Range(0, count).SelectMany(x => x == 0 ? new byte[] { 0xb8, 0x0b, 0x00, 0x00, 0x2a, 0x00, 0x00, 0x00 } :
                                                                            x == 1 ? new byte[] { 0x58, 0x1b, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff } :
                                                                                     new byte[] { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00 }).ToArray();
@@ -52,7 +52,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         public void TestEventTimeSeriesStreamIntValues(int value)
         {
             var eventstream = new EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>(span);
-            
+
             for (int i = 0; i < count; i++)
                 eventstream.WriteEvent(new Tuple<DateTime, int>(begin.AddSeconds(7).AddMilliseconds(i + 1), value));
 

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using NodaTime;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
-using NodaTime;
+using System;
+using System.Collections.Generic;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
 {
@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
         public Zone ZoneID { get; set; }
         public List<SensorTypeAndValues> Sensor { get; set; }
     }
-    
+
     public class SensorTypeAndValues
     {
         public Sensor Type { get; set; }

@@ -1,11 +1,10 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
-using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using System.Collections.Generic;
 using System.Linq;
-using System;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 {

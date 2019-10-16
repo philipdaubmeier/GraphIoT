@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.ViessmannClient;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
+using PhilipDaubmeier.ViessmannClient;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         public async Task PollValues()
         {
             _logger.LogInformation($"{DateTime.Now} Viessmann Background Service is polling new heating values...");
-            
+
             try
             {
                 await PollHeatingValues();
@@ -57,7 +57,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
             var time = DateTime.UtcNow;
             var day = time.Date;
-            
+
             var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Key == day).FirstOrDefault();
             if (dbHeatingSeries == null)
                 _dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingMidresData() { Key = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });

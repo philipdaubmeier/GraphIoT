@@ -2,14 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
-using PhilipDaubmeier.TokenStore.Database;
-using PhilipDaubmeier.TokenStore.DependencyInjection;
-using PhilipDaubmeier.ViessmannClient;
-using PhilipDaubmeier.ViessmannClient.Model;
 using PhilipDaubmeier.GraphIoT.Viessmann.Config;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using PhilipDaubmeier.GraphIoT.Viessmann.Polling;
 using PhilipDaubmeier.GraphIoT.Viessmann.ViewModel;
+using PhilipDaubmeier.TokenStore.Database;
+using PhilipDaubmeier.TokenStore.DependencyInjection;
+using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
         public static IServiceCollection AddViessmannHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration viessmannConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IViessmannDbContext, ITokenStoreDbContext
         {
             serviceCollection.AddDbContext<IViessmannDbContext, TDbContext>(dbConfig);
-            
+
             serviceCollection.Configure<ViessmannConfig>(viessmannConfig);
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);

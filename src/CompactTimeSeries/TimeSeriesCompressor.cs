@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             _timeseries = timeseries;
         }
-        
+
         public void Dispose()
         {
             _timeseries.Dispose();

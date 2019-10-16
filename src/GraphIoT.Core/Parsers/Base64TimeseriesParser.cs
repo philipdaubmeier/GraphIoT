@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
     public static class Base64TimeseriesParser
     {
         private const int defaultDecimalPlaces = 1;
-        
+
         public static TimeSeries<T> ToTimeseries<T>(this string base64, TimeSeriesSpan span, int decimalPlaces = defaultDecimalPlaces) where T : struct
         {
             var timeseries = new TimeSeries<T>(span);
@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
                 }
                 return timeseries;
             }
-            
+
             for (int i = 0; i < bytes.Length - 1 && i < span.Count * 2; i += 2)
             {
                 var value = (short)(bytes[i] << 8 | bytes[i + 1]);
@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
 
         public static string ToBase64(this TimeSeries<double> timeseries, int decimalPlaces = defaultDecimalPlaces)
         {
-            return ToBase64(timeseries.Select(d => d.Value.HasValue ? 
+            return ToBase64(timeseries.Select(d => d.Value.HasValue ?
                 (int)(d.Value.Value * Math.Pow(10d, decimalPlaces)) : (int?)null));
         }
 

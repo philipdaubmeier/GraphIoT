@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi.Database
         #region ITokenStoreDbContext
         public DbSet<AuthData> AuthDataSet { get; set; }
         #endregion
-        
+
         #region IDigitalstromDbContext
         public DbSet<DigitalstromZone> DsZones { get; set; }
 
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi.Database
 
         public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
         #endregion
-        
+
         public IntegrationTestDbContext(DbContextOptions<IntegrationTestDbContext> options)
             : base(options)
         { }

@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model
         /// Credential information and a token store object.
         /// </summary>
         IViessmannAuth AuthData { get; }
-        
+
         /// <summary>
         /// A HttpMessageHandler to inject for the connection to the Viessmann server,
         /// either for mocking purposes for testing or also for setting a proxy server etc.

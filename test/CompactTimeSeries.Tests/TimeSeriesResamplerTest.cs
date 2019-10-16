@@ -34,7 +34,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         public void TestIntTimeSeriesDownsampling()
         {
             var timeseries = new TimeSeriesStream<int>(span);
-            
+
             timeseries[0] = 1;
             timeseries[3] = 23;
             timeseries[7] = 43;
@@ -44,9 +44,9 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
             var resampler = new TimeSeriesResampler<TimeSeriesStream<int>, int>(spanDownsampling);
             resampler.SampleAccumulate(timeseries);
 
-            Assert.Equal(new List<int>(){ 1, 23, -1, 43, 104 }, resampler.Resampled.Trimmed(-1));
+            Assert.Equal(new List<int>() { 1, 23, -1, 43, 104 }, resampler.Resampled.Trimmed(-1));
         }
-        
+
         [Fact]
         public void TestIntTimeSeriesDownsamplingNoOversampling()
         {

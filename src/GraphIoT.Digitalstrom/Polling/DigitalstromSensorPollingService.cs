@@ -128,7 +128,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             var dbSensorSeries = set.Where(x => x.ZoneId == zoneIdInt && x.Key == day).FirstOrDefault();
             if (dbSensorSeries != null)
                 return dbSensorSeries;
-            
+
             var dbZone = _dbContext.DsZones.Where(x => x.Id == zoneIdInt).FirstOrDefault();
             if (dbZone == null)
                 _dbContext.DsZones.Add(dbZone = new DigitalstromZone() { Id = zoneIdInt });

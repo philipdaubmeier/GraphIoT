@@ -167,7 +167,7 @@ namespace PhilipDaubmeier.DigitalstromClient
             return await Load<LastCalledScenesResponse>(new Uri("/json/zone/getLastCalledScene", UriKind.Relative)
                 .AddQuery("id", zone).AddQuery("groupID", group ?? (int?)null));
         }
-        
+
         /// <summary>
         /// Returns a list of all zones, each with the last called sceneNumber for all groups.
         /// </summary>
@@ -204,7 +204,7 @@ namespace PhilipDaubmeier.DigitalstromClient
             return await QueryPropertyTree<ZonesAndSensorValuesResponse>(
                 "/apartment/zones/*(ZoneID)/groups/group0/sensor/*(type,value,time)");
         }
-        
+
         /// <summary>
         /// Returns a list of all circuits and an info about their energy metering capabilities
         /// </summary>

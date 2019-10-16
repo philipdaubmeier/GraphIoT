@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.ViessmannClient
             return await ParseControllersResponse(await GetAsync(
                 new Uri($"https://api.viessmann.io/estrella/rest/v2.0/gateways/{gatewayId}/controllers")));
         }
-        
+
         private async Task<HttpResponseMessage> GetAsync(Uri uri)
         {
             var request = new HttpRequestMessage()
@@ -45,7 +45,7 @@ namespace PhilipDaubmeier.ViessmannClient
             var password = _connectionProvider.AuthData.UserPassword;
             var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
             request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
-            
+
             return await _client.SendAsync(request);
         }
 

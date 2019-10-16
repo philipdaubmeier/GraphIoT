@@ -1,8 +1,8 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
-using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +54,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             // initial, low and mid resolution loading is handled by base class
             if (DataResolution != Resolution.HighRes)
                 return base.DeferredLoadGraph<Tseries, Tval>(index, nameSelector, strKeySelector, format, preprocess);
-            
+
             // already loaded or nothing to load
             if (dataHigh == null || _loadedGraphs.Count > 0)
                 return _loadedGraphs.ContainsKey(index) ? _loadedGraphs[index] : new GraphViewModel();

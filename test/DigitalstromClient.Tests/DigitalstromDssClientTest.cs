@@ -796,8 +796,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             try { await dsApiClient.PollForEvents(42, 60000); } catch { }
             UriForMethodName.Add("PollForEvents", mockHttp.LastCalledUri);
 
-            try { await dsApiClient.RaiseEvent((SystemEventName)SystemEvent.CallScene,
-                new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("mykey", "myval") }); } catch { }
+            try
+            {
+                await dsApiClient.RaiseEvent((SystemEventName)SystemEvent.CallScene,
+              new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("mykey", "myval") });
+            }
+            catch { }
             UriForMethodName.Add("RaiseEvent", mockHttp.LastCalledUri);
 
             var allUris = string.Join("\n", UriForMethodName.Select(x => $"{x.Key}: {x.Value}"));

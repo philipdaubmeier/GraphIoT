@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
 
                 if (eventObj == null)
                     throw new ArgumentNullException("eventObj");
-                
+
                 writer.Write((ushort)Math.Min(Math.Max(eventObj.Properties.ZoneID, 0), ushort.MaxValue));
                 writer.Write((byte)Math.Min(Math.Max(eventObj.Properties.GroupID, 0), byte.MaxValue));
                 writer.Write((byte)Math.Min(Math.Max(eventObj.Properties.SceneID, 0), byte.MaxValue));

@@ -25,7 +25,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel.Tests
         [Fact]
         public void TestMixedGraphViewModel()
         {
-            var graphViewModel = new GraphViewModel() {
+            var graphViewModel = new GraphViewModel()
+            {
                 Begin = new DateTime(2019, 01, 01, 12, 0, 0, DateTimeKind.Utc),
                 Spacing = TimeSpan.FromMinutes(1),
                 Name = "test",

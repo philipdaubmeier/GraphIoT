@@ -10,13 +10,13 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
     {
         public ISonnenAuth AuthData { get; private set; }
         public HttpMessageHandler Handler { get; private set; }
-        
+
         public string ClientId { get; private set; }
 
         public SonnenConfigConnectionProvider(TokenStore<SonnenPortalClient> tokenStore, IOptions<SonnenConfig> config)
         {
             ClientId = config.Value.ClientId;
-            
+
             AuthData = new SonnenHostAuth(tokenStore, config.Value.Username, config.Value.Password);
         }
     }

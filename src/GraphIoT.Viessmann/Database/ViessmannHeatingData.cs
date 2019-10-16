@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
 
         [MaxLength(800)]
         public string DhwTempCurve { get; set; }
-        
+
         [MaxLength(100)]
         public string BurnerActiveCurve { get; set; }
 
@@ -86,10 +86,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
 
         [NotMapped]
         public TimeSeries<int> BurnerModulationSeries => BurnerModulationCurve.ToTimeseries<int>(Span);
-        
+
         [NotMapped]
         public TimeSeries<double> OutsideTempSeries => OutsideTempCurve.ToTimeseries<double>(Span);
-        
+
         [NotMapped]
         public TimeSeries<double> BoilerTempSeries => BoilerTempCurve.ToTimeseries<double>(Span);
 
@@ -104,7 +104,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
 
         [NotMapped]
         public TimeSeries<double> DhwTempSeries => DhwTempCurve.ToTimeseries<double>(Span);
-        
+
         [NotMapped]
         public TimeSeries<bool> BurnerActiveSeries => BurnerActiveCurve.ToTimeseries<bool>(Span);
 

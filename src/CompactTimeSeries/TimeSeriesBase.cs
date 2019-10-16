@@ -82,7 +82,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// See <see cref="ITimeSeries{T}.Count"/>
         /// </summary>
         public int Count => _span.Count;
-        
+
         public abstract IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -162,7 +162,7 @@ namespace PhilipDaubmeier.ViessmannClient
         {
             if (_connectionProvider.AuthData.IsAccessTokenValid())
                 return;
-            
+
             var request = new HttpRequestMessage()
             {
                 RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),

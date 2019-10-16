@@ -68,14 +68,14 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         public ActionResult ComputeSolarLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_solarPollingService == null)
-                return StatusCode((int) HttpStatusCode.BadRequest);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode((int) HttpStatusCode.NotFound);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _solarPollingService.GenerateLowResSolarSeries(span.Begin, span.End);
 
-            return StatusCode((int) HttpStatusCode.OK);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/triggerpolling/viessmann/heating/lowres/compute
@@ -83,14 +83,14 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         public ActionResult ComputeHeatingLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
             if (_heatingPollingService == null)
-                return StatusCode((int) HttpStatusCode.BadRequest);
+                return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
-                return StatusCode((int) HttpStatusCode.NotFound);
+                return StatusCode((int)HttpStatusCode.NotFound);
 
             _heatingPollingService.GenerateLowResHeatingSeries(span.Begin, span.End);
 
-            return StatusCode((int) HttpStatusCode.OK);
+            return StatusCode((int)HttpStatusCode.OK);
         }
 
         // POST api/triggerpolling/sonnen/poll

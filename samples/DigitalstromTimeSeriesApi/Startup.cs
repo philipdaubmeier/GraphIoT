@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
+using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection;
 using System;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 
 namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
 {
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
 
         public IConfiguration Configuration { get; }
         public IHostEnvironment Environment { get; }
-        
+
         public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                 )
                 .AddGrafanaHost();
         }
-        
+
         public virtual void Configure(IApplicationBuilder app, IHostEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())

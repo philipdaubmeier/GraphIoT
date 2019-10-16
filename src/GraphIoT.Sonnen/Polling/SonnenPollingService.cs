@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.SonnenClient;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
+using PhilipDaubmeier.SonnenClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
         public async Task PollValues()
         {
             _logger.LogInformation($"{DateTime.Now} MySonnen Background Service is polling new energy values...");
-            
+
             try
             {
                 await PollSensorValues(DateTime.UtcNow.AddHours(-1), DateTime.UtcNow);
@@ -84,9 +84,9 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 
             _dbContext.SaveChanges();
         }
-        
-        private void SaveEnergyMidResValues(DateTime day, TimeSeries<int> productionPower, TimeSeries<int> consumptionPower, 
-            TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging, 
+
+        private void SaveEnergyMidResValues(DateTime day, TimeSeries<int> productionPower, TimeSeries<int> consumptionPower,
+            TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging,
             TimeSeries<int> gridFeedin, TimeSeries<int> gridPurchase, TimeSeries<double> batteryUsoc)
         {
             var dbEnergySeries = _dbContext.SonnenEnergyDataSet.Where(x => x.Key == day).FirstOrDefault();

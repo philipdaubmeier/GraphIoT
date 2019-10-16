@@ -31,7 +31,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
                 .AddQuery("key3", "val3")
                 .AddQuery("key4", "val4");
 
-            Uri newUri2 = 
+            Uri newUri2 =
                 (
                     (Uri)
                         ((Uri)baseUri.AddQuery("key1", "val1").AddQuery("key2", "val2")

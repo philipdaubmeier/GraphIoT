@@ -1,6 +1,5 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
-using PhilipDaubmeier.DigitalstromClient.Network;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,7 +50,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         {
             if (subscribed)
                 return;
-            
+
             await initializedSempahore.WaitAsync();
             try
             {

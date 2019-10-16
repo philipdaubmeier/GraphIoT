@@ -70,7 +70,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         #region IDisposable Support
         private bool isDisposed = false;
-        
+
         public void Dispose()
         {
             if (isDisposed)

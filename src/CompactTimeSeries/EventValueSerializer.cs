@@ -89,7 +89,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 (_tupleFactory as TupleFactory<int>).Set(timestampUtc, reader.ReadInt32());
             else if (typeof(TValue) == typeof(double))
                 (_tupleFactory as TupleFactory<double>).Set(timestampUtc, reader.ReadDouble());
-            
+
             return _tupleFactory.Create();
         }
     }
