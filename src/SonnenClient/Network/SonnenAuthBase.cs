@@ -161,11 +161,16 @@ namespace PhilipDaubmeier.SonnenClient.Network
             headers.TryAddWithoutValidation("User-Agent", _userAgent);
         }
 
+        private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
+        {
+            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
+        }
+
         private async Task<AuthState> RequestAuthenticityToken()
         {
             var state = new AuthState("/landing");
 
-            var authorizeParameters = new List<(string, string)>() {
+            var authorizeParameters = new[] {
                 ("client_id", _provider.ClientId),
                 ("response_type", "code"),
                 ("redirect_uri", _redirectUri),
@@ -176,7 +181,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
                 ("locale", "de")
             };
 
-            var queryString = string.Join('&', authorizeParameters.Select((key, val) => $"{key}={val}"));
+            var queryString = string.Join('&', authorizeParameters.Select(x => $"{x.Item1}={x.Item2}"));
             var requestUri = new Uri($"{_authBaseUri}oauth/authorize?{queryString}");
             return await ParseAuthenticityToken(await _client.GetAsync(requestUri), state);
         }
@@ -206,13 +211,13 @@ namespace PhilipDaubmeier.SonnenClient.Network
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}users/sign_in"));
             AddCommonAuthHeaders(request.Headers, $"{_authBaseUri}users/sign_in");
             request.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
-            request.Content = new FormUrlEncodedContent(new[]
+            request.Content = FormContentFromList(new[]
                 {
-                    new KeyValuePair<string, string>("authenticity_token", state.AuthenticityToken),
-                    new KeyValuePair<string, string>("user[email]", _provider.AuthData.Username),
-                    new KeyValuePair<string, string>("user[password]", _provider.AuthData.UserPassword),
-                    new KeyValuePair<string, string>("user[remember_me]", "0"),
-                    new KeyValuePair<string, string>("commit", "Log+in")
+                    ("authenticity_token", state.AuthenticityToken),
+                    ("user[email]", _provider.AuthData.Username),
+                    ("user[password]", _provider.AuthData.UserPassword),
+                    ("user[remember_me]", "0"),
+                    ("commit", "Log+in")
                 });
 
             return ParseAuthorizationCode(await _client.SendAsync(request), state);
@@ -247,13 +252,13 @@ namespace PhilipDaubmeier.SonnenClient.Network
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}oauth/token"));
             AddCommonAuthHeaders(request.Headers, string.Empty);
             request.Headers.Add("Accept", "application/json,application/vnd.api+json");
-            request.Content = new FormUrlEncodedContent(new[]
+            request.Content = FormContentFromList(new[]
                 {
-                    new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("code", state.AuthorizationCode),
-                    new KeyValuePair<string, string>("client_id", _provider.ClientId),
-                    new KeyValuePair<string, string>("redirect_uri", _redirectUri),
-                    new KeyValuePair<string, string>("code_verifier", state.CodeVerifier)
+                    ("grant_type", "authorization_code"),
+                    ("code", state.AuthorizationCode),
+                    ("client_id", _provider.ClientId),
+                    ("redirect_uri", _redirectUri),
+                    ("code_verifier", state.CodeVerifier)
                 });
 
             await ParseAccessTokenResponse(await _client.SendAsync(request));
@@ -264,11 +269,11 @@ namespace PhilipDaubmeier.SonnenClient.Network
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}oauth/token"));
             AddCommonAuthHeaders(request.Headers, string.Empty);
             request.Headers.Add("Accept", "application/json,application/vnd.api+json");
-            request.Content = new FormUrlEncodedContent(new[]
+            request.Content = FormContentFromList(new[]
                 {
-                    new KeyValuePair<string, string>("client_id", _provider.ClientId),
-                    new KeyValuePair<string, string>("refresh_token", _authData.RefreshToken),
-                    new KeyValuePair<string, string>("grant_type", "refresh_token")
+                    ("client_id", _provider.ClientId),
+                    ("refresh_token", _authData.RefreshToken),
+                    ("grant_type", "refresh_token")
                 });
 
             await ParseAccessTokenResponse(await _client.SendAsync(request));
