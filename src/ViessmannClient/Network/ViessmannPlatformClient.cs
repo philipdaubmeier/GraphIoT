@@ -35,16 +35,8 @@ namespace PhilipDaubmeier.ViessmannClient
 
         public async Task<string> GetInstallations()
         {
-            await Authenticate();
-
-            var request = new HttpRequestMessage()
-            {
-                RequestUri = new Uri("https://api.viessmann-platform.io/general-management/v1/installations?expanded=true"),
-                Method = HttpMethod.Get
-            };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
-
-            return await (await _authClient.SendAsync(request)).Content.ReadAsStringAsync();
+            var uri = new Uri("https://api.viessmann-platform.io/general-management/v1/installations?expanded=true");
+            return await (await CallApi(uri)).Content.ReadAsStringAsync();
         }
 
         public async Task<(string status, double temperature)> GetOutsideTemperature()
@@ -145,12 +137,17 @@ namespace PhilipDaubmeier.ViessmannClient
 
         private async Task<HttpResponseMessage> GetFeature(string featureName)
         {
+            var uri = $"https://api.viessmann-platform.io/operational-data/v1/installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features/{featureName}";
+            return await CallApi(new Uri(uri));
+        }
+
+        private async Task<HttpResponseMessage> CallApi(Uri uri)
+        {
             await Authenticate();
 
-            string baseUrl = "https://api.viessmann-platform.io/operational-data/v1/";
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{baseUrl}installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features/{featureName}"),
+                RequestUri = uri,
                 Method = HttpMethod.Get
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
