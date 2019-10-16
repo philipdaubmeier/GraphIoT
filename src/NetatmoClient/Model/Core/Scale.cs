@@ -58,17 +58,16 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public static implicit operator TimeSpan(Scale scale)
         {
-            switch (scale._scale)
+            return scale._scale switch
             {
-                case MeasureScale.Scale30Min: return new TimeSpan(0, 30, 0);
-                case MeasureScale.Scale1Hour: return new TimeSpan(1, 0, 0);
-                case MeasureScale.Scale3Hours: return new TimeSpan(3, 0, 0);
-                case MeasureScale.Scale1Day: return new TimeSpan(1, 0, 0, 0);
-                case MeasureScale.Scale1Week: return new TimeSpan(7, 0, 0, 0);
-                case MeasureScale.Scale1Month: return new TimeSpan(30, 10, 28, 48);
-                case MeasureScale.ScaleMax: goto default;
-                default: return new TimeSpan(0, 1, 0);
-            }
+                MeasureScale.Scale30Min => new TimeSpan(0, 30, 0),
+                MeasureScale.Scale1Hour => new TimeSpan(1, 0, 0),
+                MeasureScale.Scale3Hours => new TimeSpan(3, 0, 0),
+                MeasureScale.Scale1Day => new TimeSpan(1, 0, 0, 0),
+                MeasureScale.Scale1Week => new TimeSpan(7, 0, 0, 0),
+                MeasureScale.Scale1Month => new TimeSpan(30, 10, 28, 48),
+                _ => new TimeSpan(0, 1, 0),
+            };
         }
 
         public static bool operator !=(Scale scale1, Scale scale2)
@@ -110,17 +109,16 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override string ToString()
         {
-            switch (_scale)
+            return _scale switch
             {
-                case MeasureScale.Scale30Min: return "30min";
-                case MeasureScale.Scale1Hour: return "1hour";
-                case MeasureScale.Scale3Hours: return "3hours";
-                case MeasureScale.Scale1Day: return "1day";
-                case MeasureScale.Scale1Week: return "1week";
-                case MeasureScale.Scale1Month: return "1month";
-                case MeasureScale.ScaleMax: goto default;
-                default: return "max";
-            }
+                MeasureScale.Scale30Min => "30min",
+                MeasureScale.Scale1Hour => "1hour",
+                MeasureScale.Scale3Hours => "3hours",
+                MeasureScale.Scale1Day => "1day",
+                MeasureScale.Scale1Week => "1week",
+                MeasureScale.Scale1Month => "1month",
+                _ => "max",
+            };
         }
     }
 }

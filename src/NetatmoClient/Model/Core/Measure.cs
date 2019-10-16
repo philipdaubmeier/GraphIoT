@@ -119,38 +119,38 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override string ToString()
         {
-            switch (_measure)
+            return _measure switch
             {
-                case MeasureType.Temperature: return "temperature";
-                case MeasureType.CO2: return "co2";
-                case MeasureType.Humidity: return "humidity";
-                case MeasureType.Pressure: return "pressure";
-                case MeasureType.Noise: return "noise";
-                case MeasureType.Rain: return "rain";
-                case MeasureType.WindStrength: return "windstrength";
-                case MeasureType.WindAngle: return "windangle";
-                case MeasureType.Guststrength: return "guststrength";
-                case MeasureType.GustAngle: return "gustangle";
-                case MeasureType.MinTemp: return "min_temp";
-                case MeasureType.MaxTemp: return "max_temp";
-                case MeasureType.MinHum: return "min_hum";
-                case MeasureType.MaxHum: return "max_hum";
-                case MeasureType.MinPressure: return "min_pressure";
-                case MeasureType.MaxPressure: return "max_pressure";
-                case MeasureType.MinNoise: return "min_noise";
-                case MeasureType.MaxNoise: return "max_noise";
-                case MeasureType.SumRain: return "sum_rain";
-                case MeasureType.MaxGust: return "max_gust";
-                case MeasureType.DateMaxHum: return "date_max_hum";
-                case MeasureType.DateMinPressure: return "date_min_pressure";
-                case MeasureType.DateMaxPressure: return "date_max_pressure";
-                case MeasureType.DateMinNoise: return "date_min_noise";
-                case MeasureType.DateMaxNoise: return "date_max_noise";
-                case MeasureType.DateMinCo2: return "date_min_co2";
-                case MeasureType.DateMaxCo2: return "date_max_co2";
-                case MeasureType.DateMaxGust: return "date_max_gust";
-                default: goto case MeasureType.Temperature;
-            }
+                MeasureType.Temperature => "temperature",
+                MeasureType.CO2 => "co2",
+                MeasureType.Humidity => "humidity",
+                MeasureType.Pressure => "pressure",
+                MeasureType.Noise => "noise",
+                MeasureType.Rain => "rain",
+                MeasureType.WindStrength => "windstrength",
+                MeasureType.WindAngle => "windangle",
+                MeasureType.Guststrength => "guststrength",
+                MeasureType.GustAngle => "gustangle",
+                MeasureType.MinTemp => "min_temp",
+                MeasureType.MaxTemp => "max_temp",
+                MeasureType.MinHum => "min_hum",
+                MeasureType.MaxHum => "max_hum",
+                MeasureType.MinPressure => "min_pressure",
+                MeasureType.MaxPressure => "max_pressure",
+                MeasureType.MinNoise => "min_noise",
+                MeasureType.MaxNoise => "max_noise",
+                MeasureType.SumRain => "sum_rain",
+                MeasureType.MaxGust => "max_gust",
+                MeasureType.DateMaxHum => "date_max_hum",
+                MeasureType.DateMinPressure => "date_min_pressure",
+                MeasureType.DateMaxPressure => "date_max_pressure",
+                MeasureType.DateMinNoise => "date_min_noise",
+                MeasureType.DateMaxNoise => "date_max_noise",
+                MeasureType.DateMinCo2 => "date_min_co2",
+                MeasureType.DateMaxCo2 => "date_max_co2",
+                MeasureType.DateMaxGust => "date_max_gust",
+                _ => "temperature",
+            };
         }
     }
 }

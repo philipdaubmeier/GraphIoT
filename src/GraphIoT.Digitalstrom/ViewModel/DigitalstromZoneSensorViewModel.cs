@@ -31,12 +31,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         public override GraphViewModel Graph(int index)
         {
             int column = index % _columns.Count;
-            switch (column)
+            return column switch
             {
-                case 0: return DeferredLoadGraph<TimeSeries<double>, double>(index, k => $"Temperatur {_dsStructure?.GetZoneName(k) ?? k.ToString()}", k => $"temperatur_zone_{(int)k}", "#.# °C");
-                case 1: return DeferredLoadGraph<TimeSeries<double>, double>(index, k => $"Luftfeuchtigkeit {_dsStructure?.GetZoneName(k) ?? k.ToString()}", k => $"luftfeuchtigkeit_zone_{(int)k}", "#.0 '%'");
-                default: return new GraphViewModel();
-            }
+                0 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => $"Temperatur {_dsStructure?.GetZoneName(k) ?? k.ToString()}", k => $"temperatur_zone_{(int)k}", "#.# °C"),
+                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => $"Luftfeuchtigkeit {_dsStructure?.GetZoneName(k) ?? k.ToString()}", k => $"luftfeuchtigkeit_zone_{(int)k}", "#.0 '%'"),
+                _ => new GraphViewModel(),
+            };
         }
     }
 }

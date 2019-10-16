@@ -20,12 +20,12 @@ namespace PhilipDaubmeier.TokenStore.DependencyInjection
 
         public static IServiceCollection AddTokenStore<T>(this IServiceCollection serviceCollection, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
-            switch (serviceLifetime)
+            return serviceLifetime switch
             {
-                case ServiceLifetime.Singleton: return serviceCollection.AddSingleton<TokenStore<T>>();
-                case ServiceLifetime.Transient: return serviceCollection.AddTransient<TokenStore<T>>();
-                default: return serviceCollection.AddScoped<TokenStore<T>>();
-            }
+                ServiceLifetime.Singleton => serviceCollection.AddSingleton<TokenStore<T>>(),
+                ServiceLifetime.Transient => serviceCollection.AddTransient<TokenStore<T>>(),
+                _ => serviceCollection.AddScoped<TokenStore<T>>(),
+            };
         }
     }
 }

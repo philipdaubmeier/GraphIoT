@@ -141,37 +141,37 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
-            switch (_type)
+            return _type switch
             {
-                case SensorType.ActivePower: return "SensorType 4: ActivePower";
-                case SensorType.OutputCurrent: return "SensorType 5: OutputCurrent";
-                case SensorType.ElectricMeter: return "SensorType 6: ElectricMeter";
-                case SensorType.TemperatureIndoors: return "SensorType 9: TemperatureIndoors";
-                case SensorType.TemperatureOutdoors: return "SensorType 10: TemperatureOutdoors";
-                case SensorType.BrightnessIndoors: return "SensorType 11: BrightnessIndoors";
-                case SensorType.BrightnessOutdoors: return "SensorType 12: BrightnessOutdoors";
-                case SensorType.HumidityIndoors: return "SensorType 13: HumidityIndoors";
-                case SensorType.HumidityOutdoors: return "SensorType 14: HumidityOutdoors";
-                case SensorType.AirPressure: return "SensorType 15: AirPressure";
-                case SensorType.GustSpeed: return "SensorType 16: GustSpeed";
-                case SensorType.GustDirection: return "SensorType 17: GustDirection";
-                case SensorType.WindSpeed: return "SensorType 18: WindSpeed";
-                case SensorType.WindDirection: return "SensorType 19: WindDirection";
-                case SensorType.Precipitation: return "SensorType 20: Precipitation";
-                case SensorType.CO2Concentration: return "SensorType 21: CO2Concentration";
-                case SensorType.COConcentration: return "SensorType 22: COConcentration";
-                case SensorType.SoundPressureLevel: return "SensorType 25: SoundPressureLevel";
-                case SensorType.RoomTemperatureSetpoint: return "SensorType 50: RoomTemperatureSetpoint";
-                case SensorType.RoomTemperatureControlVariable: return "SensorType 51: RoomTemperatureControlVariable";
-                case SensorType.Status: return "SensorType 60: Status";
-                case SensorType.Reserved1: return "SensorType 61: Reserved1";
-                case SensorType.Reserved2: return "SensorType 62: Reserved2";
-                case SensorType.OutputCurrent16A: return "SensorType 64: OutputCurrent16A";
-                case SensorType.ActivePowerVA: return "SensorType 65: ActivePowerVA";
-                case SensorType.NotUsed: return "SensorType 253: NotUsed";
-                case SensorType.UnknownType: return "SensorType 255: UnknownType";
-                default: return string.Format("SensorType {0}: Not defined!", _type);
-            }
+                SensorType.ActivePower => "SensorType 4: ActivePower",
+                SensorType.OutputCurrent => "SensorType 5: OutputCurrent",
+                SensorType.ElectricMeter => "SensorType 6: ElectricMeter",
+                SensorType.TemperatureIndoors => "SensorType 9: TemperatureIndoors",
+                SensorType.TemperatureOutdoors => "SensorType 10: TemperatureOutdoors",
+                SensorType.BrightnessIndoors => "SensorType 11: BrightnessIndoors",
+                SensorType.BrightnessOutdoors => "SensorType 12: BrightnessOutdoors",
+                SensorType.HumidityIndoors => "SensorType 13: HumidityIndoors",
+                SensorType.HumidityOutdoors => "SensorType 14: HumidityOutdoors",
+                SensorType.AirPressure => "SensorType 15: AirPressure",
+                SensorType.GustSpeed => "SensorType 16: GustSpeed",
+                SensorType.GustDirection => "SensorType 17: GustDirection",
+                SensorType.WindSpeed => "SensorType 18: WindSpeed",
+                SensorType.WindDirection => "SensorType 19: WindDirection",
+                SensorType.Precipitation => "SensorType 20: Precipitation",
+                SensorType.CO2Concentration => "SensorType 21: CO2Concentration",
+                SensorType.COConcentration => "SensorType 22: COConcentration",
+                SensorType.SoundPressureLevel => "SensorType 25: SoundPressureLevel",
+                SensorType.RoomTemperatureSetpoint => "SensorType 50: RoomTemperatureSetpoint",
+                SensorType.RoomTemperatureControlVariable => "SensorType 51: RoomTemperatureControlVariable",
+                SensorType.Status => "SensorType 60: Status",
+                SensorType.Reserved1 => "SensorType 61: Reserved1",
+                SensorType.Reserved2 => "SensorType 62: Reserved2",
+                SensorType.OutputCurrent16A => "SensorType 64: OutputCurrent16A",
+                SensorType.ActivePowerVA => "SensorType 65: ActivePowerVA",
+                SensorType.NotUsed => "SensorType 253: NotUsed",
+                SensorType.UnknownType => "SensorType 255: UnknownType",
+                _ => string.Format("SensorType {0}: Not defined!", _type),
+            };
         }
     }
 }

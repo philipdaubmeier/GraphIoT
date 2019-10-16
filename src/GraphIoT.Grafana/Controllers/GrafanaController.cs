@@ -39,7 +39,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         {
             get
             {
-                string ToRawId(string name) => Regex.Replace(name.ToLowerInvariant().Replace("ä", "ae").Replace("ö", "oe")
+                static string ToRawId(string name) => Regex.Replace(name.ToLowerInvariant().Replace("ä", "ae").Replace("ö", "oe")
                     .Replace("ü", "ue").Replace("ß", "ss"), @"[^\u0000-\u007F]+", string.Empty).Replace(' ', '_');
 
                 if (graphIds == null)
@@ -181,14 +181,14 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 // if a custom 'aggregate.func' was given, take that as aggregation method
                 Aggregator ToAggregator(string aggregateRaw)
                 {
-                    switch (aggregateRaw?.Substring(0, Math.Min(3, target.data.aggregate.func.Length))?.ToLowerInvariant())
+                    return (aggregateRaw?.Substring(0, Math.Min(3, target.data.aggregate.func.Length))?.ToLowerInvariant()) switch
                     {
-                        case "min": return Aggregator.Minimum;
-                        case "max": return Aggregator.Maximum;
-                        case "avg": return Aggregator.Average;
-                        case "sum": return Aggregator.Sum;
-                        default: return Aggregator.Default;
-                    }
+                        "min" => Aggregator.Minimum,
+                        "max" => Aggregator.Maximum,
+                        "avg" => Aggregator.Average,
+                        "sum" => Aggregator.Sum,
+                        _ => Aggregator.Default,
+                    };
                 }
                 viewModel.AggregatorFunction = ToAggregator(target?.data?.aggregate?.func);
 

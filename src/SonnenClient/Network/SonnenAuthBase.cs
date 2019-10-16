@@ -165,18 +165,18 @@ namespace PhilipDaubmeier.SonnenClient.Network
         {
             var state = new AuthState("/landing");
 
-            var authorizeParameters = new List<Tuple<string, string>>() {
-                new Tuple<string, string>("client_id", _provider.ClientId),
-                new Tuple<string, string>("response_type", "code"),
-                new Tuple<string, string>("redirect_uri", _redirectUri),
-                new Tuple<string, string>("code_challenge", state.CodeChallenge),
-                new Tuple<string, string>("nonce", state.Nonce),
-                new Tuple<string, string>("code_challenge_method", state.CodeChallengeMethod),
-                new Tuple<string, string>("state", state.State),
-                new Tuple<string, string>("locale", "de")
+            var authorizeParameters = new List<(string, string)>() {
+                ("client_id", _provider.ClientId),
+                ("response_type", "code"),
+                ("redirect_uri", _redirectUri),
+                ("code_challenge", state.CodeChallenge),
+                ("nonce", state.Nonce),
+                ("code_challenge_method", state.CodeChallengeMethod),
+                ("state", state.State),
+                ("locale", "de")
             };
 
-            var queryString = string.Join('&', authorizeParameters.Select(x => $"{x.Item1}={x.Item2}"));
+            var queryString = string.Join('&', authorizeParameters.Select((key, val) => $"{key}={val}"));
             var requestUri = new Uri($"{_authBaseUri}oauth/authorize?{queryString}");
             return await ParseAuthenticityToken(await _client.GetAsync(requestUri), state);
         }

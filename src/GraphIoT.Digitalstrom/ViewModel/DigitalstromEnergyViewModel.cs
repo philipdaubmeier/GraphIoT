@@ -42,11 +42,11 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         public override GraphViewModel Graph(int index)
         {
             int column = index % _columns.Count;
-            switch (column)
+            return column switch
             {
-                case 0: return DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => $"Stromverbrauch {_dsStructure?.GetCircuitName(k) ?? k.ToString()}", k => $"stromverbrauch_{k.ToString()}", "# Ws");
-                default: return new GraphViewModel();
-            }
+                0 => DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => $"Stromverbrauch {_dsStructure?.GetCircuitName(k) ?? k.ToString()}", k => $"stromverbrauch_{k.ToString()}", "# Ws"),
+                _ => new GraphViewModel(),
+            };
         }
 
         protected new GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Dsuid, string> nameSelector, Func<Dsuid, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
@@ -65,10 +65,11 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             var reduced = _keys.Keys.ToDictionary(x => x, x => new List<ITimeSeries<Tval>>());
             foreach (var dbEntry in dataHigh.ToList())
             {
-                using (var seriesCollection = dbEntry.EnergySeriesEveryMeter)
-                    foreach (var series in seriesCollection.Where(s => reduced.ContainsKey(s.Key)))
-                        reduced[series.Key].Add(Resample<Tseries, Tval>(new TimeSeriesSpan(series.Value.Span.Begin, series.Value.Span.End, Span.Duration),
-                                                                        new List<ITimeSeries<Tval>>() { series.Value as ITimeSeries<Tval> }) as ITimeSeries<Tval>);
+                using var seriesCollection = dbEntry.EnergySeriesEveryMeter;
+                foreach (var series in seriesCollection.Where(s => reduced.ContainsKey(s.Key)))
+                    reduced[series.Key].Add(Resample<Tseries, Tval>(
+                        new TimeSeriesSpan(series.Value.Span.Begin, series.Value.Span.End, Span.Duration),
+                        new List<ITimeSeries<Tval>>() { series.Value as ITimeSeries<Tval> }) as ITimeSeries<Tval>);
             }
 
             // in the second pass we can then merge them into the final series - one time series object per circuit

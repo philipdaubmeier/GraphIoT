@@ -209,7 +209,7 @@ namespace PhilipDaubmeier.ViessmannClient
 
         private class ClassNullable<T> where T : struct
         {
-            private T? _val;
+            private readonly T? _val;
             public ClassNullable(T? value) { _val = value; }
             public override string ToString() { return _val?.ToString(); }
             public static implicit operator ClassNullable<T>(T? value) { return new ClassNullable<T>(value); }
@@ -304,23 +304,18 @@ namespace PhilipDaubmeier.ViessmannClient
             if (typeStringRaw.properties?.value?.type?.Trim()?.Equals("string", StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 var featureStrRaw = JsonConvert.DeserializeAnonymousType(responseStr, definitionStrVal);
-                return new Tuple<T1, T2>(featureStrRaw.properties?.value?.value as T1, default(T2));
+                return new Tuple<T1, T2>(featureStrRaw.properties?.value?.value as T1, default);
             }
 
             var featureRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
-            switch (attrNames.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty)
+            return (attrNames.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty) switch
             {
-                case "active":
-                    return new Tuple<T1, T2>(((ClassNullable<bool>)featureRaw.properties?.active?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.temperature?.value) as T2);
-                case "hours":
-                    return new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.hours?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.starts?.value) as T2);
-                case "status":
-                    return new Tuple<T1, T2>(featureRaw.properties?.status?.value as T1, ((ClassNullable<double>)featureRaw.properties?.value?.value) as T2);
-                case "value":
-                    return new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.value?.value) as T1, default(T2));
-                default:
-                    return new Tuple<T1, T2>(default(T1), default(T2));
-            }
+                "active" => new Tuple<T1, T2>(((ClassNullable<bool>)featureRaw.properties?.active?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.temperature?.value) as T2),
+                "hours" => new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.hours?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.starts?.value) as T2),
+                "status" => new Tuple<T1, T2>(featureRaw.properties?.status?.value as T1, ((ClassNullable<double>)featureRaw.properties?.value?.value) as T2),
+                "value" => new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.value?.value) as T1, default),
+                _ => new Tuple<T1, T2>(default, default),
+            };
         }
     }
 }

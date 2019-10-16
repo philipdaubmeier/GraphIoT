@@ -181,25 +181,25 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public string ToDisplayString()
         {
-            switch (_group)
+            return _group switch
             {
-                case (int)GroupType.Various: return "Weiss - Gerät";
-                case (int)GroupType.Light: return "Gelb - Licht";
-                case (int)GroupType.Shading: return "Grau - Beschattung";
-                case (int)GroupType.Heating: return "Blau - Heizung";
-                case (int)GroupType.Cooling: return "Blau - Kühlung";
-                case (int)GroupType.Ventilation: return "Blau - Lüftung";
-                case (int)GroupType.Window: return "Blau - Fenster";
-                case (int)GroupType.AirRecirculation: return "Blau - Luftzirkulation";
-                case (int)GroupType.ApartmentVentilation: return "Blau - Lüftungssystem";
-                case (int)GroupType.TemperatureControl: return "Blau - Einzelraumregelung";
-                case (int)GroupType.Audio: return "Cyan - Audio";
-                case (int)GroupType.Video: return "Magenta - Video";
-                case (int)GroupType.Security: return "Rot - Sicherheit";
-                case (int)GroupType.Access: return "Grün - Zugang";
-                case (int)GroupType.Joker: return "Schwarz - Joker";
-                default: return string.Format("Unbekannt ({0})", (int)_group);
-            }
+                (int)GroupType.Various => "Weiss - Gerät",
+                (int)GroupType.Light => "Gelb - Licht",
+                (int)GroupType.Shading => "Grau - Beschattung",
+                (int)GroupType.Heating => "Blau - Heizung",
+                (int)GroupType.Cooling => "Blau - Kühlung",
+                (int)GroupType.Ventilation => "Blau - Lüftung",
+                (int)GroupType.Window => "Blau - Fenster",
+                (int)GroupType.AirRecirculation => "Blau - Luftzirkulation",
+                (int)GroupType.ApartmentVentilation => "Blau - Lüftungssystem",
+                (int)GroupType.TemperatureControl => "Blau - Einzelraumregelung",
+                (int)GroupType.Audio => "Cyan - Audio",
+                (int)GroupType.Video => "Magenta - Video",
+                (int)GroupType.Security => "Rot - Sicherheit",
+                (int)GroupType.Access => "Grün - Zugang",
+                (int)GroupType.Joker => "Schwarz - Joker",
+                _ => string.Format("Unbekannt ({0})", _group),
+            };
         }
     }
 }

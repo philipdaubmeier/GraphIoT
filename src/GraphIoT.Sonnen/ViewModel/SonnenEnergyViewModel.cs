@@ -20,18 +20,18 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.ViewModel
 
         public override GraphViewModel Graph(int index)
         {
-            switch (index)
+            return index switch
             {
-                case 0: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Erzeugung", null, "# W");
-                case 1: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Verbrauch", null, "# W");
-                case 2: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Eigenverbrauch", null, "# W");
-                case 3: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Batterieladung", null, "# W");
-                case 4: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Batterieentladung", null, "# W");
-                case 5: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Netzeinspeisung", null, "# W");
-                case 6: return DeferredLoadGraph<TimeSeries<int>, int>(index, "Netzbezug", null, "# W");
-                case 7: return DeferredLoadGraph<TimeSeries<double>, double>(index, "Batterie Ladestand", null, "#.# %");
-                default: return new GraphViewModel();
-            }
+                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Erzeugung", null, "# W"),
+                1 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Verbrauch", null, "# W"),
+                2 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Eigenverbrauch", null, "# W"),
+                3 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Batterieladung", null, "# W"),
+                4 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Batterieentladung", null, "# W"),
+                5 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Netzeinspeisung", null, "# W"),
+                6 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Netzbezug", null, "# W"),
+                7 => DeferredLoadGraph<TimeSeries<double>, double>(index, "Batterie Ladestand", null, "#.# %"),
+                _ => new GraphViewModel(),
+            };
         }
     }
 }

@@ -40,38 +40,38 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Database
         /// </summary>
         public void SetDecimalsByMeasureType(Measure type)
         {
-            switch ((MeasureType)type)
+            Decimals = ((MeasureType)type) switch
             {
-                case MeasureType.Temperature: Decimals = 1; break;
-                case MeasureType.CO2: Decimals = 0; break;
-                case MeasureType.Humidity: Decimals = 1; break;
-                case MeasureType.Pressure: Decimals = 1; break;
-                case MeasureType.Noise: Decimals = 1; break;
-                case MeasureType.Rain: Decimals = 3; break;
-                case MeasureType.WindStrength: Decimals = 1; break;
-                case MeasureType.WindAngle: Decimals = 1; break;
-                case MeasureType.Guststrength: Decimals = 1; break;
-                case MeasureType.GustAngle: Decimals = 1; break;
-                case MeasureType.MinTemp: Decimals = 1; break;
-                case MeasureType.MaxTemp: Decimals = 1; break;
-                case MeasureType.MinHum: Decimals = 1; break;
-                case MeasureType.MaxHum: Decimals = 1; break;
-                case MeasureType.MinPressure: Decimals = 1; break;
-                case MeasureType.MaxPressure: Decimals = 1; break;
-                case MeasureType.MinNoise: Decimals = 1; break;
-                case MeasureType.MaxNoise: Decimals = 1; break;
-                case MeasureType.SumRain: Decimals = 0; break;
-                case MeasureType.MaxGust: Decimals = 1; break;
-                case MeasureType.DateMaxHum: Decimals = 1; break;
-                case MeasureType.DateMinPressure: Decimals = 1; break;
-                case MeasureType.DateMaxPressure: Decimals = 1; break;
-                case MeasureType.DateMinNoise: Decimals = 1; break;
-                case MeasureType.DateMaxNoise: Decimals = 1; break;
-                case MeasureType.DateMinCo2: Decimals = 0; break;
-                case MeasureType.DateMaxCo2: Decimals = 0; break;
-                case MeasureType.DateMaxGust: Decimals = 1; break;
-                default: goto case MeasureType.Temperature;
-            }
+                MeasureType.Temperature => 1,
+                MeasureType.CO2 => 0,
+                MeasureType.Humidity => 1,
+                MeasureType.Pressure => 1,
+                MeasureType.Noise => 1,
+                MeasureType.Rain => 3,
+                MeasureType.WindStrength => 1,
+                MeasureType.WindAngle => 1,
+                MeasureType.Guststrength => 1,
+                MeasureType.GustAngle => 1,
+                MeasureType.MinTemp => 1,
+                MeasureType.MaxTemp => 1,
+                MeasureType.MinHum => 1,
+                MeasureType.MaxHum => 1,
+                MeasureType.MinPressure => 1,
+                MeasureType.MaxPressure => 1,
+                MeasureType.MinNoise => 1,
+                MeasureType.MaxNoise => 1,
+                MeasureType.SumRain => 0,
+                MeasureType.MaxGust => 1,
+                MeasureType.DateMaxHum => 1,
+                MeasureType.DateMinPressure => 1,
+                MeasureType.DateMaxPressure => 1,
+                MeasureType.DateMinNoise => 1,
+                MeasureType.DateMaxNoise => 1,
+                MeasureType.DateMinCo2 => 0,
+                MeasureType.DateMaxCo2 => 0,
+                MeasureType.DateMaxGust => 1,
+                _ => 1,
+            };
         }
 
         [MaxLength(30)]

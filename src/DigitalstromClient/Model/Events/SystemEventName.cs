@@ -48,42 +48,42 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
         {
             get
             {
-                switch (Type)
+                return Type switch
                 {
-                    case SystemEvent.ModelReady: return "model_ready";
-                    case SystemEvent.Running: return "running";
-                    case SystemEvent.CallScene: return "callScene";
-                    case SystemEvent.CallSceneBus: return "callSceneBus";
-                    case SystemEvent.UndoScene: return "undoScene";
-                    case SystemEvent.Blink: return "blink";
-                    case SystemEvent.ButtonClick: return "buttonClick";
-                    case SystemEvent.ButtonDeviceAction: return "buttonDeviceAction";
-                    case SystemEvent.DeviceBinaryInputEvent: return "deviceBinaryInputEvent";
-                    case SystemEvent.DeviceSensorEvent: return "deviceSensorEvent";
-                    case SystemEvent.DeviceSensorValue: return "deviceSensorValue";
-                    case SystemEvent.DeviceActionEvent: return "deviceActionEvent";
-                    case SystemEvent.DeviceEventEvent: return "deviceEventEvent";
-                    case SystemEvent.DeviceStateEvent: return "deviceStateEvent";
-                    case SystemEvent.ZoneSensorValue: return "zoneSensorValue";
-                    case SystemEvent.StateChange: return "stateChange";
-                    case SystemEvent.Sunshine: return "sunshine";
-                    case SystemEvent.FrostProtection: return "frostprotection";
-                    case SystemEvent.HeatingModeSwitch: return "heating_mode_switch";
-                    case SystemEvent.BuildingService: return "building_service";
-                    case SystemEvent.Sendmail: return "sendmail";
-                    case SystemEvent.OperationLock: return "operation_lock";
-                    case SystemEvent.ClusterConfigLock: return "cluster_config_lock";
-                    case SystemEvent.DevicesFirstSeen: return "devices_first_seen";
-                    case SystemEvent.ActionExecute: return "action_execute";
-                    case SystemEvent.Highlevelevent: return "highlevelevent";
-                    case SystemEvent.ApartmentModelChanged: return "apartmentModelChanged";
-                    case SystemEvent.UserDefinedActionChanged: return "userDefinedActionChanged";
-                    case SystemEvent.AddonStateChange: return "addonStateChange";
-                    case SystemEvent.TimedEventChanged: return "timedEventChanged";
-                    case SystemEvent.ExecutionDenied: return "executionDenied";
-                    case SystemEvent.ExecutionDeniedDigestCheck: return "execution_denied_digest_check";
-                    default: return "unknown_event_type";
-                }
+                    SystemEvent.ModelReady => "model_ready",
+                    SystemEvent.Running => "running",
+                    SystemEvent.CallScene => "callScene",
+                    SystemEvent.CallSceneBus => "callSceneBus",
+                    SystemEvent.UndoScene => "undoScene",
+                    SystemEvent.Blink => "blink",
+                    SystemEvent.ButtonClick => "buttonClick",
+                    SystemEvent.ButtonDeviceAction => "buttonDeviceAction",
+                    SystemEvent.DeviceBinaryInputEvent => "deviceBinaryInputEvent",
+                    SystemEvent.DeviceSensorEvent => "deviceSensorEvent",
+                    SystemEvent.DeviceSensorValue => "deviceSensorValue",
+                    SystemEvent.DeviceActionEvent => "deviceActionEvent",
+                    SystemEvent.DeviceEventEvent => "deviceEventEvent",
+                    SystemEvent.DeviceStateEvent => "deviceStateEvent",
+                    SystemEvent.ZoneSensorValue => "zoneSensorValue",
+                    SystemEvent.StateChange => "stateChange",
+                    SystemEvent.Sunshine => "sunshine",
+                    SystemEvent.FrostProtection => "frostprotection",
+                    SystemEvent.HeatingModeSwitch => "heating_mode_switch",
+                    SystemEvent.BuildingService => "building_service",
+                    SystemEvent.Sendmail => "sendmail",
+                    SystemEvent.OperationLock => "operation_lock",
+                    SystemEvent.ClusterConfigLock => "cluster_config_lock",
+                    SystemEvent.DevicesFirstSeen => "devices_first_seen",
+                    SystemEvent.ActionExecute => "action_execute",
+                    SystemEvent.Highlevelevent => "highlevelevent",
+                    SystemEvent.ApartmentModelChanged => "apartmentModelChanged",
+                    SystemEvent.UserDefinedActionChanged => "userDefinedActionChanged",
+                    SystemEvent.AddonStateChange => "addonStateChange",
+                    SystemEvent.TimedEventChanged => "timedEventChanged",
+                    SystemEvent.ExecutionDenied => "executionDenied",
+                    SystemEvent.ExecutionDeniedDigestCheck => "execution_denied_digest_check",
+                    _ => "unknown_event_type",
+                };
             }
         }
 
@@ -116,7 +116,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 
         public static bool operator ==(SystemEventName name1, SystemEventName name2)
         {
-            if ((object)name1 == null || (object)name2 == null)
+            if (name1 is null || name2 is null)
                 return ReferenceEquals(name1, name2);
             return name1.Type == name2.Type;
         }

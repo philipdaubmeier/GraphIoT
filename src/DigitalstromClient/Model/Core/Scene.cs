@@ -287,73 +287,73 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public string ToDisplayString()
         {
-            switch (_scene)
+            return _scene switch
             {
-                case SceneCommand.Preset0: return "Aus";
-                case SceneCommand.Preset1: return "Szene 1";
-                case SceneCommand.Preset2: return "Szene 2";
-                case SceneCommand.Preset3: return "Szene 3";
-                case SceneCommand.Preset4: return "Szene 4";
-                case SceneCommand.Preset10: return "Szene 10 (Aus)";
-                case SceneCommand.Preset11: return "Szene 11";
-                case SceneCommand.Preset12: return "Szene 12";
-                case SceneCommand.Preset13: return "Szene 13";
-                case SceneCommand.Preset14: return "Szene 14";
-                case SceneCommand.Preset20: return "Szene 20 (Aus)";
-                case SceneCommand.Preset21: return "Szene 21";
-                case SceneCommand.Preset22: return "Szene 22";
-                case SceneCommand.Preset23: return "Szene 23";
-                case SceneCommand.Preset24: return "Szene 24";
-                case SceneCommand.Preset30: return "Szene 30 (Aus)";
-                case SceneCommand.Preset31: return "Szene 31";
-                case SceneCommand.Preset32: return "Szene 32";
-                case SceneCommand.Preset33: return "Szene 33";
-                case SceneCommand.Preset34: return "Szene 34";
-                case SceneCommand.Preset40: return "Szene 40 (Aus)";
-                case SceneCommand.Preset41: return "Szene 41";
-                case SceneCommand.Preset42: return "Szene 42";
-                case SceneCommand.Preset43: return "Szene 43";
-                case SceneCommand.Preset44: return "Szene 44";
-                case SceneCommand.Area1On: return "Bereich1 Ein";
-                case SceneCommand.Area2On: return "Bereich2 Ein";
-                case SceneCommand.Area3On: return "Bereich3 Ein";
-                case SceneCommand.Area4On: return "Bereich4 Ein";
-                case SceneCommand.Area1Off: return "Bereich1 Aus";
-                case SceneCommand.Area2Off: return "Bereich2 Aus";
-                case SceneCommand.Area3Off: return "Bereich3 Aus";
-                case SceneCommand.Area4Off: return "Bereich4 Aus";
-                case SceneCommand.AutoOff: return "Langsam Aus";
-                case SceneCommand.Impulse: return "Impuls";
-                case SceneCommand.AutoStandby: return "A-Standby";
-                case SceneCommand.Decrement: return "dunkler";
-                case SceneCommand.Increment: return "heller";
-                case SceneCommand.Minimum: return "Min";
-                case SceneCommand.Maximum: return "Max";
-                case SceneCommand.Stop: return "Stop";
-                case SceneCommand.Panic: return "Panik";
-                case SceneCommand.Standby: return "Standby";
-                case SceneCommand.DeepOff: return "Raum aus";
-                case SceneCommand.Sleeping: return "Schlafen";
-                case SceneCommand.Wakeup: return "Aufwachen";
-                case SceneCommand.Present: return "Kommen";
-                case SceneCommand.Absent: return "Gehen";
-                case SceneCommand.DoorBell: return "Klingeln";
-                case SceneCommand.Alarm1: return "Alarm 1";
-                case SceneCommand.Alarm2: return "Alarm 2";
-                case SceneCommand.Alarm3: return "Alarm 3";
-                case SceneCommand.Alarm4: return "Alarm 4";
-                case SceneCommand.Fire: return "Feuer";
-                case SceneCommand.Smoke: return "Rauch";
-                case SceneCommand.Water: return "Wasser";
-                case SceneCommand.Gas: return "Gas";
-                case SceneCommand.Wind: return "Wind";
-                case SceneCommand.NoWind: return "kein Wind";
-                case SceneCommand.Rain: return "Regen";
-                case SceneCommand.NoRain: return "kein Regen";
-                case SceneCommand.Hail: return "Hagel";
-                case SceneCommand.NoHail: return "kein Hagel";
-                default: return string.Format("Unbekannt ({0})", (int)_scene);
-            }
+                SceneCommand.Preset0 => "Aus",
+                SceneCommand.Preset1 => "Szene 1",
+                SceneCommand.Preset2 => "Szene 2",
+                SceneCommand.Preset3 => "Szene 3",
+                SceneCommand.Preset4 => "Szene 4",
+                SceneCommand.Preset10 => "Szene 10 (Aus)",
+                SceneCommand.Preset11 => "Szene 11",
+                SceneCommand.Preset12 => "Szene 12",
+                SceneCommand.Preset13 => "Szene 13",
+                SceneCommand.Preset14 => "Szene 14",
+                SceneCommand.Preset20 => "Szene 20 (Aus)",
+                SceneCommand.Preset21 => "Szene 21",
+                SceneCommand.Preset22 => "Szene 22",
+                SceneCommand.Preset23 => "Szene 23",
+                SceneCommand.Preset24 => "Szene 24",
+                SceneCommand.Preset30 => "Szene 30 (Aus)",
+                SceneCommand.Preset31 => "Szene 31",
+                SceneCommand.Preset32 => "Szene 32",
+                SceneCommand.Preset33 => "Szene 33",
+                SceneCommand.Preset34 => "Szene 34",
+                SceneCommand.Preset40 => "Szene 40 (Aus)",
+                SceneCommand.Preset41 => "Szene 41",
+                SceneCommand.Preset42 => "Szene 42",
+                SceneCommand.Preset43 => "Szene 43",
+                SceneCommand.Preset44 => "Szene 44",
+                SceneCommand.Area1On => "Bereich1 Ein",
+                SceneCommand.Area2On => "Bereich2 Ein",
+                SceneCommand.Area3On => "Bereich3 Ein",
+                SceneCommand.Area4On => "Bereich4 Ein",
+                SceneCommand.Area1Off => "Bereich1 Aus",
+                SceneCommand.Area2Off => "Bereich2 Aus",
+                SceneCommand.Area3Off => "Bereich3 Aus",
+                SceneCommand.Area4Off => "Bereich4 Aus",
+                SceneCommand.AutoOff => "Langsam Aus",
+                SceneCommand.Impulse => "Impuls",
+                SceneCommand.AutoStandby => "A-Standby",
+                SceneCommand.Decrement => "dunkler",
+                SceneCommand.Increment => "heller",
+                SceneCommand.Minimum => "Min",
+                SceneCommand.Maximum => "Max",
+                SceneCommand.Stop => "Stop",
+                SceneCommand.Panic => "Panik",
+                SceneCommand.Standby => "Standby",
+                SceneCommand.DeepOff => "Raum aus",
+                SceneCommand.Sleeping => "Schlafen",
+                SceneCommand.Wakeup => "Aufwachen",
+                SceneCommand.Present => "Kommen",
+                SceneCommand.Absent => "Gehen",
+                SceneCommand.DoorBell => "Klingeln",
+                SceneCommand.Alarm1 => "Alarm 1",
+                SceneCommand.Alarm2 => "Alarm 2",
+                SceneCommand.Alarm3 => "Alarm 3",
+                SceneCommand.Alarm4 => "Alarm 4",
+                SceneCommand.Fire => "Feuer",
+                SceneCommand.Smoke => "Rauch",
+                SceneCommand.Water => "Wasser",
+                SceneCommand.Gas => "Gas",
+                SceneCommand.Wind => "Wind",
+                SceneCommand.NoWind => "kein Wind",
+                SceneCommand.Rain => "Regen",
+                SceneCommand.NoRain => "kein Regen",
+                SceneCommand.Hail => "Hagel",
+                SceneCommand.NoHail => "kein Hagel",
+                _ => string.Format("Unbekannt ({0})", (int)_scene),
+            };
         }
     }
 }
