@@ -10,6 +10,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 {
     public abstract class DigitalstromClientBase : IDisposable
     {
+        private readonly JsonSerializer _jsonSerializer = new JsonSerializer();
         private readonly UriPriorityList _baseUris;
         private readonly HttpClient _client;
         private Task _initializeTask;
@@ -115,12 +116,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             var responseMessage = await _client.GetAsync(requestUri);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
-            using (var sr = new StreamReader(responseStream))
-            using (var jsonTextReader = new JsonTextReader(sr))
-            {
-                var serializer = new JsonSerializer();
-                return serializer.Deserialize<Wiremessage<T>>(jsonTextReader);
-            }
+            using var sr = new StreamReader(responseStream);
+            using var jsonTextReader = new JsonTextReader(sr);
+            return _jsonSerializer.Deserialize<Wiremessage<T>>(jsonTextReader);
         }
 
         public void Dispose()

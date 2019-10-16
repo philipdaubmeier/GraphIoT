@@ -89,7 +89,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
 
         public SystemEventName(SystemEvent type)
         {
-            this.Type = type;
+            Type = type;
         }
 
         public static implicit operator SystemEventName(SystemEvent type)
