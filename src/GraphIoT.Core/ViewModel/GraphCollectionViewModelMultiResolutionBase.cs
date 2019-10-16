@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
             if (DataResolution == Resolution.LowRes)
             {
-                DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+                static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
                 var beginMonth = FirstOfMonth(Span.Begin.Date);
                 var endMonth = FirstOfMonth(Span.End.Date);
 

@@ -130,7 +130,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             TimeSeries<int> directUsagePower, TimeSeries<int> batteryCharging, TimeSeries<int> batteryDischarging,
             TimeSeries<int> gridFeedin, TimeSeries<int> gridPurchase, TimeSeries<double> batteryUsoc)
         {
-            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
             var dbEnergySeries = _dbContext.SonnenEnergyLowresDataSet.Where(x => x.Key == month).FirstOrDefault();
             if (dbEnergySeries == null)

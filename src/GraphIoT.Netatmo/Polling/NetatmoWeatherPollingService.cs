@@ -134,7 +134,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Polling
             {
                 foreach (var timeseries in loaded.Value)
                 {
-                    DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+                    static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
                     var dbSensorSeries = GetOrCreateEntity(_dbContext.NetatmoMeasureLowresDataSet, FirstOfMonth(timeseries.Begin), loaded.Key.Item2, loaded.Key.Item3);
 
                     var seriesToWriteInto = dbSensorSeries.MeasureSeries;

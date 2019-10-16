@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.ViessmannClient
     {
         private readonly IViessmannConnectionProvider<ViessmannEstrellaClient> _connectionProvider;
 
-        private HttpClient _client = new HttpClient();
+        private readonly HttpClient _client = new HttpClient();
 
         public ViessmannEstrellaClient(IViessmannConnectionProvider<ViessmannEstrellaClient> connectionProvider)
         {

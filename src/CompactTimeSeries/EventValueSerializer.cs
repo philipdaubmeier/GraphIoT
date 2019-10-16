@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
         }
 
-        private TupleFactory<TValue> _tupleFactory = new TupleFactory<TValue>();
+        private readonly TupleFactory<TValue> _tupleFactory = new TupleFactory<TValue>();
 
         /// <summary>
         /// See <see cref="IEventSerializer{TEvent}.SizeOf"/>
@@ -69,9 +69,9 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             var nullable = new TValue?(eventObj.Item2);
             if (typeof(TValue) == typeof(int))
-                writer.Write((nullable as int?) ?? default(int));
+                writer.Write((nullable as int?) ?? default);
             else if (typeof(TValue) == typeof(double))
-                writer.Write((nullable as double?) ?? default(double));
+                writer.Write((nullable as double?) ?? default);
         }
 
         /// <summary>

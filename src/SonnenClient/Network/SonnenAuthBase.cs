@@ -99,9 +99,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
         {
             var responseStream = await (await RequestSonnenApi(uri)).Content.ReadAsStreamAsync();
 
-            using (var sr = new StreamReader(responseStream))
-            using (var jsonTextReader = new JsonTextReader(sr))
-                return _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.ContainedData;
+            using var sr = new StreamReader(responseStream);
+            using var jsonTextReader = new JsonTextReader(sr);
+            return _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.ContainedData;
         }
 
         /// <summary>
