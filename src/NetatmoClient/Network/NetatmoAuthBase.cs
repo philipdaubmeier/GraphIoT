@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.NetatmoClient
         {
             _provider = connectionProvider;
             _authData = _provider?.AuthData;
-            _client = new HttpClient();
+            _client = _provider?.Client;
         }
 
         /// <summary>

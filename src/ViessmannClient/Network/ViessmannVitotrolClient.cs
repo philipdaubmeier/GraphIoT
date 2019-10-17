@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.ViessmannClient
     {
         private readonly IViessmannConnectionProvider<ViessmannVitotrolClient> _connectionProvider;
 
-        private static readonly HttpClient _client = new HttpClient();
+        private readonly HttpClient _client;
 
         private const string _soapUri = @"https://api.viessmann.io/vitotrol/soap/v1.0/iPhoneWebService.asmx";
         private const string _soapPrefix = @"<?xml version=""1.0"" encoding=""UTF-8""?><soap:Envelope xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"" xmlns:soap=""http://schemas.xmlsoap.org/soap/envelope/"" xmlns=""http://www.e-controlnet.de/services/vii/""><soap:Body>";
@@ -25,6 +25,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public ViessmannVitotrolClient(IViessmannConnectionProvider<ViessmannVitotrolClient> connectionProvider)
         {
             _connectionProvider = connectionProvider;
+            _client = _connectionProvider.Client;
         }
 
         public async Task<List<(string id, string name)>> GetTypeInfo()

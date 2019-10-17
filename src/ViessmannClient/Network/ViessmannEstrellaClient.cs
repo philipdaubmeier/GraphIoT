@@ -14,11 +14,12 @@ namespace PhilipDaubmeier.ViessmannClient
     {
         private readonly IViessmannConnectionProvider<ViessmannEstrellaClient> _connectionProvider;
 
-        private readonly HttpClient _client = new HttpClient();
+        private readonly HttpClient _client;
 
         public ViessmannEstrellaClient(IViessmannConnectionProvider<ViessmannEstrellaClient> connectionProvider)
         {
             _connectionProvider = connectionProvider;
+            _client = _connectionProvider.Client;
         }
 
         public async Task<List<int>> GetGateways()

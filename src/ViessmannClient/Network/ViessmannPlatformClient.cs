@@ -14,9 +14,8 @@ namespace PhilipDaubmeier.ViessmannClient
     {
         private readonly IViessmannConnectionProvider<ViessmannPlatformClient> _connectionProvider;
 
-        private static readonly HttpClientHandler _authClientHandler = new HttpClientHandler() { AllowAutoRedirect = false };
-        private static readonly HttpClient _authClient = new HttpClient(_authClientHandler);
-        private static readonly HttpClient _client = new HttpClient();
+        private readonly HttpClient _client;
+        private readonly HttpClient _authClient;
 
         private const string _authUri = "https://iam.viessmann.com/idp/v1/authorize";
         private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
@@ -31,6 +30,8 @@ namespace PhilipDaubmeier.ViessmannClient
         public ViessmannPlatformClient(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
         {
             _connectionProvider = connectionProvider;
+            _client = connectionProvider.Client;
+            _authClient = connectionProvider.AuthClient;
         }
 
         public async Task<string> GetInstallations()
