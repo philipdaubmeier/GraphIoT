@@ -26,8 +26,6 @@ namespace PhilipDaubmeier.SonnenClient.Network
         private readonly ISonnenConnectionProvider _provider;
         private readonly ISonnenAuth _authData;
 
-        private static readonly CookieContainer _cookieContainer = new CookieContainer();
-        private static HttpMessageHandler _clientHandler;
         private static HttpClient _client;
 
         private static readonly IContractResolver _jsonResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
@@ -59,12 +57,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         {
             _provider = connectionProvider;
             _authData = _provider?.AuthData;
-            _clientHandler = _provider?.Handler ?? new HttpClientHandler()
-            {
-                UseCookies = true,
-                CookieContainer = _cookieContainer
-            };
-            _client = new HttpClient(_clientHandler);
+            _client = _provider?.Client;
         }
 
         /// <summary>

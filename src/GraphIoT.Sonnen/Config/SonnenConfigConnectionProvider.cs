@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
     public class SonnenConfigConnectionProvider : ISonnenConnectionProvider
     {
         public ISonnenAuth AuthData { get; private set; }
-        public HttpMessageHandler Handler { get; private set; }
+        public HttpClient Client { get; private set; }
 
         public string ClientId { get; private set; }
 

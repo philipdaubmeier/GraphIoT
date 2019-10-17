@@ -26,11 +26,11 @@ namespace PhilipDaubmeier.NetatmoClient.Network
             }
         }
 
-        public string AppId { get; }
+        public string AppId { get; set; }
 
-        public string AppSecret { get; }
+        public string AppSecret { get; set; }
 
-        public string Scope { get; }
+        public string Scope { get; set; }
 
         #region IDisposable Support
         private bool disposed = false;
