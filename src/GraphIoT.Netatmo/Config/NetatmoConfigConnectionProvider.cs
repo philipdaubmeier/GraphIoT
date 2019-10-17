@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
     public class NetatmoConfigConnectionProvider : INetatmoConnectionProvider
     {
         public INetatmoAuth AuthData { get; private set; }
-        public HttpMessageHandler Handler { get; private set; }
+        public HttpClient Client { get; private set; }
 
         public string AppId { get; private set; }
         public string AppSecret { get; private set; }

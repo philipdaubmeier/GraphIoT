@@ -22,8 +22,7 @@ namespace PhilipDaubmeier.NetatmoClient
         private readonly INetatmoConnectionProvider _provider;
         private readonly INetatmoAuth _authData;
 
-        private HttpMessageHandler _clientHandler;
-        private HttpClient _client;
+        private readonly HttpClient _client;
 
         private readonly JsonSerializer _jsonSerializer = new JsonSerializer()
         {
@@ -37,8 +36,7 @@ namespace PhilipDaubmeier.NetatmoClient
         {
             _provider = connectionProvider;
             _authData = _provider?.AuthData;
-            _clientHandler = _provider?.Handler ?? new HttpClientHandler();
-            _client = new HttpClient(_clientHandler);
+            _client = new HttpClient();
         }
 
         /// <summary>

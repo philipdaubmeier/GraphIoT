@@ -10,11 +10,10 @@ namespace PhilipDaubmeier.NetatmoClient.Network
         INetatmoAuth AuthData { get; }
 
         /// <summary>
-        /// A HttpMessageHandler to inject for the connection to the netatmo server,
-        /// either for mocking purposes for testing or also for setting a proxy server etc.
-        /// If null is returned, NetatmoClient will create a default handler.
+        /// A HttpClient to inject for the connection to the netatmo server,
+        /// to be used for working with HttpClientFactory pattern or for test mocking purposes.
         /// </summary>
-        HttpMessageHandler Handler { get; }
+        HttpClient Client { get; }
 
         string AppId { get; }
 
