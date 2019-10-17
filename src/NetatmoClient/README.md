@@ -13,28 +13,26 @@ PM> Install-Package PhilipDaubmeier.NetatmoClient
 
 ## Usage
 
-You have to implement the interface `INetatmoConnectionProvider` to provide the `NetatmoWebClient` with all information necessary to authenticate at the API and establish a connection.
+You have to implement the interface `INetatmoConnectionProvider` to provide the `NetatmoWebClient` with all information necessary to authenticate at the API and establish a connection or use the existing `NetatmoConnectionProvider`.
 
 The minimal viable example for playing around with the client would be as follows:
 
 ```csharp
-public class NetatmoConnProvider : INetatmoConnectionProvider
+var netatmoConnProvider = new NetatmoConnectionProvider()
 {
-    public INetatmoAuth AuthData => new NetatmoAuth("<username>", "<password>");
-    public HttpMessageHandler Handler => null;
-
-    public string AppId => "<your_netatmo_connect_app_id>";
-    public string AppSecret => "<your_netatmo_connect_app_secret>";
-    public string Scope => "read_station read_presence access_presence";
-}
+    AuthData = new NetatmoAuth("<username>", "<password>"),
+    AppId = "<your_netatmo_connect_app_id>",
+    AppSecret = "<your_netatmo_connect_app_secret>",
+    Scope = "read_station read_presence access_presence"
+};
 ```
 
-> **Caution:** in a productive use you may want to load your app id and secret from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `INetatmoAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `INetatmoAuth` class. You can have a look at the respective classes in [`GraphIoT.Netatmo`](../GraphIoT.Netatmo/Config) as an example.
+> **Caution:** in a productive use you may want to implement your own `INetatmoConnectionProvider` and load your app id and secret from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `INetatmoAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `INetatmoAuth` class. You can have a look at the respective classes in [`GraphIoT.Netatmo`](../GraphIoT.Netatmo/Config) as an example.
 
-If you have the connection provider class in place, you can create a `NetatmoWebClient` and query station data and measurements:
+If you have the connection provider in place, you can create a `NetatmoWebClient` and query station data and measurements:
 
 ```csharp
-var netatmoClient = new NetatmoWebClient(new NetatmoConnProvider());
+var netatmoClient = new NetatmoWebClient(netatmoConnProvider);
 
 // Find the id of the first base station of the logged in user
 var weatherStation = await netatmoClient.GetWeatherStationData();

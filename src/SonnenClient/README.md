@@ -13,26 +13,24 @@ PM> Install-Package PhilipDaubmeier.SonnenClient
 
 ## Usage
 
-You have to implement the interface `ISonnenConnectionProvider` to provide the `SonnenPortalClient` with all information necessary to authenticate at the API and establish a connection.
+You have to implement the interface `ISonnenConnectionProvider` to provide the `SonnenPortalClient` with all information necessary to authenticate at the API and establish a connection or use the existing `SonnenConnectionProvider`.
 
 The minimal viable example for playing around with the client would be as follows:
 
 ```csharp
-public class SonnenConnProvider : ISonnenConnectionProvider
+var sonnenConnProvider = new SonnenConnectionProvider()
 {
-    public ISonnenAuth AuthData => new SonnenAuth("<username>", "<password>");
-    public HttpMessageHandler Handler => null;
-
-    public string ClientId => "<client_id>";
-}
+    AuthData = new SonnenAuth("<username>", "<password>"),
+    ClientId = "<client_id>"
+};
 ```
 
-> **Caution:** in a productive use you may want to load your client id from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `ISonnenAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `ISonnenAuth` class. You can have a look at the respective classes in [`GraphIoT.Sonnen`](../GraphIoT.Sonnen/Config) as an example.
+> **Caution:** in a productive use you may want to implement your own `ISonnenConnectionProvider` and load your client id from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `ISonnenAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `ISonnenAuth` class. You can have a look at the respective classes in [`GraphIoT.Sonnen`](../GraphIoT.Sonnen/Config) as an example.
 
-If you have the connection provider class in place, you can create a `SonnenPortalClient` and query for battery info and measurements:
+If you have the connection provider in place, you can create a `SonnenPortalClient` and query for battery info and measurements:
 
 ```csharp
-var sonnenClient = new SonnenPortalClient(new SonnenConnProvider());
+var sonnenClient = new SonnenPortalClient(sonnenConnProvider);
             
 // get the default Sonnen battery site
 var siteId = (await sonnenClient.GetUserSites()).DefaultSiteId;

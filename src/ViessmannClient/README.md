@@ -40,41 +40,54 @@ public class ViessmannAuth : IViessmannAuth
         return Task.CompletedTask;
     }
 }
-
-public class ViessmannConnProvider<T> : IViessmannConnectionProvider<T>
-{
-    public IViessmannAuth AuthData => new ViessmannAuth("<username>", "<password>");
-    public HttpMessageHandler Handler => null;
-    public string VitotrolDeviceId => "<deviceId>";
-    public string VitotrolInstallationId => "<installationId>";
-    public string PlattformInstallationId => "<installationId>";
-    public string PlattformGatewayId => "<gatewayId>";
-    public string PlattformApiClientId => "<clientId>";
-    public string PlattformApiClientSecret => "<clientSecret>";
-}
 ```
 
-> **Caution:** in a productive use you may want to load your app id, secret and user credentials from a suitable vault. You can have a look at the respective classes in [`GraphIoT.Viessmann`](../GraphIoT.Viessmann/Config) as an example for `IViessmannAuth` and `IViessmannConnectionProvider<T>` implemenations with secrets injection and storing/loading of access tokens.
+And to create a connection provider you can use the default implementation `ViessmannConnectionProvider<T>`:
 
-If you have the connection provider class in place, you can create and use the Viessmann clients like this:
+```csharp
+var viessmannEstrellaConnProvider = new ViessmannConnProvider<ViessmannEstrellaClient>()
+{
+    AuthData = new ViessmannAuth("<username>", "<password>")
+};
+
+var viessmannVitotrolConnProvider = new ViessmannConnProvider<ViessmannVitotrolClient>()
+{
+    AuthData = new ViessmannAuth("<username>", "<password>"),
+    VitotrolDeviceId = "<deviceId>",
+    VitotrolInstallationId = "<installationId>"
+};
+
+var viessmannPlatformConnProvider = new ViessmannConnProvider<ViessmannPlatformClient>()
+{
+    AuthData = new ViessmannAuth("<username>", "<password>"),
+    PlattformInstallationId = "<installationId>",
+    PlattformGatewayId = "<gatewayId>",
+    PlattformApiClientId = "<clientId>",
+    PlattformApiClientSecret = "<clientSecret>"
+};
+```
+
+> **Caution:** in a productive use you may want to implement your own `IViessmannConnectionProvider<T>` and load your app id, secret and user credentials from a suitable vault. You can have a look at the respective classes in [`GraphIoT.Viessmann`](../GraphIoT.Viessmann/Config) as an example for `IViessmannAuth` and `IViessmannConnectionProvider<T>` implemenations with secrets injection and storing/loading of access tokens.
+
+If you have the connection providers in place, you can create and use the Viessmann clients like this:
 
 ```csharp
 // Get the gateway and all controllers via Estrella server
-var estrellaClient = new ViessmannEstrellaClient(new ViessmannConnProvider<ViessmannEstrellaClient>());
+var estrellaClient = new ViessmannEstrellaClient(viessmannEstrellaConnProvider);
 var gatewayIds = await estrellaClient.GetGateways();
 foreach (var gatewayId in gatewayIds)
     foreach (var controller in await estrellaClient.GetControllers(gatewayId))
         Console.WriteLine($"Controller id: {controller.Item1} name: {controller.Item2}");
 
 // Get raw datapoints from Vitotrol client, e.g. solar production (id: 7895)
-var vitotrolClient = new ViessmannVitotrolClient(new ViessmannConnProvider<ViessmannVitotrolClient>());
+var vitotrolClient = new ViessmannVitotrolClient(viessmannVitotrolConnProvider);
 var solarWhTotalTuple = (await vitotrolClient.GetData(new List<int>() { 7895 })).First();
 var timestamp = solarWhTotalTuple.Item3.ToUniversalTime();
 var solarWhTotal = int.Parse(solarWhTotalTuple.Item2);
 Console.WriteLine($"Total solar production today id: {solarWhTotal} Wh, time: {timestamp}");
 
 // Get heating sensor values via Viessmann Platform client
-var platformClient = new ViessmannPlatformClient(new ViessmannConnProvider<ViessmannPlatformClient>());
+var platformClient = new ViessmannPlatformClient(viessmannPlatformConnProvider);
 var outsideTemp = (await platformClient.GetOutsideTemperature()).Item2;
 var boilerTemp = await platformClient.GetBoilerTemperature();
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
