@@ -10,11 +10,15 @@ namespace PhilipDaubmeier.ViessmannClient.Model
         IViessmannAuth AuthData { get; }
 
         /// <summary>
-        /// A HttpMessageHandler to inject for the connection to the Viessmann server,
-        /// either for mocking purposes for testing or also for setting a proxy server etc.
-        /// If null is returned, the Viessmann clients will create a default handler.
+        /// A HttpClient to inject for the connection to the Viessmann servers,
+        /// to be used for working with HttpClientFactory pattern or for test mocking purposes.
         /// </summary>
-        HttpMessageHandler Handler { get; }
+        HttpClient Client { get; }
+
+        /// <summary>
+        /// A HttpClient to inject for authentication that does not follow redirects.
+        /// </summary>
+        HttpClient AuthClient { get; }
 
         string VitotrolDeviceId { get; }
         string VitotrolInstallationId { get; }

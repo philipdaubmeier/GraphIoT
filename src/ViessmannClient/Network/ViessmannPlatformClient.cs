@@ -152,7 +152,7 @@ namespace PhilipDaubmeier.ViessmannClient
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
 
-            return await _authClient.SendAsync(request);
+            return await _client.SendAsync(request);
         }
 
         private async Task Authenticate()

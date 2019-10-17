@@ -8,7 +8,8 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
     public class ViessmannConfigConnectionProvider<T> : IViessmannConnectionProvider<T>
     {
         public IViessmannAuth AuthData { get; private set; }
-        public HttpMessageHandler Handler { get; private set; }
+        public HttpClient Client { get; private set; }
+        public HttpClient AuthClient { get; private set; }
 
         public string VitotrolDeviceId { get; private set; }
         public string VitotrolInstallationId { get; private set; }
