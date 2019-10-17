@@ -11,7 +11,11 @@ using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Network;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Timeout;
 using System;
+using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection
 {
@@ -26,8 +30,10 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection
 
             serviceCollection.AddSingleton<INetatmoDeviceService, NetatmoDeviceService>();
 
+            serviceCollection.AddNetatmoHttpClient();
             serviceCollection.AddScoped<INetatmoConnectionProvider, NetatmoConfigConnectionProvider>();
             serviceCollection.AddScoped<NetatmoWebClient>();
+
             serviceCollection.AddPollingService<INetatmoPollingService, NetatmoWeatherPollingService>();
             serviceCollection.AddTimedPollingHost<INetatmoPollingService>(netatmoConfig.GetSection("PollingService"));
 
@@ -42,6 +48,39 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
 
             return serviceCollection.AddNetatmoHost(netatmoConfig, tokenStoreConfig);
+        }
+
+        public static IServiceCollection AddNetatmoHttpClient(this IServiceCollection serviceCollection)
+        {
+            var retryPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .Or<TimeoutRejectedException>()
+                .WaitAndRetryAsync(sleepDurations: new[]
+                    {
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(10)
+                    });
+
+            var timeoutIndividualTryPolicy = Policy
+                .TimeoutAsync<HttpResponseMessage>(5);
+
+            var circuitBreakerPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromMinutes(2)
+                );
+
+            serviceCollection.AddHttpClient<NetatmoConfigConnectionProvider>(client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
+            })
+                .AddPolicyHandler(retryPolicy)
+                .AddPolicyHandler(timeoutIndividualTryPolicy)
+                .AddPolicyHandler(circuitBreakerPolicy);
+
+            return serviceCollection;
         }
     }
 }

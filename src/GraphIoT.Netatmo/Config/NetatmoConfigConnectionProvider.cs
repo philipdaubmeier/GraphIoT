@@ -6,22 +6,17 @@ using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
 {
-    public class NetatmoConfigConnectionProvider : INetatmoConnectionProvider
+    public class NetatmoConfigConnectionProvider : NetatmoConnectionProvider
     {
-        public INetatmoAuth AuthData { get; private set; }
-        public HttpClient Client { get; private set; }
-
-        public string AppId { get; private set; }
-        public string AppSecret { get; private set; }
-        public string Scope { get; private set; }
-
-        public NetatmoConfigConnectionProvider(TokenStore<NetatmoWebClient> tokenStore, IOptions<NetatmoConfig> config)
+        public NetatmoConfigConnectionProvider(TokenStore<NetatmoWebClient> tokenStore, IOptions<NetatmoConfig> config, HttpClient client)
         {
             AppId = config.Value.AppId;
             AppSecret = config.Value.AppSecret;
             Scope = config.Value.Scope;
 
             AuthData = new NetatmoHostAuth(tokenStore, config.Value.Username, config.Value.Password);
+
+            Client = client;
         }
     }
 }

@@ -10,7 +10,11 @@ using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannClient;
 using PhilipDaubmeier.ViessmannClient.Model;
+using Polly;
+using Polly.Extensions.Http;
+using Polly.Timeout;
 using System;
+using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 {
@@ -28,6 +32,12 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
             serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
+            serviceCollection.AddViessmannHttpClient<ViessmannAuthClientProvider>();
+            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
+            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
+            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
+
+            serviceCollection.AddScoped<ViessmannAuthClientProvider>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannEstrellaClient>, ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
@@ -42,6 +52,42 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
             serviceCollection.AddGraphCollectionViewModel<ViessmannHeatingViewModel>();
             serviceCollection.AddGraphCollectionViewModel<ViessmannSolarViewModel>();
+
+            return serviceCollection;
+        }
+
+        public static IServiceCollection AddViessmannHttpClient<TClient>(this IServiceCollection serviceCollection) where TClient : class
+        {
+            var useAuthHandler = typeof(TClient) == typeof(ViessmannAuthClientProvider);
+
+            var retryPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .Or<TimeoutRejectedException>()
+                .WaitAndRetryAsync(sleepDurations: new[]
+                    {
+                        TimeSpan.FromSeconds(1),
+                        TimeSpan.FromSeconds(5),
+                        TimeSpan.FromSeconds(10)
+                    });
+
+            var timeoutIndividualTryPolicy = Policy
+                .TimeoutAsync<HttpResponseMessage>(5);
+
+            var circuitBreakerPolicy = HttpPolicyExtensions
+                .HandleTransientHttpError()
+                .CircuitBreakerAsync(
+                    handledEventsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromMinutes(2)
+                );
+
+            serviceCollection.AddHttpClient<TClient>(client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
+            })
+                .ConfigurePrimaryHttpMessageHandler(() => useAuthHandler ? ViessmannConnectionProvider<TClient>.CreateAuthHandler() : new HttpClientHandler())
+                .AddPolicyHandler(retryPolicy)
+                .AddPolicyHandler(timeoutIndividualTryPolicy)
+                .AddPolicyHandler(circuitBreakerPolicy);
 
             return serviceCollection;
         }

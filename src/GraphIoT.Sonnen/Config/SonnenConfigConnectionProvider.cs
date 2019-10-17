@@ -6,18 +6,15 @@ using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
 {
-    public class SonnenConfigConnectionProvider : ISonnenConnectionProvider
+    public class SonnenConfigConnectionProvider : SonnenConnectionProvider
     {
-        public ISonnenAuth AuthData { get; private set; }
-        public HttpClient Client { get; private set; }
-
-        public string ClientId { get; private set; }
-
-        public SonnenConfigConnectionProvider(TokenStore<SonnenPortalClient> tokenStore, IOptions<SonnenConfig> config)
+        public SonnenConfigConnectionProvider(TokenStore<SonnenPortalClient> tokenStore, IOptions<SonnenConfig> config, HttpClient client)
         {
             ClientId = config.Value.ClientId;
 
             AuthData = new SonnenHostAuth(tokenStore, config.Value.Username, config.Value.Password);
+
+            Client = client;
         }
     }
 }
