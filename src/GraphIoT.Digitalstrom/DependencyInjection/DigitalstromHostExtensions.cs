@@ -28,8 +28,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
 
-            serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
+            serviceCollection.AddTransient<DigitalstromConfigConnectionBuilder>();
             serviceCollection.AddDssHttpClient();
+            serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
             serviceCollection.AddScoped<DigitalstromDssClient>();
 
             serviceCollection.AddSingleton<IDigitalstromStructureService, DigitalstromStructureService>();
@@ -79,13 +80,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
                     durationOfBreak: TimeSpan.FromMinutes(2)
                 );
 
-            serviceCollection.AddHttpClient<DigitalstromConfigConnectionProvider>("DssHttpClient", client =>
+            serviceCollection.AddHttpClient<DigitalstromHttpClient>(client =>
                 {
                     client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
                 })
                 .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
                 {
-                    return (serviceProvider.GetRequiredService<IDigitalstromConnectionProvider>() as DigitalstromConfigConnectionProvider)?.Handler;
+                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
                 })
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)

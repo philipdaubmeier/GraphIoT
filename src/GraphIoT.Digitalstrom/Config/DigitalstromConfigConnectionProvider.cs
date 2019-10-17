@@ -11,12 +11,25 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 {
+    public class DigitalstromHttpClient
+    {
+        public DigitalstromHttpClient(HttpClient client = null) => Client = client;
+        public HttpClient Client { get; private set; }
+    }
+
+    public class DigitalstromConfigConnectionBuilder : DigitalstromConfigConnectionProvider
+    {
+        public DigitalstromConfigConnectionBuilder(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
+            : base(tokenStore, config, null)
+        { }
+    }
+
     public class DigitalstromConfigConnectionProvider : DigitalstromConnectionProvider
     {
-        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, HttpClient client = null)
+        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, DigitalstromHttpClient client)
             : base(UrisFromConfig(config), AuthFromConfig(tokenStore, config), CertFromConfig(config))
         {
-            HttpClient = client;
+            HttpClient = client?.Client;
 
             if (httpClient == null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
             {

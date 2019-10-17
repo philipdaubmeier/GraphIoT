@@ -32,12 +32,11 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
             serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
-            serviceCollection.AddViessmannHttpClient<ViessmannAuthClientProvider>();
-            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
-            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
-            serviceCollection.AddViessmannHttpClient<ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
+            serviceCollection.AddViessmannHttpClient<ViessmannAuthHttpClient>();
+            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannEstrellaClient>>();
+            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannPlatformClient>>();
+            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannVitotrolClient>>();
 
-            serviceCollection.AddScoped<ViessmannAuthClientProvider>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannEstrellaClient>, ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
@@ -58,7 +57,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
         public static IServiceCollection AddViessmannHttpClient<TClient>(this IServiceCollection serviceCollection) where TClient : class
         {
-            var useAuthHandler = typeof(TClient) == typeof(ViessmannAuthClientProvider);
+            var useAuthHandler = typeof(TClient) == typeof(ViessmannAuthHttpClient);
 
             var retryPolicy = HttpPolicyExtensions
                 .HandleTransientHttpError()

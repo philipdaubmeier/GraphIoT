@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection
                     durationOfBreak: TimeSpan.FromMinutes(2)
                 );
 
-            serviceCollection.AddHttpClient<NetatmoConfigConnectionProvider>(client =>
+            serviceCollection.AddHttpClient<NetatmoHttpClient>(client =>
             {
                 client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
             })

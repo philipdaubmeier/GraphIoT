@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection
                     durationOfBreak: TimeSpan.FromMinutes(2)
                 );
 
-            serviceCollection.AddHttpClient<SonnenConfigConnectionProvider>(client =>
+            serviceCollection.AddHttpClient<SonnenHttpClient>(client =>
             {
                 client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
             })

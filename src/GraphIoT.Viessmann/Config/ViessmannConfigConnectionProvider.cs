@@ -5,16 +5,21 @@ using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
 {
-    public class ViessmannAuthClientProvider
+    public class ViessmannHttpClient<T>
     {
-        public HttpClient AuthClient { get; private set; }
+        public ViessmannHttpClient(HttpClient client) => Client = client;
+        public HttpClient Client { get; private set; }
+    }
 
-        public ViessmannAuthClientProvider(HttpClient authClient) => AuthClient = authClient;
+    public class ViessmannAuthHttpClient
+    {
+        public ViessmannAuthHttpClient(HttpClient authClient) => AuthClient = authClient;
+        public HttpClient AuthClient { get; private set; }
     }
 
     public class ViessmannConfigConnectionProvider<T> : ViessmannConnectionProvider<T>
     {
-        public ViessmannConfigConnectionProvider(TokenStore<T> tokenStore, IOptions<ViessmannConfig> config, ViessmannAuthClientProvider authClient, HttpClient client)
+        public ViessmannConfigConnectionProvider(TokenStore<T> tokenStore, IOptions<ViessmannConfig> config, ViessmannHttpClient<T> client, ViessmannAuthHttpClient authClient)
         {
             VitotrolDeviceId = config.Value.VitotrolDeviceId;
             VitotrolInstallationId = config.Value.VitotrolInstallationId;
@@ -26,7 +31,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
 
             AuthData = new ViessmannAuth<T>(tokenStore, config.Value.Username, config.Value.Password);
 
-            Client = client;
+            Client = client.Client;
             AuthClient = authClient.AuthClient;
         }
     }
