@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.TokenStore.DependencyInjection
             return serviceCollection.AddDbContext<ITokenStoreDbContext, TDbContext>(dbOptionsAction);
         }
 
-        public static IServiceCollection ConfigureTokenStore(this IServiceCollection serviceCollection, IConfiguration config = null)
+        public static IServiceCollection ConfigureTokenStore(this IServiceCollection serviceCollection, IConfiguration config)
         {
             return serviceCollection.Configure<TokenStoreConfig>(config);
         }

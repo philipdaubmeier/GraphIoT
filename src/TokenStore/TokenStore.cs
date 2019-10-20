@@ -15,8 +15,8 @@ namespace PhilipDaubmeier.TokenStore
 
         public TokenStore(ITokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
-            string serviceName = string.Empty;
-            if (!(config?.Value?.ClassNameMapping?.TryGetValue(typeof(T).Name, out serviceName) ?? false))
+            string? serviceName = string.Empty;
+            if (!(config?.Value?.ClassNameMapping?.TryGetValue(typeof(T).Name, out serviceName) ?? false) || serviceName is null)
                 serviceName = typeof(T).Name;
 
             _serviceName = serviceName;
@@ -27,13 +27,13 @@ namespace PhilipDaubmeier.TokenStore
         private string AccessTokenExpiryId => $"{_serviceName}.access_token_expiry";
         private string RefreshTokenId => $"{_serviceName}.refresh_token";
 
-        private string _accessToken = null;
+        private string? _accessToken = null;
         private DateTime? _accessTokenExpiry = null;
-        private string _refreshToken = null;
+        private string? _refreshToken = null;
 
-        public string AccessToken => LoadTokenIfNull() ? _accessToken : null;
-        public DateTime AccessTokenExpiry => LoadTokenIfNull() ? _accessTokenExpiry.Value : DateTime.MinValue;
-        public string RefreshToken => LoadTokenIfNull() ? _refreshToken : null;
+        public string? AccessToken => LoadTokenIfNull() ? _accessToken : null;
+        public DateTime AccessTokenExpiry => LoadTokenIfNull() ? _accessTokenExpiry!.Value : DateTime.MinValue;
+        public string? RefreshToken => LoadTokenIfNull() ? _refreshToken : null;
 
         private bool LoadTokenIfNull()
         {
@@ -75,9 +75,9 @@ namespace PhilipDaubmeier.TokenStore
             return AccessTokenExpiry > DateTime.Now && !string.IsNullOrEmpty(AccessToken);
         }
 
-        private DateTime FromBinaryString(string str)
+        private DateTime FromBinaryString(string? str)
         {
-            if (str == null)
+            if (str is null)
                 return DateTime.MinValue;
 
             if (!long.TryParse(str, out long time))
@@ -86,9 +86,9 @@ namespace PhilipDaubmeier.TokenStore
             return DateTime.FromBinary(time);
         }
 
-        private void UpdateValue(string key, string oldValue, string newValue)
+        private void UpdateValue(string key, string? oldValue, string newValue)
         {
-            if (oldValue == newValue)
+            if (!(oldValue is null) && oldValue == newValue)
                 return;
 
             var entity = _dbContext.AuthDataSet.SingleOrDefault(x => x.AuthDataId == key);

@@ -98,7 +98,7 @@ namespace PhilipDaubmeier.TokenStore.Tests
             });
         }
 
-        private ITokenStoreDbContext GetMockDbContext(List<AuthData> authList = null)
+        private ITokenStoreDbContext GetMockDbContext(List<AuthData>? authList = null)
         {
             var db = Mock.Of<ITokenStoreDbContext>(d => d.SaveChangesAsync(default) == Task.FromResult(1));
             db.AuthDataSet = GetQueryableMockDbSet(authList ?? new List<AuthData>());
