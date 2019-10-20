@@ -76,7 +76,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             return eventstream;
         }
 
-        public byte[] ToByteArray()
+        public byte[]? ToByteArray()
         {
             return (_stream as MemoryStream)?.ToArray();
         }
@@ -124,7 +124,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             _count++;
         }
 
-        private TEvent ReadEvent()
+        private TEvent? ReadEvent()
         {
             using var reader = new BinaryReader(_stream, Encoding.UTF8, true);
             var millis = reader.ReadInt32();

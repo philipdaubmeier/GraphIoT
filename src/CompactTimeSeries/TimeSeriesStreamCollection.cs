@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace PhilipDaubmeier.CompactTimeSeries
 {
-    public class TimeSeriesStreamCollection<TKey, T> : IEnumerable<KeyValuePair<TKey, ITimeSeries<T>>>, IDisposable where T : struct
+    public class TimeSeriesStreamCollection<TKey, T> : IEnumerable<KeyValuePair<TKey, ITimeSeries<T>>>, IDisposable where TKey : notnull where T : struct
     {
-        private readonly Dictionary<TKey, ITimeSeries<T>> _dict;
+        private readonly Dictionary<TKey, ITimeSeries<T>> _dict = new Dictionary<TKey, ITimeSeries<T>>();
         private readonly CompressableMemoryStream _stream;
 
         public class BinaryStreamMetrics
@@ -45,8 +45,6 @@ namespace PhilipDaubmeier.CompactTimeSeries
             var keyList = keys.ToList();
             Metrics = new BinaryStreamMetrics(keySize, span.Count, decimalPlaces);
 
-            _dict = new Dictionary<TKey, ITimeSeries<T>>();
-
             _stream = new CompressableMemoryStream(Metrics.StreamSize(keyList.Count));
             _stream.SetLength(Metrics.StreamSize(keyList.Count));
 
@@ -72,8 +70,6 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             Metrics = new BinaryStreamMetrics(keySize, span.Count, decimalPlaces);
             _stream = CompressableMemoryStream.FromCompressedByteArray(compressedByteArray);
-
-            _dict = new Dictionary<TKey, ITimeSeries<T>>();
 
             int count = 0;
             using (var reader = new BinaryReader(_stream, System.Text.Encoding.UTF8, true))

@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 
 namespace PhilipDaubmeier.CompactTimeSeries
 {
-    public class TimeSeriesCompressor<TKey, T> where T : struct
+    public class TimeSeriesCompressor<TKey, T> where TKey : notnull where T : struct
     {
         private readonly TimeSeriesStreamCollection<TKey, T> _timeseries;
 
@@ -18,16 +18,19 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
         public void Dispose() => _timeseries.Dispose();
 
-        public byte[] ToCompressedByteArray()
+        public byte[]? ToCompressedByteArray()
         {
             using var clonedTimeSeries = CloneTimeSeriesKeys();
+            if (clonedTimeSeries == null)
+                return null;
+
             foreach (var key in _timeseries.Select(x => x.Key))
                 WriteDiffTimeseries(_timeseries[key], clonedTimeSeries[key]);
 
             return (clonedTimeSeries.UnderlyingStream as CompressableMemoryStream)?.ToCompressedByteArray();
         }
 
-        private TimeSeriesStreamCollection<TKey, T> CloneTimeSeriesKeys()
+        private TimeSeriesStreamCollection<TKey, T>? CloneTimeSeriesKeys()
         {
             var metr = _timeseries.Metrics;
             var firstitem = (_timeseries.FirstOrDefault().Value as TimeSeriesBase<T>);

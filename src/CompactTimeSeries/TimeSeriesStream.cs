@@ -207,11 +207,12 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 val = (value as int?);
             else if (typeof(T) == typeof(double))
             {
-                if (!value.HasValue || double.IsNaN((value as double?).Value))
+                double? doubleval = value as double?;
+                if (!doubleval.HasValue || double.IsNaN(doubleval.Value))
                     val = null;
                 else
                 {
-                    var uncropped = (value as double?).Value * Math.Pow(10d, _decimalPlaces);
+                    var uncropped = doubleval.Value * Math.Pow(10d, _decimalPlaces);
                     val = uncropped > int.MaxValue ? int.MaxValue : uncropped < int.MinValue ? int.MinValue : (int)uncropped;
                 }
             }
@@ -238,7 +239,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 .Select(d => d > 0x01 ? null : (bool?)(d == 0x01)).ToList();
             foreach (var b in boolValues)
             {
-                (_keyValuePairFactory as KeyValuePairFactory<bool>).Set(time, b);
+                (_keyValuePairFactory as KeyValuePairFactory<bool>)!.Set(time, b);
                 yield return _keyValuePairFactory.Create();
 
                 time += _span.Duration;
@@ -259,10 +260,10 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
             if (typeof(T) == typeof(int))
                 (_keyValuePairFactory as KeyValuePairFactory<int>)
-                    .Set(time, value == short.MinValue ? null : (short?)value);
+                    !.Set(time, value == short.MinValue ? null : (short?)value);
             else if (typeof(T) == typeof(double))
                 (_keyValuePairFactory as KeyValuePairFactory<double>)
-                    .Set(time, value == short.MinValue ? null : (double?)value / Math.Pow(10d, _decimalPlaces));
+                    !.Set(time, value == short.MinValue ? null : (double?)value / Math.Pow(10d, _decimalPlaces));
 
             return _keyValuePairFactory.Create();
         }

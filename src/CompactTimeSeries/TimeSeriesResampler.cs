@@ -12,16 +12,19 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
     public class TimeSeriesResampler<Tseries, Tval> where Tval : struct where Tseries : TimeSeriesBase<Tval>
     {
-        private Tseries resampled = null;
+        private Tseries? resampled = null;
         public Tseries Resampled
         {
             get
             {
                 CreateDeferred(Span.Duration);
-                return resampled;
+                return resampled!;
             }
             set
             {
+                if (value is null)
+                    return;
+
                 resampled = value;
                 Span = resampled.Span;
             }
@@ -44,7 +47,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             if (Constraint == SamplingConstraint.NoOversampling && Span.Duration < oldInterval)
                 Span = new TimeSeriesSpan(Span.Begin, Span.End, oldInterval);
 
-            resampled = (Tseries)Activator.CreateInstance(typeof(Tseries), Span);
+            resampled = (Tseries?)Activator.CreateInstance(typeof(Tseries), Span);
         }
 
         public void SampleAccumulate(ITimeSeries<Tval> timeseries)
@@ -81,6 +84,9 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             foreach (var serie in listTimeseries)
             {
+                if (serie is null)
+                    continue;
+
                 if (!(serie.Span.End >= timebucket && serie.Span.Begin <= timebucket + Resampled.Span.Duration))
                     continue;
 
@@ -88,7 +94,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 var endIndex = Math.Min(serie.Count, (int)Math.Ceiling((timebucket + Resampled.Span.Duration - serie.Span.Begin) / serie.Span.Duration));
                 for (int i = startIndex; i < endIndex; i++)
                     if (serie[i].HasValue)
-                        yield return serie[i].Value;
+                        yield return serie[i]!.Value;
             }
         }
     }
