@@ -29,13 +29,11 @@ namespace PhilipDaubmeier.CompactTimeSeries
             _isStreamManaged = true;
 
             var nullEventBytes = Enumerable.Range(0, _serializer.SizeOf).Select(b => (byte)0).ToArray();
-            using (var writer = new BinaryWriter(_stream, Encoding.UTF8, true))
+            using var writer = new BinaryWriter(_stream, Encoding.UTF8, true);
+            for (int i = 0; i < span.Count; i++)
             {
-                for (int i = 0; i < span.Count; i++)
-                {
-                    writer.Write(-1);
-                    writer.Write(nullEventBytes);
-                }
+                writer.Write(-1);
+                writer.Write(nullEventBytes);
             }
         }
 
@@ -128,15 +126,13 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
         private TEvent ReadEvent()
         {
-            using (var reader = new BinaryReader(_stream, Encoding.UTF8, true))
-            {
-                var millis = reader.ReadInt32();
-                if (millis < 0)
-                    return null;
+            using var reader = new BinaryReader(_stream, Encoding.UTF8, true);
+            var millis = reader.ReadInt32();
+            if (millis < 0)
+                return null;
 
-                var timestamp = Span.Begin.ToUniversalTime().AddMilliseconds(millis);
-                return _serializer.Deserialize(reader, timestamp);
-            }
+            var timestamp = Span.Begin.ToUniversalTime().AddMilliseconds(millis);
+            return _serializer.Deserialize(reader, timestamp);
         }
     }
 }

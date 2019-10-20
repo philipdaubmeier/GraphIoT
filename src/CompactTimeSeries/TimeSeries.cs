@@ -6,7 +6,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 {
     public class TimeSeries<T> : TimeSeriesBase<T> where T : struct
     {
-        private List<KeyValuePair<DateTime, T?>> _list;
+        private readonly List<KeyValuePair<DateTime, T?>> _list;
 
         /// <summary>
         /// Creates a new TimeSeries object with the given number of equally spaced time buckets.
@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             : base(span)
         {
             _list = Enumerable.Range(0, _span.Count).Select(t =>
-                new KeyValuePair<DateTime, T?>(span.Begin.Add(_span.Duration * t), default(T?))).ToList();
+                new KeyValuePair<DateTime, T?>(span.Begin.Add(_span.Duration * t), default)).ToList();
         }
 
         /// <summary>
@@ -23,19 +23,11 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// </summary>
         public override T? this[DateTime time]
         {
+            get => !TryFindIndex(time, out _, out int index) ? default : _list[index].Value;
             set
             {
-                if (!TryFindIndex(time, out DateTime timeBucket, out int index))
-                    return;
-
-                _list[index] = new KeyValuePair<DateTime, T?>(timeBucket, value);
-            }
-            get
-            {
-                if (!TryFindIndex(time, out DateTime timeBucket, out int index))
-                    return default(T?);
-
-                return _list[index].Value;
+                if (TryFindIndex(time, out DateTime timeBucket, out int index))
+                    _list[index] = new KeyValuePair<DateTime, T?>(timeBucket, value);
             }
         }
 
@@ -44,14 +36,8 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// </summary>
         public override T? this[int index]
         {
-            set
-            {
-                _list[index] = new KeyValuePair<DateTime, T?>(_list[index].Key, value);
-            }
-            get
-            {
-                return _list[index].Value;
-            }
+            get => _list[index].Value;
+            set => _list[index] = new KeyValuePair<DateTime, T?>(_list[index].Key, value);
         }
 
         public override IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator()

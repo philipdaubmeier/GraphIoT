@@ -8,8 +8,8 @@ namespace PhilipDaubmeier.CompactTimeSeries
 {
     public class TimeSeriesStreamCollection<TKey, T> : IEnumerable<KeyValuePair<TKey, ITimeSeries<T>>>, IDisposable where T : struct
     {
-        private Dictionary<TKey, ITimeSeries<T>> _dict;
-        private CompressableMemoryStream _stream;
+        private readonly Dictionary<TKey, ITimeSeries<T>> _dict;
+        private readonly CompressableMemoryStream _stream;
 
         public class BinaryStreamMetrics
         {
@@ -96,10 +96,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
         public Stream UnderlyingStream => _stream;
 
-        public void Dispose()
-        {
-            _stream.Dispose();
-        }
+        public void Dispose() => _stream.Dispose();
 
         public override string ToString()
         {

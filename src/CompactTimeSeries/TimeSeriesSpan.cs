@@ -102,9 +102,6 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// Check wether the given date is included in this TimeSeriesSpan, i.e. the date is
         /// in the interval between Begin (included) and End (excluded)
         /// </summary>
-        public bool IsIncluded(DateTime dateTime)
-        {
-            return dateTime >= Begin && dateTime < End;
-        }
+        public bool IsIncluded(DateTime dateTime) => dateTime >= Begin && dateTime < End;
     }
 }

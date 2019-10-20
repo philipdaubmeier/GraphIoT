@@ -34,10 +34,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         public TimeSeriesResampler(TimeSeriesSpan span) : this(span, SamplingConstraint.SampleAny) { }
 
         public TimeSeriesResampler(TimeSeriesSpan span, SamplingConstraint constraint)
-        {
-            Span = span;
-            Constraint = constraint;
-        }
+            => (Span, Constraint) = (span, constraint);
 
         private void CreateDeferred(TimeSpan oldInterval)
         {

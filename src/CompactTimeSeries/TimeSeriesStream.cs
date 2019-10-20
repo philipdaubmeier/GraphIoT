@@ -37,13 +37,13 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
         }
 
-        private KeyValuePairFactory<T> _keyValuePairFactory = new KeyValuePairFactory<T>();
+        private readonly KeyValuePairFactory<T> _keyValuePairFactory = new KeyValuePairFactory<T>();
 
-        private Stream _stream;
-        private bool _isStreamManaged = false;
-        private int _startPosition = 0;
+        private readonly Stream _stream;
+        private readonly bool _isStreamManaged = false;
+        private readonly int _startPosition = 0;
 
-        private int _decimalPlaces;
+        private readonly int _decimalPlaces;
 
         /// <summary>
         /// Creates a new TimeSeriesStream object with the given number of equally spaced time buckets.
@@ -91,19 +91,11 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// </summary>
         public override T? this[DateTime time]
         {
+            get => !SeekToTimeBucket(time) ? (default) : ReadKeyValuePair(time).Value;
             set
             {
-                if (!SeekToTimeBucket(time))
-                    return;
-
-                WriteValue(value);
-            }
-            get
-            {
-                if (!SeekToTimeBucket(time))
-                    return default(T?);
-
-                return ReadKeyValuePair(time).Value;
+                if (SeekToTimeBucket(time))
+                    WriteValue(value);
             }
         }
 
@@ -128,7 +120,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                     throw new ArgumentOutOfRangeException();
 
                 if (!SeekToTimeBucket(index))
-                    return default(T?);
+                    return default;
 
                 return ReadKeyValuePair(DateTime.MinValue).Value;
             }
@@ -261,7 +253,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             int readByte1 = _stream.ReadByte();
             int readByte2 = _stream.ReadByte();
             if (readByte1 < 0 || readByte2 < 0)
-                return new KeyValuePair<DateTime, T?>(DateTime.MinValue, default(T?));
+                return new KeyValuePair<DateTime, T?>(DateTime.MinValue, default);
 
             var value = (short)(readByte1 << 8 | readByte2);
 

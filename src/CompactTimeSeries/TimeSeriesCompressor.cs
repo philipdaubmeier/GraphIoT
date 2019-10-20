@@ -6,7 +6,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 {
     public class TimeSeriesCompressor<TKey, T> where T : struct
     {
-        private TimeSeriesStreamCollection<TKey, T> _timeseries;
+        private readonly TimeSeriesStreamCollection<TKey, T> _timeseries;
 
         /// <summary>
         /// Creates a new instance of the TimeSeriesCompressor class for converting the given
@@ -14,25 +14,17 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// Both compaction effects add up as the diff-ing of mostly constant or steady series
         /// results in many small and similar values which can then be huffman coded more efficiently.
         /// </summary>
-        public TimeSeriesCompressor(TimeSeriesStreamCollection<TKey, T> timeseries)
-        {
-            _timeseries = timeseries;
-        }
+        public TimeSeriesCompressor(TimeSeriesStreamCollection<TKey, T> timeseries) => _timeseries = timeseries;
 
-        public void Dispose()
-        {
-            _timeseries.Dispose();
-        }
+        public void Dispose() => _timeseries.Dispose();
 
         public byte[] ToCompressedByteArray()
         {
-            using (var clonedTimeSeries = CloneTimeSeriesKeys())
-            {
-                foreach (var key in _timeseries.Select(x => x.Key))
-                    WriteDiffTimeseries(_timeseries[key], clonedTimeSeries[key]);
+            using var clonedTimeSeries = CloneTimeSeriesKeys();
+            foreach (var key in _timeseries.Select(x => x.Key))
+                WriteDiffTimeseries(_timeseries[key], clonedTimeSeries[key]);
 
-                return (clonedTimeSeries.UnderlyingStream as CompressableMemoryStream)?.ToCompressedByteArray();
-            }
+            return (clonedTimeSeries.UnderlyingStream as CompressableMemoryStream)?.ToCompressedByteArray();
         }
 
         private TimeSeriesStreamCollection<TKey, T> CloneTimeSeriesKeys()
@@ -77,7 +69,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         private void WriteDiffTimeseries(ITimeSeries<T> source, ITimeSeries<T> dest)
         {
             bool first = true;
-            T previous = default(T);
+            T previous = default;
             for (int i = 0; i < source.Count; i++)
             {
                 T current = source[i] ?? previous;
@@ -86,7 +78,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
                 if (first)
                 {
-                    diff = source[i] ?? default(T);
+                    diff = source[i] ?? default;
                     first = false;
                 }
 
@@ -94,8 +86,8 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
         }
 
-        private static ParameterExpression paramA = Expression.Parameter(typeof(T), "a");
-        private static ParameterExpression paramB = Expression.Parameter(typeof(T), "b");
-        private static Func<T, T, T> GenericSubtract = Expression.Lambda<Func<T, T, T>>(Expression.Subtract(paramA, paramB), paramA, paramB).Compile();
+        private static readonly ParameterExpression paramA = Expression.Parameter(typeof(T), "a");
+        private static readonly ParameterExpression paramB = Expression.Parameter(typeof(T), "b");
+        private static readonly Func<T, T, T> GenericSubtract = Expression.Lambda<Func<T, T, T>>(Expression.Subtract(paramA, paramB), paramA, paramB).Compile();
     }
 }

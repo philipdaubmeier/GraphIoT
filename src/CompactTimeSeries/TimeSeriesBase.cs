@@ -13,10 +13,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         /// <summary>
         /// TimeSeriesBase constructor for the given number of equally spaced time buckets.
         /// </summary>
-        public TimeSeriesBase(TimeSeriesSpan span)
-        {
-            _span = span;
-        }
+        public TimeSeriesBase(TimeSeriesSpan span) => _span = span;
 
         /// <summary>
         /// See <see cref="ITimeSeries{T}.Trimmed()"/>
@@ -24,8 +21,8 @@ namespace PhilipDaubmeier.CompactTimeSeries
         public List<T?> Trimmed()
         {
             return this.SkipWhile(x => !x.Value.HasValue)
-                .Reverse().SkipWhile(x => !x.Value.HasValue).Reverse()
-                .Select(x => x.Value).ToList();
+                .Reverse().SkipWhile(x => !x.Value.HasValue)
+                .Reverse().Select(x => x.Value).ToList();
         }
 
         /// <summary>
@@ -42,16 +39,13 @@ namespace PhilipDaubmeier.CompactTimeSeries
         public void Accumulate(DateTime time, T item)
         {
             var old = this[time];
-            if (old.HasValue)
-                this[time] = Add(old.Value, item);
-            else
-                this[time] = item;
+            this[time] = old.HasValue ? (T?)Add(old.Value, item) : (T?)item;
         }
 
         // Helper method/hack for adding up generic values
-        private static ParameterExpression paramA = Expression.Parameter(typeof(T), "a");
-        private static ParameterExpression paramB = Expression.Parameter(typeof(T), "b");
-        private static Func<T, T, T> Add = Expression.Lambda<Func<T, T, T>>(Expression.Add(paramA, paramB), paramA, paramB).Compile();
+        private static readonly ParameterExpression paramA = Expression.Parameter(typeof(T), "a");
+        private static readonly ParameterExpression paramB = Expression.Parameter(typeof(T), "b");
+        private static readonly Func<T, T, T> Add = Expression.Lambda<Func<T, T, T>>(Expression.Add(paramA, paramB), paramA, paramB).Compile();
 
         /// <summary>
         /// See <see cref="ITimeSeries{T}.this[DateTime time]"/>
@@ -85,9 +79,6 @@ namespace PhilipDaubmeier.CompactTimeSeries
 
         public abstract IEnumerator<KeyValuePair<DateTime, T?>> GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }
