@@ -7,9 +7,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
     {
         string Key { get; }
 
-        TimeSeriesSpan Span { get; set; }
+        TimeSeriesSpan? Span { get; set; }
 
-        string Query { get; set; }
+        string? Query { get; set; }
 
         IEnumerable<EventViewModel> Events { get; }
     }

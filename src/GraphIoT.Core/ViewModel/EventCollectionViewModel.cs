@@ -8,11 +8,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
     /// </summary>
     public abstract class EventCollectionViewModel : IEventCollectionViewModel
     {
-        public virtual string Key { get; }
+        public abstract string Key { get; }
 
-        public TimeSeriesSpan Span { get; set; }
+        public TimeSeriesSpan? Span { get; set; } = null;
 
-        public string Query { get; set; }
+        public string? Query { get; set; } = null;
 
         public abstract IEnumerable<EventViewModel> Events { get; }
     }

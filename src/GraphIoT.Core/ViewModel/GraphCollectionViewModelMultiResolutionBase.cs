@@ -7,8 +7,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
     public abstract class GraphCollectionViewModelMultiResolutionBase<Tentity> : GraphCollectionViewModelDeferredLoadBase<Tentity> where Tentity : class, ITimeSeriesDbEntity
     {
-        protected Dictionary<Resolution, IQueryable<Tentity>> _dataTables = null;
-        protected Dictionary<Resolution, TimeSpan> _spans = null;
+        protected Dictionary<Resolution, IQueryable<Tentity>> _dataTables;
+        protected Dictionary<Resolution, TimeSpan> _spans;
 
         protected enum Resolution
         {
@@ -30,7 +30,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         {
             _dataTables = dataTables;
             _spans = dataTables.Select(t => new Tuple<Resolution, Type>(t.Key, t.Value.GetType().GenericTypeArguments.FirstOrDefault()))
-                               .ToDictionary(t => t.Item1, t => (Activator.CreateInstance(t.Item2) as TimeSeriesDbEntityBase).Span.Duration);
+                               .ToDictionary(t => t.Item1, t => (Activator.CreateInstance(t.Item2) as ITimeSeriesDbEntity)!.Span.Duration);
         }
 
         protected override void InvalidateData()

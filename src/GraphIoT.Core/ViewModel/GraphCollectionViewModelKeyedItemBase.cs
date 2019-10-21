@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
-    public abstract class GraphCollectionViewModelKeyedItemBase<Tentity, Tkey> : GraphCollectionViewModelMultiResolutionBase<Tentity> where Tentity : class, ITimeSeriesDbEntity
+    public abstract class GraphCollectionViewModelKeyedItemBase<Tentity, Tkey> : GraphCollectionViewModelMultiResolutionBase<Tentity> where Tentity : class, ITimeSeriesDbEntity where Tkey : notnull
     {
         protected readonly Dictionary<int, GraphViewModel> _loadedGraphs = new Dictionary<int, GraphViewModel>();
         protected readonly Dictionary<Tkey, int> _keys;
@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         public override int GraphCount() => _columns.Count * _keys.Count;
 
-        protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Tkey, string> nameSelector, Func<Tkey, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Tkey, string> nameSelector, Func<Tkey, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>>? preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
             // the requested index is already loaded
             if (_loadedGraphs.ContainsKey(index))

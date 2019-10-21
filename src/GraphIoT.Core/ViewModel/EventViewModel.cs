@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
@@ -12,5 +13,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         public string Title { get; set; }
         public string Text { get; set; }
         public IEnumerable<string> Tags { get; set; }
+
+        public EventViewModel(DateTime time, string title, string text, IEnumerable<string>? tags)
+            => (Time, Title, Text, Tags) = (time, title, text, tags ?? Enumerable.Empty<string>());
     }
 }

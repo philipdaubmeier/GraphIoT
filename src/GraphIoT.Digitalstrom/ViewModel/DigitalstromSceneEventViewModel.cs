@@ -27,6 +27,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
         private IEnumerable<EventViewModel> EnumerateEvents()
         {
+            if (Span is null || Query is null)
+                yield break;
+
             var eventData = _db.DsSceneEventDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date).ToList();
             var events = eventData.SelectMany(x => x.EventStream).Where(x => x.TimestampUtc >= Span.Begin.ToUniversalTime() && x.TimestampUtc <= Span.End.ToUniversalTime()).ToList();
             List<DssEvent> filtered;
@@ -62,13 +65,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
             foreach (var dssEvent in filtered)
             {
-                yield return new EventViewModel()
-                {
-                    Time = dssEvent.TimestampUtc,
-                    Title = $"{dssEvent.SystemEvent.Name}",
-                    Text = $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
-                    Tags = new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() }
-                };
+                yield return new EventViewModel(
+                    time: dssEvent.TimestampUtc,
+                    title: $"{dssEvent.SystemEvent.Name}",
+                    text: $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
+                    tags: new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToDisplayString(), dssEvent.Properties.SceneID.ToDisplayString() }
+                );
             }
         }
     }

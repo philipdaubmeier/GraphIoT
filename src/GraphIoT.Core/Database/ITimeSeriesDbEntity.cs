@@ -7,6 +7,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
     {
         DateTime Key { get; set; }
 
+        TimeSeriesSpan Span { get; }
+
         TimeSeries<T> GetSeries<T>(int index) where T : struct;
 
         void SetSeries<T>(int index, TimeSeries<T> series) where T : struct;

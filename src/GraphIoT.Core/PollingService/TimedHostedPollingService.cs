@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.GraphIoT.Core
         private readonly ILogger _logger;
         private readonly TimeSpan _interval;
         private readonly string _loggingName;
-        private Timer _timer;
+        private Timer? _timer = null;
 
         public TimedHostedPollingService(IServiceScopeFactory serviceScopeFactory, ILogger<TimedHostedPollingService<TPollingService>> logger, IOptions<TimedHostedPollingConfig<TPollingService>> config)
         {
@@ -47,7 +47,7 @@ namespace PhilipDaubmeier.GraphIoT.Core
             _timer?.Dispose();
         }
 
-        private async void PollAll(object state)
+        private async void PollAll(object? state)
         {
             using var scope = _serviceScopeFactory.CreateScope();
 

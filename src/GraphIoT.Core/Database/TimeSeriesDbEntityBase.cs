@@ -26,7 +26,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
-            return (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string).ToTimeseries<T>(Span, DecimalPlaces);
+            var curve = (CurveProperty(index)?.GetGetMethod()?.Invoke(this, null) as string);
+            if (curve is null)
+                throw new Exception($"There is no readable curve property at index {index}");
+
+            return curve.ToTimeseries<T>(Span, DecimalPlaces);
         }
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
@@ -36,7 +40,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         private static readonly Semaphore _loadPropertiesSemaphore = new Semaphore(1, 1);
         private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();
-        private PropertyInfo CurveProperty(int index)
+        private PropertyInfo? CurveProperty(int index)
         {
             try
             {

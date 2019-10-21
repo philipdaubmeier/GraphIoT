@@ -5,7 +5,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
 {
     public static class TimeIntervalParser
     {
-        public static TimeSpan ToTimeSpan(this string interval)
+        public static TimeSpan ToTimeSpan(this string? interval)
         {
             if (interval == null)
                 return new TimeSpan();

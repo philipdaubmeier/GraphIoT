@@ -9,9 +9,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
         private const int minCount = 1;
         private const int maxCount = 5000;
 
+        private static readonly TimeSeriesSpan DefaultSpan = new TimeSeriesSpan(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1);
+
         public static bool TryParse(string begin, string end, string count, out TimeSeriesSpan span)
         {
-            span = null;
+            span = DefaultSpan;
 
             if (!int.TryParse(count, out int countInt))
                 return false;

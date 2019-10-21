@@ -7,11 +7,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
     public abstract class GraphCollectionViewModelBase : IGraphCollectionViewModel
     {
-        public virtual string Key { get; }
+        public abstract string Key { get; }
 
         public GraphCollectionViewModelBase()
         {
-            Span = new TimeSeriesSpan(DateTime.MinValue, DateTime.MinValue.AddMinutes(1), 1);
+            span = new TimeSeriesSpan(DateTime.MinValue, DateTime.MinValue.AddMinutes(1), 1);
         }
 
         protected bool IsInitialSpan => Span.Begin == DateTime.MinValue && Span.End == DateTime.MinValue.AddMinutes(1) && Span.Count == 1;
