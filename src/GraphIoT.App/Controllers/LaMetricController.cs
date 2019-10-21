@@ -60,7 +60,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             {
                 Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min)
             };
-            var totalYieldToday = viewModel.Graph(0).Points.Select(x => (decimal?)x).Where(x => x.HasValue).Sum(x => x.Value) / 60 / 1000;
+            var totalYieldToday = viewModel.Graph(0).Points.Select(x => (decimal?)x).Where(x => x.HasValue).Sum(x => x!.Value) / 60 / 1000;
 
             viewModel.Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now.Date.AddDays(1), 37);
             var chartSolarYield = viewModel.Graph(0).Points;
@@ -90,7 +90,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             if (dbSolarSeries == null)
                 return StatusCode((int)HttpStatusCode.NotFound);
 
-            var totalYieldToday = (double)dbSolarSeries.SolarWhTotal / 1000d;
+            var totalYieldToday = (dbSolarSeries.SolarWhTotal ?? 0) / 1000d;
             var chartSolarYield = dbSolarSeries.SolarWhSeries.Trimmed(0).TakeLast(37);
             var currentCollectorTemp = dbSolarSeries.SolarCollectorTempSeries.Reverse()
                 .SkipWhile(x => !x.Value.HasValue).FirstOrDefault().Value;

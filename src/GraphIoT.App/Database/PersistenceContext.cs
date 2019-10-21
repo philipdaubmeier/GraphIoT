@@ -10,53 +10,53 @@ namespace PhilipDaubmeier.GraphIoT.App.Database
     public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext
     {
         #region ITokenStoreDbContext
-        public DbSet<AuthData> AuthDataSet { get; set; }
+        public DbSet<AuthData> AuthDataSet { get; set; } = null!;
         #endregion
 
 
         #region IDigitalstromDbContext
-        public DbSet<DigitalstromZone> DsZones { get; set; }
+        public DbSet<DigitalstromZone> DsZones { get; set; } = null!;
 
-        public DbSet<DigitalstromCircuit> DsCircuits { get; set; }
+        public DbSet<DigitalstromCircuit> DsCircuits { get; set; } = null!;
 
-        public DbSet<DigitalstromZoneSensorLowresData> DsSensorLowresDataSet { get; set; }
+        public DbSet<DigitalstromZoneSensorLowresData> DsSensorLowresDataSet { get; set; } = null!;
 
-        public DbSet<DigitalstromZoneSensorMidresData> DsSensorDataSet { get; set; }
+        public DbSet<DigitalstromZoneSensorMidresData> DsSensorDataSet { get; set; } = null!;
 
-        public DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; }
+        public DbSet<DigitalstromSceneEventData> DsSceneEventDataSet { get; set; } = null!;
 
-        public DbSet<DigitalstromEnergyLowresData> DsEnergyLowresDataSet { get; set; }
+        public DbSet<DigitalstromEnergyLowresData> DsEnergyLowresDataSet { get; set; } = null!;
 
-        public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; }
+        public DbSet<DigitalstromEnergyMidresData> DsEnergyMidresDataSet { get; set; } = null!;
 
-        public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; }
+        public DbSet<DigitalstromEnergyHighresData> DsEnergyHighresDataSet { get; set; } = null!;
         #endregion
 
 
         #region INetatmoDbContext
-        public DbSet<NetatmoModuleMeasure> NetatmoModuleMeasures { get; set; }
+        public DbSet<NetatmoModuleMeasure> NetatmoModuleMeasures { get; set; } = null!;
 
-        public DbSet<NetatmoMeasureLowresData> NetatmoMeasureLowresDataSet { get; set; }
+        public DbSet<NetatmoMeasureLowresData> NetatmoMeasureLowresDataSet { get; set; } = null!;
 
-        public DbSet<NetatmoMeasureMidresData> NetatmoMeasureDataSet { get; set; }
+        public DbSet<NetatmoMeasureMidresData> NetatmoMeasureDataSet { get; set; } = null!;
         #endregion
 
 
         #region IViessmannDbContext
-        public DbSet<ViessmannHeatingLowresData> ViessmannHeatingLowresTimeseries { get; set; }
+        public DbSet<ViessmannHeatingLowresData> ViessmannHeatingLowresTimeseries { get; set; } = null!;
 
-        public DbSet<ViessmannHeatingMidresData> ViessmannHeatingTimeseries { get; set; }
+        public DbSet<ViessmannHeatingMidresData> ViessmannHeatingTimeseries { get; set; } = null!;
 
-        public DbSet<ViessmannSolarLowresData> ViessmannSolarLowresTimeseries { get; set; }
+        public DbSet<ViessmannSolarLowresData> ViessmannSolarLowresTimeseries { get; set; } = null!;
 
-        public DbSet<ViessmannSolarMidresData> ViessmannSolarTimeseries { get; set; }
+        public DbSet<ViessmannSolarMidresData> ViessmannSolarTimeseries { get; set; } = null!;
         #endregion
 
 
         #region ISonnenDbContext
-        public DbSet<SonnenEnergyLowresData> SonnenEnergyLowresDataSet { get; set; }
+        public DbSet<SonnenEnergyLowresData> SonnenEnergyLowresDataSet { get; set; } = null!;
 
-        public DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; }
+        public DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; } = null!;
         #endregion
 
 
