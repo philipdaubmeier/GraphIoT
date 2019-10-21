@@ -26,19 +26,19 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         public class BackupRoot
         {
             [JsonProperty("tables")]
-            public List<BackupTable> Tables { get; set; }
+            public List<BackupTable> Tables { get; set; } = null!;
         }
 
         public class BackupTable
         {
             [JsonProperty("table")]
-            public string Table { get; set; }
+            public string Table { get; set; } = null!;
 
             [JsonProperty("columns")]
-            public List<string> Columns { get; set; }
+            public List<string> Columns { get; set; } = null!;
 
             [JsonProperty("rows")]
-            public List<List<object>> Rows { get; set; }
+            public List<List<object?>> Rows { get; set; } = null!;
         }
 
         /// <summary>
@@ -51,9 +51,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         {
             return GetTables(db, tableFilter).Select(table => new BackupTable()
             {
-                Table = table.Item1.Name,
-                Columns = GetColumnNames(table.Item2),
-                Rows = GetColumns(table.Item2, start, end)
+                Table = table.property.Name,
+                Columns = GetColumnNames(table.value),
+                Rows = GetColumns(table.value, start, end)
             });
         }
 
@@ -63,41 +63,43 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         /// </summary>
         public async Task RestoreBackup(Stream backupToLoad, CancellationToken cancellationToken = default)
         {
-            BackupRoot backupData = null;
+            BackupRoot? backupData = null;
             using (var sr = new StreamReader(backupToLoad))
             using (var jsonTextReader = new JsonTextReader(sr))
                 backupData = _jsonSerializer.Deserialize<BackupRoot>(jsonTextReader);
 
-            if (backupData == null)
+            if (backupData is null)
                 throw new IOException("Backup could not be parsed - wrong format");
 
             var tableFilters = backupData?.Tables?.Select(table => table.Table.Trim())?.ToList() ?? new List<string>();
 
-            foreach (var table in GetTables(db, tableFilters))
+            foreach (var (property, value) in GetTables(db, tableFilters))
             {
-                var tableData = backupData.Tables.Where(tableToRestore => tableToRestore.Table == table.Item1.Name).FirstOrDefault();
+                var tableData = backupData?.Tables.Where(tableToRestore => tableToRestore.Table == property.Name).FirstOrDefault();
                 if (tableData == null)
                     continue;
 
-                var columnNames = GetColumnNames(table.Item2).ToList();
+                var columnNames = GetColumnNames(value).ToList();
                 if (tableData.Columns.Count != columnNames.Count)
-                    throw new IOException($"Backup has different number of columns than current database in table \"{table.Item1.Name}\"");
+                    throw new IOException($"Backup has different number of columns than current database in table \"{property.Name}\"");
 
                 if (!tableData.Columns.All(x => x == columnNames[tableData.Columns.IndexOf(x)]))
-                    throw new IOException($"Backup has different columns or in different order than current database in table \"{table.Item1.Name}\"");
+                    throw new IOException($"Backup has different columns or in different order than current database in table \"{property.Name}\"");
 
-                var columnProps = GetColumnProperties(table.Item2).ToList();
+                var columnProps = GetColumnProperties(value).ToList();
                 foreach (var row in tableData.Rows)
-                    RestoreBackupRow(table.Item2, row, table.Item1, columnProps);
+                    RestoreBackupRow(value, row, property, columnProps);
             }
 
             await db.SaveChangesAsync(cancellationToken);
         }
 
-        private void RestoreBackupRow(IQueryable<object> tableDbSet, List<object> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
+        private void RestoreBackupRow(IQueryable<object> tableDbSet, List<object?> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
         {
             var entityType = tableProperty.PropertyType.GenericTypeArguments.First();
             var newEntity = Activator.CreateInstance(entityType);
+            if (newEntity is null)
+                throw new Exception($"Could not instantiate {entityType}");
 
             for (int i = 0; i < Math.Min(columnProperties.Count, rowData.Count); i++)
                 columnProperties[i].SetPropertyValue(newEntity, rowData[i]);
@@ -108,14 +110,14 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             methodInfo.Invoke(null, new object[] { tableDbSet, db, newEntity });
         }
 
-        private IEnumerable<Tuple<PropertyInfo, IQueryable<object>>> GetTables(DbContext dbContext, ICollection<string> tableFilter)
+        private IEnumerable<(PropertyInfo property, IQueryable<object> value)> GetTables(DbContext dbContext, ICollection<string> tableFilter)
         {
             var tableProperties = dbContext.GetType().GetProperties()
                     .Where(prop => prop.PropertyType.IsSubclassOfGeneric(typeof(DbSet<>)))
                     .Where(prop => tableFilter.Count <= 0 ? true : tableFilter.Contains(prop.Name, StringComparer.InvariantCultureIgnoreCase));
 
-            return tableProperties.Select(prop => new Tuple<PropertyInfo, IQueryable<object>>(prop,
-                prop.GetGetMethod().Invoke(dbContext, null) as IQueryable<object>));
+            return tableProperties.Select(prop => (prop, prop.GetGetMethod()?.Invoke(dbContext, null) as IQueryable<object>))
+                .Where(x => x.Item2 != null).Select(x => (x.prop, x.Item2!));
         }
 
         private IEnumerable<PropertyInfo> GetColumnProperties(IQueryable<object> table)
@@ -131,7 +133,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             return GetColumnProperties(table).Select(prop => prop.Name).ToList();
         }
 
-        private List<List<object>> GetColumns(IQueryable<object> table, DateTime start, DateTime end)
+        private List<List<object?>> GetColumns(IQueryable<object> table, DateTime start, DateTime end)
         {
             var columnProperties = GetColumnProperties(table);
 
@@ -141,7 +143,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             else
                 rows = table;
 
-            return rows.Select(row => columnProperties.Select(prop => prop.GetGetMethod().Invoke(row, null)).ToList()).ToList();
+            return rows.Select(row => columnProperties.Select(prop => prop.GetGetMethod())
+                                                      .Where(getter => getter != null)
+                                                      .Select(getter => getter!.Invoke(row, null)).ToList()).ToList();
         }
     }
 }
