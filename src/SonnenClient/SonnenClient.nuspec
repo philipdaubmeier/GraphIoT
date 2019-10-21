@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Sonnen Portal RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+      1.2.0-beta1 - added support for HttpClientFactory and Polly. Enabled non-nullable reference types.
       1.1.0 - migrated to .NET Core 3.0
       1.0.0 - Initial version with publishing version 1.0 of GraphIoT
     </releaseNotes>
@@ -20,7 +21,7 @@
       <group targetFramework="netcoreapp3.0">
         <dependency id="HtmlAgilityPack" version="1.11.16" />
         <dependency id="Microsoft.AspNet.WebApi.Client" version="5.2.7" />
-        <dependency id="Newtonsoft.Json" version="12.0.2" />
+        <dependency id="Newtonsoft.Json" version="12.0.3-beta2" />
         <dependency id="NodaTime" version="2.4.7" />
       </group>
     </dependencies>

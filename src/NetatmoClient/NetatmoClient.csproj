@@ -13,13 +13,13 @@
     <PackageId>PhilipDaubmeier.NetatmoClient</PackageId>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.1.0</Version>
+    <Version>1.2.0-beta1</Version>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3-beta2" />
     <PackageReference Include="NodaTime" Version="2.4.7" />
   </ItemGroup>
 
