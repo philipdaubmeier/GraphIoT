@@ -2,6 +2,6 @@
 {
     internal class ApplicationTokenResponse : IWiremessagePayload
     {
-        public string ApplicationToken { get; set; }
+        public string? ApplicationToken { get; set; }
     }
 }

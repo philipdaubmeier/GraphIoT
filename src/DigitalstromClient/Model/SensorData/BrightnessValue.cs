@@ -2,7 +2,7 @@
 {
     public class BrightnessValue : AbstractSensorValue
     {
-        public static implicit operator BrightnessValue(SensorValue sensor)
+        public static implicit operator BrightnessValue?(SensorValue sensor)
         {
             return sensor.BrightnessValueTime.HasValue ? new BrightnessValue()
             {

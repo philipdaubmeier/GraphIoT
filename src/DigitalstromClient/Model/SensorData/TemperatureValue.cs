@@ -2,7 +2,7 @@
 {
     public class TemperatureValue : AbstractSensorValue
     {
-        public static implicit operator TemperatureValue(SensorValue sensor)
+        public static implicit operator TemperatureValue?(SensorValue sensor)
         {
             return sensor.TemperatureValueTime.HasValue ? new TemperatureValue()
             {

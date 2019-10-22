@@ -22,13 +22,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model
 
         public T? Result
         {
-            get
-            {
-                if (!Ok)
-                    throw new Exception("Received ok=false while parsing result!");
-
-                return _result;
-            }
+            get => _result;
             set => _result = value;
         }
     }

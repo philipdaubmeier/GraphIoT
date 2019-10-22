@@ -6,7 +6,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 {
     public class MeteringCircuitsResponse : IWiremessagePayload
     {
-        public List<MeteringCapabilities> DSMeters { get; set; }
+        public List<MeteringCapabilities> DSMeters { get; set; } = new List<MeteringCapabilities>();
 
         /// <summary>
         /// Returns the DSUID and name of all circuits that have metering capability
@@ -18,9 +18,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Energy
 
     public class MeteringCapabilities
     {
-        public Dsuid DSUID { get; set; }
-        public string Name { get; set; }
-        public List<MeteringCapability> Capabilities { get; set; }
+        public Dsuid DSUID { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public List<MeteringCapability> Capabilities { get; set; } = new List<MeteringCapability>();
     }
 
     public class MeteringCapability

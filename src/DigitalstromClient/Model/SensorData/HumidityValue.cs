@@ -2,7 +2,7 @@
 {
     public class HumidityValue : AbstractSensorValue
     {
-        public static implicit operator HumidityValue(SensorValue sensor)
+        public static implicit operator HumidityValue?(SensorValue sensor)
         {
             return sensor.HumidityValueTime.HasValue ? new HumidityValue()
             {

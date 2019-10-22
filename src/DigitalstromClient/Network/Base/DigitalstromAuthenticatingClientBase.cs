@@ -47,12 +47,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// <returns>The deserialized response object</returns>
         protected async Task<T> Load<T>(Uri uri) where T : class, IWiremessagePayload
         {
-            var payload = await Load<T>(new UriQueryStringBuilder(uri));
-
-            if (payload is null)
-                throw new IOException("Received ok=true but no result payload could be parsed!");
-
-            return payload;
+            return await Load<T>(new UriQueryStringBuilder(uri));
         }
 
         /// <summary>
@@ -64,9 +59,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             await Load(new UriQueryStringBuilder(uri));
         }
 
-        private protected async Task<T?> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
+        private protected async Task<T> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
-            return await Load<T>(uri, true);
+            var payload = await Load<T>(uri, true);
+
+            if (payload is null)
+                throw new IOException("Received ok=true but no result payload could be parsed!");
+
+            return payload;
         }
 
         private protected async Task Load(UriQueryStringBuilder uri)
@@ -157,9 +157,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             var responseData = await LoadWiremessage<SessionTokenResponse>(uri);
 
-            if (responseData == null)
+            if (responseData is null)
                 throw new FormatException("No response data received");
-            if (responseData.Ok && responseData.Result != null)
+            if (responseData.Ok && responseData.Result?.Token != null)
                 return responseData.Result.Token;
             throw new IOException("Could not log in");
         }

@@ -5,9 +5,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
 {
     public class HeatingConfigZone
     {
-        public Zone Id { get; set; }
-        public string Name { get; set; }
-        public Dsuid ControlDSUID { get; set; }
+        public Zone Id { get; set; } = 0;
+        public string Name { get; set; } = string.Empty;
+        public Dsuid ControlDSUID { get; set; } = string.Empty;
         public bool IsConfigured { get; set; }
         public int? ControlMode { get; set; }
         public int? EmergencyValue { get; set; }
@@ -27,6 +27,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Heating
 
     public class TemperatureControlConfigResponse : IWiremessagePayload
     {
-        public List<HeatingConfigZone> Zones { get; set; }
+        public List<HeatingConfigZone> Zones { get; set; } = new List<HeatingConfigZone>();
     }
 }

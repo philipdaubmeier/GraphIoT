@@ -2,7 +2,7 @@
 {
     public class CO2ConcentrationValue : AbstractSensorValue
     {
-        public static implicit operator CO2ConcentrationValue(SensorValue sensor)
+        public static implicit operator CO2ConcentrationValue?(SensorValue sensor)
         {
             return sensor.CO2ConcentrationValueTime.HasValue ? new CO2ConcentrationValue()
             {

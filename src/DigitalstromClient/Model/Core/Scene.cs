@@ -260,7 +260,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _scene.CompareTo(value._scene);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _scene.CompareTo((value as Scene)?._scene ?? value);
         }
@@ -270,9 +270,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return this == scene;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Scene);
+            return obj is Scene scene && this == scene;
         }
 
         public override int GetHashCode()
@@ -282,7 +282,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
-            return Enum.GetName(typeof(SceneCommand), _scene);
+            return Enum.GetName(typeof(SceneCommand), _scene) ?? string.Empty;
         }
 
         public string ToDisplayString()

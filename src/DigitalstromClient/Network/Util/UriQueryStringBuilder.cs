@@ -50,9 +50,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             return value.HasValue ? AddQuery(key, value.Value) : this;
         }
 
-        public UriQueryStringBuilder AddQuery(string key, List<KeyValuePair<string, string>> keyValueList)
+        public UriQueryStringBuilder AddQuery(string key, List<KeyValuePair<string, string>>? keyValueList)
         {
-            if (keyValueList == null || keyValueList.Count == 0)
+            if (keyValueList is null || keyValueList.Count == 0)
                 return this;
 
             _values.Add(key, string.Join(";", keyValueList.Select(x => x.Key + "=" + x.Value).ToArray()));

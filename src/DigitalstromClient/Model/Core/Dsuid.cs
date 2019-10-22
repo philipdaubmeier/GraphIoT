@@ -54,14 +54,14 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _hex.CompareTo(value._hex);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _hex.CompareTo((value as Dsuid)?._hex ?? value);
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object? o)
         {
-            return this == (o as Dsuid);
+            return o is Dsuid dsuid && this == dsuid;
         }
 
         public bool Equals(Dsuid g)

@@ -518,7 +518,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             var result = await dsApiClient.GetZonesAndSensorValues();
 
             Assert.Equal(0, (int)result.Zones[0].ZoneID);
-            Assert.Null(result.Zones[0].Sensor);
+            Assert.Empty(result.Zones[0].Sensor);
 
             Assert.Equal(32027, (int)result.Zones[2].ZoneID);
             Assert.Equal(9, (int)result.Zones[2].Sensor[0].Type);

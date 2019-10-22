@@ -154,7 +154,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _group.CompareTo(value._group);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _group.CompareTo((value as Group)?._group ?? value);
         }
@@ -164,9 +164,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return this == group;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Group);
+            return obj is Group group && this == group;
         }
 
         public override int GetHashCode()

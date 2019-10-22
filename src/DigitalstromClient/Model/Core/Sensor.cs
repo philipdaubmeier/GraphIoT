@@ -119,7 +119,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _type.CompareTo(value._type);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _type.CompareTo((value as Sensor)?._type ?? value);
         }
@@ -129,9 +129,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return this == sensor;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Sensor);
+            return obj is Sensor sensor && this == sensor;
         }
 
         public override int GetHashCode()

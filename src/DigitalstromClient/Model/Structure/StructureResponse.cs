@@ -2,6 +2,6 @@
 {
     public class StructureResponse : IWiremessagePayload
     {
-        public Apartment Apartment { get; set; }
+        public Apartment Apartment { get; set; } = new Apartment();
     }
 }

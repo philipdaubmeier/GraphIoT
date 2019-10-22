@@ -104,7 +104,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
                 .Where(x => x.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 .FirstOrDefault();
 
-            if (matchingEvent == null)
+            if (matchingEvent is null)
                 return new SystemEventName(SystemEvent.Unknown);
             return matchingEvent;
         }
@@ -121,9 +121,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Events
             return name1.Type == name2.Type;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return ((SystemEventName)obj).Type == Type;
+            return obj is SystemEventName sysEvent && this == sysEvent;
         }
 
         public override int GetHashCode()

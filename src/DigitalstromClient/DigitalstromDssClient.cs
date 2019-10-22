@@ -74,7 +74,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         public async Task<Apartment> GetStructure()
         {
-            return (await Load<StructureResponse>(new Uri("/json/apartment/getStructure", UriKind.Relative)))?.Apartment;
+            return (await Load<StructureResponse>(new Uri("/json/apartment/getStructure", UriKind.Relative))).Apartment;
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         public async Task<ReachableScenesResponse> GetReachableScenes(Zone zone, Group group)
         {
             return await Load<ReachableScenesResponse>(new Uri("/json/zone/getReachableScenes", UriKind.Relative)
-                .AddQuery("id", zone).AddQuery("groupID", group ?? (int?)null));
+                .AddQuery("id", zone).AddQuery("groupID", (int?)group ?? null));
         }
 
         /// <summary>
@@ -162,10 +162,10 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </summary>
         /// <param name="zone">Zone ID</param>
         /// <param name="group">The target group</param>
-        public async Task<LastCalledScenesResponse> GetLastCalledScene(Zone zone, Group group = null)
+        public async Task<LastCalledScenesResponse> GetLastCalledScene(Zone zone, Group? group = null)
         {
             return await Load<LastCalledScenesResponse>(new Uri("/json/zone/getLastCalledScene", UriKind.Relative)
-                .AddQuery("id", zone).AddQuery("groupID", group ?? (int?)null));
+                .AddQuery("id", zone).AddQuery("groupID", group is null ? null : (int?)group ?? null));
         }
 
         /// <summary>
@@ -308,7 +308,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// </remarks>
         /// <param name="name">Identifier for event</param>
         /// <param name="parameters">List of key-value pairs</param>
-        public async Task RaiseEvent(IEventName name, List<KeyValuePair<string, string>> parameters = null)
+        public async Task RaiseEvent(IEventName name, List<KeyValuePair<string, string>>? parameters = null)
         {
             await Load(new Uri("/json/event/raise", UriKind.Relative)
                 .AddQuery("name", name.Name).AddQuery("parameter", parameters));

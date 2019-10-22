@@ -51,7 +51,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _zone.CompareTo(value._zone);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _zone.CompareTo((value as Zone)?._zone ?? value);
         }
@@ -61,9 +61,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return this == zone;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Zone);
+            return obj is Zone zone && this == zone;
         }
 
         public override int GetHashCode()
