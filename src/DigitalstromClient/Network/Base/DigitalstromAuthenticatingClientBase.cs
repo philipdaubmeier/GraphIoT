@@ -47,7 +47,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         /// <returns>The deserialized response object</returns>
         protected async Task<T> Load<T>(Uri uri) where T : class, IWiremessagePayload
         {
-            return await Load<T>(new UriQueryStringBuilder(uri));
+            var payload = await Load<T>(new UriQueryStringBuilder(uri));
+
+            if (payload is null)
+                throw new IOException("Received ok=true but no result payload could be parsed!");
+
+            return payload;
         }
 
         /// <summary>
@@ -59,7 +64,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             await Load(new UriQueryStringBuilder(uri));
         }
 
-        private protected async Task<T> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
+        private protected async Task<T?> Load<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
             return await Load<T>(uri, true);
         }
@@ -69,12 +74,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             await Load<VoidPayload>(uri, false);
         }
 
-        private protected new async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
+        private protected new async Task<T?> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
             await Authenticate();
 
             if (!SkipAuthentication())
-                uri = uri.AddQuery("token", _authData.SessionToken);
+            {
+                var sessionToken = _authData.SessionToken;
+                if (sessionToken is null)
+                    throw new ArgumentException("No session token present for connecting");
+
+                uri = uri.AddQuery("token", sessionToken);
+            }
 
             var result = await base.Load<T>(uri, hasPayload);
 
@@ -131,11 +142,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             var responseData = await LoadWiremessage<ApplicationTokenResponse>(uri);
 
-            var appToken = responseData == null || responseData.Result == null ? null : responseData.Result.ApplicationToken;
-            await _authData.UpdateTokenAsync(null, DateTime.MinValue, appToken);
-
-            if (_authData.ApplicationToken == null)
+            var appToken = responseData?.Result?.ApplicationToken;
+            if (appToken is null)
                 throw new IOException("Could not get an application token");
+            
+            await _authData.UpdateTokenAsync(null, DateTime.MinValue, appToken);
         }
 
         private async Task<string> LoginCredentials()
@@ -158,8 +169,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (_authData.MustFetchApplicationToken() || string.IsNullOrEmpty(loginSessionToken))
                 throw new ArgumentException("Application token and temporary session token must be present before getting a new session token");
 
+            var appToken = _authData.ApplicationToken;
+            if (appToken is null)
+                throw new ArgumentException("Application token could not be loaded for activating it");
+
             Uri uri = new Uri("/json/system/enableToken", UriKind.Relative)
-                .AddQuery("applicationToken", _authData.ApplicationToken)
+                .AddQuery("applicationToken", appToken)
                 .AddQuery("token", loginSessionToken);
 
             var responseData = await LoadWiremessage<LoginResponse>(uri);
@@ -175,8 +190,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (_authData.MustFetchApplicationToken())
                 throw new ArgumentException("Application token must be present before getting a session token");
 
+            var appToken = _authData.ApplicationToken;
+            if (appToken is null)
+                throw new ArgumentException("Application token could not be loaded for refreshing session token");
+
             Uri uri = new Uri("/json/system/loginApplication", UriKind.Relative)
-                .AddQuery("loginToken", _authData.ApplicationToken);
+                .AddQuery("loginToken", appToken);
 
             var responseData = await LoadWiremessage<SessionTokenResponse>(uri);
 
@@ -185,7 +204,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
             if (responseData.Ok && responseData.Result != null && !string.IsNullOrEmpty(responseData.Result.Token))
             {
-                await _authData.UpdateTokenAsync(responseData.Result.Token, DateTime.UtcNow.AddSeconds(60), _authData.ApplicationToken);
+                await _authData.UpdateTokenAsync(responseData.Result.Token, DateTime.UtcNow.AddSeconds(60), appToken);
                 return true;
             }
 

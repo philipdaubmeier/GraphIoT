@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private readonly JsonSerializer _jsonSerializer = new JsonSerializer();
         private readonly UriPriorityList _baseUris;
         private readonly HttpClient _client;
-        private Task _initializeTask;
+        private Task? _initializeTask;
 
         /// <summary>
         /// Provides fundamental functionality to request the Digitalstrom DSS REST webservice
@@ -66,7 +66,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             await GetBaseUri();
         }
 
-        private async Task<Uri> GetBaseUri()
+        private async Task<Uri?> GetBaseUri()
         {
             if (_initializeTask == null)
                 return _baseUris.GetCurrent();
@@ -80,7 +80,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private async Task<Uri> BuildAbsoluteUri(Uri relativeUri)
         {
             var baseUri = await GetBaseUri();
-            if (_baseUris.CurrentHasAuthIncluded())
+            if (baseUri is null)
+                throw new IOException("No base uri was given");
+            else if (_baseUris.CurrentHasAuthIncluded())
                 return new Uri($"{baseUri}{WebUtility.UrlEncode(relativeUri.ToString())}");
             else
                 return new Uri(baseUri, relativeUri);
@@ -91,11 +93,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             return await Load<T>(uri, hasPayload);
         }
 
-        private protected async Task<T> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
+        private protected async Task<T?> Load<T>(UriQueryStringBuilder uri, bool hasPayload = true) where T : class, IWiremessagePayload
         {
-            Wiremessage<T> responseData = await LoadWiremessage<T>(uri);
+            var responseData = await LoadWiremessage<T>(uri);
 
-            if (responseData == null)
+            if (responseData is null)
                 throw new FormatException("No response data received");
 
             if (!responseData.Ok)
@@ -104,13 +106,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                     responseData.Message ?? "null"));
             }
 
-            if (hasPayload && responseData.Result == null)
+            if (hasPayload && responseData.Result is null)
                 throw new IOException("Received ok=true but no result object!");
 
             return responseData.Result;
         }
 
-        private protected async Task<Wiremessage<T>> LoadWiremessage<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
+        private protected async Task<Wiremessage<T>?> LoadWiremessage<T>(UriQueryStringBuilder uri) where T : class, IWiremessagePayload
         {
             var requestUri = await BuildAbsoluteUri(uri);
             var responseMessage = await _client.GetAsync(requestUri);

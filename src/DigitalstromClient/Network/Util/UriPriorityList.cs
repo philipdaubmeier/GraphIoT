@@ -11,9 +11,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         private readonly List<bool> _authIncluded;
         private int _currentIndex = 0;
 
-        public UriPriorityList(List<Uri> list)
+        public UriPriorityList(IEnumerable<Uri> list)
         {
-            _list = list;
+            _list = list.ToList();
             _authIncluded = Enumerable.Range(0, _list.Count).Select(i => false).ToList();
         }
 
@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             _authIncluded = Enumerable.Range(0, _list.Count).Select(i => i < authInclList.Count ? authInclList[i] : false).ToList();
         }
 
-        public Uri GetCurrent()
+        public Uri? GetCurrent()
         {
             if (_list.Count <= 0)
                 return null;

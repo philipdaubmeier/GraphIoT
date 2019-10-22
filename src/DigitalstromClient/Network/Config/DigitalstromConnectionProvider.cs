@@ -14,8 +14,11 @@ namespace PhilipDaubmeier.DigitalstromClient
         private static readonly Semaphore trustCertificateSemaphore = new Semaphore(1, 1);
 
         private bool skipDisposingHttpClient = false;
-        protected HttpClient httpClient;
-        protected HttpMessageHandler httpHandler;
+        protected HttpClient? httpClient = null;
+
+#pragma warning disable IDE0069 // IDisposable.Dispose() is never called on httpHandler because its parent HttpClient disposes it already.
+        protected HttpMessageHandler? httpHandler = null;
+#pragma warning restore IDE0069
 
         /// <summary>
         /// See <see cref="IDigitalstromConnectionProvider.Uris"/>
@@ -34,13 +37,13 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// with the same fingerprint, issuer and serial number. If it returns null,
         /// any valid cert is accepted but no self-signed ones of a Digitalstrom server.
         /// </summary>
-        public X509Certificate2 ServerCertificate { get; set; }
+        public X509Certificate2? ServerCertificate { get; set; }
 
         /// <summary>
         /// Gets or sets a callback method to validate the server certificate, which
         /// is called if no ServerCertificate is set.
         /// </summary>
-        public Func<X509Certificate2, bool> ServerCertificateValidationCallback { get; private set; }
+        public Func<X509Certificate2, bool>? ServerCertificateValidationCallback { get; private set; }
 
         /// <summary>
         /// A HttpMessageHandler to inject for the connection to the Digitalstrom server,
@@ -85,19 +88,19 @@ namespace PhilipDaubmeier.DigitalstromClient
             }
         }
 
-        public DigitalstromConnectionProvider(Uri uri, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
+        public DigitalstromConnectionProvider(Uri uri, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool>? certCallback, HttpMessageHandler? handler = null)
             : this(new UriPriorityList(new List<Uri>() { uri }), credentialCallback, certCallback, handler)
         { }
 
-        public DigitalstromConnectionProvider(Uri uri, IDigitalstromAuth authData, X509Certificate2 cert = null, HttpMessageHandler handler = null)
+        public DigitalstromConnectionProvider(Uri uri, IDigitalstromAuth authData, X509Certificate2? cert = null, HttpMessageHandler? handler = null)
             : this(new UriPriorityList(new List<Uri>() { uri }), authData, cert, null, handler)
         { }
 
-        public DigitalstromConnectionProvider(UriPriorityList uris, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool> certCallback, HttpMessageHandler handler = null)
+        public DigitalstromConnectionProvider(UriPriorityList uris, Func<IDigitalstromAuth> credentialCallback, Func<X509Certificate2, bool>? certCallback, HttpMessageHandler? handler = null)
             : this(uris, new EphemeralDigitalstromAuth(credentialCallback), null, certCallback, handler)
         { }
 
-        public DigitalstromConnectionProvider(UriPriorityList uris, IDigitalstromAuth authData, X509Certificate2 cert = null, Func<X509Certificate2, bool> certCallback = null, HttpMessageHandler handler = null)
+        public DigitalstromConnectionProvider(UriPriorityList uris, IDigitalstromAuth authData, X509Certificate2? cert = null, Func<X509Certificate2, bool>? certCallback = null, HttpMessageHandler? handler = null)
         {
             Uris = uris;
             AuthData = authData;
@@ -111,12 +114,13 @@ namespace PhilipDaubmeier.DigitalstromClient
         private HttpMessageHandler BuildHttpHandler()
         {
             var clientHandler = httpHandler ?? new HttpClientHandler();
-            if (!(clientHandler is HttpClientHandler) ||
+            if (!(clientHandler is HttpClientHandler httpClientHandler) ||
                 (ServerCertificate is null && ServerCertificateValidationCallback is null))
                 return clientHandler;
 
-            (clientHandler as HttpClientHandler).ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
-                sslPolicyErrors == SslPolicyErrors.None || ValidateCertificate(cert);
+            if (!(httpClientHandler is null))
+                httpClientHandler.ServerCertificateCustomValidationCallback = (request, cert, chain, sslPolicyErrors) =>
+                    sslPolicyErrors == SslPolicyErrors.None || ValidateCertificate(cert);
             return clientHandler;
         }
 
