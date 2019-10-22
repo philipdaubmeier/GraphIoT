@@ -34,24 +34,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEqualsOperators()
         {
-            Zone zone1 = null;
-            Zone zone2 = null;
-            Zone zone3 = 7;
-            Zone zone4 = 12;
-            Zone zone5 = 12;
+            Zone zone1 = 7;
+            Zone zone2 = 12;
+            Zone zone3 = 12;
 
-            Assert.True(zone1 == zone2);
-            Assert.False(zone2 == zone3);
-            Assert.False(zone3 == zone4);
-            Assert.True(zone4 == zone5);
+            Assert.False(zone1 == zone2);
+            Assert.True(zone2 == zone3);
 
-            Assert.False(zone1 != zone2);
-            Assert.True(zone2 != zone3);
-            Assert.True(zone3 != zone4);
-            Assert.False(zone4 != zone5);
+            Assert.True(zone1 != zone2);
+            Assert.False(zone2 != zone3);
 
-            Assert.False(zone3.Equals(zone4));
-            Assert.True(zone4.Equals(zone5));
+            Assert.False(zone1.Equals(zone2));
+            Assert.True(zone2.Equals(zone3));
         }
 
         [Theory]

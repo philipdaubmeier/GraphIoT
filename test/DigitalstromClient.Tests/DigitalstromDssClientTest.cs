@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetSensorValues()
         {
-            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+            using var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
                 .AddAuthMock()
                 .AddSensorMocks(1, 1)
                 .ToMockProvider());
@@ -44,8 +44,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             Assert.Equal(20.05, result.Zones[1].Values[0].TemperatureValue);
             Assert.Equal(42.475, result.Zones[1].Values[1].HumidityValue);
 
-            Assert.Equal(20.05, result.Zones[1].Temperature.Value);
-            Assert.Equal(42.475, result.Zones[1].Humidity.Value);
+            Assert.Equal(20.05, result.Zones[1].Temperature?.Value);
+            Assert.Equal(42.475, result.Zones[1].Humidity?.Value);
             Assert.Null(result.Zones[1].Brightness);
             Assert.Null(result.Zones[1].Co2concentration);
         }
@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         {
             var mockHttp = new MockHttpMessageHandler();
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp
+            using var dsApiClient = new DigitalstromDssClient(mockHttp
                 .AddAuthMock()
                 .AddStructureMock()
                 .ToMockProvider());
@@ -128,7 +128,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetTemperatureControlStatus();
 
@@ -175,7 +175,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetTemperatureControlValues();
 
@@ -233,7 +233,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetTemperatureControlConfig();
 
@@ -267,7 +267,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""message"": ""Cannot set control values in current mode""
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             await Assert.ThrowsAsync<IOException>(() => dsApiClient.SetTemperatureControlValues(zoneKitchen, null, null, 22));
         }
@@ -283,7 +283,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             await dsApiClient.CallScene(zoneKitchen, Color.Yellow, SceneCommand.Preset1, true);
         }
@@ -304,7 +304,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetReachableScenes(zoneKitchen, Color.Yellow);
 
@@ -327,11 +327,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetLastCalledScene(zoneKitchen, Color.Yellow);
 
-            Assert.Equal(5, (int)result.Scene);
+            Assert.Equal(5, (int)(result.Scene ?? 0));
         }
 
         [Fact]
@@ -371,7 +371,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var zonesScenes = await dsApiClient.GetZonesAndLastCalledScenes();
             Assert.NotEmpty(zonesScenes.Zones);
@@ -425,7 +425,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var zonesScenes = await dsApiClient.GetDevicesAndOutputChannelTypes();
             Assert.NotEmpty(zonesScenes.Zones);
@@ -494,7 +494,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var zonesScenes = await dsApiClient.GetDevicesAndLastOutputValues();
             Assert.NotEmpty(zonesScenes.Zones);
@@ -510,7 +510,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetZonesAndSensorValues()
         {
-            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+            using var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
                 .AddAuthMock()
                 .AddSensorMocks()
                 .ToMockProvider());
@@ -528,7 +528,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetMeteringCircuits()
         {
-            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+            using var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
                 .AddAuthMock()
                 .AddEnergyMeteringMocks()
                 .ToMockProvider());
@@ -549,7 +549,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         {
             var mockHttp = new MockHttpMessageHandler();
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp
+            using var dsApiClient = new DigitalstromDssClient(mockHttp
                 .AddAuthMock()
                 .AddCircuitZonesMocks(new Zone[] { 4, 32027 })
                 .ToMockProvider());
@@ -593,7 +593,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.GetTotalEnergy(1, 2);
 
@@ -609,7 +609,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         [Fact]
         public async Task TestGetEnergy()
         {
-            var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
+            using var dsApiClient = new DigitalstromDssClient(new MockHttpMessageHandler()
                 .AddAuthMock()
                 .AddEnergyMeteringMocks(1, 50)
                 .ToMockProvider());
@@ -636,7 +636,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             await dsApiClient.Subscribe((SystemEventName)SystemEvent.CallScene, 42);
         }
@@ -652,7 +652,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             await dsApiClient.Unsubscribe((SystemEventName)SystemEvent.CallScene, 42);
         }
@@ -693,7 +693,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                                   ""ok"": true
                               }");
 
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             var result = await dsApiClient.PollForEvents(42, 60000);
 
@@ -722,7 +722,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
                     .Respond("application/json", @"{
                                   ""ok"": true
                               }");
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToMockProvider());
 
             await dsApiClient.RaiseEvent((SystemEventName)SystemEvent.CallScene,
                 new List<KeyValuePair<string, string>>() { new KeyValuePair<string, string>("mykey", "myval") });
@@ -732,7 +732,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
         public async Task GenerateUnitTestRequestUris()
         {
             var mockHttp = new MockDigitalstromConnection.TestGenerationHttpMessageHandler();
-            var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToTestGenerationProvider());
+            using var dsApiClient = new DigitalstromDssClient(mockHttp.AddAuthMock().ToTestGenerationProvider());
 
             var UriForMethodName = new Dictionary<string, string>();
 

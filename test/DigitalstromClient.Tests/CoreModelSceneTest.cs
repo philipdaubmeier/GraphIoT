@@ -64,24 +64,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEqualsOperators()
         {
-            Scene scene1 = null;
-            Scene scene2 = null;
-            Scene scene3 = new Scene(SceneCommand.DeepOff);
-            Scene scene4 = new Scene(SceneCommand.Preset4);
-            Scene scene5 = new Scene(SceneCommand.Preset4);
+            Scene scene1 = new Scene(SceneCommand.DeepOff);
+            Scene scene2 = new Scene(SceneCommand.Preset4);
+            Scene scene3 = new Scene(SceneCommand.Preset4);
 
-            Assert.True(scene1 == scene2);
-            Assert.False(scene2 == scene3);
-            Assert.False(scene3 == scene4);
-            Assert.True(scene4 == scene5);
+            Assert.False(scene1 == scene2);
+            Assert.True(scene2 == scene3);
 
-            Assert.False(scene1 != scene2);
-            Assert.True(scene2 != scene3);
-            Assert.True(scene3 != scene4);
-            Assert.False(scene4 != scene5);
+            Assert.True(scene1 != scene2);
+            Assert.False(scene2 != scene3);
 
-            Assert.False(scene3.Equals(scene4));
-            Assert.True(scene4.Equals(scene5));
+            Assert.False(scene1.Equals(scene2));
+            Assert.True(scene2.Equals(scene3));
         }
 
         [Theory]

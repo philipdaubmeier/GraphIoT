@@ -65,24 +65,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEqualsOperators()
         {
-            Sensor sensorType1 = null;
-            Sensor sensorType2 = null;
-            Sensor sensorType3 = 5;
-            Sensor sensorType4 = 14;
-            Sensor sensorType5 = 14;
+            Sensor sensorType1 = 5;
+            Sensor sensorType2 = 14;
+            Sensor sensorType3 = 14;
 
-            Assert.True(sensorType1 == sensorType2);
-            Assert.False(sensorType2 == sensorType3);
-            Assert.False(sensorType3 == sensorType4);
-            Assert.True(sensorType4 == sensorType5);
+            Assert.False(sensorType1 == sensorType2);
+            Assert.True(sensorType2 == sensorType3);
 
-            Assert.False(sensorType1 != sensorType2);
-            Assert.True(sensorType2 != sensorType3);
-            Assert.True(sensorType3 != sensorType4);
-            Assert.False(sensorType4 != sensorType5);
+            Assert.True(sensorType1 != sensorType2);
+            Assert.False(sensorType2 != sensorType3);
 
-            Assert.False(sensorType3.Equals(sensorType4));
-            Assert.True(sensorType4.Equals(sensorType5));
+            Assert.False(sensorType1.Equals(sensorType2));
+            Assert.True(sensorType2.Equals(sensorType3));
         }
 
         [Theory]

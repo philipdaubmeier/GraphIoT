@@ -70,24 +70,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEqualsOperators()
         {
-            Group group1 = null;
-            Group group2 = null;
-            Group group3 = GroupType.Various;
-            Group group4 = GroupType.Light;
-            Group group5 = GroupType.Light;
+            Group group1 = GroupType.Various;
+            Group group2 = GroupType.Light;
+            Group group3 = GroupType.Light;
 
-            Assert.True(group1 == group2);
-            Assert.False(group2 == group3);
-            Assert.False(group3 == group4);
-            Assert.True(group4 == group5);
+            Assert.False(group1 == group2);
+            Assert.True(group2 == group3);
 
-            Assert.False(group1 != group2);
-            Assert.True(group2 != group3);
-            Assert.True(group3 != group4);
-            Assert.False(group4 != group5);
+            Assert.True(group1 != group2);
+            Assert.False(group2 != group3);
 
-            Assert.False(group3.Equals(group4));
-            Assert.True(group4.Equals(group5));
+            Assert.False(group1.Equals(group2));
+            Assert.True(group2.Equals(group3));
         }
 
         [Theory]
