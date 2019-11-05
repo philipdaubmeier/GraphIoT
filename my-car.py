@@ -48,7 +48,7 @@ def mqtt(s,url_base):
     MQTT.mqttc.publish(MQTT_TOPIC + '/tours', CarNetPost(s,url_base, '/-/dimp/get-tours'), qos=0, retain=True)
     MQTT.mqttc.publish(MQTT_TOPIC + '/news', CarNetPost(s,url_base, '/-/news/get-news'), qos=0, retain=True)
     #MQTT.mqttc.publish(MQTT_TOPIC + '/latest-trip-statistics', CarNetPost(s,url_base, '/-/rts/get-latest-trip-statistics'), qos=0, retain=True)
-    MQTT.mqttc.publish(MQTT_TOPIC + '/car-details', CarNetPost(s,url_base, '/-/mainnavigation/load-car-details/WVWZZZ3HZJE506705'), qos=0, retain=True)
+    MQTT.mqttc.publish(MQTT_TOPIC + '/car-details', CarNetPost(s,url_base, '/-/mainnavigation/load-car-details/' + getVin(s, url_base, 0)), qos=0, retain=True)
     MQTT.mqttc.publish(MQTT_TOPIC + '/preferred-dealer', CarNetPost(s,url_base, '/-/mainnavigation/get-preferred-dealer'), qos=0, retain=True)
     MQTT.mqttc.publish(MQTT_TOPIC + '/ppoi-list', CarNetPost(s,url_base, '/-/ppoi/get-ppoi-list'), qos=0, retain=True)
     MQTT.mqttc.publish(MQTT_TOPIC + '/fences', CarNetPost(s,url_base, '/-/geofence/get-fences'), qos=0, retain=True)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
 
     # We need to load a car is spin commands are used
     if CARNET_SPIN:
-        print(CarNetPost(session, url, '/-/mainnavigation/load-car-details/' + CARNET_VIN))
+        CarNetPost(session, url, '/-/mainnavigation/load-car-details/' + CARNET_VIN)
 
     if CARNET_COMMAND == 'startCharge':
         startCharge(session, url)

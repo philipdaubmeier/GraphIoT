@@ -308,9 +308,13 @@ def retrieveCarNetInfo(session, url_base):
     response = CarNetPost(session, url_base, '/-/mainnavigation/get-fully-loaded-cars')
     print(response)
     # Resp ex: {"errorCode":"0","fullyLoadedVehiclesResponse":{"completeVehicles":[],"vehiclesNotFullyLoaded":[{"vin":"WVWZZZAUZGWxxxxxx","name":"GTE Dhr Boer","expired":false,"model":null,"modelCode":null,"modelYear":null,"imageUrl":null,"vehicleSpecificFallbackImageUrl":null,"modelSpecificFallbackImageUrl":null,"defaultImageUrl":"/portal/delegate/vehicle-image/WVWZZZAUZGWxxxxx","vehicleBrand":"v","enrollmentDate":"20160923","deviceOCU1":null,"deviceOCU2":null,"deviceMIB":null,"engineTypeCombustian":false,"engineTypeHybridOCU1":true,"engineTypeHybridOCU2":false,"engineTypeElectric":false,"engineTypeCNG":false,"engineTypeDefault":false,"stpStatus":"UNAVAILABLE","windowstateSupported":true,"dashboardUrl":"/portal/user/55e2ea85-2a5c-46c4-bb0b-f0cde8bcf22e/v_c5rlgqwltznnz_l-k7dfv5l1vxyuyxuz","vhrRequested":false,"vsrRequested":false,"vhrConfigAvailable":false,"verifiedByDealer":false,"vhr2":false,"roleEnabled":true,"isEL2Vehicle":true,"workshopMode":false,"hiddenUserProfiles":false,"mobileKeyActivated":null,"enrollmentType":"MILEAGE","ocu3Low":false,"packageServices":[{"packageServiceId":"NET.500.010.F","propertyKeyReference":"NET.500.010.1","packageServiceName":"e-Remote","trackingName":"e-Remote","activationDate":"03-11-2015","expirationDate":"03-11-2020","expired":false,"expireInAMonth":false,"packageType":"er","enrollmentPackageType":"er"}],"defaultCar":true,"vwConnectPowerLayerAvailable":false,"xprofileId":"c5rlgqwltznnz_l-k7dfv5l1vxyuyxuz","smartCardKeyActivated":null,"fullyEnrolled":true,"secondaryUser":false,"fleet":false,"touareg":false,"iceSupported":false,"flightMode":false,"esimCompatible":false,"dkyenabled":false,"selected":true}],"status":"VALID","currentVehicleValid":true}}
-    vin = json.loads(response).get('fullyLoadedVehiclesResponse').get('vehiclesNotFullyLoaded')[0].get('vin')
-    print('found vin: ',vin)
-    
+    try:
+        vin = json.loads(response).get('fullyLoadedVehiclesResponse').get('vehiclesNotFullyLoaded')[0].get('vin')
+        print('found vin: ',vin)
+    except:
+        vin = json.loads(response).get('fullyLoadedVehiclesResponse').get('completeVehicles')[0].get('vin')
+        print('found vin: ',vin)
+
     # Check on invitations of some kind.
     print(CarNetPost(session, url_base, '/-/mainnavigation/check-unanswered-invitations'))
     # Resp ex: {"checkUnansweredInvitationsResponse":{"hasUnansweredInvitations":false},"errorCode":"0"}

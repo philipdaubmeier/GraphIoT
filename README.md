@@ -1,6 +1,6 @@
 # Python Volkswagen CarNet Client
 
-This is a Python client for Volkswagen CarNet, it simulates the behaviour of the CarNet web page. It allows users to retrieve information about the vehicle (location, temperature and mileage), next to this the Window melt and Climat functionalities can be started from the Python script. This was built based on work from wez3 and reneboer.
+This is a Python client for Volkswagen CarNet - aka VW We Connect -, it simulates the behaviour of the CarNet web page. It allows users to retrieve information about the vehicle (such as location, temperature and mileage), next to this the Window melt and Climat functionalities can be started from the Python script. This was built based on work from wez3 and reneboer.
 
 # Installation
 
@@ -11,61 +11,68 @@ MQTT_HOST = "<hostname or IP>" <- host where your mqtt broker runs
 MQTT_PORT = <port> <- port of your mqtt service, default is 1883
 ```
 
+Install requests and paho-mqtt:
+
+```
+pip install requests paho-mqtt
+```
+or for Python3:
+```
+pip3 install requests paho-mqtt
+```
+
+
+
 # Usage
 
-Run the script with arguments. If you only own one car in VW we, the vin parameter is obsolete. The following are supported:
-```
-python3 vw_carnet_web.py -u <username> -p <password> -s <spin> -v <vin> -c retrieveCarNetInfo
-```
+Run the script with arguments. If you only own one car in VW we, the vin parameter is obsolete.
 
 ```
-python3 vw_carnet_web.py  -u <username> -p <password> -s <spin> -v <vin> -c startClimat
+python3 we_connect_client.py -u <username> -p <password> [-s <spin>] [-v <vin>] -c <command> [-d]
 ```
 
-```
-python3 vw_carnet_web.py  -u <username> -p <password> -s <spin> -v <vin> -c stopClimat
-```
+Add -d for debugging output to the console if needed.
 
-```
-python3 vw_carnet_web.py  -u <username> -p <password> -s <spin> -v <vin> -c startWindowMelt
-```
+The following commands are supported:
 
-```
-python3 vw_carnet_web.py  -u <username> -p <password> -s <spin> -v <vin> -c stopWindowMelt
-```
+* startCharge
+* stopCharge
+* getCharge
+* startClimat
+* startClimate
+* stopClimat
+* stopClimate
+* getClimat
+* getClimate
+* startWindowMelt
+* stopWindowMelt
+* getWindowMelt
+* getVIN
+* remoteLock [spin parameter needed, availability is country-depending]
+* remoteUnlock [spin parameter needed, availability is country-depending]
+* startRemoteVentilation [spin parameter needed]
+* stopRemoteVentilation
+* startRemoteHeating [spin parameter needed]
+* stopRemoteHeating
+* getRemoteHeating
+* getLatestReport    
+* getGeofences
+* getAlerts
+* retrieveCarNetInfo
 
-...
-(see code for more options)
+# Send all data to the MQTT broker configured in lib_mqtt:
 
-Send all data to the MQTT broker configured in lib_mqtt:
+To allow this, I added a new file called my-car.py to the original repository from reneboer. It reuses all functions from we_connect_client but adds one new command: mqtt.
 ```
-python3 vw_carnet.py -u <username> -p <password> -s <spin> -v <vin> -c mqtt
+python3 my-car.py -u <username> -p <password> -s <spin> -v <vin> -c mqtt
 ```
-
+If you like, you can use my-car.py for all commands including the above - it will forward everything besides mqtt to the original code.
 See also [FHEM integration](https://forum.fhem.de/index.php/topic,83090.msg886586.html#msg886586)
 
+# Credits
 
-ORIGINAL README FROM RENEBOER:
-# python-carnet-client
-Python script we_connect_clinet.py emulates the VW WE Connect web site to send commands to your car and get status.
+All this is possible due to the excellent work of reneboer and wez3. See details in his repository [here](https://github.com/reneboer/python-carnet-client)
 
-You must have a VW WE Connect (formerly CarNet) userid and password. Also make sure to logon to the portal https://www.portal.volkswagen-we.com first before using the script. The VW site prompts for several items at first logon the script does not handle.
+# Known issues
 
-This script requires the [requests](https://github.com/kennethreitz/requests) library. To install it, run `pip install requests`.
-
-Based of work from wez3 at https://github.com/wez3/volkswagen-carnet-client
-It has similar functions and Charging control for electric VW's
-
-The first two parameters are your userid and password (in single quotes!), the optional third is the command.
-
-Avaible commands to the script are:
-  startCharge, stopCharge, getCharge, startClimat, stopClimat, getClimat, startClimate, getClimate, stopClimate, startWindowMelt, stopWindowMelt, getWindowMelt
-
-If no command is specified the full car status is retreived.
-
-Command example:
-```
-python we_connect_client.py '<userid>' '<pwd>' startCharge
-```
-
-
+Calling startRemoteVentilation does not switch the car from heating to ventilation mode. It is not yet clear what makes the car switch over to the ventilation mode. Suggestions are welcome.
