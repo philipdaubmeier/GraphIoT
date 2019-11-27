@@ -10,9 +10,9 @@ namespace PhilipDaubmeier.DigitalstromTwin
     {
         private readonly ApartmentState model;
 
-        public event SceneChangedEventHandler SceneChanged;
+        public event SceneChangedEventHandler? SceneChanged;
 
-        internal event SceneChangedEventHandler SceneChangedInternal;
+        internal event SceneChangedEventHandler? SceneChangedInternal;
 
         /// <summary>
         /// Creates a new TwinChangeAggregator instance for the given twin model. It subscribes
@@ -93,8 +93,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private void StatePropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             // ignore sensor state changes, as sensors can not be changed/written
-            var sceneState = sender as SceneState;
-            if (sceneState is null)
+            if (!(sender is SceneState sceneState))
                 return;
 
             if (e.PropertyName != nameof(SceneState.Value))
@@ -113,8 +112,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private void StatePropertyChangedInternal(object sender, PropertyChangedEventArgs e)
         {
-            var sceneState = sender as SceneState;
-            if (sceneState is null)
+            if (!(sender is SceneState sceneState))
                 return;
 
             if (!TryFindZoneAndGroup(sceneState, out Zone zone, out Group group))
@@ -142,8 +140,8 @@ namespace PhilipDaubmeier.DigitalstromTwin
                     return true;
                 }
             }
-            zone = default;
-            group = default;
+            zone = 0;
+            group = 0;
             return false;
         }
     }

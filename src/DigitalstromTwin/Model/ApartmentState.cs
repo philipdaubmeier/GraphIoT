@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         /// <summary>
         /// Event raised when the collection changes.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         public bool IsRoomExisting(Zone zone)
         {

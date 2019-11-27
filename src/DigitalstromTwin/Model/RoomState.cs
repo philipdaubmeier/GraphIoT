@@ -18,14 +18,14 @@ namespace PhilipDaubmeier.DigitalstromTwin
         /// <summary>
         /// Event raised when the collection changes.
         /// </summary>
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
         /// <summary>
         /// Returns true if the given color group has a scene value other than "Unknown"
         /// </summary>
         public bool HasSceneValue(Group color)
         {
-            if (!_sceneStates.TryGetValue(color, out SceneState state))
+            if (!_sceneStates.TryGetValue(color, out SceneState? state))
                 return false;
             return state.Value != _defaultScene;
         }
@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         /// </summary>
         public bool HasSensorValue(Sensor sensor)
         {
-            if (!_sensorStates.TryGetValue(sensor, out SensorState state))
+            if (!_sensorStates.TryGetValue(sensor, out SensorState? state))
                 return false;
             return state.Value.Type != SensorType.UnknownType;
         }

@@ -6,13 +6,12 @@ namespace PhilipDaubmeier.DigitalstromTwin
     public class SensorState : AbstractState<SensorTypeAndValues>
     {
         public SensorState()
-        {
-            Value = new SensorTypeAndValues()
+            : base(new SensorTypeAndValues()
             {
                 Type = SensorType.UnknownType,
                 Time = 0,
                 Value = 0
-            };
-        }
+            })
+        { }
     }
 }

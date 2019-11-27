@@ -9,14 +9,14 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class DigitalstromDssTwin : ApartmentState, IDisposable
     {
-        private readonly DigitalstromDssClient _dssClient;
-        private readonly DssEventSubscriber _subscriber;
-        private readonly TwinChangeAggregator _changeAggregator;
+        private readonly DigitalstromDssClient? _dssClient;
+        private readonly DssEventSubscriber? _subscriber;
+        private readonly TwinChangeAggregator? _changeAggregator;
 
         public event SceneChangedEventHandler SceneChanged
         {
-            add { _changeAggregator.SceneChanged += value; }
-            remove { _changeAggregator.SceneChanged -= value; }
+            add { if (_changeAggregator != null) _changeAggregator.SceneChanged += value; }
+            remove { if (_changeAggregator != null) _changeAggregator.SceneChanged -= value; }
         }
 
         public DigitalstromDssTwin(IDigitalstromConnectionProvider connectionProvider)
@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             _subscriber = _dssClient is null ? null : new DssEventSubscriber(_dssClient, SubscribedEventNames);
             _changeAggregator = _subscriber is null ? null : new TwinChangeAggregator(this);
 
-            if (_changeAggregator == null)
+            if (_subscriber is null || _changeAggregator is null)
                 return;
 
             _subscriber.ApiEventRaised += HandleDssApiEvent;
@@ -38,8 +38,11 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private async void LoadApartmentScenes()
         {
-            var apartment = await _dssClient?.GetZonesAndLastCalledScenes();
-            if (apartment?.Zones == null)
+            if (_dssClient is null)
+                return;
+
+            var apartment = await _dssClient.GetZonesAndLastCalledScenes();
+            if (apartment?.Zones is null)
                 return;
 
             foreach (var zone in apartment.Zones.Where(x => x?.Groups != null))
@@ -49,8 +52,11 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private async void LoadApartmentSensors()
         {
-            var apartment = await _dssClient?.GetZonesAndSensorValues();
-            if (apartment?.Zones == null)
+            if (_dssClient is null)
+                return;
+
+            var apartment = await _dssClient.GetZonesAndSensorValues();
+            if (apartment?.Zones is null)
                 return;
 
             foreach (var zone in apartment.Zones.Where(x => x?.Sensor != null))
@@ -60,7 +66,10 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private async void CallScene(Zone zone, Group group, Scene scene)
         {
-            await _dssClient?.CallScene(zone, group, scene);
+            if (_dssClient is null)
+                return;
+
+            await _dssClient.CallScene(zone, group, scene);
         }
 
         private IEnumerable<IEventName> SubscribedEventNames
@@ -72,9 +81,9 @@ namespace PhilipDaubmeier.DigitalstromTwin
             }
         }
 
-        private void HandleDssApiEvent(object sender, ApiEventRaisedEventArgs<DssEvent> args)
+        private void HandleDssApiEvent(object? sender, ApiEventRaisedEventArgs<DssEvent> args)
         {
-            if (args.ApiEvent == null)
+            if (args.ApiEvent is null)
                 return;
 
             switch (args.ApiEvent.SystemEvent.Type)
@@ -88,7 +97,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private void HandleDssCallSceneEvent(DssEvent dssEvent)
         {
             var props = dssEvent.Properties;
-            if (props == null)
+            if (props is null)
                 return;
 
             this[props.ZoneID, props.GroupID].ValueInternal = props.SceneID;

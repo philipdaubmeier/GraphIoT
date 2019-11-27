@@ -4,9 +4,6 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class SceneState : AbstractState<Scene>
     {
-        public SceneState()
-        {
-            Value = SceneCommand.Unknown;
-        }
+        public SceneState() : base(SceneCommand.Unknown) { }
     }
 }

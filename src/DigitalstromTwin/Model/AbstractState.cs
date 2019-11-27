@@ -7,7 +7,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public abstract class AbstractState<T> : INotifyPropertyChanged
     {
-        private PropertyChangedEventHandler _propertyChanged;
+        private PropertyChangedEventHandler? _propertyChanged;
         public event PropertyChangedEventHandler PropertyChanged
         {
             add
@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             }
         }
 
-        private PropertyChangedEventHandler _propertyChangedInternal;
+        private PropertyChangedEventHandler? _propertyChangedInternal;
         internal event PropertyChangedEventHandler PropertyChangedInternal
         {
             add
@@ -37,7 +37,12 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         public DateTime Timestamp { get; set; }
 
-        private Semaphore _stateSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _stateSemaphore = new Semaphore(1, 1);
+
+        public AbstractState(T value)
+        {
+            _value = value;
+        }
 
         private T _value;
         public T Value

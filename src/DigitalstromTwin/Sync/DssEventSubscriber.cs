@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private volatile bool subscribed;
         private readonly int subscriptionId;
 
-        private DigitalstromDssClient apiClient;
+        private DigitalstromDssClient? apiClient;
         private readonly bool ownsClient = false;
 
         private readonly IEnumerable<IEventName> eventsToSubscribe;
@@ -37,9 +37,12 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         protected override async Task<IEnumerable<DssEvent>> ProcessEventPolling()
         {
+            if (apiClient is null)
+                return new List<DssEvent>();
+
             await Subscribe();
 
-            var events = await apiClient?.PollForEvents(subscriptionId, 60000);
+            var events = await apiClient.PollForEvents(subscriptionId, 60000);
             if (events.Events == null)
                 return new List<DssEvent>();
 
@@ -48,14 +51,14 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private async Task Subscribe()
         {
-            if (subscribed)
+            if (subscribed || apiClient is null)
                 return;
 
             await initializedSempahore.WaitAsync();
             try
             {
                 foreach (var eventName in eventsToSubscribe)
-                    await apiClient?.Subscribe(eventName, subscriptionId);
+                    await apiClient.Subscribe(eventName, subscriptionId);
                 subscribed = true;
             }
             finally

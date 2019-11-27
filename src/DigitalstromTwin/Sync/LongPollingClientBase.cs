@@ -7,21 +7,21 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class ErrorOccuredEventArgs : EventArgs
     {
-        public Exception Error { get; set; }
+        public Exception? Error { get; set; }
     }
 
-    public class ApiEventRaisedEventArgs<TApiEvent> : EventArgs
+    public class ApiEventRaisedEventArgs<TApiEvent> : EventArgs where TApiEvent : class
     {
-        public TApiEvent ApiEvent { get; set; }
+        public TApiEvent? ApiEvent { get; set; }
     }
 
-    public abstract class LongPollingClientBase<TApiEvent> : IDisposable
+    public abstract class LongPollingClientBase<TApiEvent> : IDisposable where TApiEvent : class
     {
-        public event EventHandler<ErrorOccuredEventArgs> ErrorOccured;
+        public event EventHandler<ErrorOccuredEventArgs>? ErrorOccured;
 
-        public event EventHandler<ApiEventRaisedEventArgs<TApiEvent>> ApiEventRaised;
+        public event EventHandler<ApiEventRaisedEventArgs<TApiEvent>>? ApiEventRaised;
 
-        private readonly Task eventWorkerThread = null;
+        private readonly Task? eventWorkerThread = null;
 
         private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
         private readonly CancellationToken cancellationToken;
@@ -52,20 +52,20 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private void OnApiEventRaised(TApiEvent eventItem)
         {
-            if (ApiEventRaised == null)
+            if (ApiEventRaised is null || eventWorkerThread is null)
                 return;
 
             var eventargs = new ApiEventRaisedEventArgs<TApiEvent>() { ApiEvent = eventItem };
-            Task task = eventWorkerThread.ContinueWith((t) => ApiEventRaised(this, eventargs));
+            Task task = eventWorkerThread.ContinueWith(t => ApiEventRaised(this, eventargs));
         }
 
         private void OnErrorOccured(Exception exception)
         {
-            if (ErrorOccured == null)
+            if (ErrorOccured is null || eventWorkerThread is null)
                 return;
 
             var eventargs = new ErrorOccuredEventArgs() { Error = exception };
-            Task task = eventWorkerThread.ContinueWith((t) => ErrorOccured(this, eventargs));
+            Task task = eventWorkerThread.ContinueWith(t => ErrorOccured(this, eventargs));
         }
 
         #region IDisposable Support
@@ -78,6 +78,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
             // This sets the cancellation token and ends the event long polling thread
             cancellationSource.Cancel();
+            cancellationSource.Dispose();
 
             isDisposed = true;
         }
