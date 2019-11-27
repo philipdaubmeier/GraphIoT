@@ -14,19 +14,20 @@ namespace PhilipDaubmeier.DigitalstromDssMock
     {
         public class TestGenerationHttpMessageHandler : MockHttpMessageHandler
         {
-            public string LastCalledUri { get; private set; }
+            public string? lastCalledUri = null;
+            public string LastCalledUri => lastCalledUri ?? string.Empty;
 
             protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                LastCalledUri = request.RequestUri.ToString();
+                lastCalledUri = request.RequestUri.ToString();
 
                 return base.SendAsync(request, cancellationToken);
             }
         }
 
-        private static IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "dssadmin", "mocksecret");
-        private static UriPriorityList testGenerationUris = new UriPriorityList(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
-        private static UriPriorityList mockUris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
+        private static readonly IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "dssadmin", "mocksecret");
+        private static readonly UriPriorityList testGenerationUris = new UriPriorityList(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
+        private static readonly UriPriorityList mockUris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
 
         public static string BaseUri => "https://unittestdummy0000123456789abcdef.digitalstrom.net:8080";
         public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";

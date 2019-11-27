@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         [Fact]
         public void TestEventTimeSeriesStreamIntSeries()
         {
-            var eventstream = new EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>(span);
+            using var eventstream = new EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>(span);
 
             var expectedEmpty = Enumerable.Range(0, count).SelectMany(x => new byte[] { 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00 }).ToArray();
             Assert.Equal(expectedEmpty, eventstream.ToByteArray());
@@ -51,14 +51,15 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         [InlineData(int.MaxValue)]
         public void TestEventTimeSeriesStreamIntValues(int value)
         {
-            var eventstream = new EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>(span);
+            using var eventstream = new EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>(span);
 
             for (int i = 0; i < count; i++)
                 eventstream.WriteEvent(new Tuple<DateTime, int>(begin.AddSeconds(7).AddMilliseconds(i + 1), value));
 
             var bytes = eventstream.ToByteArray();
+            Assert.NotNull(bytes);
 
-            var neweventstream = EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>.FromByteArray(span, bytes);
+            var neweventstream = EventTimeSeriesStream<Tuple<DateTime, int>, EventValueSerializer<int>>.FromByteArray(span, bytes!);
 
             Assert.Equal(count, neweventstream.Count());
 
