@@ -213,7 +213,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.Preset0;
 
             var eventCount = 0;
-            NotifyCollectionChangedEventArgs args = null;
+            NotifyCollectionChangedEventArgs? args = null;
             model.CollectionChanged += (s, e) => { args = e; eventCount++; };
 
             // change existing scene state, should yield no collection change
@@ -222,9 +222,10 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             // scene state was not created before, should yield 'add' collection event
             model[zoneKitchen, Color.Black].Value = SceneCommand.Preset4;
-            Assert.Equal(NotifyCollectionChangedAction.Add, args.Action);
-            Assert.Equal(new List<KeyValuePair<Zone, RoomState>>() { new KeyValuePair<Zone, RoomState>(zoneKitchen, model[zoneKitchen]) }, args.NewItems);
-            Assert.Null(args.OldItems);
+            Assert.NotNull(args);
+            Assert.Equal(NotifyCollectionChangedAction.Add, args?.Action);
+            Assert.Equal(new List<KeyValuePair<Zone, RoomState>>() { new KeyValuePair<Zone, RoomState>(zoneKitchen, model[zoneKitchen]) }, args?.NewItems);
+            Assert.Null(args?.OldItems);
 
             Assert.Equal(1, eventCount);
         }
@@ -241,7 +242,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             model[zoneLivingroom, SensorType.HumidityIndoors].Value = new SensorTypeAndValues() { Value = 54 };
 
             var eventCount = 0;
-            NotifyCollectionChangedEventArgs args = null;
+            NotifyCollectionChangedEventArgs? args = null;
             model[zoneLivingroom].CollectionChanged += (s, e) => { args = e; eventCount++; };
 
             // change existing scene state, should yield no collection change
@@ -254,21 +255,22 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             // scene state was not created before, should yield 'add' collection event
             model[zoneLivingroom, Color.Black].Value = SceneCommand.Preset4;
-            Assert.Equal(NotifyCollectionChangedAction.Add, args.Action);
+            Assert.NotNull(args?.OldItems);
+            Assert.Equal(NotifyCollectionChangedAction.Add, args?.Action);
             Assert.Equal(new List<KeyValuePair<Group, SceneState>>()
             {
                 new KeyValuePair<Group, SceneState>(Color.Black, model[zoneLivingroom, Color.Black])
-            }, args.NewItems);
-            Assert.Null(args.OldItems);
+            }, args?.NewItems);
+            Assert.Null(args?.OldItems);
 
             // sensor state was not created before, should yield 'add' collection event
             model[zoneLivingroom, SensorType.BrightnessIndoors].Value = new SensorTypeAndValues() { Value = 30 };
-            Assert.Equal(NotifyCollectionChangedAction.Add, args.Action);
+            Assert.Equal(NotifyCollectionChangedAction.Add, args?.Action);
             Assert.Equal(new List<KeyValuePair<Sensor, SensorState>>()
             {
                 new KeyValuePair<Sensor, SensorState>(SensorType.BrightnessIndoors, model[zoneLivingroom, SensorType.BrightnessIndoors])
-            }, args.NewItems);
-            Assert.Null(args.OldItems);
+            }, args?.NewItems);
+            Assert.Null(args?.OldItems);
 
             Assert.Equal(2, eventCount);
         }

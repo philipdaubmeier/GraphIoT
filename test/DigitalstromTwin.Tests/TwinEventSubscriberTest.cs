@@ -40,26 +40,24 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42))
-            {
-                await Task.Delay(100);
-                mockHttp.AutoFlush = false;
-                try { mockHttp.Flush(); } catch { }
+            using var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42);
+            await Task.Delay(100);
+            mockHttp.AutoFlush = false;
+            try { mockHttp.Flush(); } catch { }
 
-                var events = new List<DssEvent>();
-                var errors = new List<Exception>();
-                subscriber.ApiEventRaised += (s, e) => { events.Add(e.ApiEvent); };
-                subscriber.ErrorOccured += (s, e) => { errors.Add(e.Error); };
+            var events = new List<DssEvent>();
+            var errors = new List<Exception>();
+            subscriber.ApiEventRaised += (s, e) => { if (e.ApiEvent != null) events.Add(e.ApiEvent); };
+            subscriber.ErrorOccured += (s, e) => { if (e.Error != null) errors.Add(e.Error); };
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset2.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset2.ToMockedSceneEvent());
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 
-                Assert.NotEmpty(events.Where(e => e.SystemEvent == SystemEvent.CallScene));
-                Assert.Empty(errors);
-            }
+            Assert.NotEmpty(events.Where(e => e.SystemEvent == SystemEvent.CallScene));
+            Assert.Empty(errors);
         }
 
         [Fact]
@@ -72,27 +70,25 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                     .WithExactQueryString($"subscriptionID=42&timeout=60000&token={MockDigitalstromConnection.AppToken}")
                     .Respond("application/json", SceneCommand.Preset0.ToMockedSceneEvent());
 
-            using (var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42))
-            {
-                await Task.Delay(300);
-                mockHttp.AutoFlush = false;
-                try { mockHttp.Flush(); } catch { }
+            using var subscriber = new DssEventSubscriber(mockHttp.AddAuthMock().ToMockProvider(), new List<SystemEventName>() { SystemEvent.CallScene }, 42);
+            await Task.Delay(300);
+            mockHttp.AutoFlush = false;
+            try { mockHttp.Flush(); } catch { }
 
-                int numChangedEvents = 0;
-                subscriber.ApiEventRaised += (s, e) => { numChangedEvents++; };
+            int numChangedEvents = 0;
+            subscriber.ApiEventRaised += (s, e) => { numChangedEvents++; };
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 
-                Assert.Equal(1, numChangedEvents);
+            Assert.Equal(1, numChangedEvents);
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset2.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset2.ToMockedSceneEvent());
 
-                Assert.Equal(2, numChangedEvents);
+            Assert.Equal(2, numChangedEvents);
 
-                await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
+            await mockHttp.MockDssEventAsync(subscriber, mockedEvent, SceneCommand.Preset1.ToMockedSceneEvent());
 
-                Assert.Equal(3, numChangedEvents);
-            }
+            Assert.Equal(3, numChangedEvents);
         }
     }
 }
