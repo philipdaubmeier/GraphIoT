@@ -22,12 +22,14 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IServiceScope _serviceScope;
 
-        private DssEventSubscriber _dssEventSubscriber = null;
+#pragma warning disable IDE0069 // false warning - is properly disposed
+        private DssEventSubscriber? _dssEventSubscriber = null;
+#pragma warning restore IDE0069
 
-        private Task _executingThread;
-        private CancellationTokenSource _cancellationSource;
+        private Task? _executingThread;
+        private CancellationTokenSource? _cancellationSource;
         private CancellationToken _cancellationToken;
-        private BlockingCollection<DssEvent> _persistenceQueue;
+        private BlockingCollection<DssEvent>? _persistenceQueue;
 
         private readonly IEnumerable<IDigitalstromEventProcessorPlugin> _plugins;
 
@@ -63,21 +65,21 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             // Stop called without start
-            if (_executingThread == null)
+            if (_executingThread is null)
                 return;
 
             _logger.LogInformation($"{DateTime.Now} Digitalstrom Event Subscriber Service is stopping.");
 
-            _dssEventSubscriber.Dispose();
+            _dssEventSubscriber?.Dispose();
             _dssEventSubscriber = null;
 
-            _persistenceQueue.CompleteAdding();
+            _persistenceQueue?.CompleteAdding();
             _persistenceQueue = null;
 
             try
             {
                 // Signal cancellation to the executing method
-                _cancellationSource.Cancel();
+                _cancellationSource?.Cancel();
             }
             finally
             {
@@ -91,8 +93,10 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
             // Disposing the event subscriber stops all its onderlying threads
             _dssEventSubscriber?.Dispose();
 
-            _cancellationSource.Cancel();
+            _cancellationSource?.Cancel();
+            _cancellationSource?.Dispose();
             _persistenceQueue?.CompleteAdding();
+            _persistenceQueue?.Dispose();
 
             // DI Scope ends here
             _serviceScope.Dispose();
@@ -158,16 +162,18 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         /// </summary>
         private void DequeueAndPipeToEventStream(int millisecondsTimeout)
         {
-            _persistenceQueue.TryTake(out DssEvent dsEvent, millisecondsTimeout, _cancellationToken);
+            if (_persistenceQueue is null)
+                return;
+            _persistenceQueue.TryTake(out DssEvent? dsEvent, millisecondsTimeout, _cancellationToken);
 
             // Timeout was triggered, no event was read - leave method and continue in main thread loop
-            if (dsEvent == null)
+            if (dsEvent is null)
                 return;
 
             if (millisecondsTimeout < 0)
-                _logger.LogInformation($"{DateTime.Now} Dequeued event (first in clump) with timestamp {dsEvent?.TimestampUtc}");
+                _logger.LogInformation($"{DateTime.Now} Dequeued event (first in clump) with timestamp {dsEvent.TimestampUtc}");
             else
-                _logger.LogInformation($"{DateTime.Now} Dequeued event (clump successor) with timestamp {dsEvent?.TimestampUtc}");
+                _logger.LogInformation($"{DateTime.Now} Dequeued event (clump successor) with timestamp {dsEvent.TimestampUtc}");
 
             foreach (var plugin in _plugins.Where(p => p.EventNames.Contains(dsEvent.SystemEvent)))
             {

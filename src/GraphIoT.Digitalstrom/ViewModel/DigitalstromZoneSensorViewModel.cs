@@ -14,8 +14,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
         public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
             : base(new Dictionary<Resolution, IQueryable<DigitalstromZoneSensorData>>() {
-                       { Resolution.LowRes, databaseContext?.DsSensorLowresDataSet },
-                       { Resolution.MidRes, databaseContext?.DsSensorDataSet }
+                       { Resolution.LowRes, databaseContext.DsSensorLowresDataSet },
+                       { Resolution.MidRes, databaseContext.DsSensorDataSet }
                    },
                    Enumerable.Range(0, 2).ToDictionary(x => x.ToString(), x => x),
                    dsStructure.Zones.Where(x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors)

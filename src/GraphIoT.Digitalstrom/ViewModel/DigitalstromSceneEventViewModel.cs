@@ -52,10 +52,10 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                 var zones = (query?.zone_ids?.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
 
                 filtered = events
-                    .Where(x => query.event_names.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase))
+                    .Where(x => query?.event_names?.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase) ?? true)
                     .Where(x => zones.Contains(x.Properties.ZoneID))
-                    .Where(x => query.group_ids.Contains(x.Properties.GroupID))
-                    .Where(x => query.scene_ids.Contains(x.Properties.SceneID))
+                    .Where(x => query?.group_ids.Contains(x.Properties.GroupID) ?? true)
+                    .Where(x => query?.scene_ids.Contains(x.Properties.SceneID) ?? true)
                     .ToList();
             }
             catch

@@ -31,13 +31,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public Guid Id { get; set; }
 
         [MaxLength(34)]
-        public string CircuitId { get; set; }
+        public string CircuitId { get; set; } = null!;
 
         [ForeignKey("CircuitId")]
-        public DigitalstromCircuit Circuit { get; set; }
+        public DigitalstromCircuit Circuit { get; set; } = null!;
 
         [MaxLength(4000)]
-        public string EnergyCurve { get; set; }
+        public string EnergyCurve { get; set; } = null!;
 
         [NotMapped]
         public TimeSeries<int> EnergySeries => EnergyCurve.ToTimeseries<int>(Span);

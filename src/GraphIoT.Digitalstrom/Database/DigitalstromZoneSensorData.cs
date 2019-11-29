@@ -33,13 +33,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public int ZoneId { get; set; }
 
         [ForeignKey("ZoneId")]
-        public DigitalstromZone Zone { get; set; }
+        public DigitalstromZone Zone { get; set; } = null!;
 
         [MaxLength(800)]
-        public string TemperatureCurve { get; set; }
+        public string TemperatureCurve { get; set; } = null!;
 
         [MaxLength(800)]
-        public string HumidityCurve { get; set; }
+        public string HumidityCurve { get; set; } = null!;
 
         [NotMapped]
         public TimeSeries<double> TemperatureSeries => TemperatureCurve.ToTimeseries<double>(Span, DecimalPlaces);

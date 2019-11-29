@@ -13,8 +13,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 {
     public class DigitalstromHttpClient
     {
-        public DigitalstromHttpClient(HttpClient client = null) => Client = client;
-        public HttpClient Client { get; private set; }
+        public DigitalstromHttpClient(HttpClient? client = default) => Client = client;
+        public HttpClient? Client { get; private set; }
     }
 
     public class DigitalstromConfigConnectionBuilder : DigitalstromConfigConnectionProvider
@@ -26,12 +26,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 
     public class DigitalstromConfigConnectionProvider : DigitalstromConnectionProvider
     {
-        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, DigitalstromHttpClient client)
+        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, DigitalstromHttpClient? client)
             : base(UrisFromConfig(config), AuthFromConfig(tokenStore, config), CertFromConfig(config))
         {
-            HttpClient = client?.Client;
+            if (client?.Client is HttpClient innerClient)
+                HttpClient = innerClient;
 
-            if (httpClient == null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
+            if (httpClient is null && !string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
             {
                 Handler = new HttpClientHandler()
                 {
@@ -46,7 +47,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
             return new PersistingDigitalstromAuth(tokenStore, config.Value.TokenAppId, config.Value.DssUsername, config.Value.DssPassword);
         }
 
-        private static X509Certificate2 CertFromConfig(IOptions<DigitalstromConfig> config)
+        private static X509Certificate2? CertFromConfig(IOptions<DigitalstromConfig> config)
         {
             try
             {

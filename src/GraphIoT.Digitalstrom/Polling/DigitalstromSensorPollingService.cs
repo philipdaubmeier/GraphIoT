@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             }
         }
 
-        private Dictionary<Sensor, ITimeSeries<double>> ReadAndSaveMidresZoneSensorValues(DateTime day, int zoneId, Dictionary<Sensor, double> sensorValues = null, DateTime timestampNewValue = default)
+        private Dictionary<Sensor, ITimeSeries<double>> ReadAndSaveMidresZoneSensorValues(DateTime day, int zoneId, Dictionary<Sensor, double>? sensorValues = null, DateTime timestampNewValue = default)
         {
             var readOnly = sensorValues == null || timestampNewValue == default;
             var readSeries = new Dictionary<Sensor, ITimeSeries<double>>();
@@ -80,7 +80,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             {
                 if (!readOnly)
                 {
-                    if (!sensorValues.ContainsKey(sensor))
+                    if (sensorValues == null || !sensorValues.ContainsKey(sensor))
                         return;
 
                     series[timestampNewValue] = sensorValues[sensor];
@@ -99,7 +99,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
         {
             foreach (var zone in midresSeries)
             {
-                DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+                static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
                 var day = zone.Value.FirstOrDefault().Value?.Span?.Begin.Date ?? DateTime.Now.Date;
                 var dbSensorSeries = GetOrCreateEntity(_dbContext.DsSensorLowresDataSet, FirstOfMonth(day), zone.Key);
 

@@ -7,15 +7,19 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class ErrorOccuredEventArgs : EventArgs
     {
-        public Exception? Error { get; set; }
+        public Exception Error { get; set; }
+
+        public ErrorOccuredEventArgs(Exception error) => Error = error;
     }
 
-    public class ApiEventRaisedEventArgs<TApiEvent> : EventArgs where TApiEvent : class
+    public class ApiEventRaisedEventArgs<TApiEvent> : EventArgs
     {
-        public TApiEvent? ApiEvent { get; set; }
+        public TApiEvent ApiEvent { get; set; }
+
+        public ApiEventRaisedEventArgs(TApiEvent apiEvent) => ApiEvent = apiEvent;
     }
 
-    public abstract class LongPollingClientBase<TApiEvent> : IDisposable where TApiEvent : class
+    public abstract class LongPollingClientBase<TApiEvent> : IDisposable
     {
         public event EventHandler<ErrorOccuredEventArgs>? ErrorOccured;
 
@@ -55,7 +59,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             if (ApiEventRaised is null || eventWorkerThread is null)
                 return;
 
-            var eventargs = new ApiEventRaisedEventArgs<TApiEvent>() { ApiEvent = eventItem };
+            var eventargs = new ApiEventRaisedEventArgs<TApiEvent>(eventItem);
             Task task = eventWorkerThread.ContinueWith(t => ApiEventRaised(this, eventargs));
         }
 
@@ -64,7 +68,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             if (ErrorOccured is null || eventWorkerThread is null)
                 return;
 
-            var eventargs = new ErrorOccuredEventArgs() { Error = exception };
+            var eventargs = new ErrorOccuredEventArgs(exception);
             Task task = eventWorkerThread.ContinueWith(t => ErrorOccured(this, eventargs));
         }
 

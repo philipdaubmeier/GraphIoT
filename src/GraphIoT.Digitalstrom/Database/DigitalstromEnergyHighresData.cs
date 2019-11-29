@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         [Required, Column("Day")]
         public override DateTime Key { get; set; }
 
-        public byte[] EnergyCurvesEveryMeter { get; set; }
+        public byte[] EnergyCurvesEveryMeter { get; set; } = null!;
 
         [NotMapped]
         public TimeSeriesStreamCollection<Dsuid, int> EnergySeriesEveryMeter

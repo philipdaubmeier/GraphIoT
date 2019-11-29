@@ -86,7 +86,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         }
 
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private EventTimeSeriesStream<DssEvent, DssSceneEventSerializer> _eventStream = null;
+        private EventTimeSeriesStream<DssEvent, DssSceneEventSerializer>? _eventStream = null;
         private bool _hasChanges = false;
 
         public DssSceneEventProcessorPlugin(IServiceScopeFactory serviceScopeFactory)
@@ -102,13 +102,17 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         /// <summary>
         /// See <see cref="IDssEventProcessorPlugin.Span"/>
         /// </summary>
-        public TimeSeriesSpan Span => _eventStream?.Span;
+        public TimeSeriesSpan Span => _eventStream?.Span ?? EmptySpan;
+        private static readonly TimeSeriesSpan EmptySpan = new TimeSeriesSpan(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1);
 
         /// <summary>
         /// See <see cref="IDssEventProcessorPlugin.WriteToEventStream(DssEvent)"/>
         /// </summary>
         public void WriteToEventStream(DssEvent dsEvent)
         {
+            if (_eventStream is null)
+                return;
+
             _eventStream.WriteEvent(dsEvent);
             _hasChanges = true;
         }
@@ -157,24 +161,22 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         /// </summary>
         public void SaveEventStreamToDb()
         {
-            if (!_hasChanges)
+            if (!_hasChanges || _eventStream is null)
                 return;
 
             var date = Span.Begin.Date;
 
-            using (var scope = _serviceScopeFactory.CreateScope())
-            using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
-            {
-                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
-                if (dbSceneEvents == null)
-                    dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Key = date });
+            using var scope = _serviceScopeFactory.CreateScope();
+            using var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>();
+            var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
+            if (dbSceneEvents == null)
+                dbContext.DsSceneEventDataSet.Add(dbSceneEvents = new DigitalstromSceneEventData() { Key = date });
 
-                dbSceneEvents.EventStream = _eventStream;
+            dbSceneEvents.EventStream = _eventStream;
 
-                dbContext.SaveChanges();
+            dbContext.SaveChanges();
 
-                _hasChanges = false;
-            }
+            _hasChanges = false;
         }
     }
 }

@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             var fetchLastValues = (int)TimeSeriesSpan.Spacing.Spacing10Min;
             var days = new TimeSeriesSpan(DateTime.Now.AddSeconds(-1 * fetchLastValues), TimeSeriesSpan.Spacing.Spacing1Sec, fetchLastValues).IncludedDates();
 
-            Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections = null;
+            Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>>? timeseriesCollections = null;
             try
             {
                 timeseriesCollections = ReadHighResEnergyValuesFromDb(days);
@@ -80,7 +80,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
         {
             foreach (var day in new TimeSeriesSpan(start, end, 1).IncludedDates())
             {
-                Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections = null;
+                Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>>? timeseriesCollections = null;
                 try
                 {
                     timeseriesCollections = ReadHighResEnergyValuesFromDb(new List<DateTime>() { day });
@@ -127,7 +127,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
 
         private void SaveLowResEnergyValuesToDb(Dictionary<DateTime, TimeSeriesStreamCollection<Dsuid, int>> timeseriesCollections)
         {
-            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             SaveMidLowResEnergyValuesToDb(timeseriesCollections.GroupBy(x => FirstOfMonth(x.Key)), db => db.DsEnergyLowresDataSet);
         }
 

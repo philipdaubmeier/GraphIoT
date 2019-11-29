@@ -4,25 +4,25 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
 {
     public class DigitalstromConfig
     {
-        public string TokenAppId { get; set; }
-        public string DssUsername { get; set; }
-        public string DssPassword { get; set; }
+        public string TokenAppId { get; set; } = null!;
+        public string DssUsername { get; set; } = null!;
+        public string DssPassword { get; set; } = null!;
 
-        public string DssCertificate { get; set; }
+        public string DssCertificate { get; set; } = null!;
 
-        public string DssUriLocal { get; set; }
-        public string DssUriDsNet { get; set; }
-        public string DssUriCloudredir { get; set; }
+        public string DssUriLocal { get; set; } = null!;
+        public string DssUriDsNet { get; set; } = null!;
+        public string DssUriCloudredir { get; set; } = null!;
 
-        public string CloudDssId { get; set; }
-        public string CloudredirToken { get; set; }
+        public string CloudDssId { get; set; } = null!;
+        public string CloudredirToken { get; set; } = null!;
 
         public bool UseCloudredir { get; set; }
 
-        public string Proxy { get; set; }
-        public string ProxyPort { get; set; }
+        public string Proxy { get; set; } = null!;
+        public string ProxyPort { get; set; } = null!;
 
-        public Uri UriLocal => string.IsNullOrWhiteSpace(DssUriLocal) ? null : new Uri(DssUriLocal);
+        public Uri? UriLocal => string.IsNullOrWhiteSpace(DssUriLocal) ? null : new Uri(DssUriLocal);
         public Uri UriDsNet => new Uri(DssUriDsNet.Replace("{CloudDssId}", CloudDssId));
         public Uri UriCloudredir => new Uri(DssUriCloudredir.Replace("{CloudDssId}", CloudDssId).Replace("{CloudredirToken}", CloudredirToken));
     }

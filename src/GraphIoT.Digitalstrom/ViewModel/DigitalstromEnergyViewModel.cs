@@ -14,12 +14,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         private readonly IDigitalstromDbContext _db;
         private readonly IDigitalstromStructureService _dsStructure;
 
-        private IQueryable<DigitalstromEnergyHighresData> dataHigh = null;
+        private IQueryable<DigitalstromEnergyHighresData>? dataHigh = null;
 
         public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
             : base(new Dictionary<Resolution, IQueryable<DigitalstromEnergyData>>() {
-                       { Resolution.LowRes, databaseContext?.DsEnergyLowresDataSet },
-                       { Resolution.MidRes, databaseContext?.DsEnergyMidresDataSet }
+                       { Resolution.LowRes, databaseContext.DsEnergyLowresDataSet },
+                       { Resolution.MidRes, databaseContext.DsEnergyMidresDataSet }
                    },
                    Enumerable.Range(0, 1).ToDictionary(x => x.ToString(), x => x),
                    dsStructure.Circuits.Where(x => dsStructure.IsMeteringCircuit(x)).OrderBy(x => x).ToList(),
@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         {
             base.InvalidateData();
 
-            dataHigh = _db?.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
+            dataHigh = _db.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public override GraphViewModel Graph(int index)
@@ -49,7 +49,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             };
         }
 
-        protected new GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Dsuid, string> nameSelector, Func<Dsuid, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>> preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
+        protected new GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, Func<Dsuid, string> nameSelector, Func<Dsuid, string> strKeySelector, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>>? preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
             // initial, low and mid resolution loading is handled by base class
             if (DataResolution != Resolution.HighRes)
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                 foreach (var series in seriesCollection.Where(s => reduced.ContainsKey(s.Key)))
                     reduced[series.Key].Add(Resample<Tseries, Tval>(
                         new TimeSeriesSpan(series.Value.Span.Begin, series.Value.Span.End, Span.Duration),
-                        new List<ITimeSeries<Tval>>() { series.Value as ITimeSeries<Tval> }) as ITimeSeries<Tval>);
+                        new List<ITimeSeries<Tval>>() { (series.Value as ITimeSeries<Tval>)! }) as ITimeSeries<Tval>);
             }
 
             // in the second pass we can then merge them into the final series - one time series object per circuit
