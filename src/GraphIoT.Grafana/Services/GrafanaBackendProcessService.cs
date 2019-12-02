@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
     {
         private readonly ILogger _logger;
         private readonly string _rootPath;
-        private Process _process = null;
+        private Process? _process = null;
 
         public GrafanaBackendProcessService(ILogger<GrafanaBackendProcessService> logger, IHostEnvironment env)
         {
@@ -77,8 +77,11 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
         {
             _logger.LogInformation($"{DateTime.Now} Grafana Backend Service is stopping.");
 
-            _process?.Kill();
-            await _process?.WaitForExitAsync(cancellationToken);
+            if (_process is null)
+                return;
+
+            _process.Kill();
+            await _process.WaitForExitAsync(cancellationToken);
         }
 
         public void Dispose()
@@ -98,7 +101,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
         /// <returns>A Task representing waiting for the process to end.</returns>
         public static Task WaitForExitAsync(this Process process, CancellationToken cancellationToken = default)
         {
-            var tcs = new TaskCompletionSource<object>();
+            var tcs = new TaskCompletionSource<object?>();
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => tcs.TrySetResult(null);
             if (cancellationToken != default)

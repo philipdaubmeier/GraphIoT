@@ -34,7 +34,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
     [Route("api/grafana")]
     public class GrafanaController : Controller
     {
-        private List<string> graphIds = null;
+        private List<string>? graphIds = null;
         public List<string> GraphIds
         {
             get
@@ -42,7 +42,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 static string ToRawId(string name) => Regex.Replace(name.ToLowerInvariant().Replace("ä", "ae").Replace("ö", "oe")
                     .Replace("ü", "ue").Replace("ß", "ss"), @"[^\u0000-\u007F]+", string.Empty).Replace(' ', '_');
 
-                if (graphIds == null)
+                if (graphIds is null)
                 {
                     graphIds = graphViewModels
                         .SelectMany(n => n.Value.Graphs()
@@ -175,13 +175,13 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 if (spanOverride.HasValue && spanOverride.Value > span.Duration)
                     targetSpan = new TimeSeriesSpan(fromDate, toDate, spanOverride.Value);
                 else if (target?.data?.overrideMaxDataPoints.HasValue ?? false)
-                    targetSpan = new TimeSeriesSpan(fromDate, toDate, target.data.overrideMaxDataPoints.Value);
+                    targetSpan = new TimeSeriesSpan(fromDate, toDate, target?.data?.overrideMaxDataPoints ?? 1);
                 viewModel.Span = targetSpan;
 
                 // if a custom 'aggregate.func' was given, take that as aggregation method
-                Aggregator ToAggregator(string aggregateRaw)
+                Aggregator ToAggregator(string? aggregateRaw)
                 {
-                    return (aggregateRaw?.Substring(0, Math.Min(3, target.data.aggregate.func.Length))?.ToLowerInvariant()) switch
+                    return (aggregateRaw?.Substring(0, Math.Min(3, target?.data?.aggregate?.func?.Length ?? 0))?.ToLowerInvariant()) switch
                     {
                         "min" => Aggregator.Minimum,
                         "max" => Aggregator.Maximum,
