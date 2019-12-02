@@ -42,8 +42,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             // for both temperature und humidity values that we are mocking (see DigitalstromDssMockExtensions.AddSensorMocks)
             var storedValuesTemperature = db.DsSensorDataSet.FirstOrDefault()?.TemperatureSeries;
             var storedValuesHumidity = db.DsSensorDataSet.FirstOrDefault()?.HumiditySeries;
-            Assert.True(1 <= storedValuesTemperature.Trimmed().Count);
-            Assert.True(1 <= storedValuesHumidity.Trimmed().Count);
+            Assert.True(1 <= (storedValuesTemperature?.Trimmed()?.Count ?? 0));
+            Assert.True(1 <= (storedValuesHumidity?.Trimmed()?.Count ?? 0));
         }
     }
 }

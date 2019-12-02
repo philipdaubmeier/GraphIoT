@@ -14,6 +14,7 @@ using PhilipDaubmeier.DigitalstromTimeSeriesApi.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection;
 using RichardSzalay.MockHttp;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,11 +22,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 {
     public class IntegrationTestWebHostFactory<TStartup> : WebApplicationFactory<TStartup> where TStartup : class
     {
-        public MockedRequest MockedEventResponse { get; private set; }
+        public MockedRequest MockedEventResponse { get; private set; } = null!;
 
         public async Task<IntegrationTestDbContext> InitDb()
         {
-            var dbContext = Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() as IntegrationTestDbContext;
+            if (!(Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() is IntegrationTestDbContext dbContext) || dbContext.Database is null)
+                throw new NullReferenceException("No database service available");
 
             await dbContext.Database.EnsureDeletedAsync();
             await dbContext.Database.EnsureCreatedAsync();
