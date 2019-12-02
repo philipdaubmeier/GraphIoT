@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.SonnenClient
         /// </summary>
         public async Task<UserSites> GetUserSites()
         {
-            return (await CallSonnenApi<UserWiremessage, UserSites>(new Uri($"{_baseUri}users/me")));
+            return await CallSonnenApi<UserWiremessage, UserSites>(new Uri($"{_baseUri}users/me")) ?? new UserSites();
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.SonnenClient
         {
             var query = $"?filter[start]={start.ToFilterTime()}&filter[end]={end.ToFilterTime()}&";
             var uri = new Uri($"{_baseUri}sites/{siteId}/measurements{query}");
-            return await CallSonnenApi<Wiremessage<MeasurementSeries>, MeasurementSeries>(uri);
+            return await CallSonnenApi<Wiremessage<MeasurementSeries>, MeasurementSeries>(uri) ?? new MeasurementSeries();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.SonnenClient
         {
             var query = $"?page[limit]={pageLimit}&page[number]={page}";
             var uri = new Uri($"{_baseUri}sites/{siteId}/battery-systems{query}");
-            return await CallSonnenApi<ListWiremessage<BatterySystem>, List<BatterySystem>>(uri);
+            return await CallSonnenApi<ListWiremessage<BatterySystem>, List<BatterySystem>>(uri) ?? new List<BatterySystem>();
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.SonnenClient
         {
             var query = $"?filter[start]={start.ToFilterTime()}&filter[end]={end.ToFilterTime()}&filter[resolution]={resolution}&";
             var uri = new Uri($"{_baseUri}sites/{siteId}/statistics{query}");
-            return await CallSonnenApi<Wiremessage<StatisticsSeries>, StatisticsSeries>(uri);
+            return await CallSonnenApi<Wiremessage<StatisticsSeries>, StatisticsSeries>(uri) ?? new StatisticsSeries();
         }
     }
 }

@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         private readonly ISonnenConnectionProvider _provider;
         private readonly ISonnenAuth _authData;
 
-        private static HttpClient _client;
+        private readonly HttpClient _client;
 
         private static readonly IContractResolver _jsonResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
         private static readonly JsonSerializer _jsonSerializer = new JsonSerializer() { ContractResolver = _jsonResolver };
@@ -39,8 +39,8 @@ namespace PhilipDaubmeier.SonnenClient.Network
             public string CodeChallengeMethod { get; }
             public string State { get; }
 
-            public string AuthenticityToken { get; set; }
-            public string AuthorizationCode { get; set; }
+            public string? AuthenticityToken { get; set; }
+            public string? AuthorizationCode { get; set; }
 
             public AuthState(string stateUrl)
             {
@@ -56,8 +56,8 @@ namespace PhilipDaubmeier.SonnenClient.Network
         public SonnenAuthBase(ISonnenConnectionProvider connectionProvider)
         {
             _provider = connectionProvider;
-            _authData = _provider?.AuthData;
-            _client = _provider?.Client;
+            _authData = _provider.AuthData;
+            _client = _provider.Client;
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// If no valid access token is present yet, this method will trigger a fresh sign-in
         /// or refresh the token with a refresh token if present and append it to the request.
         /// </summary>
-        protected async Task<TData> CallSonnenApi<TWiremessage, TData>(Uri uri)
+        protected async Task<TData?> CallSonnenApi<TWiremessage, TData>(Uri uri)
             where TWiremessage : IWiremessage<TData> where TData : class
         {
             var responseStream = await (await RequestSonnenApi(uri)).Content.ReadAsStreamAsync();
@@ -201,6 +201,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
         private async Task<AuthState> RequestAuthorizationCode(AuthState state)
         {
+            if (state.AuthenticityToken is null)
+                throw new IOException("Can not request authorization code without authenticity token.");
+
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}users/sign_in"));
             AddCommonAuthHeaders(request.Headers, $"{_authBaseUri}users/sign_in");
             request.Headers.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -242,6 +245,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
         private async Task RequestAccessTokenWithAuthCode(AuthState state)
         {
+            if (state.AuthorizationCode is null)
+                throw new IOException("Can not request access token without authorization code.");
+
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}oauth/token"));
             AddCommonAuthHeaders(request.Headers, string.Empty);
             request.Headers.Add("Accept", "application/json,application/vnd.api+json");
@@ -259,6 +265,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
         private async Task RequestAccessTokenWithRefreshToken()
         {
+            if (_authData.RefreshToken is null)
+                throw new IOException("Can not refresh access token without refresh token.");
+
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{_authBaseUri}oauth/token"));
             AddCommonAuthHeaders(request.Headers, string.Empty);
             request.Headers.Add("Accept", "application/json,application/vnd.api+json");

@@ -2,6 +2,6 @@
 {
     public interface IWiremessage<T> where T : class
     {
-        T ContainedData { get; }
+        T? ContainedData { get; }
     }
 }

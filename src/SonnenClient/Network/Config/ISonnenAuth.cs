@@ -5,9 +5,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
 {
     public interface ISonnenAuth
     {
-        string AccessToken { get; }
+        string? AccessToken { get; }
         DateTime AccessTokenExpiry { get; }
-        string RefreshToken { get; }
+        string? RefreshToken { get; }
 
         string Username { get; }
         string UserPassword { get; }

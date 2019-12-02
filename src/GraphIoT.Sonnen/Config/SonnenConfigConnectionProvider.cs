@@ -15,12 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
     public class SonnenConfigConnectionProvider : SonnenConnectionProvider
     {
         public SonnenConfigConnectionProvider(TokenStore<SonnenPortalClient> tokenStore, IOptions<SonnenConfig> config, SonnenHttpClient client)
-        {
-            ClientId = config.Value.ClientId;
-
-            AuthData = new SonnenHostAuth(tokenStore, config.Value.Username, config.Value.Password);
-
-            Client = client.Client;
-        }
+            : base(new SonnenHostAuth(tokenStore, config.Value.Username, config.Value.Password), config.Value.ClientId)
+            => Client = client.Client;
     }
 }

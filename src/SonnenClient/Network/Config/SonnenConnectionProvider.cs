@@ -7,7 +7,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
     public class SonnenConnectionProvider : ISonnenConnectionProvider, IDisposable
     {
         private bool skipDisposingClient = false;
-        private HttpClient client;
+        private HttpClient? client;
 
         private static readonly CookieContainer cookieContainer = new CookieContainer();
 
@@ -40,6 +40,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
         };
 
         public string ClientId { get; set; }
+
+        public SonnenConnectionProvider(ISonnenAuth authData, string clientId)
+            => (AuthData, ClientId) = (authData, clientId);
 
         #region IDisposable Support
         private bool disposed = false;
