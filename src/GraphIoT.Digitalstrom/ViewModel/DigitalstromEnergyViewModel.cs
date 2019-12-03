@@ -28,6 +28,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         {
             _db = databaseContext;
             _dsStructure = dsStructure;
+
+            InvalidateData();
         }
 
         public override string Key => "energy";
@@ -36,6 +38,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         {
             base.InvalidateData();
 
+            if (_db is null)
+                return;
             dataHigh = _db.DsEnergyHighresDataSet.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 

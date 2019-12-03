@@ -24,7 +24,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         protected override void InvalidateData()
         {
             _graphs.Clear();
-            data = _dataTable?.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
+
+            if (_dataTable is null)
+                return;
+
+            data = _dataTable.Where(x => x.Key >= Span.Begin.Date && x.Key <= Span.End.Date);
         }
 
         public bool IsEmpty => !Graph(0).Points.Any();
