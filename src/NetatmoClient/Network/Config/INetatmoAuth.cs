@@ -5,9 +5,9 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 {
     public interface INetatmoAuth
     {
-        string AccessToken { get; }
+        string? AccessToken { get; }
         DateTime AccessTokenExpiry { get; }
-        string RefreshToken { get; }
+        string? RefreshToken { get; }
 
         string Username { get; }
         string UserPassword { get; }
@@ -18,6 +18,6 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 
         bool MustRefreshToken();
 
-        Task UpdateTokenAsync(string accessToken, DateTime accessTokenExpiry, string refreshToken);
+        Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken);
     }
 }

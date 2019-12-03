@@ -5,12 +5,12 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 {
     public class NetatmoAuth : INetatmoAuth
     {
-        public string AccessToken { get; private set; }
+        public string? AccessToken { get; private set; }
         public DateTime AccessTokenExpiry { get; private set; }
-        public string RefreshToken { get; private set; }
+        public string? RefreshToken { get; private set; }
 
-        public string NetatmoAppId { get; set; }
-        public string NetatmoAppSecret { get; set; }
+        public string NetatmoAppId { get; set; } = string.Empty;
+        public string NetatmoAppSecret { get; set; } = string.Empty;
         public string Username { get; private set; }
         public string UserPassword { get; private set; }
         public string Scope { get { return "read_station read_presence access_presence"; } }
@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
             return !string.IsNullOrEmpty(RefreshToken) && AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0;
         }
 
-        public Task UpdateTokenAsync(string accessToken, DateTime accessTokenExpiry, string refreshToken)
+        public Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken)
         {
             AccessToken = accessToken;
             AccessTokenExpiry = accessTokenExpiry;

@@ -2,8 +2,8 @@
 {
     public class Administrative
     {
-        public string RegLocale { get; set; }
-        public string Lang { get; set; }
+        public string RegLocale { get; set; } = string.Empty;
+        public string Lang { get; set; } = string.Empty;
         public int Unit { get; set; }
         public int Windunit { get; set; }
         public int Pressureunit { get; set; }

@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
                     for (int k = 0; k < clump.Value.Count; k++)
                     {
                         if (index < clump.Value[k].Count && clump.Value[k][index].HasValue)
-                            yield return new KeyValuePair<DateTime, double>(time, clump.Value[k][index].Value);
+                            yield return new KeyValuePair<DateTime, double>(time, clump.Value[k][index] ?? 0);
                         time += clump.StepTime;
                     }
                 }

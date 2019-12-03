@@ -2,7 +2,7 @@
 {
     public class User
     {
-        public string Mail { get; set; }
-        public Administrative Administrative { get; set; }
+        public string Mail { get; set; } = string.Empty;
+        public Administrative Administrative { get; set; } = new Administrative();
     }
 }

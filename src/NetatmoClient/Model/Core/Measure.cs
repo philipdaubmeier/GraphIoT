@@ -40,7 +40,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
     [DebuggerDisplay("{_measure,nq}")]
     public class Measure : IComparable, IComparable<Measure>, IEquatable<Measure>
     {
-        private static Dictionary<string, MeasureType> _mappingDict = null;
+        private static Dictionary<string, MeasureType>? _mappingDict = null;
         private static Dictionary<string, MeasureType> Mapping
         {
             get
@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
                 return new Measure(value);
             if (input == "wind")
                 return new Measure(MeasureType.WindStrength);
-            return null;
+            return new Measure(MeasureType.Temperature);
         }
 
         public static implicit operator MeasureType(Measure measure)
@@ -97,7 +97,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return _measure.CompareTo(value._measure);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _measure.CompareTo((value as Measure)?._measure ?? value);
         }
@@ -107,9 +107,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return this == measure;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Measure);
+            if (!(obj is Measure measure))
+                return false;
+            return this == measure;
         }
 
         public override int GetHashCode()

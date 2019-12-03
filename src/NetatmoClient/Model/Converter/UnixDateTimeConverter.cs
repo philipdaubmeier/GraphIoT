@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model
 
         public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return Instant.FromUnixTimeSeconds((long)reader.Value).ToDateTimeUtc();
+            return Instant.FromUnixTimeSeconds((long)(reader.Value ?? 0)).ToDateTimeUtc();
         }
     }
 }

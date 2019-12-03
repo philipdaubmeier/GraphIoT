@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public DateTime TimeUtc { get; set; }
 
         public double? Temperature { get; set; }
-        public string TempTrend { get; set; }
+        public string TempTrend { get; set; } = string.Empty;
         public int? DateMaxTemp { get; set; }
         public int? DateMinTemp { get; set; }
         public double? MinTemp { get; set; }
@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public int? WindStrength { get; set; }
         public int? GustAngle { get; set; }
         public int? GustStrength { get; set; }
-        public List<WindHistoric> WindHistoric { get; set; }
+        public List<WindHistoric> WindHistoric { get; set; } = new List<WindHistoric>();
         public int? DateMaxWindStr { get; set; }
         public int? MaxWindAngle { get; set; }
         public int? MaxWindStr { get; set; }

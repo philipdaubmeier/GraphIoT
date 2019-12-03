@@ -15,6 +15,8 @@
     <Company>PhilipDaubmeier</Company>
     <Version>1.2.0-beta1</Version>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

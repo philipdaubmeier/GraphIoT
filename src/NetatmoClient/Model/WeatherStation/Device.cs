@@ -14,9 +14,9 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime LastUpgrade { get; set; }
 
-        public List<Module> Modules { get; set; }
-        public Place Place { get; set; }
-        public string StationName { get; set; }
+        public List<Module> Modules { get; set; } = new List<Module>();
+        public Place Place { get; set; } = new Place();
+        public string StationName { get; set; } = string.Empty;
         public int WifiStatus { get; set; }
     }
 }

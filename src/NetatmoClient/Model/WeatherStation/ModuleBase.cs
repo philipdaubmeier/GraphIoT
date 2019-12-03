@@ -7,13 +7,13 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
     public class ModuleBase
     {
         [JsonProperty("_id")]
-        public ModuleId Id { get; set; }
-        public string ModuleName { get; set; }
-        public string Type { get; set; }
+        public ModuleId Id { get; set; } = string.Empty;
+        public string ModuleName { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         public int Firmware { get; set; }
-        public ModuleData DashboardData { get; set; }
+        public ModuleData DashboardData { get; set; } = new ModuleData();
 
-        private List<Measure> _dataType;
+        private List<Measure> _dataType = new List<Measure>();
         public List<Measure> DataType
         {
             get
@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
                 // Special case for wind module: add all 4 wind measures that can be read
                 if (value != null && value.Count == 1 && value[0] == MeasureType.WindStrength)
                     _dataType = new List<Measure>() { MeasureType.WindStrength, MeasureType.WindAngle, MeasureType.Guststrength, MeasureType.GustAngle };
-                else
+                else if (value != null)
                     _dataType = value;
             }
         }

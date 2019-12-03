@@ -2,9 +2,9 @@
 {
     public class User
     {
-        public string RegLocale { get; set; }
-        public string Lang { get; set; }
-        public string Country { get; set; }
-        public string Mail { get; set; }
+        public string RegLocale { get; set; } = string.Empty;
+        public string Lang { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string Mail { get; set; } = string.Empty;
     }
 }

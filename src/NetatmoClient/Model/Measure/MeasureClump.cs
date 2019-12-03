@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
         [JsonConverter(typeof(SecondsTimeSpanConverter))]
         public TimeSpan StepTime { get; set; }
 
-        public List<List<double?>> Value { get; set; }
+        public List<List<double?>> Value { get; set; } = new List<List<double?>>();
 
         public IEnumerable<KeyValuePair<Measure, IEnumerable<KeyValuePair<DateTime, double>>>> GetTimestampedValues(List<Measure> measures)
         {
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
                 for (int k = 0; k < Value.Count; k++)
                 {
                     if (index < Value[k].Count && Value[k][index].HasValue)
-                        yield return new KeyValuePair<DateTime, double>(time, Value[k][index].Value);
+                        yield return new KeyValuePair<DateTime, double>(time, Value[k][index] ?? 0);
                     time += StepTime;
                 }
             }

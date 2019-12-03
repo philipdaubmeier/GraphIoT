@@ -35,8 +35,8 @@ namespace PhilipDaubmeier.NetatmoClient
         public NetatmoAuthBase(INetatmoConnectionProvider connectionProvider)
         {
             _provider = connectionProvider;
-            _authData = _provider?.AuthData;
-            _client = _provider?.Client;
+            _authData = _provider.AuthData;
+            _client = _provider.Client;
         }
 
         /// <summary>
@@ -44,12 +44,15 @@ namespace PhilipDaubmeier.NetatmoClient
         /// If no valid access token is present yet, this method will trigger a fresh sign-in or
         /// refresh the token with a refresh token if present and
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestNetatmoApi(Uri uri, IEnumerable<(string, string)> parameters = null)
+        protected async Task<HttpResponseMessage> RequestNetatmoApi(Uri uri, IEnumerable<(string, string?)>? parameters = null)
         {
             await Authenticate();
 
-            var authparam = new[] { ("access_token", _authData.AccessToken) };
-            var postData = FormContentFromList(parameters == null ? authparam : authparam.Union(parameters.Where(p => p.Item2 != null)));
+            if (_authData.AccessToken is null)
+                throw new IOException("Can not request data without access token.");
+
+            var authparam = new[] { ("access_token", _authData.AccessToken!) };
+            var postData = FormContentFromList(parameters == null ? authparam : authparam.Union(parameters.Where(p => p.Item2 != null).Select(p => (p.Item1, p.Item2!))));
             return await _client.PostAsync(uri, postData);
         }
 
@@ -59,7 +62,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// will trigger a fresh sign-in or refresh the token with a refresh token if present and
         /// append it to the request.
         /// </summary>
-        protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<(string, string)> parameters = null)
+        protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<(string, string?)>? parameters = null)
             where TWiremessage : IWiremessage<TData> where TData : class
         {
             var responseStream = await (await RequestNetatmoApi(uri, parameters)).Content.ReadAsStreamAsync();
@@ -123,6 +126,9 @@ namespace PhilipDaubmeier.NetatmoClient
 
         private async Task RefreshAccessToken()
         {
+            if (_authData.RefreshToken is null)
+                throw new IOException("Can not refresh access token without refresh token.");
+
             await LoadAndStoreAccessToken(new[]
             {
                 ("grant_type", "refresh_token"),
@@ -138,12 +144,12 @@ namespace PhilipDaubmeier.NetatmoClient
             var responseMessage = await _client.PostAsync(new Uri(new Uri(_baseUri), "/oauth2/token"), postData);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
-            AccessTokenResponse responseData = null;
+            AccessTokenResponse? responseData = null;
             using (var sr = new StreamReader(responseStream))
             using (var jsonTextReader = new JsonTextReader(sr))
                 responseData = _jsonSerializer.Deserialize<AccessTokenResponse>(jsonTextReader);
 
-            await _authData.UpdateTokenAsync(responseData.AccessToken, DateTime.UtcNow.AddSeconds(responseData.ExpiresIn), responseData.RefreshToken);
+            await _authData.UpdateTokenAsync(responseData?.AccessToken, DateTime.UtcNow.AddSeconds(responseData?.ExpiresIn ?? 0), responseData?.RefreshToken);
         }
 
         public void Dispose()

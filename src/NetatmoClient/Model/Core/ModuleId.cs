@@ -63,14 +63,16 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return ((string)this).CompareTo(value);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return ((string)this).CompareTo((value as ModuleId) ?? value);
         }
 
-        public override bool Equals(object o)
+        public override bool Equals(object? obj)
         {
-            return this == (o as ModuleId);
+            if (!(obj is ModuleId value))
+                return false;
+            return this == value;
         }
 
         public bool Equals(ModuleId g)

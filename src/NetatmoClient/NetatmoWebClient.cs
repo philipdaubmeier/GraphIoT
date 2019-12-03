@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// </summary>
         /// <param name="deviceId">Weather station mac address. If null, all devices (or all favorites) are returned.</param>
         /// <param name="getFavorites">To retrieve user's favorite weather stations. Default is false.</param>
-        public async Task<WeatherStationData> GetWeatherStationData(ModuleId deviceId = default, bool? getFavorites = default)
+        public async Task<WeatherStationData> GetWeatherStationData(ModuleId? deviceId = default, bool? getFavorites = default)
         {
             var uri = new Uri($"{_baseUri}/api/getstationsdata");
             return await CallNetatmoApi<WeatherStationResponse, WeatherStationData>(uri, new[]
@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// </summary>
         /// <param name="homeId">Specify if you're looking for the events of a specific Home. Example: "56c881f049c75fe562732029"</param>
         /// <param name="size">Number of events to retrieve. Default is 30.</param>
-        public async Task<HomeData> GetHomeData(string homeId = default, int? size = default)
+        public async Task<HomeData> GetHomeData(string? homeId = default, int? size = default)
         {
             var uri = new Uri($"{_baseUri}/api/gethomedata");
             return await CallNetatmoApi<HomeDataResponse, HomeData>(uri, new[]
@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.NetatmoClient
         /// <param name="dateEnd">Timestamp of the last measure to retrieve (default and max are 1024). Default is null.</param>
         /// <param name="limit">Maximum number of measurements (default and max are 1024)</param>
         /// <param name="realTime">If scale different than max, timestamps are by default offset + scale/2. To get exact timestamps, use true. Default is false.</param>
-        public async Task<TimestampedMeasureCollection> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, Scale scale = default, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
+        public async Task<TimestampedMeasureCollection> GetMeasure(ModuleId deviceId, ModuleId moduleId, IEnumerable<Measure> types, Scale? scale = default, DateTime? dateBegin = default, DateTime? dateEnd = default, int? limit = default, bool? realTime = default)
         {
             var uri = new Uri($"{_baseUri}/api/getmeasure");
             return new TimestampedMeasureCollection(await CallNetatmoApi<MeasureResponse, List<MeasureClump>>(uri, new[]
@@ -70,7 +70,7 @@ namespace PhilipDaubmeier.NetatmoClient
                 ("device_id", (string)deviceId),
                 ("module_id", (string)moduleId),
                 ("scale", scale?.ToString() ?? new Scale(MeasureScale.ScaleMax).ToString()),
-                ("type", types == null ? null : string.Join(',', types.Where(t => t != null).Select(t => t.ToString()))),
+                ("type", string.Join(',', types.Select(t => t.ToString()))),
                 ("date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
                 ("date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
                 ("limit", !limit.HasValue ? null : Math.Max(0, Math.Min(1024, limit.Value)).ToString()),

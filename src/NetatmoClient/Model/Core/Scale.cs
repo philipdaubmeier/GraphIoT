@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
     [DebuggerDisplay("{_scale,nq}")]
     public class Scale : IComparable, IComparable<Scale>, IEquatable<Scale>
     {
-        private static Dictionary<string, MeasureScale> _mappingDict = null;
+        private static Dictionary<string, MeasureScale>? _mappingDict = null;
         private static Dictionary<string, MeasureScale> Mapping
         {
             get
@@ -48,7 +48,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
         {
             if (Mapping.TryGetValue(scale.Trim().ToLowerInvariant(), out MeasureScale value))
                 return new Scale(value);
-            return null;
+            return new Scale(MeasureScale.ScaleMax);
         }
 
         public static implicit operator MeasureScale(Scale scale)
@@ -87,7 +87,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return _scale.CompareTo(value._scale);
         }
 
-        public int CompareTo(object value)
+        public int CompareTo(object? value)
         {
             return _scale.CompareTo((value as Scale)?._scale ?? value);
         }
@@ -97,9 +97,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return this == scale;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            return this == (obj as Scale);
+            if (!(obj is Scale scale))
+                return false;
+            return this == scale;
         }
 
         public override int GetHashCode()

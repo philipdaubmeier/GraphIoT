@@ -12,7 +12,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model
 
         public override TimeSpan ReadJson(JsonReader reader, Type objectType, TimeSpan existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            return new TimeSpan(0, 0, (int)Math.Min(int.MaxValue, (long)reader.Value));
+            return new TimeSpan(0, 0, (int)Math.Min(int.MaxValue, (long)(reader.Value ?? 0)));
         }
     }
 }

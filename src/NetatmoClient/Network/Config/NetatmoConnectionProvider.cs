@@ -6,7 +6,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
     public class NetatmoConnectionProvider : INetatmoConnectionProvider, IDisposable
     {
         private bool skipDisposingClient = false;
-        private HttpClient client;
+        private HttpClient? client = null;
 
         /// <summary>
         /// See <see cref="INetatmoConnectionProvider.AuthData"/>
@@ -26,11 +26,14 @@ namespace PhilipDaubmeier.NetatmoClient.Network
             }
         }
 
-        public string AppId { get; set; }
+        public string AppId { get; set; } = string.Empty;
 
-        public string AppSecret { get; set; }
+        public string AppSecret { get; set; } = string.Empty;
 
-        public string Scope { get; set; }
+        public string Scope { get; set; } = string.Empty;
+
+        public NetatmoConnectionProvider(INetatmoAuth authData)
+            => AuthData = authData;
 
         #region IDisposable Support
         private bool disposed = false;

@@ -2,9 +2,9 @@
 {
     public class Snapshot
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public int Version { get; set; }
-        public string Key { get; set; }
-        public string Filename { get; set; }
+        public string Key { get; set; } = string.Empty;
+        public string Filename { get; set; } = string.Empty;
     }
 }
