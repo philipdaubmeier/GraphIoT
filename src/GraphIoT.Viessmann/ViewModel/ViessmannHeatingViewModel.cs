@@ -10,8 +10,8 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
     {
         public ViessmannHeatingViewModel(IViessmannDbContext databaseContext)
             : base(new Dictionary<Resolution, IQueryable<ViessmannHeatingData>>() {
-                       { Resolution.LowRes, databaseContext?.ViessmannHeatingLowresTimeseries },
-                       { Resolution.MidRes, databaseContext?.ViessmannHeatingTimeseries }
+                       { Resolution.LowRes, databaseContext.ViessmannHeatingLowresTimeseries },
+                       { Resolution.MidRes, databaseContext.ViessmannHeatingTimeseries }
                    },
                    Enumerable.Range(0, 14).ToDictionary(x => x.ToString(), x => x))
         { }
@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
             static ITimeSeries<double> RemoveZeros(ITimeSeries<double> input)
             {
                 for (int i = 0; i < input.Count; i++)
-                    if (input[i].HasValue && input[i].Value == 0d)
+                    if (input[i].HasValue && input[i] == 0d)
                         input[i] = null;
                 return input;
             }

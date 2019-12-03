@@ -33,19 +33,19 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
         public Guid Id { get; set; }
 
         [MaxLength(800)]
-        public string SolarWhCurve { get; set; }
+        public string SolarWhCurve { get; set; } = null!;
 
         [MaxLength(800)]
-        public string SolarCollectorTempCurve { get; set; }
+        public string SolarCollectorTempCurve { get; set; } = null!;
 
         [MaxLength(800)]
-        public string SolarHotwaterTempCurve { get; set; }
+        public string SolarHotwaterTempCurve { get; set; } = null!;
 
         [MaxLength(100)]
-        public string SolarPumpStateCurve { get; set; }
+        public string SolarPumpStateCurve { get; set; } = null!;
 
         [MaxLength(100)]
-        public string SolarSuppressionCurve { get; set; }
+        public string SolarSuppressionCurve { get; set; } = null!;
 
         [NotMapped]
         public TimeSeries<int> SolarWhSeries => SolarWhCurve.ToTimeseries<int>(Span);

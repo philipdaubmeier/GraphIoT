@@ -10,8 +10,8 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
     {
         public ViessmannSolarViewModel(IViessmannDbContext databaseContext)
             : base(new Dictionary<Resolution, IQueryable<ViessmannSolarData>>() {
-                       { Resolution.LowRes, databaseContext?.ViessmannSolarLowresTimeseries },
-                       { Resolution.MidRes, databaseContext?.ViessmannSolarTimeseries }
+                       { Resolution.LowRes, databaseContext.ViessmannSolarLowresTimeseries },
+                       { Resolution.MidRes, databaseContext.ViessmannSolarTimeseries }
                    },
                    Enumerable.Range(0, 5).ToDictionary(x => x.ToString(), x => x))
         { }
