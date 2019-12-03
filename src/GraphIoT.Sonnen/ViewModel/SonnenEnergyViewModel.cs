@@ -10,8 +10,8 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.ViewModel
     {
         public SonnenEnergyViewModel(ISonnenDbContext databaseContext)
             : base(new Dictionary<Resolution, IQueryable<SonnenEnergyData>>() {
-                       { Resolution.LowRes, databaseContext?.SonnenEnergyLowresDataSet },
-                       { Resolution.MidRes, databaseContext?.SonnenEnergyDataSet }
+                       { Resolution.LowRes, databaseContext.SonnenEnergyLowresDataSet },
+                       { Resolution.MidRes, databaseContext.SonnenEnergyDataSet }
                    },
                    Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x))
         { }

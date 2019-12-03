@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
         private readonly ISonnenDbContext _dbContext;
         private readonly SonnenPortalClient _sonnenClient;
 
-        private string _siteId = null;
+        private string? _siteId = null;
 
         public SonnenPollingService(ILogger<SonnenPollingService> logger, ISonnenDbContext databaseContext, SonnenPortalClient sonnenClient)
         {
@@ -61,7 +61,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             var gridPurchase = new TimeSeries<int>(span);
             var batteryUsoc = new TimeSeries<double>(span);
 
-            for (int i = 0; i < Math.Min(span.Count, energyValues?.ProductionPower?.Count ?? 0); i++)
+            for (int i = 0; i < Math.Min(span.Count, energyValues.ProductionPower.Count); i++)
             {
                 productionPower[i] = energyValues.ProductionPower[i];
                 consumptionPower[i] = energyValues.ConsumptionPower[i];

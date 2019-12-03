@@ -10,9 +10,9 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
     {
         private readonly TokenStore<SonnenPortalClient> _tokenStore;
 
-        public string AccessToken => _tokenStore.AccessToken;
+        public string? AccessToken => _tokenStore.AccessToken;
         public DateTime AccessTokenExpiry => _tokenStore.AccessTokenExpiry;
-        public string RefreshToken => _tokenStore.RefreshToken;
+        public string? RefreshToken => _tokenStore.RefreshToken;
 
         public string Username { get; }
         public string UserPassword { get; }
@@ -26,9 +26,9 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Config
 
         public bool IsAccessTokenValid() => _tokenStore.IsAccessTokenValid();
 
-        public async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
+        public async Task UpdateTokenAsync(string? sessionToken, DateTime sessionExpiration, string? applicationToken)
         {
-            await _tokenStore.UpdateToken(sessionToken, sessionExpiration, applicationToken);
+            await _tokenStore.UpdateToken(sessionToken ?? string.Empty, sessionExpiration, applicationToken ?? string.Empty);
         }
     }
 }
