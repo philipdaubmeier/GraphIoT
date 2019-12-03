@@ -31,28 +31,28 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
         public Guid Id { get; set; }
 
         [MaxLength(4000)]
-        public string ProductionPowerCurve { get; set; } = null!;
+        public string? ProductionPowerCurve { get; set; }
 
         [MaxLength(4000)]
-        public string ConsumptionPowerCurve { get; set; } = null!;
+        public string? ConsumptionPowerCurve { get; set; }
 
         [MaxLength(4000)]
-        public string DirectUsagePowerCurve { get; set; } = null!;
+        public string? DirectUsagePowerCurve { get; set; }
 
         [MaxLength(4000)]
-        public string BatteryChargingCurve { get; set; } = null!;
+        public string? BatteryChargingCurve { get; set; }
 
         [MaxLength(4000)]
-        public string BatteryDischargingCurve { get; set; } = null!;
+        public string? BatteryDischargingCurve { get; set; }
 
         [MaxLength(4000)]
-        public string GridFeedinCurve { get; set; } = null!;
+        public string? GridFeedinCurve { get; set; }
 
         [MaxLength(4000)]
-        public string GridPurchaseCurve { get; set; } = null!;
+        public string? GridPurchaseCurve { get; set; }
 
         [MaxLength(4000)]
-        public string BatteryUsocCurve { get; set; } = null!;
+        public string? BatteryUsocCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<int> ProductionPowerSeries => ProductionPowerCurve.ToTimeseries<int>(Span);

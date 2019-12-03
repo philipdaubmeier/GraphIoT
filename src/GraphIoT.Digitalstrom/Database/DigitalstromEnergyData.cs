@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public DigitalstromCircuit Circuit { get; set; } = null!;
 
         [MaxLength(4000)]
-        public string EnergyCurve { get; set; } = null!;
+        public string? EnergyCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<int> EnergySeries => EnergyCurve.ToTimeseries<int>(Span);

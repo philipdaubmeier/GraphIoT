@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public DateTime Key { get; set; }
 
         [MaxLength(10000)]
-        public string EventStreamEncoded { get; set; } = null!;
+        public string? EventStreamEncoded { get; set; }
 
         [NotMapped]
         public TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), MaxEventsPerDay);
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         [NotMapped]
         public SceneEventStream EventStream
         {
-            get => SceneEventStream.FromByteArray(Span, Convert.FromBase64String(EventStreamEncoded));
+            get => SceneEventStream.FromByteArray(Span, EventStreamEncoded is null ? new byte[0] : Convert.FromBase64String(EventStreamEncoded));
             set
             {
                 var bytes = value.ToByteArray();

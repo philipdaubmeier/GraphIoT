@@ -37,46 +37,46 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
         public Guid Id { get; set; }
 
         [MaxLength(800)]
-        public string BurnerMinutesCurve { get; set; } = null!;
+        public string? BurnerMinutesCurve { get; set; }
 
         [MaxLength(800)]
-        public string BurnerStartsCurve { get; set; } = null!;
+        public string? BurnerStartsCurve { get; set; }
 
         [MaxLength(800)]
-        public string BurnerModulationCurve { get; set; } = null!;
+        public string? BurnerModulationCurve { get; set; }
 
         [MaxLength(800)]
-        public string OutsideTempCurve { get; set; } = null!;
+        public string? OutsideTempCurve { get; set; }
 
         [MaxLength(800)]
-        public string BoilerTempCurve { get; set; } = null!;
+        public string? BoilerTempCurve { get; set; }
 
         [MaxLength(800)]
-        public string BoilerTempMainCurve { get; set; } = null!;
+        public string? BoilerTempMainCurve { get; set; }
 
         [MaxLength(800)]
-        public string Circuit0TempCurve { get; set; } = null!;
+        public string? Circuit0TempCurve { get; set; }
 
         [MaxLength(800)]
-        public string Circuit1TempCurve { get; set; } = null!;
+        public string? Circuit1TempCurve { get; set; }
 
         [MaxLength(800)]
-        public string DhwTempCurve { get; set; } = null!;
+        public string? DhwTempCurve { get; set; }
 
         [MaxLength(100)]
-        public string BurnerActiveCurve { get; set; } = null!;
+        public string? BurnerActiveCurve { get; set; }
 
         [MaxLength(100)]
-        public string Circuit0PumpCurve { get; set; } = null!;
+        public string? Circuit0PumpCurve { get; set; }
 
         [MaxLength(100)]
-        public string Circuit1PumpCurve { get; set; } = null!;
+        public string? Circuit1PumpCurve { get; set; }
 
         [MaxLength(100)]
-        public string DhwPrimaryPumpCurve { get; set; } = null!;
+        public string? DhwPrimaryPumpCurve { get; set; }
 
         [MaxLength(100)]
-        public string DhwCirculationPumpCurve { get; set; } = null!;
+        public string? DhwCirculationPumpCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<double> BurnerMinutesSeries => BurnerMinutesCurve.ToTimeseries<double>(Span);

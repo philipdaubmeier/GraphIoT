@@ -39,7 +39,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Database
         public int Decimals { get; set; }
 
         [MaxLength(800)]
-        public string MeasureCurve { get; set; } = null!;
+        public string? MeasureCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<double> MeasureSeries => MeasureCurve.ToTimeseries<double>(Span, DecimalPlaces);

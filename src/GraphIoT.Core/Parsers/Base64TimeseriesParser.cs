@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
     {
         private const int defaultDecimalPlaces = 1;
 
-        public static TimeSeries<T> ToTimeseries<T>(this string base64, TimeSeriesSpan span, int decimalPlaces = defaultDecimalPlaces) where T : struct
+        public static TimeSeries<T> ToTimeseries<T>(this string? base64, TimeSeriesSpan span, int decimalPlaces = defaultDecimalPlaces) where T : struct
         {
             var timeseries = new TimeSeries<T>(span);
             if (string.IsNullOrWhiteSpace(base64))
