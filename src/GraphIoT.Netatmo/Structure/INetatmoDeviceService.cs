@@ -14,11 +14,11 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 
         Guid? GetModuleMeasureDbId(ModuleId module, Measure measure);
 
-        ModuleId GetDeviceId(Guid dbId);
+        ModuleId? GetDeviceId(Guid dbId);
 
-        ModuleId GetModuleId(Guid dbId);
+        ModuleId? GetModuleId(Guid dbId);
 
-        Measure GetMeasure(Guid dbId);
+        Measure? GetMeasure(Guid dbId);
 
         string GetDeviceName(ModuleId module, int crop = -1);
 

@@ -11,13 +11,13 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Database
         public Guid Id { get; set; }
 
         [Required, MaxLength(17)]
-        public string DeviceId { get; set; }
+        public string DeviceId { get; set; } = null!;
 
         [Required, MaxLength(17)]
-        public string ModuleId { get; set; }
+        public string ModuleId { get; set; } = null!;
 
         [Required, MaxLength(20)]
-        public string Measure { get; set; }
+        public string Measure { get; set; } = null!;
 
         [Required]
         public int Decimals { get; set; }
@@ -75,9 +75,9 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Database
         }
 
         [MaxLength(30)]
-        public string StationName { get; set; }
+        public string? StationName { get; set; }
 
         [MaxLength(30)]
-        public string ModuleName { get; set; }
+        public string? ModuleName { get; set; }
     }
 }

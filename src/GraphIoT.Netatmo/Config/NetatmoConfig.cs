@@ -2,10 +2,10 @@
 {
     public class NetatmoConfig
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string AppId { get; set; }
-        public string AppSecret { get; set; }
-        public string Scope { get; set; }
+        public string Username { get; set; } = null!;
+        public string Password { get; set; } = null!;
+        public string AppId { get; set; } = null!;
+        public string AppSecret { get; set; } = null!;
+        public string Scope { get; set; } = null!;
     }
 }

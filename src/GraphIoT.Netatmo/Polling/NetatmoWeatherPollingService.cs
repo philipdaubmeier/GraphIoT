@@ -63,7 +63,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Polling
                 var measureTypes = _netatmoStructure.GetModuleMeasures(module.Item2);
                 var measures = await _netatmoClient.GetMeasure(module.Item1, module.Item2, measureTypes, MeasureScale.ScaleMax, start, end, null, true);
 
-                var series = measureTypes.Where(m => m != null).ToDictionary(m => m, m => Enumerable.Range(0, days.Count).Select(k =>
+                var series = measureTypes.ToDictionary(m => m, m => Enumerable.Range(0, days.Count).Select(k =>
                         new TimeSeries<double>(new TimeSeriesSpan(days[k], days[k].AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min))).ToList());
                 foreach (var measure in measures)
                     foreach (var originSeries in measure.Value)

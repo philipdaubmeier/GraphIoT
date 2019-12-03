@@ -10,9 +10,9 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
     {
         private readonly TokenStore<NetatmoWebClient> _tokenStore;
 
-        public string AccessToken => _tokenStore.AccessToken;
+        public string? AccessToken => _tokenStore.AccessToken;
         public DateTime AccessTokenExpiry => _tokenStore.AccessTokenExpiry;
-        public string RefreshToken => _tokenStore.RefreshToken;
+        public string? RefreshToken => _tokenStore.RefreshToken;
 
         public string Username { get; private set; }
         public string UserPassword { get; private set; }
@@ -37,9 +37,9 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
             return !string.IsNullOrEmpty(RefreshToken) && AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0;
         }
 
-        public async Task UpdateTokenAsync(string sessionToken, DateTime sessionExpiration, string applicationToken)
+        public async Task UpdateTokenAsync(string? sessionToken, DateTime sessionExpiration, string? applicationToken)
         {
-            await _tokenStore.UpdateToken(sessionToken, sessionExpiration, applicationToken);
+            await _tokenStore.UpdateToken(sessionToken ?? string.Empty, sessionExpiration, applicationToken ?? string.Empty);
         }
     }
 }

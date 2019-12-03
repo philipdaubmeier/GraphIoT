@@ -15,14 +15,14 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.ViewModel
 
         public NetatmoMeasureViewModel(INetatmoDbContext databaseContext, INetatmoDeviceService netatmoStructure)
             : base(new Dictionary<Resolution, IQueryable<NetatmoMeasureData>>() {
-                       { Resolution.LowRes, databaseContext?.NetatmoMeasureLowresDataSet },
-                       { Resolution.MidRes, databaseContext?.NetatmoMeasureDataSet }
+                       { Resolution.LowRes, databaseContext.NetatmoMeasureLowresDataSet },
+                       { Resolution.MidRes, databaseContext.NetatmoMeasureDataSet }
                    },
                    Enumerable.Range(0, 1).ToDictionary(x => x.ToString(), x => x),
                    netatmoStructure.Modules.SelectMany(x => netatmoStructure.GetModuleMeasures(x.Item2)
                                                .Select(m => netatmoStructure.GetModuleMeasureDbId(x.Item2, m))
                                            )
-                                           .Where(x => x.HasValue).Select(x => x.Value)
+                                           .Where(x => x != null && x.HasValue).Select(x => x!.Value)
                                            .OrderBy(x => netatmoStructure.GetDeviceId(x))
                                            .ThenBy(x => netatmoStructure.GetModuleId(x))
                                            .ThenBy(x => netatmoStructure.GetMeasure(x))
@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.ViewModel
         public override GraphViewModel Graph(int index)
         {
             return DeferredLoadGraph<TimeSeries<double>, double>(index,
-                k => $"{((MeasureType)_netatmoStructure.GetMeasure(k)).ToString()} {_netatmoStructure.GetModuleName(_netatmoStructure.GetModuleId(k))} {_netatmoStructure.GetDeviceName(_netatmoStructure.GetDeviceId(k))}",
+                k => $"{((MeasureType)(_netatmoStructure.GetMeasure(k) ?? MeasureType.Temperature)).ToString()} {_netatmoStructure.GetModuleName(_netatmoStructure.GetModuleId(k) ?? string.Empty)} {_netatmoStructure.GetDeviceName(_netatmoStructure.GetDeviceId(k) ?? string.Empty)}",
                 k => $"measure_{_netatmoStructure.GetModuleId(k)}_{_netatmoStructure.GetMeasure(k)}", "#.#");
         }
     }

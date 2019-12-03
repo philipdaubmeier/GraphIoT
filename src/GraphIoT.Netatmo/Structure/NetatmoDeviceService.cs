@@ -13,13 +13,13 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 {
     public class NetatmoDeviceService : INetatmoDeviceService
     {
-        private Dictionary<Tuple<ModuleId, ModuleId>, List<Measure>> _modules = null;
+        private Dictionary<Tuple<ModuleId, ModuleId>, List<Measure>>? _modules = null;
 
-        private Dictionary<Tuple<ModuleId, Measure>, Guid> _moduleDbIds = null;
+        private Dictionary<Tuple<ModuleId, Measure>, Guid>? _moduleDbIds = null;
 
-        private Dictionary<ModuleId, string> _deviceNames = null;
+        private Dictionary<ModuleId, string>? _deviceNames = null;
 
-        private Dictionary<ModuleId, string> _moduleNames = null;
+        private Dictionary<ModuleId, string>? _moduleNames = null;
 
         private readonly IServiceScopeFactory _serviceScopeFactory;
 
@@ -33,21 +33,23 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             _logger = logger;
         }
 
+        private static readonly List<ModuleId> EmptyDeviceList = new List<ModuleId>();
         public IEnumerable<ModuleId> Devices
         {
             get
             {
                 LazyLoad();
-                return _modules.Select(x => x.Key.Item1).Distinct().OrderBy(x => x);
+                return _modules?.Select(x => x.Key.Item1)?.Distinct()?.OrderBy(x => x) ?? EmptyDeviceList.OrderBy(x => x);
             }
         }
 
+        private static readonly List<Tuple<ModuleId, ModuleId>> EmptyModuleList = new List<Tuple<ModuleId, ModuleId>>();
         public IEnumerable<Tuple<ModuleId, ModuleId>> Modules
         {
             get
             {
                 LazyLoad();
-                return _modules.Select(x => x.Key).Distinct().OrderBy(x => x.Item1).ThenBy(x => x.Item2);
+                return _modules?.Select(x => x.Key)?.Distinct()?.OrderBy(x => x.Item1)?.ThenBy(x => x.Item2) ?? EmptyModuleList.OrderBy(x => x.Item1);
             }
         }
 
@@ -69,17 +71,21 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             return dbId.First().Value;
         }
 
-        public ModuleId GetDeviceId(Guid dbId)
+        public ModuleId? GetDeviceId(Guid dbId)
         {
             LazyLoad();
 
-            var db = _modules.Where(x => x.Key.Item2 == GetModuleId(dbId));
+            var moduleId = GetModuleId(dbId);
+            if (moduleId is null)
+                return null;
+
+            var db = _modules.Where(x => x.Key.Item2 == moduleId);
             if (!db.Any())
                 return null;
             return db.First().Key.Item1;
         }
 
-        public ModuleId GetModuleId(Guid dbId)
+        public ModuleId? GetModuleId(Guid dbId)
         {
             LazyLoad();
 
@@ -89,7 +95,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             return db.First().Key.Item1;
         }
 
-        public Measure GetMeasure(Guid dbId)
+        public Measure? GetMeasure(Guid dbId)
         {
             LazyLoad();
 
@@ -103,18 +109,18 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
         {
             LazyLoad();
 
-            if (!_deviceNames.TryGetValue(module, out string name))
+            if (_deviceNames is null || !_deviceNames.TryGetValue(module, out string? name))
                 return string.Empty;
-            return crop < 0 ? name : name.Substring(0, Math.Min(name.Length, crop));
+            return (crop < 0 ? name : name?.Substring(0, Math.Min(name.Length, crop))) ?? string.Empty;
         }
 
         public string GetModuleName(ModuleId module, int crop = -1)
         {
             LazyLoad();
 
-            if (!_moduleNames.TryGetValue(module, out string name))
+            if (_moduleNames is null || !_moduleNames.TryGetValue(module, out string? name))
                 return string.Empty;
-            return crop < 0 ? name : name.Substring(0, Math.Min(name.Length, crop));
+            return (crop < 0 ? name : name?.Substring(0, Math.Min(name.Length, crop))) ?? string.Empty;
         }
 
         public void ReloadFromNetatmoApi()
@@ -133,20 +139,18 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             {
                 _loadSemaphore.WaitOne();
 
-                using (var scope = _serviceScopeFactory.CreateScope())
-                {
-                    var netatmoClient = scope.ServiceProvider.GetService<NetatmoWebClient>();
-                    var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
+                using var scope = _serviceScopeFactory.CreateScope();
+                var netatmoClient = scope.ServiceProvider.GetService<NetatmoWebClient>();
+                var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
 
-                    if (_modules == null)
-                        LoadStructureFromDb(dbContext);
+                if (_modules == null)
+                    LoadStructureFromDb(dbContext);
 
-                    if (_modules == null || forceReloadFromNetatmoApi)
-                        LoadStructureFromNetatmoApi(netatmoClient);
+                if (_modules == null || forceReloadFromNetatmoApi)
+                    LoadStructureFromNetatmoApi(netatmoClient);
 
-                    if (_moduleDbIds == null || (_modules != null && _moduleDbIds.Count < _modules.Count))
-                        LoadDbIds(dbContext);
-                }
+                if (_moduleDbIds == null || (_modules != null && _moduleDbIds.Count < _modules.Count))
+                    LoadDbIds(dbContext);
             }
             catch (Exception ex)
             {

@@ -33,13 +33,13 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Database
         public Guid ModuleMeasureId { get; set; }
 
         [ForeignKey("ModuleMeasureId")]
-        public NetatmoModuleMeasure ModuleMeasure { get; set; }
+        public NetatmoModuleMeasure ModuleMeasure { get; set; } = null!;
 
         [Required]
         public int Decimals { get; set; }
 
         [MaxLength(800)]
-        public string MeasureCurve { get; set; }
+        public string MeasureCurve { get; set; } = null!;
 
         [NotMapped]
         public TimeSeries<double> MeasureSeries => MeasureCurve.ToTimeseries<double>(Span, DecimalPlaces);
