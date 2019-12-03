@@ -7,8 +7,8 @@ namespace PhilipDaubmeier.ViessmannClient.Model
     {
         private bool skipDisposingClient = false;
         private bool skipDisposingAuthClient = false;
-        private HttpClient client;
-        private HttpClient authClient;
+        private HttpClient? client = null;
+        private HttpClient? authClient = null;
 
         /// <summary>
         /// See <see cref="IViessmannConnectionProvider{T}.AuthData"/>
@@ -48,13 +48,16 @@ namespace PhilipDaubmeier.ViessmannClient.Model
         /// </summary>
         public static HttpMessageHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
 
-        public string VitotrolDeviceId { get; set; }
-        public string VitotrolInstallationId { get; set; }
+        public string VitotrolDeviceId { get; set; } = string.Empty;
+        public string VitotrolInstallationId { get; set; } = string.Empty;
 
-        public string PlattformInstallationId { get; set; }
-        public string PlattformGatewayId { get; set; }
-        public string PlattformApiClientId { get; set; }
-        public string PlattformApiClientSecret { get; set; }
+        public string PlattformInstallationId { get; set; } = string.Empty;
+        public string PlattformGatewayId { get; set; } = string.Empty;
+        public string PlattformApiClientId { get; set; } = string.Empty;
+        public string PlattformApiClientSecret { get; set; } = string.Empty;
+
+        public ViessmannConnectionProvider(IViessmannAuth authData)
+            => AuthData = authData;
 
         #region IDisposable Support
         private bool disposed = false;

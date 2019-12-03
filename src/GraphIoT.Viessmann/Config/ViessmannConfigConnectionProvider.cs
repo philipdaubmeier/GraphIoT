@@ -20,6 +20,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
     public class ViessmannConfigConnectionProvider<T> : ViessmannConnectionProvider<T>
     {
         public ViessmannConfigConnectionProvider(TokenStore<T> tokenStore, IOptions<ViessmannConfig> config, ViessmannHttpClient<T> client, ViessmannAuthHttpClient authClient)
+            : base(new ViessmannAuth<T>(tokenStore, config.Value.Username, config.Value.Password))
         {
             VitotrolDeviceId = config.Value.VitotrolDeviceId;
             VitotrolInstallationId = config.Value.VitotrolInstallationId;
@@ -28,8 +29,6 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
             PlattformGatewayId = config.Value.PlattformGatewayId;
             PlattformApiClientId = config.Value.PlattformApiClientId;
             PlattformApiClientSecret = config.Value.PlattformApiClientSecret;
-
-            AuthData = new ViessmannAuth<T>(tokenStore, config.Value.Username, config.Value.Password);
 
             Client = client.Client;
             AuthClient = authClient.AuthClient;

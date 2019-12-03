@@ -59,7 +59,7 @@ namespace PhilipDaubmeier.ViessmannClient
             await _connectionProvider.AuthData.UpdateTokenAsync(sessiontoken, DateTime.Now.AddHours(1), string.Empty);
         }
 
-        private async Task<HttpResponseMessage> SendSoap(string action, string body, string token)
+        private async Task<HttpResponseMessage> SendSoap(string action, string body, string? token)
         {
             var soapBody = $"{_soapPrefix}<{action}>{body}</{action}>{_soapSuffix}";
             var request = new HttpRequestMessage(HttpMethod.Post, new Uri(_soapUri));

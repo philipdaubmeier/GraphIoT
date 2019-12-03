@@ -5,7 +5,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model
 {
     public interface IViessmannAuth
     {
-        string AccessToken { get; }
+        string? AccessToken { get; }
         DateTime AccessTokenExpiry { get; }
 
         string Username { get; }
@@ -13,6 +13,6 @@ namespace PhilipDaubmeier.ViessmannClient.Model
 
         bool IsAccessTokenValid();
 
-        Task UpdateTokenAsync(string accessToken, DateTime accessTokenExpiry, string refreshToken);
+        Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken);
     }
 }

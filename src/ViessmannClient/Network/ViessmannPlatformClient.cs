@@ -43,7 +43,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public async Task<(string status, double temperature)> GetOutsideTemperature()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.sensors.temperature.outside"), "status", "value");
-            return (res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1 ?? string.Empty, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<double> GetBoilerTemperature()
@@ -66,12 +66,12 @@ namespace PhilipDaubmeier.ViessmannClient
 
         public async Task<string> GetCircuitOperatingMode(Circuit circuit)
         {
-            return await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.modes.active"), "value");
+            return await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.modes.active"), "value") ?? string.Empty;
         }
 
         public async Task<string> GetCircuitActiveProgram(Circuit circuit)
         {
-            return await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.active"), "value");
+            return await ParseFeatureResponse<string>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.operating.programs.active"), "value") ?? string.Empty;
         }
 
         public async Task<(bool active, double temperature)> GetCircuitProgramNormal(Circuit circuit)
@@ -95,7 +95,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public async Task<(string status, double temperature)> GetCircuitTemperature(Circuit circuit)
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature($"heating.circuits.{CircuitNumber(circuit)}.sensors.temperature.supply"), "status", "value");
-            return (res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1 ?? string.Empty, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<bool> GetCircuitCirculationPump(Circuit circuit)
@@ -106,7 +106,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public async Task<(string status, double temperature)> GetDhwStorageTemperature()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.dhw.sensors.temperature.hotWaterStorage"), "status", "value");
-            return (res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1 ?? string.Empty, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<bool> GetDhwPrimaryPump()
@@ -122,7 +122,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public async Task<(string status, double temperature)> GetBoilerTemperatureMain()
         {
             var res = await ParseFeatureResponse<string, ClassNullable<double>>(await GetFeature("heating.boiler.sensors.temperature.main"), "status", "value");
-            return (res.Item1, ((double?)res.Item2) ?? 0d);
+            return (res.Item1 ?? string.Empty, ((double?)res.Item2) ?? 0d);
         }
 
         public async Task<int> GetBurnerModulation()
@@ -209,17 +209,17 @@ namespace PhilipDaubmeier.ViessmannClient
         {
             private readonly T? _val;
             public ClassNullable(T? value) { _val = value; }
-            public override string ToString() { return _val?.ToString(); }
+            public override string ToString() { return _val?.ToString() ?? string.Empty; }
             public static implicit operator ClassNullable<T>(T? value) { return new ClassNullable<T>(value); }
-            public static implicit operator T?(ClassNullable<T> nullable) { return nullable._val; }
+            public static implicit operator T?(ClassNullable<T>? nullable) { return nullable is null ? default : nullable._val; }
         }
 
-        private async Task<T> ParseFeatureResponse<T>(HttpResponseMessage response, string attrName) where T : class
+        private async Task<T?> ParseFeatureResponse<T>(HttpResponseMessage response, string attrName) where T : class
         {
             return (await ParseFeatureResponse<T, string>(response, attrName)).Item1;
         }
 
-        private async Task<Tuple<T1, T2>> ParseFeatureResponse<T1, T2>(HttpResponseMessage response, params string[] attrNames) where T1 : class where T2 : class
+        private async Task<Tuple<T1?, T2?>> ParseFeatureResponse<T1, T2>(HttpResponseMessage response, params string[] attrNames) where T1 : class where T2 : class
         {
             var subDefLinks = new[] { new
                 {
@@ -302,17 +302,17 @@ namespace PhilipDaubmeier.ViessmannClient
             if (typeStringRaw.properties?.value?.type?.Trim()?.Equals("string", StringComparison.InvariantCultureIgnoreCase) ?? false)
             {
                 var featureStrRaw = JsonConvert.DeserializeAnonymousType(responseStr, definitionStrVal);
-                return new Tuple<T1, T2>(featureStrRaw.properties?.value?.value as T1, default);
+                return new Tuple<T1?, T2?>(featureStrRaw.properties?.value?.value as T1, default);
             }
 
             var featureRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
             return (attrNames.FirstOrDefault()?.Trim()?.ToLowerInvariant() ?? string.Empty) switch
             {
-                "active" => new Tuple<T1, T2>(((ClassNullable<bool>)featureRaw.properties?.active?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.temperature?.value) as T2),
-                "hours" => new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.hours?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.starts?.value) as T2),
-                "status" => new Tuple<T1, T2>(featureRaw.properties?.status?.value as T1, ((ClassNullable<double>)featureRaw.properties?.value?.value) as T2),
-                "value" => new Tuple<T1, T2>(((ClassNullable<double>)featureRaw.properties?.value?.value) as T1, default),
-                _ => new Tuple<T1, T2>(default, default),
+                "active" => new Tuple<T1?, T2?>(((ClassNullable<bool>)featureRaw.properties?.active?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.temperature?.value) as T2),
+                "hours" => new Tuple<T1?, T2?>(((ClassNullable<double>)featureRaw.properties?.hours?.value) as T1, ((ClassNullable<double>)featureRaw.properties?.starts?.value) as T2),
+                "status" => new Tuple<T1?, T2?>(featureRaw.properties?.status?.value as T1, ((ClassNullable<double>)featureRaw.properties?.value?.value) as T2),
+                "value" => new Tuple<T1?, T2?>(((ClassNullable<double>)featureRaw.properties?.value?.value) as T1, default),
+                _ => new Tuple<T1?, T2?>(default, default),
             };
         }
     }
