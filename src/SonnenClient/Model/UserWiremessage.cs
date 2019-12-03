@@ -9,21 +9,21 @@ namespace PhilipDaubmeier.SonnenClient.Model
     {
         public UserDataWiremessage? Data { get; set; }
 
-        public UserSites? ContainedData => new UserSites()
+        public UserSites ContainedData => new UserSites()
         {
-            User = Data?.Attributes,
-            DefaultSiteId = Data?.Relationships?.DefaultSite?.Data?.Id,
+            User = Data?.Attributes ?? new UserProfile(),
+            DefaultSiteId = Data?.Relationships?.DefaultSite?.Data?.Id ?? string.Empty,
             SiteIds = Data?.Relationships?.Sites?.Data
                 ?.Where(s => s.Type?.Equals("sites", StringComparison.InvariantCultureIgnoreCase) ?? false)
-                ?.Where(s => s.Id != null)?.Select(s => s.Id!)?.ToList()
+                ?.Where(s => s.Id != null)?.Select(s => s.Id!)?.ToList() ?? new List<string>()
         };
     }
 
     public class UserSites
     {
-        public UserProfile? User { get; set; }
-        public string? DefaultSiteId { get; set; }
-        public List<string>? SiteIds { get; set; }
+        public UserProfile User { get; set; } = new UserProfile();
+        public string DefaultSiteId { get; set; } = string.Empty;
+        public List<string> SiteIds { get; set; } = new List<string>();
     }
 
     public class UserDataWiremessage : DataWiremessage<UserProfile>

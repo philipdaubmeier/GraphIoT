@@ -48,10 +48,10 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             }
 
             var energyValues = await _sonnenClient.GetEnergyMeasurements(_siteId, start, end);
-            if (!energyValues.Start.HasValue || !energyValues.End.HasValue)
+            if (energyValues.Start == DateTime.MinValue || energyValues.End == DateTime.MinValue)
                 return;
 
-            var span = new TimeSeriesSpan(energyValues.Start.Value.ToUniversalTime(), energyValues.End.Value.ToUniversalTime(), energyValues.Resolution);
+            var span = new TimeSeriesSpan(energyValues.Start.ToUniversalTime(), energyValues.End.ToUniversalTime(), energyValues.Resolution);
             var productionPower = new TimeSeries<int>(span);
             var consumptionPower = new TimeSeries<int>(span);
             var directUsagePower = new TimeSeries<int>(span);
