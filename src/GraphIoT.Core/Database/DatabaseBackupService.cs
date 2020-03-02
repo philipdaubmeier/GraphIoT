@@ -143,9 +143,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             else
                 rows = table;
 
-            return rows.Select(row => columnProperties.Select(prop => prop.GetGetMethod())
-                                                      .Where(getter => getter != null)
-                                                      .Select(getter => getter!.Invoke(row, null)).ToList()).ToList();
+            return rows.ToList().Select(row => columnProperties.Select(prop => prop.GetGetMethod())
+                                                               .Where(getter => getter != null)
+                                                               .Select(getter => getter!.Invoke(row, null)).ToList()).ToList();
         }
     }
 }
