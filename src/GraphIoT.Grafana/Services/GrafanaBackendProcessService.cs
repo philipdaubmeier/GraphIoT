@@ -29,8 +29,10 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
         {
             _logger.LogInformation($"{DateTime.Now} Grafana Backend Service is starting.");
 
+            var extension = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? ".exe" : string.Empty;
+
             _process = new Process();
-            _process.StartInfo.FileName = Path.Combine(_rootPath, "Grafana", "bin", "grafana-server.exe");
+            _process.StartInfo.FileName = Path.Combine(_rootPath, "Grafana", "bin", $"grafana-server{extension}");
             _process.StartInfo.WorkingDirectory = Path.Combine(_rootPath, "Grafana", "bin");
             _process.StartInfo.RedirectStandardOutput = true;
             _process.StartInfo.RedirectStandardError = true;
