@@ -158,6 +158,10 @@ namespace PhilipDaubmeier.ViessmannClient
 
         private async Task Authenticate()
         {
+            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformInstallationId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformGatewayId) ||
+                string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
+                throw new Exception("ViessmannPlatformClient is missing one or more of the mandatory connection provider configuration values.");
+
             if (_connectionProvider.AuthData.IsAccessTokenValid())
                 return;
 
