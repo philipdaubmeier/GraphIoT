@@ -295,8 +295,30 @@ namespace PhilipDaubmeier.ViessmannClient
                 entities = subDefEntities,
                 actions = new List<object>()
             };
+            var definitionError = new
+            {
+                viErrorId = "",
+                statusCode = (int?)0,
+                errorType = "",
+                message = "",
+                extendedPayload = new
+                {
+                    name = "",
+                    requestCountLimit = (long?)0,
+                    clientId = "",
+                    userId = "",
+                    limitReset = (long?)0
+                }
+            };
 
             var responseStr = await response.Content.ReadAsStringAsync();
+
+            var errorResponseRaw = JsonConvert.DeserializeAnonymousType(responseStr, definitionError);
+            if (errorResponseRaw?.statusCode?.Equals(429) ?? false)
+            {
+                var resetTime = errorResponseRaw?.extendedPayload?.limitReset != null ? (DateTimeOffset?)DateTimeOffset.FromUnixTimeMilliseconds(errorResponseRaw.extendedPayload.limitReset.Value) : null;
+                throw new HttpRequestException($"Viessmann Platform API rate limit exceeded. {errorResponseRaw?.extendedPayload?.name}: {errorResponseRaw?.extendedPayload?.requestCountLimit}. Will be reset at {resetTime?.UtcDateTime}");
+            }
 
             var typeStringRaw = JsonConvert.DeserializeAnonymousType(responseStr, new { properties = new { value = new { type = "" } } });
             if (typeStringRaw.properties?.value?.type?.Trim()?.Equals("string", StringComparison.InvariantCultureIgnoreCase) ?? false)
