@@ -16,6 +16,10 @@ namespace PhilipDaubmeier.DigitalstromClient
         private bool skipDisposingHttpClient = false;
         protected HttpClient? httpClient = null;
 
+#pragma warning disable IDE0069 // It is disposed by the one that injected it
+        protected HttpClient? longPollingHttpClient = null;
+#pragma warning restore IDE0069
+
 #pragma warning disable IDE0069 // IDisposable.Dispose() is never called on httpHandler because its parent HttpClient disposes it already.
         protected HttpMessageHandler? httpHandler = null;
 #pragma warning restore IDE0069
@@ -85,6 +89,21 @@ namespace PhilipDaubmeier.DigitalstromClient
             {
                 httpClient = value;
                 skipDisposingHttpClient = true;
+            }
+        }
+
+        /// <summary>
+        /// See <see cref="IDigitalstromConnectionProvider.LongPollingHttpClient"/>
+        /// </summary>
+        public HttpClient LongPollingHttpClient
+        {
+            get
+            {
+                return longPollingHttpClient ?? HttpClient;
+            }
+            protected set
+            {
+                longPollingHttpClient = value;
             }
         }
 

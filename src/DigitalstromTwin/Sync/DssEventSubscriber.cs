@@ -1,6 +1,9 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
+using PhilipDaubmeier.DigitalstromClient.Network;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,6 +11,21 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class DssEventSubscriber : LongPollingClientBase<DssEvent>
     {
+        private class DigitalstromLongPollingConnectionProvider : IDigitalstromConnectionProvider
+        {
+            private IDigitalstromConnectionProvider inner;
+
+            public DigitalstromLongPollingConnectionProvider(IDigitalstromConnectionProvider inner) => this.inner = inner;
+
+            UriPriorityList IDigitalstromConnectionProvider.Uris => inner.Uris;
+
+            IDigitalstromAuth IDigitalstromConnectionProvider.AuthData => inner.AuthData;
+
+            HttpClient IDigitalstromConnectionProvider.HttpClient => inner.LongPollingHttpClient;
+
+            HttpClient IDigitalstromConnectionProvider.LongPollingHttpClient => inner.LongPollingHttpClient;
+        }
+
         private const int defaultSubscriptionId = 10;
 
         private readonly SemaphoreSlim initializedSempahore = new SemaphoreSlim(0, 1);
@@ -20,7 +38,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private readonly IEnumerable<IEventName> eventsToSubscribe;
 
         public DssEventSubscriber(IDigitalstromConnectionProvider connectionProvider, IEnumerable<IEventName> eventsToSubscribe, int subscriptionId = defaultSubscriptionId)
-            : this(new DigitalstromDssClient(connectionProvider), eventsToSubscribe, subscriptionId)
+            : this(new DigitalstromDssClient(new DigitalstromLongPollingConnectionProvider(connectionProvider)), eventsToSubscribe, subscriptionId)
         {
             ownsClient = true;
         }

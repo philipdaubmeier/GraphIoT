@@ -92,6 +92,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);
 
+            serviceCollection.AddHttpClient<DigitalstromLongPollingHttpClient>()
+                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
+                {
+                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
+                });
+
             return serviceCollection;
         }
     }

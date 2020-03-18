@@ -27,5 +27,12 @@ namespace PhilipDaubmeier.DigitalstromClient
         /// care of (like in case of the HttpClientFactory).
         /// </summary>
         HttpClient HttpClient { get; }
+
+        /// <summary>
+        /// Returnes a HttpClient instance with special setup for long polling of digitalstrom
+        /// events. Implementations can opt return a reference to the same instance of the
+        /// property HttpClient per default.
+        /// </summary>
+        HttpClient LongPollingHttpClient { get; }
     }
 }
