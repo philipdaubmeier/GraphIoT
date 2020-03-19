@@ -10,17 +10,8 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.ViessmannClient
 {
-    public class ViessmannPlatformClient
+    public class ViessmannPlatformClient : ViessmannAuthBase
     {
-        private readonly IViessmannConnectionProvider<ViessmannPlatformClient> _connectionProvider;
-
-        private readonly HttpClient _client;
-        private readonly HttpClient _authClient;
-
-        private const string _authUri = "https://iam.viessmann.com/idp/v1/authorize";
-        private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
-        private const string _redirectUri = "vicare://oauth-callback/everest";
-
         public enum Circuit
         {
             Circuit0,
@@ -28,16 +19,12 @@ namespace PhilipDaubmeier.ViessmannClient
         }
 
         public ViessmannPlatformClient(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
-        {
-            _connectionProvider = connectionProvider;
-            _client = connectionProvider.Client;
-            _authClient = connectionProvider.AuthClient;
-        }
+            : base(connectionProvider) { }
 
         public async Task<string> GetInstallations()
         {
             var uri = new Uri("https://api.viessmann-platform.io/general-management/v1/installations?expanded=true");
-            return await (await CallApi(uri)).Content.ReadAsStringAsync();
+            return await (await RequestViessmannApi(uri)).Content.ReadAsStringAsync();
         }
 
         public async Task<(string status, double temperature)> GetOutsideTemperature()
@@ -139,74 +126,7 @@ namespace PhilipDaubmeier.ViessmannClient
         private async Task<HttpResponseMessage> GetFeature(string featureName)
         {
             var uri = $"https://api.viessmann-platform.io/operational-data/v1/installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features/{featureName}";
-            return await CallApi(new Uri(uri));
-        }
-
-        private async Task<HttpResponseMessage> CallApi(Uri uri)
-        {
-            await Authenticate();
-
-            var request = new HttpRequestMessage()
-            {
-                RequestUri = uri,
-                Method = HttpMethod.Get
-            };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
-
-            return await _client.SendAsync(request);
-        }
-
-        private async Task Authenticate()
-        {
-            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformInstallationId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformGatewayId) ||
-                string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
-                throw new Exception("ViessmannPlatformClient is missing one or more of the mandatory connection provider configuration values.");
-
-            if (_connectionProvider.AuthData.IsAccessTokenValid())
-                return;
-
-            var request = new HttpRequestMessage()
-            {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
-                Method = HttpMethod.Get,
-            };
-
-            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_connectionProvider.AuthData.Username}:{_connectionProvider.AuthData.UserPassword}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
-
-            var response = await _authClient.SendAsync(request);
-            var location = response.Headers.Location.AbsoluteUri;
-
-            var prefix = $"{_redirectUri}?code=";
-            if (!location.StartsWith(prefix) || location.Length <= prefix.Length)
-                throw new Exception("could not retrieve auth code");
-
-            var authorization_code = location.Substring(prefix.Length);
-
-            Tuple<string, DateTime> loadedToken = await ParseTokenResponse(await _client.PostAsync(
-                new Uri(_tokenUri), new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("client_id", _connectionProvider.PlattformApiClientId),
-                    new KeyValuePair<string, string>("client_secret", _connectionProvider.PlattformApiClientSecret),
-                    new KeyValuePair<string, string>("code", authorization_code),
-                    new KeyValuePair<string, string>("redirect_uri", _redirectUri)
-                })));
-
-            await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, string.Empty);
-        }
-
-        private async Task<Tuple<string, DateTime>> ParseTokenResponse(HttpResponseMessage response)
-        {
-            var definition = new
-            {
-                access_token = "",
-                expires_in = "",
-                token_type = ""
-            };
-            var responseStr = await response.Content.ReadAsStringAsync();
-            var authRaw = JsonConvert.DeserializeAnonymousType(responseStr, definition);
-            return new Tuple<string, DateTime>(authRaw.access_token, DateTime.Now.AddSeconds(int.Parse(authRaw.expires_in)));
+            return await RequestViessmannApi(new Uri(uri));
         }
 
         private class ClassNullable<T> where T : struct
