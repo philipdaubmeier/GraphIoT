@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Serialization;
 using PhilipDaubmeier.ViessmannClient.Model;
 using PhilipDaubmeier.ViessmannClient.Model.Auth;
+using PhilipDaubmeier.ViessmannClient.Model.Error;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -69,15 +70,32 @@ namespace PhilipDaubmeier.ViessmannClient
         /// </summary>
         protected async Task<TModel> CallViessmannApi<TModel>(Uri uri)
         {
-            var responseStream = await (await RequestViessmannApi(uri)).Content.ReadAsStreamAsync();
+            var responseString = await (await RequestViessmannApi(uri)).Content.ReadAsStringAsync();
 
-            using var sr = new StreamReader(responseStream);
+            using var sr = new StringReader(responseString);
             using var jsonTextReader = new JsonTextReader(sr);
             var result = _jsonSerializer.Deserialize<TModel>(jsonTextReader);
             if (result == null)
-                throw new IOException("Could not deserialize response.");
+                throw ExtractErrorMessage(responseString);
 
             return result;
+        }
+
+        private Exception ExtractErrorMessage(string payload)
+        {
+            using var sr = new StringReader(payload);
+            using var jsonTextReader = new JsonTextReader(sr);
+            var errorResponse = _jsonSerializer.Deserialize<ErrorPayload>(jsonTextReader);
+
+            var resetTime = errorResponse?.ExtendedPayload?.LimitReset != null ? (DateTimeOffset?)DateTimeOffset.FromUnixTimeMilliseconds(errorResponse.ExtendedPayload.LimitReset.Value) : null;
+
+            if (errorResponse?.StatusCode?.Equals(429) ?? false)
+                throw new HttpRequestException($"Viessmann Platform API rate limit exceeded. {errorResponse?.ExtendedPayload?.Name}: {errorResponse?.ExtendedPayload?.RequestCountLimit}. Will be reset at {resetTime?.UtcDateTime}");
+
+            if (errorResponse?.StatusCode.HasValue ?? false)
+                return new IOException($"Viessmann Platform API error code {errorResponse?.StatusCode.Value}. Message: \"{errorResponse?.Message}\"");
+
+            return new IOException("Could not deserialize response.");
         }
 
         /// <summary>
