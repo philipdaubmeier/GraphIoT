@@ -2,6 +2,7 @@
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using PhilipDaubmeier.ViessmannClient;
+using PhilipDaubmeier.ViessmannClient.Model.Features;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,23 +38,25 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private async Task PollHeatingValues()
         {
-            var burnerStatistics = await _platformClient.GetBurnerStatistics();
-            var burnerHoursTotal = burnerStatistics.Item1;
-            var burnerStartsTotal = burnerStatistics.Item2;
-            var burnerModulation = await _platformClient.GetBurnerModulation();
+            var features = await _platformClient.GetFeatures();
 
-            var outsideTemp = (await _platformClient.GetOutsideTemperature()).temperature;
-            var boilerTemp = await _platformClient.GetBoilerTemperature();
-            var boilerTempMain = (await _platformClient.GetBoilerTemperatureMain()).temperature;
-            var circuit0Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit0)).temperature;
-            var circuit1Temp = (await _platformClient.GetCircuitTemperature(ViessmannPlatformClient.Circuit.Circuit1)).temperature;
-            var dhwTemp = (await _platformClient.GetDhwStorageTemperature()).temperature;
+            var burnerStatistics = features.GetFeature(FeatureName.Name.HeatingBurnerStatistics);
+            var burnerHoursTotal = (double)(burnerStatistics?.Hours?.Value ?? 0);
+            var burnerStartsTotal = (int)(burnerStatistics?.Starts?.Value ?? 0);
+            var burnerModulation = (features.GetFeature(FeatureName.Name.HeatingBurnerModulation)?.Value?.Value as int?) ?? 0;
 
-            var burnerActive = await _platformClient.GetBurnerActiveStatus();
-            var circuit0Pump = await _platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit0);
-            var circuit1Pump = await _platformClient.GetCircuitCirculationPump(ViessmannPlatformClient.Circuit.Circuit1);
-            var dhwPrimPump = await _platformClient.GetDhwPrimaryPump();
-            var dhwCircPump = await _platformClient.GetDhwCirculationPump();
+            var outsideTemp = (double)(features.GetFeature(FeatureName.Name.HeatingSensorsTemperatureOutside)?.Temperature?.Value ?? 0);
+            var boilerTemp = (double)(features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.Temperature?.Value ?? 0);
+            var boilerTempMain = (double)(features.GetFeature(FeatureName.Name.HeatingBoilerSensorsTemperatureMain)?.Temperature?.Value ?? 0);
+            var circuit0Temp = (double)(features.GetFeature(FeatureName.Name.HeatingCircuitsSensorsTemperature, FeatureName.Circuit.Circuit0)?.Temperature?.Value ?? 0);
+            var circuit1Temp = (double)(features.GetFeature(FeatureName.Name.HeatingCircuitsSensorsTemperature, FeatureName.Circuit.Circuit1)?.Temperature?.Value ?? 0);
+            var dhwTemp = (double)(features.GetFeature(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorage)?.Temperature?.Value ?? 0);
+
+            var burnerActive = features.GetFeature(FeatureName.Name.HeatingBurner)?.Active?.Value ?? false;
+            var circuit0Pump = features.GetFeature(FeatureName.Name.HeatingCircuitsCirculationPump, FeatureName.Circuit.Circuit0)?.Active?.Value ?? false;
+            var circuit1Pump = features.GetFeature(FeatureName.Name.HeatingCircuitsCirculationPump, FeatureName.Circuit.Circuit1)?.Active?.Value ?? false;
+            var dhwPrimPump = features.GetFeature(FeatureName.Name.HeatingCircuitsDhwPumps)?.Active?.Value ?? false;
+            var dhwCircPump = features.GetFeature(FeatureName.Name.HeatingCircuitsCirculationPump)?.Active?.Value ?? false;
 
             var time = DateTime.UtcNow;
             var day = time.Date;
@@ -148,7 +151,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             TimeSeries<double> series5Src, TimeSeries<double> series6Src, TimeSeries<double> series7Src, TimeSeries<double> series8Src, TimeSeries<double> series9Src,
             TimeSeries<bool> series10Src, TimeSeries<bool> series11Src, TimeSeries<bool> series12Src, TimeSeries<bool> series13Src, TimeSeries<bool> series14Src)
         {
-            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
             var dbHeatingSeries = _dbContext.ViessmannHeatingLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
             if (dbHeatingSeries == null)
