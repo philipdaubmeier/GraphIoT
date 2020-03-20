@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
@@ -6,9 +7,9 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
     {
         public enum Circuit
         {
-            Circuit0,
-            Circuit1,
-            Circuit2
+            Circuit0 = 0,
+            Circuit1 = 1,
+            Circuit2 = 2
         }
 
         public enum Name
@@ -195,18 +196,17 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             CircuitNum = circuit ?? Circuit.Circuit0;
         }
 
+        public static implicit operator string(FeatureName name)
+        {
+            var nameStr = _mapping.ToDictionary(x => x.Value, x => x.Key)[name._name];
+            return nameStr.Replace(".{circuit}", $".{(int)name.CircuitNum}");
+        }
+
         public static implicit operator FeatureName(string name)
         {
             var circuit = Circuit.Circuit0;
             if (name.Length >= 18 && int.TryParse(name.Replace("heating.circuits.", "").Substring(0, 1), out int circuitNum))
-            {
-                circuit = circuitNum switch
-                {
-                    1 => Circuit.Circuit1,
-                    2 => Circuit.Circuit2,
-                    _ => Circuit.Circuit0
-                };
-            }
+                circuit = (Circuit)circuitNum;
 
             var placeholder = ".{circuit}";
             name = name.Replace(".0", placeholder).Replace(".1", placeholder).Replace(".2", placeholder);
