@@ -277,7 +277,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _scene.GetHashCode();
+            return HashCode.Combine(_scene);
         }
 
         public override string ToString()

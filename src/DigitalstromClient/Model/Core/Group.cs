@@ -171,12 +171,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _group.GetHashCode();
+            return HashCode.Combine(_group);
         }
 
         public override string ToString()
         {
-            return $"ID {_group}: {((Color)this).ToString()} - {((GroupType)this).ToString()}";
+            return $"ID {_group}: {(Color)this} - {(GroupType)this}";
         }
 
         public string ToDisplayString()
