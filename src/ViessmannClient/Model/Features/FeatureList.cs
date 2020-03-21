@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
@@ -10,7 +11,13 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public PropertyList? GetFeature(FeatureName.Name name, FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
         {
             var nameStr = (string)new FeatureName(name, circuit);
-            return Features.Where(x => x.Name?.Equals(nameStr, System.StringComparison.InvariantCultureIgnoreCase) ?? false).FirstOrDefault()?.Properties;
+            return Features.Where(x => x.Name?.Equals(nameStr, StringComparison.InvariantCultureIgnoreCase) ?? false).FirstOrDefault()?.Properties;
+        }
+
+        public DateTime? GetTimestamp(FeatureName.Name name, FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            var nameStr = (string)new FeatureName(name, circuit);
+            return Features.Where(x => x.Name?.Equals(nameStr, StringComparison.InvariantCultureIgnoreCase) ?? false).FirstOrDefault()?.Timestamp;
         }
     }
 }

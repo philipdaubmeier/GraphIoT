@@ -31,6 +31,12 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<List<double>>? Year { get; set; }
         public TypedValue<string?>? Unit { get; set; }
 
+        public int? ValueAsInt => (Value?.Value as IConvertible)?.ToInt32(null);
+
+        public double? ValueAsDouble => (Value?.Value as IConvertible)?.ToDouble(null);
+
+        public bool? StatusAsBool => Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase);
+
         public override string ToString()
         {
             return string.Join(", ", GetProperties().Select(p => $"{p.property}: {p.value}"));
