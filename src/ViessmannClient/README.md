@@ -58,7 +58,7 @@ var viessmannConnProvider = new ViessmannConnectionProvider<ViessmannPlatformCli
 If you have the connection providers in place, you can create and use the Viessmann client like this:
 
 ```csharp
-var client = new ViessmannPlatformClient(viessmannPlatformConnProvider);
+var client = new ViessmannPlatformClient(viessmannConnProvider);
 
 // Get the first installation, gateway and device id of the logged in user
 var installationId = (await client.GetInstallations()).Data.First().Id ?? 0;
