@@ -3,7 +3,7 @@
 
 # ViessmannClient
 
-This class library provides a way to call the Viessmann Server interfaces. It supports RESTful Viessmann Plattform services, the Estrella server as well as the legacy Vitotrol SOAP service. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.
+This class library provides a way to call the Viessmann Platform API. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface for reading all details of an installation as well as all setting and sensor values of devices.
 
 ## NuGet
 
