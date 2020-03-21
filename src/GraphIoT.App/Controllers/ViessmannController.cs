@@ -50,7 +50,11 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         {
             var res = await _platformClient.GetInstallations();
 
-            return Json(Newtonsoft.Json.JsonConvert.DeserializeObject(res));
+            return Json(res.Data.Select(x => new
+            {
+                id = x.Id,
+                desc = x.Description
+            }));
         }
 
         // GET: api/viessmann/features
