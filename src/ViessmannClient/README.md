@@ -45,23 +45,9 @@ public class ViessmannAuth : IViessmannAuth
 And to create a connection provider you can use the default implementation `ViessmannConnectionProvider<T>`:
 
 ```csharp
-var viessmannEstrellaConnProvider = new ViessmannConnProvider<ViessmannEstrellaClient>()
-{
-    AuthData = new ViessmannAuth("<username>", "<password>")
-};
-
-var viessmannVitotrolConnProvider = new ViessmannConnProvider<ViessmannVitotrolClient>()
+var viessmannConnProvider = new ViessmannConnectionProvider<ViessmannPlatformClient>()
 {
     AuthData = new ViessmannAuth("<username>", "<password>"),
-    VitotrolDeviceId = "<deviceId>",
-    VitotrolInstallationId = "<installationId>"
-};
-
-var viessmannPlatformConnProvider = new ViessmannConnProvider<ViessmannPlatformClient>()
-{
-    AuthData = new ViessmannAuth("<username>", "<password>"),
-    PlattformInstallationId = "<installationId>",
-    PlattformGatewayId = "<gatewayId>",
     PlattformApiClientId = "<clientId>",
     PlattformApiClientSecret = "<clientSecret>"
 };
@@ -69,39 +55,31 @@ var viessmannPlatformConnProvider = new ViessmannConnProvider<ViessmannPlatformC
 
 > **Caution:** in a productive use you may want to implement your own `IViessmannConnectionProvider<T>` and load your app id, secret and user credentials from a suitable vault. You can have a look at the respective classes in [`GraphIoT.Viessmann`](../GraphIoT.Viessmann/Config) as an example for `IViessmannAuth` and `IViessmannConnectionProvider<T>` implemenations with secrets injection and storing/loading of access tokens.
 
-If you have the connection providers in place, you can create and use the Viessmann clients like this:
+If you have the connection providers in place, you can create and use the Viessmann client like this:
 
 ```csharp
-// Get the gateway and all controllers via Estrella server
-var estrellaClient = new ViessmannEstrellaClient(viessmannEstrellaConnProvider);
-var gatewayIds = await estrellaClient.GetGateways();
-foreach (var gatewayId in gatewayIds)
-    foreach (var controller in await estrellaClient.GetControllers(gatewayId))
-        Console.WriteLine($"Controller id: {controller.Item1} name: {controller.Item2}");
+var client = new ViessmannPlatformClient(viessmannPlatformConnProvider);
 
-// Get raw datapoints from Vitotrol client, e.g. solar production (id: 7895)
-var vitotrolClient = new ViessmannVitotrolClient(viessmannVitotrolConnProvider);
-var solarWhTotalTuple = (await vitotrolClient.GetData(new List<int>() { 7895 })).First();
-var timestamp = solarWhTotalTuple.Item3.ToUniversalTime();
-var solarWhTotal = int.Parse(solarWhTotalTuple.Item2);
-Console.WriteLine($"Total solar production today id: {solarWhTotal} Wh, time: {timestamp}");
+// Get the first installation id and gateway id of the logged in user
+var installationId = (await client.GetInstallations()).Data.First().Id ?? 0;
+var gatewayId = (await client.GetGateways(installationId)).Data.First().Id;
 
-// Get heating sensor values via Viessmann Platform client
-var platformClient = new ViessmannPlatformClient(viessmannPlatformConnProvider);
-var outsideTemp = (await platformClient.GetOutsideTemperature()).Item2;
-var boilerTemp = await platformClient.GetBoilerTemperature();
+// Get sensor values
+var features = await client.GetFeatures(installationId, gatewayId);
+var outsideTemp = features.GetFeature(FeatureName.Name.HeatingSensorsTemperatureOutside)?.ValueAsDouble;
+var boilerTemp = features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.ValueAsDouble;
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
 ```
 
 ## Platform Support
 
-CompactTimeSeries is compiled for .NET Core 3.0.
+ViessmannClient is compiled for .NET Core 3.0.
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2019 Philip Daubmeier
+Copyright (c) 2020 Philip Daubmeier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
