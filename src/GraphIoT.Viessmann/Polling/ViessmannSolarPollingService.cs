@@ -41,43 +41,58 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         {
             var data = await _vitotrolClient.GetData(new List<int>() { 5272, 5273, 5274, 5276, 7895 });
             var time = data.First().timestamp.ToUniversalTime();
-            var day = time.Date;
-
-            var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
-            if (dbSolarSeries == null)
-                _dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarMidresData() { Key = day });
 
             var item = data.First(d => d.id == 7895.ToString());
-            var newValue = int.Parse(item.value);
-            var oldValue = dbSolarSeries.SolarWhTotal;
-            var series1 = dbSolarSeries.SolarWhSeries;
-            series1.Accumulate(time, oldValue.HasValue ? newValue - oldValue.Value : 0);
-            dbSolarSeries.SetSeries(0, series1);
-            dbSolarSeries.SolarWhTotal = newValue;
+            var solarWhTotal = int.Parse(item.value);
 
             item = data.First(d => d.id == 5272.ToString());
-            var series2 = dbSolarSeries.SolarCollectorTempSeries;
-            series2[time] = double.Parse(item.value, CultureInfo.InvariantCulture);
-            dbSolarSeries.SetSeries(1, series2);
+            var solarCollectorTemp = double.Parse(item.value, CultureInfo.InvariantCulture);
 
             item = data.First(d => d.id == 5276.ToString());
-            var series3 = dbSolarSeries.SolarHotwaterTempSeries;
-            series3[time] = double.Parse(item.value, CultureInfo.InvariantCulture);
-            dbSolarSeries.SetSeries(2, series3);
+            var solarHotwaterTemp = double.Parse(item.value, CultureInfo.InvariantCulture);
 
             item = data.First(d => d.id == 5274.ToString());
-            var series4 = dbSolarSeries.SolarPumpStateSeries;
-            series4[time] = item.value.Trim() != "0";
-            dbSolarSeries.SetSeries(3, series4);
+            var solarPumpState = item.value.Trim() != "0";
 
             item = data.First(d => d.id == 5273.ToString());
+            var solarSuppression = item.value.Trim() != "0";
+
+            SaveSolarValues(_dbContext, time, solarWhTotal, solarCollectorTemp, solarHotwaterTemp, solarPumpState, solarSuppression);
+        }
+
+        public static void SaveSolarValues(IViessmannDbContext dbContext, DateTime time, int solarWhTotal, double solarCollectorTemp, double solarHotwaterTemp, bool solarPumpState, bool solarSuppression)
+        {
+            var day = time.Date;
+
+            var dbSolarSeries = dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
+            if (dbSolarSeries == null)
+                dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarMidresData() { Key = day });
+
+            var oldSolarWhTotal = dbSolarSeries.SolarWhTotal;
+            var series1 = dbSolarSeries.SolarWhSeries;
+            series1.Accumulate(time, oldSolarWhTotal.HasValue ? solarWhTotal - oldSolarWhTotal.Value : 0);
+            dbSolarSeries.SetSeries(0, series1);
+            dbSolarSeries.SolarWhTotal = solarWhTotal;
+
+            var series2 = dbSolarSeries.SolarCollectorTempSeries;
+            series2[time] = solarCollectorTemp;
+            dbSolarSeries.SetSeries(1, series2);
+
+            var series3 = dbSolarSeries.SolarHotwaterTempSeries;
+            series3[time] = solarHotwaterTemp;
+            dbSolarSeries.SetSeries(2, series3);
+
+            var series4 = dbSolarSeries.SolarPumpStateSeries;
+            series4[time] = solarPumpState;
+            dbSolarSeries.SetSeries(3, series4);
+
             var series5 = dbSolarSeries.SolarSuppressionSeries;
-            series5[time] = item.value.Trim() != "0";
+            series5[time] = solarSuppression;
             dbSolarSeries.SetSeries(4, series5);
 
-            SaveLowresSolarValues(day, series1, series2, series3, series4, series5);
+            SaveLowresSolarValues(dbContext, day, series1, series2, series3, series4, series5);
 
-            _dbContext.SaveChanges();
+            dbContext.SaveChanges();
         }
 
         public void GenerateLowResSolarSeries(DateTime start, DateTime end)
@@ -88,18 +103,18 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
                 if (dbSolarSeries == null)
                     continue;
 
-                SaveLowresSolarValues(day, dbSolarSeries.SolarWhSeries, dbSolarSeries.SolarCollectorTempSeries, dbSolarSeries.SolarHotwaterTempSeries, dbSolarSeries.SolarPumpStateSeries, dbSolarSeries.SolarSuppressionSeries);
+                SaveLowresSolarValues(_dbContext, day, dbSolarSeries.SolarWhSeries, dbSolarSeries.SolarCollectorTempSeries, dbSolarSeries.SolarHotwaterTempSeries, dbSolarSeries.SolarPumpStateSeries, dbSolarSeries.SolarSuppressionSeries);
                 _dbContext.SaveChanges();
             }
         }
 
-        private void SaveLowresSolarValues(DateTime day, TimeSeries<int> series1Src, TimeSeries<double> series2Src, TimeSeries<double> series3Src, TimeSeries<bool> series4Src, TimeSeries<bool> series5Src)
+        private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, TimeSeries<int> series1Src, TimeSeries<double> series2Src, TimeSeries<double> series3Src, TimeSeries<bool> series4Src, TimeSeries<bool> series5Src)
         {
             DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
-            var dbSolarSeries = _dbContext.ViessmannSolarLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
+            var dbSolarSeries = dbContext.ViessmannSolarLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
             if (dbSolarSeries == null)
-                _dbContext.ViessmannSolarLowresTimeseries.Add(dbSolarSeries = new ViessmannSolarLowresData() { Key = month });
+                dbContext.ViessmannSolarLowresTimeseries.Add(dbSolarSeries = new ViessmannSolarLowresData() { Key = month });
 
             // Hack: remove first 5 elements due to bug in day-boundaries
             ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
