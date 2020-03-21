@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using PhilipDaubmeier.TokenStore;
-using PhilipDaubmeier.ViessmannClient.Model;
+using PhilipDaubmeier.ViessmannClient.Network;
 using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.Config

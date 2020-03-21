@@ -1,7 +1,7 @@
-﻿using PhilipDaubmeier.ViessmannClient.Model;
-using PhilipDaubmeier.ViessmannClient.Model.Features;
+﻿using PhilipDaubmeier.ViessmannClient.Model.Features;
 using PhilipDaubmeier.ViessmannClient.Model.Gateways;
 using PhilipDaubmeier.ViessmannClient.Model.Installations;
+using PhilipDaubmeier.ViessmannClient.Network;
 using System;
 using System.Threading.Tasks;
 

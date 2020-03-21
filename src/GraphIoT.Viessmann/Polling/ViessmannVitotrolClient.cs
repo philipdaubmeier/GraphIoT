@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using PhilipDaubmeier.GraphIoT.Viessmann.Config;
-using PhilipDaubmeier.ViessmannClient.Model;
+using PhilipDaubmeier.ViessmannClient.Network;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

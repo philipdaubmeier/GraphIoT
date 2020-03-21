@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace PhilipDaubmeier.ViessmannClient.Model
+namespace PhilipDaubmeier.ViessmannClient.Network
 {
     public class ViessmannConnectionProvider<T> : IViessmannConnectionProvider<T>, IDisposable
     {

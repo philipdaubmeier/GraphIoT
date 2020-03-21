@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PhilipDaubmeier.ViessmannClient.Model;
 using PhilipDaubmeier.ViessmannClient.Model.Auth;
 using PhilipDaubmeier.ViessmannClient.Model.Error;
 using System;
@@ -12,7 +11,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.ViessmannClient
+namespace PhilipDaubmeier.ViessmannClient.Network
 {
     public abstract class ViessmannAuthBase : IDisposable
     {

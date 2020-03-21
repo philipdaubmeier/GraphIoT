@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.ViessmannClient.Model
+namespace PhilipDaubmeier.ViessmannClient.Network
 {
     public interface IViessmannAuth
     {

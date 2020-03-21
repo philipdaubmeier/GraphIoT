@@ -110,14 +110,14 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, TimeSeries<int> series1Src, TimeSeries<double> series2Src, TimeSeries<double> series3Src, TimeSeries<bool> series4Src, TimeSeries<bool> series5Src)
         {
-            DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
             var dbSolarSeries = dbContext.ViessmannSolarLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
             if (dbSolarSeries == null)
                 dbContext.ViessmannSolarLowresTimeseries.Add(dbSolarSeries = new ViessmannSolarLowresData() { Key = month });
 
             // Hack: remove first 5 elements due to bug in day-boundaries
-            ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
+            static ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
             {
                 for (int i = 0; i < 5; i++)
                     input[i] = input[i].HasValue ? (int?)0 : null;

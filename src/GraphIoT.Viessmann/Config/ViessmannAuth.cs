@@ -1,5 +1,5 @@
 ﻿using PhilipDaubmeier.TokenStore;
-using PhilipDaubmeier.ViessmannClient.Model;
+using PhilipDaubmeier.ViessmannClient.Network;
 using System;
 using System.Threading.Tasks;
 

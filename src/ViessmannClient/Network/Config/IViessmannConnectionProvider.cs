@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 
-namespace PhilipDaubmeier.ViessmannClient.Model
+namespace PhilipDaubmeier.ViessmannClient.Network
 {
     public interface IViessmannConnectionProvider<T>
     {

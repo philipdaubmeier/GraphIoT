@@ -9,7 +9,7 @@ using PhilipDaubmeier.GraphIoT.Viessmann.ViewModel;
 using PhilipDaubmeier.TokenStore.Database;
 using PhilipDaubmeier.TokenStore.DependencyInjection;
 using PhilipDaubmeier.ViessmannClient;
-using PhilipDaubmeier.ViessmannClient.Model;
+using PhilipDaubmeier.ViessmannClient.Network;
 using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
