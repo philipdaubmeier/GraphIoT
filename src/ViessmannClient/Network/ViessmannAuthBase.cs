@@ -31,7 +31,7 @@ namespace PhilipDaubmeier.ViessmannClient
         {
             ContractResolver = new DefaultContractResolver
             {
-                NamingStrategy = new SnakeCaseNamingStrategy()
+                NamingStrategy = new CamelCaseNamingStrategy()
             }
         };
 
