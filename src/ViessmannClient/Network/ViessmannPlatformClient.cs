@@ -20,15 +20,15 @@ namespace PhilipDaubmeier.ViessmannClient
             return await CallViessmannApi<InstallationList>(new Uri(uri), g => g?.Data != null);
         }
 
-        public async Task<GatewayList> GetGateways()
+        public async Task<GatewayList> GetGateways(long installationId)
         {
-            var uri = $"{_baseUri}iot/v1/equipment/installations/{_connectionProvider.PlattformInstallationId}/gateways";
+            var uri = $"{_baseUri}iot/v1/equipment/installations/{installationId}/gateways";
             return await CallViessmannApi<GatewayList>(new Uri(uri), g => g?.Data != null);
         }
 
-        public async Task<FeatureList> GetFeatures()
+        public async Task<FeatureList> GetFeatures(long installationId, long gatewayId)
         {
-            var uri = $"{_baseUri}operational-data/v2/installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features?reduceHypermedia=true";
+            var uri = $"{_baseUri}operational-data/v2/installations/{installationId}/gateways/{gatewayId}/devices/0/features?reduceHypermedia=true";
             return await CallViessmannApi<FeatureList>(new Uri(uri), f => f?.Features != null);
         }
     }

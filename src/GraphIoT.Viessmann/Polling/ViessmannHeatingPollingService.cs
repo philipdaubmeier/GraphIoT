@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Viessmann.Config;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using PhilipDaubmeier.ViessmannClient;
 using PhilipDaubmeier.ViessmannClient.Model.Features;
@@ -14,12 +16,14 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
     {
         private readonly ILogger _logger;
         private readonly IViessmannDbContext _dbContext;
+        private readonly ViessmannConfig _config;
         private readonly ViessmannPlatformClient _platformClient;
 
-        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, IViessmannDbContext dbContext, ViessmannPlatformClient platformClient)
+        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, IViessmannDbContext dbContext, IOptions<ViessmannConfig> config, ViessmannPlatformClient platformClient)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _config = config.Value;
             _platformClient = platformClient;
         }
 
@@ -39,7 +43,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private async Task PollHeatingValues()
         {
-            var features = await _platformClient.GetFeatures();
+            var features = await _platformClient.GetFeatures(_config.InstallationId, _config.GatewayId);
 
             var time = features.GetTimestamp(FeatureName.Name.Heating)?.ToUniversalTime() ?? DateTime.UtcNow;
 
