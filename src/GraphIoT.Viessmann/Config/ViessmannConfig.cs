@@ -12,5 +12,8 @@
         public string PlattformGatewayId { get; set; } = null!;
         public string PlattformApiClientId { get; set; } = null!;
         public string PlattformApiClientSecret { get; set; } = null!;
+
+        public long InstallationId => long.TryParse(PlattformInstallationId, out long id) ? id : 0;
+        public long GatewayId => long.TryParse(PlattformGatewayId, out long id) ? id : 0;
     }
 }
