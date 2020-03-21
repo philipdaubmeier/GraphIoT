@@ -60,12 +60,13 @@ If you have the connection providers in place, you can create and use the Viessm
 ```csharp
 var client = new ViessmannPlatformClient(viessmannPlatformConnProvider);
 
-// Get the first installation id and gateway id of the logged in user
+// Get the first installation, gateway and device id of the logged in user
 var installationId = (await client.GetInstallations()).Data.First().Id ?? 0;
 var gatewayId = (await client.GetGateways(installationId)).Data.First().Id;
+var deviceId = (await client.GetDevices(installationId, gatewayId)).Data.First().LongId;
 
 // Get sensor values
-var features = await client.GetFeatures(installationId, gatewayId);
+var features = await client.GetFeatures(installationId, gatewayId, deviceId);
 var outsideTemp = features.GetFeature(FeatureName.Name.HeatingSensorsTemperatureOutside)?.ValueAsDouble;
 var boilerTemp = features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.ValueAsDouble;
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
