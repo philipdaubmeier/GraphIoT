@@ -59,6 +59,7 @@ namespace PhilipDaubmeier.ViessmannClient
                 Method = HttpMethod.Get
             };
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
+            request.Headers.Add("Accept", "application/json");
 
             return await _client.SendAsync(request);
         }
