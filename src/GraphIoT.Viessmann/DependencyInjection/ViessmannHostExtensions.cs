@@ -28,20 +28,16 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
-            serviceCollection.AddTokenStore<ViessmannEstrellaClient>();
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
             serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
             serviceCollection.AddViessmannHttpClient<ViessmannAuthHttpClient>();
-            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannEstrellaClient>>();
             serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannPlatformClient>>();
             serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannVitotrolClient>>();
 
-            serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannEstrellaClient>, ViessmannConfigConnectionProvider<ViessmannEstrellaClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
 
-            serviceCollection.AddScoped<ViessmannEstrellaClient>();
             serviceCollection.AddScoped<ViessmannPlatformClient>();
             serviceCollection.AddScoped<ViessmannVitotrolClient>();
 
