@@ -1,4 +1,6 @@
-﻿using PhilipDaubmeier.ViessmannClient.Model;
+﻿using Microsoft.Extensions.Options;
+using PhilipDaubmeier.GraphIoT.Viessmann.Config;
+using PhilipDaubmeier.ViessmannClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -14,6 +16,7 @@ namespace PhilipDaubmeier.ViessmannClient
     public class ViessmannVitotrolClient
     {
         private readonly IViessmannConnectionProvider<ViessmannVitotrolClient> _connectionProvider;
+        private readonly ViessmannConfig _config;
 
         private readonly HttpClient _client;
 
@@ -22,17 +25,18 @@ namespace PhilipDaubmeier.ViessmannClient
         private const string _soapSuffix = @"</soap:Body></soap:Envelope>";
         private const string _soapAction = @"http://www.e-controlnet.de/services/vii/";
 
-        public ViessmannVitotrolClient(IViessmannConnectionProvider<ViessmannVitotrolClient> connectionProvider)
+        public ViessmannVitotrolClient(IViessmannConnectionProvider<ViessmannVitotrolClient> connectionProvider, IOptions<ViessmannConfig> config)
         {
             _connectionProvider = connectionProvider;
             _client = _connectionProvider.Client;
+            _config = config.Value;
         }
 
         public async Task<List<(string id, string name)>> GetTypeInfo()
         {
             await Authenticate();
 
-            var body = $"<GeraetId>{_connectionProvider.VitotrolDeviceId}</GeraetId><AnlageId>{_connectionProvider.VitotrolInstallationId}</AnlageId>";
+            var body = $"<GeraetId>{_config.VitotrolDeviceId}</GeraetId><AnlageId>{_config.VitotrolInstallationId}</AnlageId>";
             return await ParseTypeInfo(await SendSoap("GetTypeInfo", body, _connectionProvider.AuthData.AccessToken));
         }
 
@@ -41,7 +45,7 @@ namespace PhilipDaubmeier.ViessmannClient
             await Authenticate();
 
             var datapointList = string.Join("</int><int>", datapoints.Select(x => x.ToString()));
-            var body = $"<UseCache>false</UseCache><GeraetId>{_connectionProvider.VitotrolDeviceId}</GeraetId><AnlageId>{_connectionProvider.VitotrolInstallationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
+            var body = $"<UseCache>false</UseCache><GeraetId>{_config.VitotrolDeviceId}</GeraetId><AnlageId>{_config.VitotrolInstallationId}</AnlageId><DatenpunktIds><int>{datapointList}</int></DatenpunktIds>";
             return await ParseData(await SendSoap("GetData", body, _connectionProvider.AuthData.AccessToken));
         }
 
