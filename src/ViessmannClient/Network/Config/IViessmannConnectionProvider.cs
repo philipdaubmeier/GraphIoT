@@ -20,11 +20,6 @@ namespace PhilipDaubmeier.ViessmannClient.Model
         /// </summary>
         HttpClient AuthClient { get; }
 
-        string VitotrolDeviceId { get; }
-        string VitotrolInstallationId { get; }
-
-        string PlattformInstallationId { get; }
-        string PlattformGatewayId { get; }
         string PlattformApiClientId { get; }
         string PlattformApiClientSecret { get; }
     }

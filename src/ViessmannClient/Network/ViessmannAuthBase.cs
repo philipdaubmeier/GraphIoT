@@ -94,7 +94,7 @@ namespace PhilipDaubmeier.ViessmannClient
                 throw new HttpRequestException($"Viessmann Platform API rate limit exceeded. {errorResponse?.ExtendedPayload?.Name}: {errorResponse?.ExtendedPayload?.RequestCountLimit}. Will be reset at {resetTime?.UtcDateTime}");
 
             if (errorResponse?.StatusCode.HasValue ?? false)
-                return new IOException($"Viessmann Platform API error code {errorResponse?.StatusCode.Value}. Message: \"{errorResponse?.Message}\"");
+                return new IOException($"Viessmann Platform API error code {errorResponse?.StatusCode}. Message: \"{errorResponse?.Message}\"");
 
             return new IOException("Could not deserialize response.");
         }
@@ -105,8 +105,7 @@ namespace PhilipDaubmeier.ViessmannClient
         /// </summary>
         protected async Task Authenticate()
         {
-            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformInstallationId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformGatewayId) ||
-                string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
+            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
                 throw new Exception("ViessmannPlatformClient is missing one or more of the mandatory connection provider configuration values.");
 
             try

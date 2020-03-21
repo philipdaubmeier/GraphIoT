@@ -48,11 +48,6 @@ namespace PhilipDaubmeier.ViessmannClient.Model
         /// </summary>
         public static HttpMessageHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
 
-        public string VitotrolDeviceId { get; set; } = string.Empty;
-        public string VitotrolInstallationId { get; set; } = string.Empty;
-
-        public string PlattformInstallationId { get; set; } = string.Empty;
-        public string PlattformGatewayId { get; set; } = string.Empty;
         public string PlattformApiClientId { get; set; } = string.Empty;
         public string PlattformApiClientSecret { get; set; } = string.Empty;
 
