@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.ViessmannClient
         public async Task<FeatureList> GetFeatures()
         {
             var uri = $"https://api.viessmann-platform.io/operational-data/v2/installations/{_connectionProvider.PlattformInstallationId}/gateways/{_connectionProvider.PlattformGatewayId}/devices/0/features?reduceHypermedia=true";
-            return await CallViessmannApi<FeatureList>(new Uri(uri));
+            return await CallViessmannApi<FeatureList>(new Uri(uri), f => f?.Features != null);
         }
     }
 }

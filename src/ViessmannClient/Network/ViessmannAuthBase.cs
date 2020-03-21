@@ -68,14 +68,14 @@ namespace PhilipDaubmeier.ViessmannClient
         /// and parses the result afterwards. If no valid access token is present yet, this method
         /// will trigger a new authentication.
         /// </summary>
-        protected async Task<TModel> CallViessmannApi<TModel>(Uri uri)
+        protected async Task<TModel> CallViessmannApi<TModel>(Uri uri, Func<TModel, bool>? isSuccess = null)
         {
             var responseString = await (await RequestViessmannApi(uri)).Content.ReadAsStringAsync();
 
             using var sr = new StringReader(responseString);
             using var jsonTextReader = new JsonTextReader(sr);
             var result = _jsonSerializer.Deserialize<TModel>(jsonTextReader);
-            if (result == null)
+            if (result == null || (isSuccess != null && !isSuccess(result)))
                 throw ExtractErrorMessage(responseString);
 
             return result;
