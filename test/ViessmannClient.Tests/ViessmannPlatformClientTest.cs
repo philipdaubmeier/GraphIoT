@@ -50,6 +50,20 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             var result = await viessmannClient.GetInstallations();
 
             Assert.Equal(MockViessmannConnection.InstallationId, result.First().LongId);
+            Assert.Equal("Long test street", result.First().Address?.Street);
+            Assert.Equal("1001", result.First().Address?.HouseNumber);
+            Assert.Equal("12345", result.First().Address?.Zip);
+            Assert.Equal("Unittest Town", result.First().Address?.City);
+            Assert.Null(result.First().Address?.Region);
+            Assert.Equal("de", result.First().Address?.Country);
+            Assert.Null(result.First().Address?.PhoneNumber);
+            Assert.Null(result.First().Address?.FaxNumber);
+            Assert.Equal(37.377166d, result.First().Address?.Geolocation?.Latitude);
+            Assert.Equal(-122.086966d, result.First().Address?.Geolocation?.Longitude);
+            Assert.Equal("Europe/Berlin", result.First().Address?.Geolocation?.TimeZone);
+            Assert.Equal("WorksProperly", result.First().AggregatedStatus);
+            Assert.Null(result.First().ServicedBy);
+            Assert.Null(result.First().HeatingType);
         }
 
         [Fact]
@@ -85,6 +99,13 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             var result = await viessmannClient.GetGateways(MockViessmannConnection.InstallationId);
 
             Assert.Equal(MockViessmannConnection.GatewayId, result.First().LongId);
+            Assert.Equal(MockViessmannConnection.GatewayId.ToString(), result.First().Serial);
+            Assert.Equal("1.4.0.0", result.First().Version);
+            Assert.Equal(false, result.First().AutoUpdate);
+            Assert.Equal("WorksProperly", result.First().AggregatedStatus);
+            Assert.Equal("Genesis", result.First().TargetRealm);
+            Assert.Equal("VitoconnectOptolink", result.First().GatewayType);
+            Assert.Equal(MockViessmannConnection.InstallationId, (long?)result.First().InstallationId);
         }
 
         [Fact]
@@ -116,6 +137,15 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             var result = await viessmannClient.GetDevices(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId);
 
             Assert.Equal(MockViessmannConnection.DeviceId, result.First().LongId);
+            Assert.Equal(MockViessmannConnection.GatewayId.ToString(), result.First().GatewaySerial);
+            Assert.Equal(MockViessmannConnection.DeviceId.ToString(), result.First().Id);
+            Assert.Equal("777555888999", result.First().BoilerSerial);
+            Assert.Equal("DeviceCommunication", result.First().BoilerSerialEditor);
+            Assert.Equal("000999888777", result.First().BmuSerial);
+            Assert.Equal("DeviceCommunication", result.First().BmuSerialEditor);
+            Assert.Equal("VPlusHO1_40", result.First().ModelId);
+            Assert.Equal("Online", result.First().Status);
+            Assert.Equal("heating", result.First().DeviceType);
         }
 
         [Fact]
