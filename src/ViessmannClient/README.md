@@ -15,34 +15,7 @@ PM> Install-Package PhilipDaubmeier.ViessmannClient
 
 You have to implement the interfaces `IViessmannAuth` and `IViessmannConnectionProvider<T>` to provide the Viessmann webservice clients with all information necessary to authenticate and establish a connection.
 
-The minimal viable example for playing around with the client would be as follows:
-
-```csharp
-public class ViessmannAuth : IViessmannAuth
-{
-    public string AccessToken { get; private set; }
-    public DateTime AccessTokenExpiry { get; private set; }
-    public string Username { get; }
-    public string UserPassword { get; }
-    public bool IsAccessTokenValid() => AccessTokenExpiry > DateTime.Now
-                                        && !string.IsNullOrEmpty(AccessToken);
-
-    public ViessmannAuth(string username, string password)
-    {
-        Username = username;
-        UserPassword = password;
-    }
-
-    public Task UpdateTokenAsync(string token, DateTime expiry, string refresh)
-    {
-        AccessToken = token;
-        AccessTokenExpiry = expiry;
-        return Task.CompletedTask;
-    }
-}
-```
-
-And to create a connection provider you can use the default implementation `ViessmannConnectionProvider<T>`:
+The minimal viable example for playing around (do not hardcode credentials in real use!) with the client would be to create a connection provider as shown here:
 
 ```csharp
 var viessmannConnProvider = new ViessmannConnectionProvider<ViessmannPlatformClient>()
@@ -71,6 +44,8 @@ var outsideTemp = features.GetFeature(FeatureName.Name.HeatingSensorsTemperature
 var boilerTemp = features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.ValueAsDouble;
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
 ```
+
+For more usage examples you can also have a look at the [unit tests](../../test/ViessmannClient.Tests).
 
 ## Platform Support
 
