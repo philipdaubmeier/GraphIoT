@@ -61,9 +61,9 @@ If you have the connection providers in place, you can create and use the Viessm
 var client = new ViessmannPlatformClient(viessmannConnProvider);
 
 // Get the first installation, gateway and device id of the logged in user
-var installationId = (await client.GetInstallations()).Data.First().Id ?? 0;
-var gatewayId = (await client.GetGateways(installationId)).Data.First().Id;
-var deviceId = (await client.GetDevices(installationId, gatewayId)).Data.First().LongId;
+var installationId = (await client.GetInstallations()).First().LongId;
+var gatewayId = (await client.GetGateways(installationId)).First().LongId;
+var deviceId = (await client.GetDevices(installationId, gatewayId)).First().LongId;
 
 // Get sensor values
 var features = await client.GetFeatures(installationId, gatewayId, deviceId);
