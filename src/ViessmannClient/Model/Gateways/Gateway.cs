@@ -4,7 +4,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Gateways
 {
     public class Gateway
     {
-        public long Id => long.TryParse(Serial, out long id) ? id : 0;
+        public long LongId => long.TryParse(Serial, out long id) ? id : 0;
         public string? Serial { get; set; }
         public string? Version { get; set; }
         public int? FirmwareUpdateFailureCounter { get; set; }

@@ -4,6 +4,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Installations
 {
     public class Installation
     {
+        public long LongId => Id ?? 0;
         public int? Id { get; set; }
         public string? Description { get; set; }
         public Address? Address { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace PhilipDaubmeier.ViessmannClient.Model.Gateways
+﻿namespace PhilipDaubmeier.ViessmannClient.Model
 {
     public class PagingCursor
     {

@@ -24,9 +24,9 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
 
             return Json(new
             {
-                installations = res.Data.Select(x => new
+                installations = res.Select(x => new
                 {
-                    id = x.Id,
+                    id = x.LongId,
                     desc = x.Description
                 })
             });
@@ -40,9 +40,9 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
 
             return Json(new
             {
-                gateways = gateways.Data.Select(x => new
+                gateways = gateways.Select(x => new
                 {
-                    id = x.Id,
+                    id = x.LongId,
                     type = x.GatewayType,
                     version = x.Version
                 })
@@ -57,9 +57,9 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
 
             return Json(new
             {
-                devices = devices.Data.Select(x => new
+                devices = devices.Select(x => new
                 {
-                    id = x.Id,
+                    id = x.LongId,
                     type = x.DeviceType,
                     model = x.ModelId
                 })
@@ -74,7 +74,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             
             return Json(new
             {
-                features = features.Features.Select(x=>new
+                features = features.Select(x=>new
                 {
                     name = x.Name,
                     properties = x.Properties?.GetProperties().Select(p => new

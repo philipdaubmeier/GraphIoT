@@ -2,8 +2,5 @@
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Devices
 {
-    public class DeviceList
-    {
-        public List<Device>? Data { get; set; }
-    }
+    public class DeviceResponse : Wiremessage<List<Device>> { }
 }
