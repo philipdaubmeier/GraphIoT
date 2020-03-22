@@ -12,11 +12,11 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<int>? ErrorCode { get; set; }
         public TypedValue<decimal>? Hours { get; set; }
         public TypedValue<long>? Starts { get; set; }
-        public TypedValue<List<string?>>? Enabled { get; set; }
+        public TypedValue<List<string?>?>? Enabled { get; set; }
         public TypedValue<string?>? Name { get; set; }
         public TypedValue<decimal>? Shift { get; set; }
         public TypedValue<decimal>? Slope { get; set; }
-        public TypedValue<Schedule>? Entries { get; set; }
+        public TypedValue<Schedule?>? Entries { get; set; }
         public TypedValue<bool>? OverlapAllowed { get; set; }
         public TypedValue<decimal>? Temperature { get; set; }
         public TypedValue<string?>? Start { get; set; }
@@ -25,10 +25,10 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<int>? ServiceIntervalMonths { get; set; }
         public TypedValue<int>? ActiveMonthSinceLastService { get; set; }
         public TypedValue<string?>? LastService { get; set; }
-        public TypedValue<List<double>>? Day { get; set; }
-        public TypedValue<List<double>>? Week { get; set; }
-        public TypedValue<List<double>>? Month { get; set; }
-        public TypedValue<List<double>>? Year { get; set; }
+        public TypedValue<List<double>?>? Day { get; set; }
+        public TypedValue<List<double>?>? Week { get; set; }
+        public TypedValue<List<double>?>? Month { get; set; }
+        public TypedValue<List<double>?>? Year { get; set; }
         public TypedValue<string?>? Unit { get; set; }
 
         public int? ValueAsInt => (Value?.Value as IConvertible)?.ToInt32(null);
