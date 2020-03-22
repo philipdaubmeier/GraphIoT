@@ -80,6 +80,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphIoT.Netatmo", "src\Gra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphIoT.Grafana", "src\GraphIoT.Grafana\GraphIoT.Grafana.csproj", "{62F71E81-2A08-446F-B478-3820E9A74C2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViessmannClient.Tests", "test\ViessmannClient.Tests\ViessmannClient.Tests.csproj", "{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -180,6 +182,10 @@ Global
 		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62F71E81-2A08-446F-B478-3820E9A74C2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -209,6 +215,7 @@ Global
 		{1F91D208-69DC-4A92-8659-03EDACBBD678} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{71767AA1-A195-4371-A0B9-C7D461E8A3C0} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{62F71E81-2A08-446F-B478-3820E9A74C2D} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{75E81A46-EE5D-4DD1-98CE-5B23E03B2CA2} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
