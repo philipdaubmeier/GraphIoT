@@ -20,13 +20,13 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             var model = new ApartmentState();
 
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.Preset3;
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 21 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 21 };
 
             Assert.Equal((int)SceneCommand.Preset3, (int)model[zoneLivingroom, Color.Yellow].Value);
             Assert.Equal(21d, model[zoneLivingroom, SensorType.TemperatureIndoors].Value.Value);
 
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.AutoOff;
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 99 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 99 };
 
             Assert.Equal((int)SceneCommand.AutoOff, (int)model[zoneLivingroom, Color.Yellow].Value);
             Assert.Equal(99d, model[zoneLivingroom, SensorType.TemperatureIndoors].Value.Value);
@@ -45,7 +45,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             Assert.False(model.IsRoomExisting(zoneLivingroom));
             Assert.True(model.IsRoomExisting(zoneKitchen));
 
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 99 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 99 };
 
             Assert.True(model.IsRoomExisting(zoneLivingroom));
             Assert.True(model.IsRoomExisting(zoneKitchen));
@@ -75,7 +75,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             Assert.False(model[zoneLivingroom].HasSensorValue(SensorType.TemperatureIndoors));
 
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 99 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 99 };
 
             Assert.True(model[zoneLivingroom].HasSensorValue(SensorType.TemperatureIndoors));
 
@@ -99,13 +99,13 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
                 new KeyValuePair<Zone, RoomState>(zoneKitchen, model[zoneKitchen])
             }, model.ToList());
 
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 99 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 99 };
 
             Assert.Equal(new List<KeyValuePair<Zone, RoomState>>()
             {
                 new KeyValuePair<Zone, RoomState>(zoneLivingroom, model[zoneLivingroom]),
                 new KeyValuePair<Zone, RoomState>(zoneKitchen, model[zoneKitchen])
-            }, model.ToList());
+            }.OrderBy(x => x.Key), model.OrderBy(x => x.Key));
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             {
                 new KeyValuePair<Group, SceneState>(Color.Yellow, model[zoneKitchen, Color.Yellow]),
                 new KeyValuePair<Group, SceneState>(Color.Cyan, model[zoneKitchen, Color.Cyan])
-            }, model[zoneKitchen].Groups.ToList());
+            }.OrderBy(x => x.Key), model[zoneKitchen].Groups.OrderBy(x => x.Key));
         }
 
         [Fact]
@@ -138,20 +138,20 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             Assert.Equal(new List<KeyValuePair<Sensor, SensorState>>(), model[zoneLivingroom].Sensors.ToList());
 
-            model[zoneLivingroom, SensorType.BrightnessIndoors].Value = new SensorTypeAndValues() { Value = 51 };
+            model[zoneLivingroom, SensorType.BrightnessIndoors].Value = new SensorTypeAndValues() { Type = SensorType.BrightnessIndoors, Value = 51 };
 
             Assert.Equal(new List<KeyValuePair<Sensor, SensorState>>()
             {
                 new KeyValuePair<Sensor, SensorState>(SensorType.BrightnessIndoors, model[zoneLivingroom, SensorType.BrightnessIndoors])
             }, model[zoneLivingroom].Sensors.ToList());
 
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 99 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 99 };
 
             Assert.Equal(new List<KeyValuePair<Sensor, SensorState>>()
             {
                 new KeyValuePair<Sensor, SensorState>(SensorType.TemperatureIndoors, model[zoneLivingroom, SensorType.TemperatureIndoors]),
                 new KeyValuePair<Sensor, SensorState>(SensorType.BrightnessIndoors, model[zoneLivingroom, SensorType.BrightnessIndoors])
-            }, model[zoneLivingroom].Sensors.ToList());
+            }.OrderBy(x => x.Key), model[zoneLivingroom].Sensors.OrderBy(x => x.Key));
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             var model = new ApartmentState();
 
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.Preset3;
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 21 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 21 };
 
             // model[zone, group] has to return the same as (model[zone])[group]
             Assert.Equal((int)model[zoneLivingroom][Color.Yellow].Value, (int)model[zoneLivingroom, Color.Yellow].Value);
@@ -238,24 +238,25 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             // create scene and sensor states, half of them is left untouched the other half is changed
             model[zoneLivingroom, Color.Cyan].Value = SceneCommand.Preset0;
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.Preset0;
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 21 };
-            model[zoneLivingroom, SensorType.HumidityIndoors].Value = new SensorTypeAndValues() { Value = 54 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 21 };
+            model[zoneLivingroom, SensorType.HumidityIndoors].Value = new SensorTypeAndValues() { Type = SensorType.HumidityIndoors, Value = 54 };
 
             var eventCount = 0;
             NotifyCollectionChangedEventArgs? args = null;
-            model[zoneLivingroom].CollectionChanged += (s, e) => { args = e; eventCount++; };
+            model[zoneLivingroom].CollectionChanged += (s, e) => { 
+                args = e; eventCount++; 
+            };
 
             // change existing scene state, should yield no collection change
             model[zoneLivingroom, Color.Yellow].Value = SceneCommand.Preset1;
             Assert.Null(args);
 
             // change existing sensor state, should yield no collection change
-            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Value = 18 };
+            model[zoneLivingroom, SensorType.TemperatureIndoors].Value = new SensorTypeAndValues() { Type = SensorType.TemperatureIndoors, Value = 18 };
             Assert.Null(args);
 
             // scene state was not created before, should yield 'add' collection event
             model[zoneLivingroom, Color.Black].Value = SceneCommand.Preset4;
-            Assert.NotNull(args?.OldItems);
             Assert.Equal(NotifyCollectionChangedAction.Add, args?.Action);
             Assert.Equal(new List<KeyValuePair<Group, SceneState>>()
             {
@@ -264,7 +265,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
             Assert.Null(args?.OldItems);
 
             // sensor state was not created before, should yield 'add' collection event
-            model[zoneLivingroom, SensorType.BrightnessIndoors].Value = new SensorTypeAndValues() { Value = 30 };
+            model[zoneLivingroom, SensorType.BrightnessIndoors].Value = new SensorTypeAndValues() { Type = SensorType.BrightnessIndoors, Value = 30 };
             Assert.Equal(NotifyCollectionChangedAction.Add, args?.Action);
             Assert.Equal(new List<KeyValuePair<Sensor, SensorState>>()
             {

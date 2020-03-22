@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -92,7 +93,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Group group = inputVal;
 
-            Assert.Equal(expected, group.GetHashCode());
+            Assert.Equal(HashCode.Combine(expected), group.GetHashCode());
         }
 
         [Theory]

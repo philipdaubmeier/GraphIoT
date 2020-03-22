@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
@@ -85,7 +86,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Scene scene = new Scene(inputVal);
 
-            Assert.Equal(expected, scene.GetHashCode());
+            Assert.Equal(HashCode.Combine(expected), scene.GetHashCode());
         }
 
         [Theory]
