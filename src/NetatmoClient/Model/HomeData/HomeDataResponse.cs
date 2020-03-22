@@ -9,11 +9,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
         {
             get
             {
-                return extractBaseUri().Combine("/live/index.m3u8");
+                return ExtractBaseUri().Combine("/live/index.m3u8");
             }
         }
 
-        private Uri extractBaseUri()
+        private Uri ExtractBaseUri()
         {
             if (Body == null)
                 throw new FormatException("The response message is empty.");
