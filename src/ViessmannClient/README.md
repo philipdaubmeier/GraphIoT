@@ -39,13 +39,19 @@ var gatewayId = (await client.GetGateways(installationId)).First().LongId;
 var deviceId = (await client.GetDevices(installationId, gatewayId)).First().LongId;
 
 // Get sensor values
-var features = await client.GetFeatures(installationId, gatewayId, deviceId);
-var outsideTemp = features.GetFeature(FeatureName.Name.HeatingSensorsTemperatureOutside)?.ValueAsDouble;
-var boilerTemp = features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.ValueAsDouble;
+var features = await client.GetDeviceFeatures(installationId, gatewayId, deviceId);
+var outsideTemp = features.GetHeatingSensorsTemperatureOutside();
+var boilerTemp = features.GetHeatingBoilerTemperature();
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
+
+// Query for properties of individual circuits
+foreach (var circuit in features.GetHeatingCircuits())
+    Console.WriteLine($"Name of {circuit}: {features.GetHeatingCircuitsCircuitName(circuit)}");
 ```
 
 For more usage examples you can also have a look at the [unit tests](../../test/ViessmannClient.Tests).
+
+A full list of status and sensor values of devices can be found in the [`DeviceFeatureList`](Model/Devices/DeviceFeatureList.cs) class.
 
 ## Platform Support
 
