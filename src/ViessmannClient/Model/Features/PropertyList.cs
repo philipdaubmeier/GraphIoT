@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PhilipDaubmeier.ViessmannClient.Model.Devices;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -30,6 +31,12 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<List<double>?>? Month { get; set; }
         public TypedValue<List<double>?>? Year { get; set; }
         public TypedValue<string?>? Unit { get; set; }
+        public TypedValue<bool>? Online { get; set; }
+        public TypedValue<decimal>? Strength { get; set; }
+        public TypedValue<int>? Channel { get; set; }
+        public TypedValue<string>? UpdateStatus { get; set; }
+        public TypedValue<string>? Version { get; set; }
+        public TypedValue<List<Device>?>? Devices { get; set; }
 
         public int? ValueAsInt => (Value?.Value as IConvertible)?.ToInt32(null);
 

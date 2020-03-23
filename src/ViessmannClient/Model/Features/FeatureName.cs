@@ -96,7 +96,13 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             HeatingSolarSensorsTemperatureDhw,
             HeatingSolarSensorsTemperatureCollector,
             HeatingSolarPowerCumulativeProduced,
-            HeatingSolarRechargeSuppression
+            HeatingSolarRechargeSuppression,
+            Gateway,
+            GatewayStatus,
+            GatewayWifi,
+            GatewayBmuconnection,
+            GatewayDevices,
+            GatewayFirmware
         }
 
         private static readonly Dictionary<string, Name> _mapping = new Dictionary<string, Name>()
@@ -183,7 +189,13 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             {"heating.solar.sensors.temperature.dhw", Name.HeatingSolarSensorsTemperatureDhw},
             {"heating.solar.sensors.temperature.collector", Name.HeatingSolarSensorsTemperatureCollector},
             {"heating.solar.power.cumulativeProduced", Name.HeatingSolarPowerCumulativeProduced},
-            {"heating.solar.rechargeSuppression", Name.HeatingSolarRechargeSuppression}
+            {"heating.solar.rechargeSuppression", Name.HeatingSolarRechargeSuppression},
+            {"gateway", Name.Gateway},
+            {"gateway.status", Name.GatewayStatus},
+            {"gateway.wifi", Name.GatewayWifi},
+            {"gateway.bmuconnection", Name.GatewayBmuconnection},
+            {"gateway.devices", Name.GatewayDevices},
+            {"gateway.firmware", Name.GatewayFirmware}
         };
 
         private readonly Name _name = Name.Heating;
