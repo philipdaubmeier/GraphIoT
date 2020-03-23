@@ -430,12 +430,12 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(0, feature5?.Entries?.Value?.Mon?.First()?.Position);
 
             Assert.Equal("number", feature6?.Value?.Type);
-            Assert.Equal(50l, feature6?.Value?.Value);
+            Assert.Equal(50L, feature6?.Value?.Value);
 
             Assert.Equal("string", feature7?.Status?.Type);
             Assert.Equal("connected", feature7?.Status?.Value);
             Assert.Equal("number", feature7?.Value?.Type);
-            Assert.Equal(6l, feature7?.Value?.Value);
+            Assert.Equal(6L, feature7?.Value?.Value);
 
             Assert.Equal("boolean", feature8?.Active?.Type);
             Assert.Equal(true, feature8?.Active?.Value);
