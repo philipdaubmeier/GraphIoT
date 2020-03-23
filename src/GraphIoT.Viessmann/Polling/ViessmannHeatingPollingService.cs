@@ -45,31 +45,30 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         {
             var features = await _platformClient.GetFeatures(_config.InstallationId, _config.GatewayId);
 
-            var time = features.GetTimestamp(FeatureName.Name.Heating)?.ToUniversalTime() ?? DateTime.UtcNow;
+            var time = features.GetTimestamp();
 
-            var burnerStatistics = features.GetFeature(FeatureName.Name.HeatingBurnerStatistics);
-            var burnerHoursTotal = (double)(burnerStatistics?.Hours?.Value ?? 0);
-            var burnerStartsTotal = (int)(burnerStatistics?.Starts?.Value ?? 0);
-            var burnerModulation = features.GetFeature(FeatureName.Name.HeatingBurnerModulation)?.ValueAsInt ?? 0;
+            var burnerHoursTotal = (double)features.GetHeatingBurnerStatisticsHours();
+            var burnerStartsTotal = (int)features.GetHeatingBurnerStatisticsStarts();
+            var burnerModulation = features.GetHeatingBurnerModulation();
 
-            var outsideTemp = features.GetFeature(FeatureName.Name.HeatingSensorsTemperatureOutside)?.ValueAsDouble ?? 0d;
-            var boilerTemp = features.GetFeature(FeatureName.Name.HeatingBoilerTemperature)?.ValueAsDouble ?? 0d;
-            var boilerTempMain = features.GetFeature(FeatureName.Name.HeatingBoilerSensorsTemperatureMain)?.ValueAsDouble ?? 0d;
-            var circuit0Temp = features.GetFeature(FeatureName.Name.HeatingCircuitsSensorsTemperature, FeatureName.Circuit.Circuit0)?.ValueAsDouble ?? 0d;
-            var circuit1Temp = features.GetFeature(FeatureName.Name.HeatingCircuitsSensorsTemperature, FeatureName.Circuit.Circuit1)?.ValueAsDouble ?? 0d;
-            var dhwTemp = features.GetFeature(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorage)?.ValueAsDouble ?? 0d;
+            var outsideTemp = features.GetHeatingSensorsTemperatureOutside();
+            var boilerTemp = features.GetHeatingBoilerTemperature();
+            var boilerTempMain = features.GetHeatingBoilerSensorsTemperatureMain();
+            var circuit0Temp = features.GetHeatingCircuitsSensorsTemperature(FeatureName.Circuit.Circuit0);
+            var circuit1Temp = features.GetHeatingCircuitsSensorsTemperature(FeatureName.Circuit.Circuit1);
+            var dhwTemp = features.GetHeatingDhwSensorsTemperatureHotWaterStorage();
 
-            var burnerActive = features.GetFeature(FeatureName.Name.HeatingBurner)?.Active?.Value ?? false;
-            var circuit0Pump = features.GetFeature(FeatureName.Name.HeatingCircuitsCirculationPump, FeatureName.Circuit.Circuit0)?.Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
-            var circuit1Pump = features.GetFeature(FeatureName.Name.HeatingCircuitsCirculationPump, FeatureName.Circuit.Circuit1)?.Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
-            var dhwPrimPump = features.GetFeature(FeatureName.Name.HeatingDhwPumpsPrimary)?.StatusAsBool ?? false;
-            var dhwCircPump = features.GetFeature(FeatureName.Name.HeatingDhwPumpsCirculation)?.StatusAsBool ?? false;
+            var burnerActive = features.IsHeatingBurnerActive();
+            var circuit0Pump = features.IsHeatingCircuitsCirculationPumpOn(FeatureName.Circuit.Circuit0);
+            var circuit1Pump = features.IsHeatingCircuitsCirculationPumpOn(FeatureName.Circuit.Circuit1);
+            var dhwPrimPump = features.IsHeatingDhwPumpsPrimaryOn();
+            var dhwCircPump = features.IsHeatingDhwPumpsCirculationOn();
 
-            var solarWhTotal = (int)((features.GetFeature(FeatureName.Name.HeatingSolarPowerProduction)?.Day?.Value as List<double>).FirstOrDefault() * 1000d);
-            var solarCollectorTemp = features.GetFeature(FeatureName.Name.HeatingSolarSensorsTemperatureCollector)?.ValueAsDouble ?? 0d;
-            var solarHotwaterTemp = features.GetFeature(FeatureName.Name.HeatingSolarSensorsTemperatureDhw)?.ValueAsDouble ?? 0d;
-            var solarPumpState = features.GetFeature(FeatureName.Name.HeatingSolarPumpsCircuit)?.StatusAsBool ?? false;
-            var solarSuppression = features.GetFeature(FeatureName.Name.HeatingSolarRechargeSuppression)?.StatusAsBool ?? false;
+            var solarWhTotal = features.GetHeatingSolarPowerProductionWhToday();
+            var solarCollectorTemp = features.GetHeatingSolarSensorsTemperatureCollector();
+            var solarHotwaterTemp = features.GetHeatingSolarSensorsTemperatureDhw();
+            var solarPumpState = features.IsHeatingSolarPumpsCircuitOn();
+            var solarSuppression = features.IsHeatingSolarRechargeSuppressionOn();
 
             SaveHeatingValues(time, burnerHoursTotal, burnerStartsTotal, burnerModulation, outsideTemp, boilerTemp, boilerTempMain, circuit0Temp, circuit1Temp, dhwTemp, burnerActive, circuit0Pump, circuit1Pump, dhwPrimPump, dhwCircPump);
 

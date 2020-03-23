@@ -1,3 +1,4 @@
+using PhilipDaubmeier.ViessmannClient.Model.Features;
 using RichardSzalay.MockHttp;
 using System.Collections.Generic;
 using System.Linq;
@@ -397,15 +398,15 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(MockViessmannConnection.DeviceId.ToString(), result.First().DeviceId);
             Assert.Equal(9, result.Count());
 
-            var feature1 = result.GetFeature(Model.Features.FeatureName.Name.HeatingBoilerTemperature);
-            var feature2 = result.GetFeature(Model.Features.FeatureName.Name.HeatingCircuits);
-            var feature3 = result.GetFeature(Model.Features.FeatureName.Name.HeatingCircuitsCirculationPump);
-            var feature4 = result.GetFeature(Model.Features.FeatureName.Name.HeatingCircuitsHeatingCurve);
-            var feature5 = result.GetFeature(Model.Features.FeatureName.Name.HeatingDhwSchedule);
-            var feature6 = result.GetFeature(Model.Features.FeatureName.Name.HeatingDhwTemperatureMain);
-            var feature7 = result.GetFeature(Model.Features.FeatureName.Name.HeatingSensorsTemperatureOutside);
-            var feature8 = result.GetFeature(Model.Features.FeatureName.Name.HeatingSolar);
-            var feature9 = result.GetFeature(Model.Features.FeatureName.Name.HeatingSolarPowerProduction);
+            var feature1 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingBoilerTemperature))?.Properties;
+            var feature2 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingCircuits))?.Properties;
+            var feature3 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingCircuitsCirculationPump))?.Properties;
+            var feature4 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingCircuitsHeatingCurve))?.Properties;
+            var feature5 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingDhwSchedule))?.Properties;
+            var feature6 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingDhwTemperatureMain))?.Properties;
+            var feature7 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingSensorsTemperatureOutside))?.Properties;
+            var feature8 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingSolar))?.Properties;
+            var feature9 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingSolarPowerProduction))?.Properties;
 
             Assert.Equal("number", feature1?.Value?.Type);
             Assert.Equal(47.6, feature1?.Value?.Value);

@@ -6,20 +6,14 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
     public class FeatureList : List<Feature>
     {
-        public PropertyList? GetFeature(FeatureName.Name name, FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        public DateTime GetTimestamp()
         {
-            return GetFirstFeature(name, circuit)?.Properties;
+            return this.FirstOrDefault()?.Timestamp ?? DateTime.UtcNow;
         }
 
-        public DateTime? GetTimestamp(FeatureName.Name name, FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        public Feature? GetRawFeatureByName(string featureName)
         {
-            return GetFirstFeature(name, circuit)?.Timestamp;
-        }
-
-        private Feature GetFirstFeature(FeatureName.Name name, FeatureName.Circuit? circuit)
-        {
-            var nameStr = (string)new FeatureName(name, circuit);
-            return this.Where(x => x.Name?.Equals(nameStr, StringComparison.InvariantCultureIgnoreCase) ?? false).FirstOrDefault();
+            return this.Where(x => x.Name?.Equals(featureName, StringComparison.InvariantCultureIgnoreCase) ?? false).FirstOrDefault();
         }
     }
 }

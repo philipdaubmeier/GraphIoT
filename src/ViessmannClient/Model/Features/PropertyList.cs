@@ -35,8 +35,6 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
 
         public double? ValueAsDouble => (Value?.Value as IConvertible)?.ToDouble(null);
 
-        public bool? StatusAsBool => Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase);
-
         public override string ToString()
         {
             return string.Join(", ", GetProperties().Select(p => $"{p.property}: {p.value}"));
