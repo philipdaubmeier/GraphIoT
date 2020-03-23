@@ -2,10 +2,10 @@
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
-    public class FeatureResponse : IWiremessage<FeatureList>
+    public class FeatureResponse<T> : IWiremessage<T> where T : FeatureList
     {
         [JsonProperty("features")]
-        public FeatureList? Data { get; set; }
+        public T? Data { get; set; }
 
         public PagingCursor? Cursor => null;
     }

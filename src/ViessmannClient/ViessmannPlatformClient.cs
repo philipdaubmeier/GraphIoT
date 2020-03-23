@@ -34,10 +34,10 @@ namespace PhilipDaubmeier.ViessmannClient
             return await CallViessmannApi<DeviceResponse, List<Device>>(new Uri(uri));
         }
 
-        public async Task<FeatureList> GetFeatures(long installationId, long gatewayId, long deviceId = 0)
+        public async Task<DeviceFeatureList> GetFeatures(long installationId, long gatewayId, long deviceId = 0)
         {
             var uri = $"{_baseUri}operational-data/v2/installations/{installationId}/gateways/{gatewayId}/devices/{deviceId}/features?reduceHypermedia=true";
-            return await CallViessmannApi<FeatureResponse, FeatureList>(new Uri(uri));
+            return await CallViessmannApi<FeatureResponse<DeviceFeatureList>, DeviceFeatureList>(new Uri(uri));
         }
     }
 }
