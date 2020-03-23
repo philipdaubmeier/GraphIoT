@@ -65,12 +65,32 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
                 })
             });
         }
-        
+
+        // GET: api/viessmann/installations/{installationId}/gateways/{gatewayId}/features
+        [HttpGet("installations/{installationId}/gateways/{gatewayId}/features")]
+        public async Task<JsonResult> GetGatewayFeatures(long installationId, long gatewayId)
+        {
+            var features = await _viessmannClient.GetGatewayFeatures(installationId, gatewayId);
+
+            return Json(new
+            {
+                features = features.Select(x => new
+                {
+                    name = x.Name,
+                    properties = x.Properties?.GetProperties().Select(p => new
+                    {
+                        name = p.property,
+                        p.value
+                    })
+                })
+            });
+        }
+
         // GET: api/viessmann/installations/{installationId}/gateways/{gatewayId}/devices/{deviceId}/features
         [HttpGet("installations/{installationId}/gateways/{gatewayId}/devices/{deviceId}/features")]
-        public async Task<JsonResult> GetFeatures(long installationId, long gatewayId, long deviceId)
+        public async Task<JsonResult> GetDeviceFeatures(long installationId, long gatewayId, long deviceId)
         {
-            var features = await _viessmannClient.GetFeatures(installationId, gatewayId, deviceId);
+            var features = await _viessmannClient.GetDeviceFeatures(installationId, gatewayId, deviceId);
             
             return Json(new
             {

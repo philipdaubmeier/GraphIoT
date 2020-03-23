@@ -43,7 +43,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private async Task PollHeatingValues()
         {
-            var features = await _platformClient.GetFeatures(_config.InstallationId, _config.GatewayId);
+            var features = await _platformClient.GetDeviceFeatures(_config.InstallationId, _config.GatewayId);
 
             var time = features.GetTimestamp();
 
