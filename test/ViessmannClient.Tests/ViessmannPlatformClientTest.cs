@@ -105,7 +105,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(MockViessmannConnection.GatewayId, result.First().LongId);
             Assert.Equal(MockViessmannConnection.GatewayId.ToString(), result.First().Serial);
             Assert.Equal("1.4.0.0", result.First().Version);
-            Assert.Equal(false, result.First().AutoUpdate);
+            Assert.False(result.First().AutoUpdate);
             Assert.Equal("WorksProperly", result.First().AggregatedStatus);
             Assert.Equal("Genesis", result.First().TargetRealm);
             Assert.Equal("VitoconnectOptolink", result.First().GatewayType);
@@ -413,7 +413,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
                                               ""thu"": [ { ""start"": ""00:00"", ""end"": ""24:00"", ""mode"": ""on"", ""position"": 0 } ],
                                               ""fri"": [ { ""start"": ""00:00"", ""end"": ""24:00"", ""mode"": ""on"", ""position"": 0 } ],
                                               ""sat"": [ { ""start"": ""00:00"", ""end"": ""24:00"", ""mode"": ""on"", ""position"": 0 } ],
-                                              ""sun"": [ { ""start"": ""00:00"", ""end"": ""24:00"", ""mode"": ""on"", ""position"": 0 } ],
+                                              ""sun"": [ { ""start"": ""00:00"", ""end"": ""24:00"", ""mode"": ""on"", ""position"": 0 } ]
                                           }
                                       }
                                   },
@@ -567,7 +567,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(0.9m, feature4?.Slope?.Value);
 
             Assert.Equal("boolean", feature5?.Active?.Type);
-            Assert.Equal(true, feature5?.Active?.Value);
+            Assert.True(feature5?.Active?.Value);
             Assert.Equal("Schedule", feature5?.Entries?.Type);
             Assert.Equal("00:00", feature5?.Entries?.Value?.Mon?.First()?.Start);
             Assert.Equal("24:00", feature5?.Entries?.Value?.Mon?.First()?.End);
@@ -583,7 +583,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(6L, feature7?.Value?.Value);
 
             Assert.Equal("boolean", feature8?.Active?.Type);
-            Assert.Equal(true, feature8?.Active?.Value);
+            Assert.True(feature8?.Active?.Value);
 
             Assert.Equal("array", feature9?.Day?.Type);
             Assert.Equal(new[] { 9.914d, 11.543d }.ToList(), feature9?.Day?.Value.ToList());
@@ -592,6 +592,184 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(new List<double>(), feature9?.Year?.Value.ToList());
             Assert.Equal("string", feature9?.Unit?.Type);
             Assert.Equal("kilowattHour", feature9?.Unit?.Value);
+        }
+
+        [Fact]
+        public async Task TestGetDeviceFeaturePropertyMethods()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            using var viessmannClient = new ViessmannPlatformClient(mockHttp
+                .AddAuthMock()
+                .AddAllDeviceFeatures()
+                .ToMockProvider());
+
+            var result = await viessmannClient.GetDeviceFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
+
+            Assert.Equal(155, result.Count());
+
+            Assert.Equal("3344556677", result.GetHeatingBoilerSerial());
+            Assert.False(result.IsHeatingBoilerSensorsTemperatureCommonSupplyConnected());
+            Assert.Equal(double.NaN, result.GetHeatingBoilerSensorsTemperatureCommonSupply());
+            Assert.True(result.IsHeatingBoilerSensorsTemperatureMainConnected());
+            Assert.Equal(47, result.GetHeatingBoilerSensorsTemperatureMain());
+            Assert.Equal(47.4, result.GetHeatingBoilerTemperature());
+            Assert.False(result.IsHeatingBurnerActive());
+            Assert.True(result.IsGetHeatingBurnerAutomaticStatusOk());
+            Assert.Equal(0, result.GetHeatingBurnerAutomaticErrorCode());
+            Assert.Equal(0, result.GetHeatingBurnerModulation());
+            Assert.Equal(9876.12m, result.GetHeatingBurnerStatisticsHours());
+            Assert.Equal(44321, result.GetHeatingBurnerStatisticsStarts());
+            Assert.Equal(new List<FeatureName.Circuit>() { FeatureName.Circuit.Circuit0, FeatureName.Circuit.Circuit1 }, result.GetHeatingCircuits());
+            Assert.True(result.IsHeatingCircuitsCircuitActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsCircuitName(FeatureName.Circuit.Circuit0));
+            Assert.True(result.IsHeatingCircuitsCirculationPumpOn(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsFrostprotectionOn(FeatureName.Circuit.Circuit0));
+            Assert.Equal(5, result.GetHeatingCircuitsHeatingCurveShift(FeatureName.Circuit.Circuit0));
+            Assert.Equal(0.9m, result.GetHeatingCircuitsHeatingCurveSlope(FeatureName.Circuit.Circuit0));
+            Assert.True(result.IsHeatingCircuitsHeatingScheduleActive(FeatureName.Circuit.Circuit0));
+            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit0).Mon);
+            Assert.Equal("dhwAndHeating", result.GetHeatingCircuitsOperatingModesActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingModesDhwActive(FeatureName.Circuit.Circuit0));
+            Assert.True(result.IsHeatingCircuitsOperatingModesDhwAndHeatingActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedNormalActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedReducedActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingModesStandbyActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal("normal", result.GetHeatingCircuitsOperatingProgramsActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsComfortActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(20, result.GetHeatingCircuitsOperatingProgramsComfortTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsEcoActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(23, result.GetHeatingCircuitsOperatingProgramsEcoTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsExternalActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsExternalTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsHolidayActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayStart(FeatureName.Circuit.Circuit0));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayEnd(FeatureName.Circuit.Circuit0));
+            Assert.True(result.IsHeatingCircuitsOperatingProgramsNormalActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(23, result.GetHeatingCircuitsOperatingProgramsNormalTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsReducedActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal(10, result.GetHeatingCircuitsOperatingProgramsReducedTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsStandbyActive(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureConnected(FeatureName.Circuit.Circuit0));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperature(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureRoomConnected(FeatureName.Circuit.Circuit0));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureRoom(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureSupplyConnected(FeatureName.Circuit.Circuit0));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureSupply(FeatureName.Circuit.Circuit0));
+            Assert.False(result.IsHeatingCircuitsGeofencingActive(FeatureName.Circuit.Circuit0));
+            Assert.Equal("home", result.GetHeatingCircuitsGeofencingStatus(FeatureName.Circuit.Circuit0));
+            Assert.True(result.IsHeatingCircuitsCircuitActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsCircuitName(FeatureName.Circuit.Circuit1));
+            Assert.True(result.IsHeatingCircuitsCirculationPumpOn(FeatureName.Circuit.Circuit1));
+            Assert.True(result.IsHeatingCircuitsFrostprotectionOn(FeatureName.Circuit.Circuit1));
+            Assert.Equal(0, result.GetHeatingCircuitsHeatingCurveShift(FeatureName.Circuit.Circuit1));
+            Assert.Equal(0.5m, result.GetHeatingCircuitsHeatingCurveSlope(FeatureName.Circuit.Circuit1));
+            Assert.True(result.IsHeatingCircuitsHeatingScheduleActive(FeatureName.Circuit.Circuit1));
+            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit1).Mon);
+            Assert.Equal("dhwAndHeating", result.GetHeatingCircuitsOperatingModesActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingModesDhwActive(FeatureName.Circuit.Circuit1));
+            Assert.True(result.IsHeatingCircuitsOperatingModesDhwAndHeatingActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedNormalActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedReducedActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingModesStandbyActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal("normal", result.GetHeatingCircuitsOperatingProgramsActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsComfortActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(24, result.GetHeatingCircuitsOperatingProgramsComfortTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsEcoActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(21, result.GetHeatingCircuitsOperatingProgramsEcoTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsExternalActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsExternalTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsHolidayActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayStart(FeatureName.Circuit.Circuit1));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayEnd(FeatureName.Circuit.Circuit1));
+            Assert.True(result.IsHeatingCircuitsOperatingProgramsNormalActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(21, result.GetHeatingCircuitsOperatingProgramsNormalTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsReducedActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal(12, result.GetHeatingCircuitsOperatingProgramsReducedTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsStandbyActive(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureConnected(FeatureName.Circuit.Circuit1));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperature(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureRoomConnected(FeatureName.Circuit.Circuit1));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureRoom(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureSupplyConnected(FeatureName.Circuit.Circuit1));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureSupply(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsGeofencingActive(FeatureName.Circuit.Circuit1));
+            Assert.Equal("home", result.GetHeatingCircuitsGeofencingStatus(FeatureName.Circuit.Circuit1));
+            Assert.False(result.IsHeatingCircuitsCircuitActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsCircuitName(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsCirculationPumpOn(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsFrostprotectionOn(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsHeatingCurveShift(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsHeatingCurveSlope(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsHeatingScheduleActive(FeatureName.Circuit.Circuit2));
+            Assert.Null(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit2).Mon);
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingModesActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingModesDhwActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingModesDhwAndHeatingActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedNormalActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingModesForcedReducedActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingModesStandbyActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsComfortActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsComfortTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsEcoActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsEcoTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsExternalActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsExternalTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsHolidayActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayStart(FeatureName.Circuit.Circuit2));
+            Assert.Equal(string.Empty, result.GetHeatingCircuitsOperatingProgramsHolidayEnd(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsNormalActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsNormalTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsReducedActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal(0, result.GetHeatingCircuitsOperatingProgramsReducedTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsOperatingProgramsStandbyActive(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureConnected(FeatureName.Circuit.Circuit2));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperature(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureRoomConnected(FeatureName.Circuit.Circuit2));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureRoom(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsSensorsTemperatureSupplyConnected(FeatureName.Circuit.Circuit2));
+            Assert.Equal(double.NaN, result.GetHeatingCircuitsSensorsTemperatureSupply(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingCircuitsGeofencingActive(FeatureName.Circuit.Circuit2));
+            Assert.Equal("home", result.GetHeatingCircuitsGeofencingStatus(FeatureName.Circuit.Circuit2));
+            Assert.False(result.IsHeatingConfigurationMultiFamilyHouseActive());
+            Assert.Equal("777555888999", result.GetHeatingControllerSerial());
+            Assert.Equal(52, result.GetHeatingDeviceTimeOffset());
+            Assert.True(result.IsHeatingDhwActive());
+            Assert.False(result.IsHeatingDhwChargingActive());
+            Assert.False(result.IsHeatingDhwPumpsCirculationOn());
+            Assert.True(result.IsHeatingDhwPumpsCirculationScheduleActive());
+            Assert.NotEmpty(result.GetHeatingDhwPumpsCirculationSchedule().Mon);
+            Assert.False(result.IsHeatingDhwPumpsPrimaryOn());
+            Assert.True(result.IsHeatingDhwScheduleActive());
+            Assert.NotEmpty(result.GetHeatingDhwSchedule().Mon);
+            Assert.True(result.IsHeatingDhwSensorsTemperatureHotWaterStorageConnected());
+            Assert.Equal(55.4, result.GetHeatingDhwSensorsTemperatureHotWaterStorage());
+            Assert.False(result.IsHeatingDhwSensorsTemperatureOutletConnected());
+            Assert.Equal(double.NaN, result.GetHeatingDhwSensorsTemperatureOutlet());
+            Assert.Equal(50, result.GetHeatingDhwTemperature());
+            Assert.Equal(50, result.GetHeatingDhwTemperatureMain());
+            Assert.True(result.IsHeatingSensorsTemperatureOutsideConnected());
+            Assert.Equal(7.3, result.GetHeatingSensorsTemperatureOutside());
+            Assert.False(result.GetHeatingServiceDue());
+            Assert.Equal(0, result.GetHeatingServiceIntervalMonths());
+            Assert.Equal(0, result.GetHeatingActiveMonthSinceLastService());
+            Assert.Equal(string.Empty, result.GetHeatingLastService());
+            Assert.True(result.IsHeatingSolarActive());
+            Assert.Equal(10698, result.GetHeatingSolarPowerProductionWhToday());
+            Assert.Equal(new List<double>() { 10.698, 7.193, 6.543, 0, 10.172, 21.322, 17.562, 6.99 }, result.GetHeatingSolarPowerProductionDay());
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionWeek());
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionMonth());
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionYear());
+            Assert.Equal("kilowattHour", result.GetHeatingSolarPowerProductionUnit());
+            Assert.True(result.IsHeatingSolarPumpsCircuitOn());
+            Assert.Equal(11085, result.GetHeatingSolarStatisticsHours());
+            Assert.True(result.IsHeatingSolarSensorsTemperatureDhwConnected());
+            Assert.Equal(41.4, result.GetHeatingSolarSensorsTemperatureDhw());
+            Assert.True(result.IsHeatingSolarSensorsTemperatureCollectorConnected());
+            Assert.Equal(50.7, result.GetHeatingSolarSensorsTemperatureCollector());
+            Assert.Equal(23456, result.GetHeatingSolarPowerCumulativeProduced());
+            Assert.True(result.IsHeatingSolarRechargeSuppressionOn());
         }
     }
 }
