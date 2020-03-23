@@ -154,7 +154,151 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
         }
 
         [Fact]
-        public async Task TestGetFeatures()
+        public async Task TestGetGatewayFeatures()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockViessmannConnection.BaseUri}operational-data/v2/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/features?reduceHypermedia=true")
+                    .Respond("application/json",
+                    @"{
+                        ""features"": [
+                            {
+                                ""isEnabled"": true,
+                                ""isReady"": true,
+                                ""gatewayId"": """ + MockViessmannConnection.GatewayId + @""",
+                                ""feature"": ""gateway.bmuconnection"",
+                                ""timestamp"": ""2020-03-23T19:54:09.825Z"",
+                                ""properties"": {
+                                    ""status"": {
+                                        ""type"": ""string"",
+                                        ""value"": ""OK""
+                                    }
+                                },
+                                ""commands"": {},
+                                ""components"": []
+                            },
+                            {
+                                ""isEnabled"": true,
+                                ""isReady"": true,
+                                ""gatewayId"": """ + MockViessmannConnection.GatewayId + @""",
+                                ""feature"": ""gateway.devices"",
+                                ""timestamp"": ""2020-03-23T19:54:09.825Z"",
+                                ""properties"": {
+                                    ""devices"": {
+                                        ""type"": ""DeviceList"",
+                                        ""value"": [
+                                            {
+                                                ""id"": """ + MockViessmannConnection.DeviceId + @""",
+                                                ""type"": ""heating"",
+                                                ""status"": ""online"",
+                                                ""fingerprint"": ""vv:12,jh:b9,gh:777,ijk:12345"",
+                                                ""modelId"": ""VPlusHO1_40"",
+                                                ""modelVersion"": ""19.1.22.1"",
+                                                ""name"": ""VT 200 (HO1A / HO1B)""
+                                            }
+                                        ]
+                                    }
+                                },
+                                ""commands"": {},
+                                ""components"": []
+                            },
+                            {
+                                ""isEnabled"": true,
+                                ""isReady"": true,
+                                ""gatewayId"": """ + MockViessmannConnection.GatewayId + @""",
+                                ""feature"": ""gateway.firmware"",
+                                ""timestamp"": ""2020-03-23T19:54:09.825Z"",
+                                ""properties"": {
+                                    ""version"": {
+                                        ""type"": ""string"",
+                                        ""value"": ""1.4.0""
+                                    },
+                                    ""updateStatus"": {
+                                        ""type"": ""string"",
+                                        ""value"": ""idle""
+                                    }
+                                },
+                                ""commands"": {},
+                                ""components"": []
+                            },
+                            {
+                                ""isEnabled"": true,
+                                ""isReady"": true,
+                                ""gatewayId"": """ + MockViessmannConnection.GatewayId + @""",
+                                ""feature"": ""gateway.status"",
+                                ""timestamp"": ""2020-03-23T19:54:09.825Z"",
+                                ""properties"": {
+                                    ""online"": {
+                                        ""type"": ""boolean"",
+                                        ""value"": true
+                                    }
+                                },
+                                ""commands"": {},
+                                ""components"": []
+                            },
+                            {
+                                ""isEnabled"": true,
+                                ""isReady"": true,
+                                ""gatewayId"": """ + MockViessmannConnection.GatewayId + @""",
+                                ""feature"": ""gateway.wifi"",
+                                ""timestamp"": ""2020-03-23T19:54:09.825Z"",
+                                ""properties"": {
+                                    ""strength"": {
+                                        ""type"": ""number"",
+                                        ""value"": -66
+                                    },
+                                    ""channel"": {
+                                        ""type"": ""number"",
+                                        ""value"": 7
+                                    }
+                                },
+                                ""commands"": {},
+                                ""components"": []
+                            }
+                        ]
+                    }");
+
+            using var viessmannClient = new ViessmannPlatformClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var result = await viessmannClient.GetGatewayFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId);
+
+            Assert.Equal(MockViessmannConnection.GatewayId.ToString(), result.First().GatewayId);
+            Assert.Equal(5, result.Count());
+
+            var feature1 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayStatus))?.Properties;
+            var feature2 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayWifi))?.Properties;
+            var feature3 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayBmuconnection))?.Properties;
+            var feature4 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayDevices))?.Properties;
+            var feature5 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayFirmware))?.Properties;
+
+            Assert.Equal("boolean", feature1?.Online?.Type);
+            Assert.True(feature1?.Online?.Value);
+
+            Assert.Equal("number", feature2?.Strength?.Type);
+            Assert.Equal(-66, feature2?.Strength?.Value);
+            Assert.Equal("number", feature2?.Channel?.Type);
+            Assert.Equal(7, feature2?.Channel?.Value);
+
+            Assert.Equal("string", feature3?.Status?.Type);
+            Assert.Equal("OK", feature3?.Status?.Value);
+
+            Assert.Equal("DeviceList", feature4?.Devices?.Type);
+            Assert.Equal(MockViessmannConnection.DeviceId, feature4?.Devices?.Value?.FirstOrDefault()?.LongId);
+            Assert.Equal("heating", feature4?.Devices?.Value?.FirstOrDefault()?.Type);
+            Assert.Equal("online", feature4?.Devices?.Value?.FirstOrDefault()?.Status);
+            Assert.Equal("vv:12,jh:b9,gh:777,ijk:12345", feature4?.Devices?.Value?.FirstOrDefault()?.Fingerprint);
+            Assert.Equal("VPlusHO1_40", feature4?.Devices?.Value?.FirstOrDefault()?.ModelId);
+            Assert.Equal("19.1.22.1", feature4?.Devices?.Value?.FirstOrDefault()?.ModelVersion);
+            Assert.Equal("VT 200 (HO1A / HO1B)", feature4?.Devices?.Value?.FirstOrDefault()?.Name);
+
+            Assert.Equal("string", feature5?.Version?.Type);
+            Assert.Equal("1.4.0", feature5?.Version?.Value);
+            Assert.Equal("string", feature5?.UpdateStatus?.Type);
+            Assert.Equal("idle", feature5?.UpdateStatus?.Value);
+        }
+
+        [Fact]
+        public async Task TestGetDeviceFeatures()
         {
             var mockHttp = new MockHttpMessageHandler();
 
@@ -393,7 +537,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 
             using var viessmannClient = new ViessmannPlatformClient(mockHttp.AddAuthMock().ToMockProvider());
 
-            var result = await viessmannClient.GetFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
+            var result = await viessmannClient.GetDeviceFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
 
             Assert.Equal(MockViessmannConnection.DeviceId.ToString(), result.First().DeviceId);
             Assert.Equal(9, result.Count());
