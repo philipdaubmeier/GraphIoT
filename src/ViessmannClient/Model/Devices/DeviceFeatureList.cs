@@ -445,10 +445,5 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         {
             return GetProperties(FeatureName.Name.HeatingSolarRechargeSuppression)?.Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
         }
-
-        private PropertyList? GetProperties(FeatureName.Name name, FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
-        {
-            return GetRawFeatureByName(new FeatureName(name, circuit))?.Properties;
-        }
     }
 }
