@@ -18,11 +18,10 @@ You have to implement the interface `ISonnenConnectionProvider` to provide the `
 The minimal viable example for playing around with the client would be as follows:
 
 ```csharp
-var sonnenConnProvider = new SonnenConnectionProvider()
-{
-    AuthData = new SonnenAuth("<username>", "<password>"),
-    ClientId = "<client_id>"
-};
+var sonnenConnProvider = new SonnenConnectionProvider(
+    authData: new SonnenAuth("<username>", "<password>"),
+    clientId: "<client_id>"
+);
 ```
 
 > **Caution:** in a productive use you may want to implement your own `ISonnenConnectionProvider` and load your client id from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `ISonnenAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `ISonnenAuth` class. You can have a look at the respective classes in [`GraphIoT.Sonnen`](../GraphIoT.Sonnen/Config) as an example.
