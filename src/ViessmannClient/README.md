@@ -55,7 +55,7 @@ A full list of status and sensor values of devices can be found in the [`DeviceF
 
 ## Platform Support
 
-ViessmannClient is compiled for .NET Core 3.0.
+ViessmannClient is compiled for .NET Core 3.1.
 
 ## License
 

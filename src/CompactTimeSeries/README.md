@@ -36,7 +36,7 @@ For more usage examples you can also have a look at the unit tests.
 
 ## Platform Support
 
-CompactTimeSeries is compiled for .NET Core 3.0.
+CompactTimeSeries is compiled for .NET Core 3.1.
 
 ## License
 
