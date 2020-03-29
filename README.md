@@ -2,6 +2,8 @@
 
 [![Build status](https://ci.appveyor.com/api/projects/status/mj67oe2c9wfkv2ld/branch/master?svg=true)](https://ci.appveyor.com/project/philipdaubmeier/graphiot/branch/master)
 
+![Azure pipeline](https://dev.azure.com/philipdaubmeier/GraphIoT/_apis/build/status/philipdaubmeier-graphiot%20-%20CI)
+
 # GraphIoT
 
 GraphIoT is a .NET Core project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
