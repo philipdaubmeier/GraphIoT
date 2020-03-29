@@ -18,9 +18,9 @@ You have to implement the interface `INetatmoConnectionProvider` to provide the 
 The minimal viable example for playing around with the client would be as follows:
 
 ```csharp
-var netatmoConnProvider = new NetatmoConnectionProvider()
+var netatmoAuth = new NetatmoAuth("<username>", "<password>");
+var netatmoConnProvider = new NetatmoConnectionProvider(netatmoAuth)
 {
-    AuthData = new NetatmoAuth("<username>", "<password>"),
     AppId = "<your_netatmo_connect_app_id>",
     AppSecret = "<your_netatmo_connect_app_secret>",
     Scope = "read_station read_presence access_presence"
