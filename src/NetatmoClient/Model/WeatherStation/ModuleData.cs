@@ -17,6 +17,8 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public double? MaxTemp { get; set; }
 
         public int? Humidity { get; set; }
+
+        [JsonProperty("CO2")]
         public int? CO2 { get; set; }
         public double? Pressure { get; set; }
         public double? AbsolutePressure { get; set; }
