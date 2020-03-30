@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Netatmo Cloud RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+1.4.1 - bugfix in CO2 dashboard data
 1.4.0 - upgraded to target framework netcoreapp3.1
 1.3.0 - included default implementation of INetatmoConnectionProvider
 1.2.0-beta1 - added support for HttpClientFactory and Polly. Enabled non-nullable reference types.
