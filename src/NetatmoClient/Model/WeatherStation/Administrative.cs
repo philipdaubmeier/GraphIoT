@@ -2,6 +2,7 @@
 {
     public class Administrative
     {
+        public string Country { get; set; } = string.Empty;
         public string RegLocale { get; set; } = string.Empty;
         public string Lang { get; set; } = string.Empty;
         public int Unit { get; set; }

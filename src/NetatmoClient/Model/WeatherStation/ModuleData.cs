@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime TimeUtc { get; set; }
 
-        public double Temperature { get; set; }
+        public double? Temperature { get; set; }
         public string TempTrend { get; set; } = string.Empty;
 
         [JsonConverter(typeof(UnixDateTimeConverter))]
@@ -32,7 +32,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public int? Noise { get; set; }
 
         public double? Rain { get; set; }
+
+        [JsonProperty("sum_rain_1")]
         public double? SumRain1 { get; set; }
+
+        [JsonProperty("sum_rain_24")]
         public double? SumRain24 { get; set; }
 
         public int? WindAngle { get; set; }

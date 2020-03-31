@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
+using System;
 using System.Collections.Generic;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
@@ -8,6 +9,10 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
     {
         [JsonProperty("_id")]
         public ModuleId Id { get; set; } = string.Empty;
+
+        [JsonConverter(typeof(UnixDateTimeConverter))]
+        public DateTime LastSetup { get; set; }
+
         public string ModuleName { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
         public int Firmware { get; set; }

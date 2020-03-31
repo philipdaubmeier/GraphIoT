@@ -9,10 +9,10 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public bool Co2Calibrating { get; set; }
 
         [JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime LastStatusStore { get; set; }
+        public DateTime DateSetup { get; set; }
 
         [JsonConverter(typeof(UnixDateTimeConverter))]
-        public DateTime LastUpgrade { get; set; }
+        public DateTime LastStatusStore { get; set; }
 
         public List<Module> Modules { get; set; } = new List<Module>();
         public Place Place { get; set; } = new Place();

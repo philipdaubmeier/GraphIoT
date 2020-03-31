@@ -99,6 +99,30 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                                                 ""date_min_temp"": 1585717163,
                                                 ""temp_trend"": ""up""
                                             }
+                                        },
+                                        {
+                                            ""_id"": ""bc:de:f9:87:65:43"",
+                                            ""type"": ""NAModule2"",
+                                            ""module_name"": ""Rain module"",
+                                            ""data_type"":
+                                            [
+                                                ""Rain""
+                                            ],
+                                            ""last_setup"": 1547021355,
+                                            ""battery_percent"": 75,
+                                            ""reachable"": true,
+                                            ""firmware"": 8,
+                                            ""last_message"": 1585722586,
+                                            ""last_seen"": 1585722586,
+                                            ""rf_status"": 64,
+                                            ""battery_vp"": 5452,
+                                            ""dashboard_data"":
+                                            {
+                                                ""time_utc"": 1585722573,
+                                                ""Rain"": 0,
+                                                ""sum_rain_1"": 0,
+                                                ""sum_rain_24"": 0
+                                            }
                                         }
                                     ]
                                 }
@@ -133,10 +157,13 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
             Assert.Equal("My Netatmo", result.Devices[0].StationName);
             Assert.Equal("MyMainModule", result.Devices[0].ModuleName);
             Assert.Equal("NAMain", result.Devices[0].Type);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1450976717), result.Devices[0].DateSetup);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1450976717), result.Devices[0].LastSetup);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1585688537), result.Devices[0].LastStatusStore);
             Assert.Equal(137, result.Devices[0].Firmware);
             Assert.Equal(62, result.Devices[0].WifiStatus);
             Assert.False(result.Devices[0].Co2Calibrating);
-            Assert.Equal(new List<Measure>() { "Temperature", "CO2", "Humidity", "Noise", "Pressure" }, result.Devices[0].DataType);
+            Assert.Equal(new List<Measure>() { MeasureType.Temperature, MeasureType.CO2, MeasureType.Humidity, MeasureType.Noise, MeasureType.Pressure }, result.Devices[0].DataType);
 
             Assert.Equal(321, result.Devices[0].Place.Altitude);
             Assert.Equal("Unittest Town", result.Devices[0].Place.City);
@@ -163,11 +190,12 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
             Assert.Equal("NAModule1", result.Devices[0].Modules[0].Type);
             Assert.Equal(44, result.Devices[0].Modules[0].Firmware);
             Assert.Equal(57, result.Devices[0].Modules[0].RfStatus);
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1450976705), result.Devices[0].Modules[0].LastSetup);
             Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1585722586), result.Devices[0].Modules[0].LastMessage);
             Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1585722547), result.Devices[0].Modules[0].LastSeen);
             Assert.Equal(5376, result.Devices[0].Modules[0].BatteryVp);
             Assert.Equal(74, result.Devices[0].Modules[0].BatteryPercent);
-            Assert.Equal(new List<Measure>() { "Temperature", "Humidity" }, result.Devices[0].Modules[0].DataType);
+            Assert.Equal(new List<Measure>() { MeasureType.Temperature, MeasureType.Humidity }, result.Devices[0].Modules[0].DataType);
 
             Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1585722547), result.Devices[0].Modules[0].DashboardData.TimeUtc);
             Assert.Equal(0, result.Devices[0].Modules[0].DashboardData.Temperature);
@@ -181,6 +209,28 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
             Assert.Null(result.Devices[0].Modules[0].DashboardData.Noise);
             Assert.Null(result.Devices[0].Modules[0].DashboardData.Pressure);
             Assert.Null(result.Devices[0].Modules[0].DashboardData.AbsolutePressure);
+
+            Assert.Equal("bc:de:f9:87:65:43", result.Devices[0].Modules[1].Id);
+            Assert.Equal("Rain module", result.Devices[0].Modules[1].ModuleName);
+            Assert.Equal("NAModule2", result.Devices[0].Modules[1].Type);
+            Assert.Equal(new List<Measure>() { MeasureType.Rain }, result.Devices[0].Modules[1].DataType);
+
+            Assert.Equal(DateTimeOffset.FromUnixTimeSeconds(1585722573), result.Devices[0].Modules[1].DashboardData.TimeUtc);
+            Assert.Equal(0, result.Devices[0].Modules[1].DashboardData.Rain);
+            Assert.Equal(0, result.Devices[0].Modules[1].DashboardData.SumRain1);
+            Assert.Equal(0, result.Devices[0].Modules[1].DashboardData.SumRain24);
+            Assert.Null(result.Devices[0].Modules[1].DashboardData.Temperature);
+            Assert.Null(result.Devices[0].Modules[1].DashboardData.CO2);
+            Assert.Null(result.Devices[0].Modules[1].DashboardData.Noise);
+
+            Assert.Equal("john@doe.com", result.User.Mail);
+            Assert.Equal("US", result.User.Administrative.Country);
+            Assert.Equal("en-US", result.User.Administrative.RegLocale);
+            Assert.Equal("en", result.User.Administrative.Lang);
+            Assert.Equal(0, result.User.Administrative.Unit);
+            Assert.Equal(0, result.User.Administrative.Windunit);
+            Assert.Equal(0, result.User.Administrative.Pressureunit);
+            Assert.Equal(0, result.User.Administrative.FeelLikeAlgo);
         }
     }
 }
