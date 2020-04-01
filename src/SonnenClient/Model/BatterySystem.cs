@@ -21,6 +21,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public string InstallationCity { get; set; } = string.Empty;
         public string InstallationState { get; set; } = string.Empty;
         public string InstallationCountryCode { get; set; } = string.Empty;
+        public string TimeZone { get; set; } = string.Empty;
         public int? BatteryCapacity { get; set; }
         public int? BatteryModules { get; set; }
         public int? BatteryInverterDesignPower { get; set; }
@@ -42,6 +43,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public int? PvGridFeedInLimit { get; set; }
         public bool? HeaterConnectionStatus { get; set; }
         public double? HeaterMaxTemperature { get; set; }
+        public bool? SmartSocketsEnabled { get; set; }
         public bool? Online { get; set; }
     }
 }

@@ -15,13 +15,15 @@
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public string CountryCode { get; set; } = string.Empty;
-        public string Latitude { get; set; } = string.Empty;
-        public string Longitude { get; set; } = string.Empty;
+        public double? Latitude { get; set; }
+        public double? Longitude { get; set; }
         public string Language { get; set; } = string.Empty;
         public bool Newsletter { get; set; } = false;
         public string TimeZone { get; set; } = string.Empty;
         public string PrivacyPolicy { get; set; } = string.Empty;
         public string TermsOfService { get; set; } = string.Empty;
         public bool ServicePartnersDataAccess { get; set; } = false;
+        public string SalesforceUserId { get; set; } = string.Empty;
+        public string SalesforceContactId { get; set; } = string.Empty;
     }
 }
