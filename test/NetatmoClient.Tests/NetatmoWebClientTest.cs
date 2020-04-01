@@ -2,6 +2,7 @@ using PhilipDaubmeier.NetatmoClient.Model.Core;
 using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -9,6 +10,8 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
 {
     public class NetatmoWebClientTest
     {
+        private static ModuleId _moduleId = "12:34:56:78:9a:bc";
+
         [Fact]
         public async Task TestGetWeatherStationMainModuleInfo()
         {
@@ -300,6 +303,50 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
             Assert.Equal("US", result.User.Country);
             Assert.Equal("john@doe.com", result.User.Mail);
             Assert.True(result.GlobalInfo.ShowTags);
+        }
+
+        [Fact]
+        public async Task TestGetMeasureTempCo2Humidity()
+        {
+            var measures = new List<Measure>() { MeasureType.Temperature, MeasureType.CO2, MeasureType.Humidity };
+
+            using var netatmoClient = new NetatmoWebClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddMeasurements(_moduleId, measures, 30)
+                .ToMockProvider());
+
+            var result = await netatmoClient.GetMeasure(_moduleId, _moduleId, measures);
+
+            Assert.Equal(3, result.Count());
+            Assert.Equal(30, result.First().Value.Count());
+            Assert.Equal(30, result.Skip(1).First().Value.Count());
+            Assert.Equal(30, result.Skip(2).First().Value.Count());
+
+            Assert.Equal(21.3, result.First().Value.First().Value);
+            Assert.Equal(524, result.Skip(1).First().Value.First().Value);
+            Assert.Equal(58, result.Skip(2).First().Value.First().Value);
+
+            Assert.Equal(21.3, result.First().Value.Skip(20).First().Value);
+            Assert.Equal(524, result.Skip(1).First().Value.Skip(20).First().Value);
+            Assert.Equal(58, result.Skip(2).First().Value.Skip(20).First().Value);
+        }
+
+        [Fact]
+        public async Task TestGetMeasureRain()
+        {
+            var measures = new List<Measure>() { MeasureType.Rain };
+
+            using var netatmoClient = new NetatmoWebClient(new MockHttpMessageHandler()
+                .AddAuthMock()
+                .AddMeasurements(_moduleId, measures, 5)
+                .ToMockProvider());
+
+            var result = await netatmoClient.GetMeasure(_moduleId, _moduleId, measures);
+
+            Assert.Single(result);
+            Assert.Equal(5, result.First().Value.Count());
+
+            Assert.Equal(0, result.First().Value.First().Value);
         }
     }
 }
