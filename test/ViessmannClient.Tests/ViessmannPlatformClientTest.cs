@@ -757,10 +757,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(string.Empty, result.GetHeatingLastService());
             Assert.True(result.IsHeatingSolarActive());
             Assert.Equal(10698, result.GetHeatingSolarPowerProductionWhToday());
-            Assert.Equal(new List<double>() { 10.698, 7.193, 6.543, 0, 10.172, 21.322, 17.562, 6.99 }, result.GetHeatingSolarPowerProductionDay());
-            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionWeek());
-            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionMonth());
-            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProductionYear());
+            Assert.Equal(new List<double>() { 10.698, 7.193, 6.543, 0, 10.172, 21.322, 17.562, 6.99 }, result.GetHeatingSolarPowerProduction());
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProduction(Resolution.Week));
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProduction(Resolution.Month));
+            Assert.Equal(new List<double>(), result.GetHeatingSolarPowerProduction(Resolution.Year));
             Assert.Equal("kilowattHour", result.GetHeatingSolarPowerProductionUnit());
             Assert.True(result.IsHeatingSolarPumpsCircuitOn());
             Assert.Equal(11085, result.GetHeatingSolarStatisticsHours());

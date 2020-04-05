@@ -5,6 +5,14 @@ using System.Linq;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
+    public enum Resolution
+    {
+        Day,
+        Week,
+        Month,
+        Year
+    }
+
     public class PropertyList
     {
         public TypedValue<object?>? Value { get; set; }
@@ -13,6 +21,8 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<int>? ErrorCode { get; set; }
         public TypedValue<decimal>? Hours { get; set; }
         public TypedValue<long>? Starts { get; set; }
+        public TypedValue<decimal>? OperationHours { get; set; }
+        public TypedValue<decimal>? ProductionHours { get; set; }
         public TypedValue<List<string?>?>? Enabled { get; set; }
         public TypedValue<string?>? Name { get; set; }
         public TypedValue<decimal>? Shift { get; set; }
@@ -41,6 +51,15 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public int? ValueAsInt => (Value?.Value as IConvertible)?.ToInt32(null);
 
         public double? ValueAsDouble => (Value?.Value as IConvertible)?.ToDouble(null);
+
+        public TypedValue<List<double>?>? SeriesByResolution(Resolution resolution) => resolution switch
+        {
+            Resolution.Day => Day,
+            Resolution.Week => Week,
+            Resolution.Month => Month,
+            Resolution.Year => Year,
+            _ => Day
+        };
 
         public override string ToString()
         {
