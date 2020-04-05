@@ -191,6 +191,21 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             return GetProperties(FeatureName.Name.HeatingCircuitsOperatingProgramsHoliday, circuit)?.End?.Value ?? string.Empty;
         }
 
+        public bool IsHeatingCircuitsOperatingProgramsHolidayAtHomeActive(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            return GetProperties(FeatureName.Name.HeatingCircuitsOperatingProgramsHolidayAtHome, circuit)?.Active?.Value ?? false;
+        }
+
+        public string GetHeatingCircuitsOperatingProgramsHolidayAtHomeStart(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            return GetProperties(FeatureName.Name.HeatingCircuitsOperatingProgramsHolidayAtHome, circuit)?.Start?.Value ?? string.Empty;
+        }
+
+        public string GetHeatingCircuitsOperatingProgramsHolidayAtHomeEnd(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            return GetProperties(FeatureName.Name.HeatingCircuitsOperatingProgramsHolidayAtHome, circuit)?.End?.Value ?? string.Empty;
+        }
+
         public bool IsHeatingCircuitsOperatingProgramsNormalActive(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
         {
             return GetProperties(FeatureName.Name.HeatingCircuitsOperatingProgramsNormal, circuit)?.Active?.Value ?? false;
@@ -281,6 +296,11 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             return GetProperties(FeatureName.Name.HeatingDhwCharging)?.Active?.Value ?? false;
         }
 
+        public bool IsHeatingDhwOneTimeChargeActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingDhwOneTimeCharge)?.Active?.Value ?? false;
+        }
+
         public bool IsHeatingDhwPumpsCirculationOn()
         {
             return GetProperties(FeatureName.Name.HeatingDhwPumpsCirculation)?.Status?.Value?.Equals("on", StringComparison.InvariantCultureIgnoreCase) ?? false;
@@ -321,6 +341,26 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorage)?.ValueAsDouble ?? double.NaN;
         }
 
+        public bool IsHeatingDhwSensorsTemperatureHotWaterStorageConnectedTop()
+        {
+            return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorageTop)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingDhwSensorsTemperatureHotWaterStorageTop()
+        {
+            return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorageTop)?.ValueAsDouble ?? double.NaN;
+        }
+
+        public bool IsHeatingDhwSensorsTemperatureHotWaterStorageConnectedBottom()
+        {
+            return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorageBottom)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingDhwSensorsTemperatureHotWaterStorageBottom()
+        {
+            return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureHotWaterStorageBottom)?.ValueAsDouble ?? double.NaN;
+        }
+
         public bool IsHeatingDhwSensorsTemperatureOutletConnected()
         {
             return GetProperties(FeatureName.Name.HeatingDhwSensorsTemperatureOutlet)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
@@ -339,6 +379,216 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public double GetHeatingDhwTemperatureMain()
         {
             return GetProperties(FeatureName.Name.HeatingDhwTemperatureMain)?.ValueAsDouble ?? double.NaN;
+        }
+
+        public string GetHeatingFuelCellOperatingModesActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesActive)?.Value?.Value?.ToString() ?? string.Empty;
+        }
+
+        public bool IsHeatingFuelCellOperatingModesEcologicalActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesEcological)?.Active?.Value ?? false;
+        }
+
+        public bool IsHeatingFuelCellOperatingModesEconomicalActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesEconomical)?.Active?.Value ?? false;
+        }
+
+        public bool IsHeatingFuelCellOperatingModesHeatControlledActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesHeatControlled)?.Active?.Value ?? false;
+        }
+
+        public bool IsHeatingFuelCellOperatingModesMaintenanceActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesMaintenance)?.Active?.Value ?? false;
+        }
+
+        public bool IsHeatingFuelCellOperatingModesStandbyActive()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingModesStandby)?.Active?.Value ?? false;
+        }
+
+        public string GetHeatingFuelCellOperatingPhase()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellOperatingPhase)?.Value?.Value?.ToString() ?? string.Empty;
+        }
+
+        public IEnumerable<double> GetHeatingFuelCellPowerProduction(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellPowerProduction)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public bool IsHeatingFuelCellSensorsTemperatureReturnConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellSensorsTemperatureReturn)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingFuelCellSensorsTemperatureReturn()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellSensorsTemperatureReturn)?.ValueAsDouble ?? double.NaN;
+        }
+
+        public bool IsHeatingFuelCellSensorsTemperatureSupplyConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellSensorsTemperatureSupply)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingFuelCellSensorsTemperatureSupply()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellSensorsTemperatureSupply)?.ValueAsDouble ?? double.NaN;
+        }
+
+        public decimal GetHeatingFuelCellStatisticsOperationHours()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellStatistics)?.OperationHours?.Value ?? 0m;
+        }
+
+        public decimal GetHeatingFuelCellStatisticsProductionHours()
+        {
+            return GetProperties(FeatureName.Name.HeatingFuelCellStatistics)?.ProductionHours?.Value ?? 0m;
+        }
+
+        public IEnumerable<double> GetHeatingGasConsumptionDhw(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingGasConsumptionDhw)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public IEnumerable<double> GetHeatingGasConsumptionFuelCell(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingGasConsumptionFuelCell)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public IEnumerable<double> GetHeatingGasConsumptionHeating(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingGasConsumptionHeating)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public IEnumerable<double> GetHeatingGasConsumptionTotal(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingGasConsumptionTotal)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public IEnumerable<double> GetHeatingHeatProduction(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingHeatProduction)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public double GetHeatingPowerCumulativeProduced()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerCumulativeProduced)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerCumulativePurchased()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerCumulativePurchased)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerCumulativeSold()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerCumulativeSold)?.ValueAsDouble ?? 0d;
+        }
+
+        public IEnumerable<double> GetHeatingPowerProduction(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProduction)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public double GetHeatingPowerProductionCumulative()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionCumulative)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerProductionCurrent()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionCurrent)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerProductionDemandCoverageCurrent()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionDemandCoverageCurrent)?.ValueAsDouble ?? 0d;
+        }
+
+        public IEnumerable<double> GetHeatingPowerProductionDemandCoverageTotal(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionDemandCoverageTotal)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public double GetHeatingPowerProductionProductionCoverageCurrent()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionProductionCoverageCurrent)?.ValueAsDouble ?? 0d;
+        }
+
+        public IEnumerable<double> GetHeatingPowerProductionProductionCoverageTotal(Resolution resolution = Resolution.Day)
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerProductionProductionCoverageTotal)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
+        }
+
+        public double GetHeatingPowerPurchaseCumulative()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerPurchaseCumulative)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerPurchaseCurrent()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerPurchaseCurrent)?.ValueAsDouble ?? 0d;
+        }
+
+        public double GetHeatingPowerSoldCumulative()
+        {
+            return GetProperties(FeatureName.Name.HeatingPowerSoldCumulative)?.ValueAsDouble ?? 0d;
+        }
+
+        public bool IsHeatingSensorsPowerOutputConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsPowerOutput)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingSensorsPowerOutput()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsPowerOutput)?.ValueAsDouble ?? 0d;
+        }
+
+        public bool IsHeatingSensorsPressureSupplyConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsPressureSupply)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingSensorsPressureSupply()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsPressureSupply)?.ValueAsDouble ?? 0d;
+        }
+
+        public bool IsHeatingSensorsTemperatureHydraulicSeparatorConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsTemperatureHydraulicSeparator)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingSensorsTemperatureHydraulicSeparator()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsTemperatureHydraulicSeparator)?.ValueAsDouble ?? 0d;
+        }
+
+        public bool IsHeatingSensorsTemperatureReturnConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsTemperatureReturn)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingSensorsTemperatureReturn()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsTemperatureReturn)?.ValueAsDouble ?? 0d;
+        }
+
+        public bool IsHeatingSensorsVolumetricFlowReturnConnected()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsVolumetricFlowReturn)?.Status?.Value?.Equals("connected", StringComparison.InvariantCultureIgnoreCase) ?? false;
+        }
+
+        public double GetHeatingSensorsVolumetricFlowReturn()
+        {
+            return GetProperties(FeatureName.Name.HeatingSensorsVolumetricFlowReturn)?.ValueAsDouble ?? 0d;
         }
 
         public bool IsHeatingSensorsTemperatureOutsideConnected()
@@ -378,27 +628,12 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
 
         public int GetHeatingSolarPowerProductionWhToday()
         {
-            return (int)(GetHeatingSolarPowerProductionDay().FirstOrDefault() * 1000d);
+            return (int)(GetHeatingSolarPowerProduction().FirstOrDefault() * 1000d);
         }
 
-        public IEnumerable<double> GetHeatingSolarPowerProductionDay()
+        public IEnumerable<double> GetHeatingSolarPowerProduction(Resolution resolution = Resolution.Day)
         {
-            return GetProperties(FeatureName.Name.HeatingSolarPowerProduction)?.Day?.Value ?? new List<double>();
-        }
-
-        public IEnumerable<double> GetHeatingSolarPowerProductionWeek()
-        {
-            return GetProperties(FeatureName.Name.HeatingSolarPowerProduction)?.Week?.Value ?? new List<double>();
-        }
-
-        public IEnumerable<double> GetHeatingSolarPowerProductionMonth()
-        {
-            return GetProperties(FeatureName.Name.HeatingSolarPowerProduction)?.Month?.Value ?? new List<double>();
-        }
-
-        public IEnumerable<double> GetHeatingSolarPowerProductionYear()
-        {
-            return GetProperties(FeatureName.Name.HeatingSolarPowerProduction)?.Year?.Value ?? new List<double>();
+            return GetProperties(FeatureName.Name.HeatingSolarPowerProduction)?.SeriesByResolution(resolution)?.Value ?? new List<double>();
         }
 
         public string GetHeatingSolarPowerProductionUnit()
