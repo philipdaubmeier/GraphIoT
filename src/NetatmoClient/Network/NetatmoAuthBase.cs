@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
-using PhilipDaubmeier.NetatmoClient.Model;
+﻿using PhilipDaubmeier.NetatmoClient.Model;
 using PhilipDaubmeier.NetatmoClient.Model.Auth;
 using PhilipDaubmeier.NetatmoClient.Network;
 using System;
@@ -8,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 

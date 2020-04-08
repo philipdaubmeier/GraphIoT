@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.SonnenClient.Model
 {
@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
     {
         public SiteRelationshipList? Sites { get; set; }
 
-        [JsonProperty("default-site")]
+        [JsonPropertyName("default-site")]
         public SiteRelationshipSingle? DefaultSite { get; set; }
     }
 

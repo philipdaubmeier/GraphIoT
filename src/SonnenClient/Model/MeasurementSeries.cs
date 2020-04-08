@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.SonnenClient.Model
 {
@@ -8,7 +9,10 @@ namespace PhilipDaubmeier.SonnenClient.Model
         public string MeasurementMethod { get; set; } = string.Empty;
         public DateTime Start { get; set; } = DateTime.MinValue;
         public DateTime End { get; set; } = DateTime.MinValue;
+
+        [JsonConverter(typeof(ResolutionConverter))]
         public Resolution Resolution { get; set; } = "1s";
+
         public List<int?> ProductionPower { get; set; } = new List<int?>();
         public List<int?> ConsumptionPower { get; set; } = new List<int?>();
         public List<int?> DirectUsagePower { get; set; } = new List<int?>();

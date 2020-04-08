@@ -1,13 +1,11 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PhilipDaubmeier.SonnenClient.Model;
+﻿using PhilipDaubmeier.SonnenClient.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,8 +25,16 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
         private readonly HttpClient _client;
 
-        private static readonly IContractResolver _jsonResolver = new DefaultContractResolver { NamingStrategy = new SnakeCaseNamingStrategy() };
-        private static readonly JsonSerializer _jsonSerializer = new JsonSerializer() { ContractResolver = _jsonResolver };
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = new SnakeCaseNamingPolicy()
+        };
+
+        public class SnakeCaseNamingPolicy : JsonNamingPolicy
+        {
+            public override string ConvertName(string name) =>
+                string.Concat(name.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
+        }
 
         private class AuthState
         {
@@ -48,7 +54,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
                 CodeVerifier = random.GenerateCodeVerifier();
                 CodeChallenge = CodeVerifier.ToSHA256Base64UrlSafe();
                 CodeChallengeMethod = "S256";
-                State = JsonConvert.SerializeObject(new { s = new { url = stateUrl }, v = CodeVerifier }).ToBase64UrlSafe();
+                State = JsonSerializer.Serialize<object>(new { s = new { url = stateUrl }, v = CodeVerifier }).ToBase64UrlSafe();
             }
         }
 
@@ -91,9 +97,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         {
             var responseStream = await (await RequestSonnenApi(uri)).Content.ReadAsStreamAsync();
 
-            using var sr = new StreamReader(responseStream);
-            using var jsonTextReader = new JsonTextReader(sr);
-            return _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.ContainedData;
+            return (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.ContainedData;
         }
 
         /// <summary>
@@ -231,7 +235,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
             var responseUri = response.RequestMessage.RequestUri;
             var querystring = responseUri.ParseQueryString();
-            if (!querystring.Keys.Cast<string>().Contains("code"))
+            if (!querystring.ContainsKey("code"))
                 throw new IOException("Response redirect uri does not contain the authorization code in its querystring.");
 
             var code = querystring["code"];
@@ -284,21 +288,18 @@ namespace PhilipDaubmeier.SonnenClient.Network
         {
             response.EnsureSuccessStatusCode();
 
-            var definition = new
-            {
-                access_token = "",
-                token_type = "",
-                expires_in = 0,
-                refresh_token = "",
-                created_at = 0
-            };
-
             try
             {
-                var tokenResponse = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
+                var tokenResponse = await JsonSerializer.DeserializeAsync<AccessTokenResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions);
 
-                var expiry = DateTimeOffset.FromUnixTimeSeconds(tokenResponse.created_at).UtcDateTime.ToLocalTime().AddSeconds(tokenResponse.expires_in);
-                await _provider.AuthData.UpdateTokenAsync(tokenResponse.access_token, expiry, tokenResponse.refresh_token);
+                if (tokenResponse.AccessToken == null)
+                    throw new IOException("No access token present in response");
+
+                if (tokenResponse.RefreshToken == null)
+                    throw new IOException("No refesh token present in response");
+
+                var expiry = DateTimeOffset.FromUnixTimeSeconds(tokenResponse.CreatedAt).UtcDateTime.ToLocalTime().AddSeconds(tokenResponse.ExpiresIn);
+                await _provider.AuthData.UpdateTokenAsync(tokenResponse.AccessToken, expiry, tokenResponse.RefreshToken);
             }
             catch (Exception ex)
             {
