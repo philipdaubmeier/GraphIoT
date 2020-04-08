@@ -106,7 +106,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _scale.GetHashCode();
+            return HashCode.Combine(_scale);
         }
 
         public override string ToString()

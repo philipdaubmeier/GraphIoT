@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
 {
     public class NetatmoWebClientTest
     {
-        private static ModuleId _moduleId = "12:34:56:78:9a:bc";
+        private static readonly ModuleId _moduleId = "12:34:56:78:9a:bc";
 
         [Fact]
         public async Task TestGetWeatherStationMainModuleInfo()

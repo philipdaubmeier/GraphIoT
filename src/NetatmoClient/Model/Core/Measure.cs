@@ -116,7 +116,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _measure.GetHashCode();
+            return HashCode.Combine(_measure);
         }
 
         public override string ToString()
