@@ -1,13 +1,13 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Diagnostics;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
     [DebuggerDisplay("Feature {Name,nq}")]
     public class Feature
     {
-        [JsonProperty("feature")]
+        [JsonPropertyName("feature")]
         public string? Name { get; set; }
         public bool? IsEnabled { get; set; }
         public bool? IsReady { get; set; }

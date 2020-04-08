@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PhilipDaubmeier.ViessmannClient.Model;
+﻿using PhilipDaubmeier.ViessmannClient.Model;
 using PhilipDaubmeier.ViessmannClient.Model.Auth;
 using PhilipDaubmeier.ViessmannClient.Model.Error;
 using System;
@@ -9,6 +7,7 @@ using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,12 +26,9 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
-        private readonly JsonSerializer _jsonSerializer = new JsonSerializer()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new CamelCaseNamingStrategy()
-            }
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
         public ViessmannAuthBase(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
@@ -40,6 +36,8 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             _connectionProvider = connectionProvider;
             _client = connectionProvider.Client;
             _authClient = connectionProvider.AuthClient;
+
+            _jsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
         }
 
         /// <summary>
@@ -74,9 +72,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             var responseString = await (await RequestViessmannApi(uri)).Content.ReadAsStringAsync();
 
-            using var sr = new StringReader(responseString);
-            using var jsonTextReader = new JsonTextReader(sr);
-            var result = _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader);
+            var result = JsonSerializer.Deserialize<TWiremessage>(responseString, _jsonSerializerOptions);
             if (result?.Data == null)
                 throw ExtractErrorMessage(responseString);
 
@@ -85,9 +81,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
         private Exception ExtractErrorMessage(string payload)
         {
-            using var sr = new StringReader(payload);
-            using var jsonTextReader = new JsonTextReader(sr);
-            var errorResponse = _jsonSerializer.Deserialize<ErrorPayload>(jsonTextReader);
+            var errorResponse = JsonSerializer.Deserialize<ErrorPayload>(payload, _jsonSerializerOptions);
 
             var resetTime = errorResponse?.ExtendedPayload?.LimitReset != null ? (DateTimeOffset?)DateTimeOffset.FromUnixTimeMilliseconds(errorResponse.ExtendedPayload.LimitReset.Value) : null;
 
@@ -170,9 +164,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             var responseStream = await response.Content.ReadAsStreamAsync();
 
-            using var sr = new StreamReader(responseStream);
-            using var jsonTextReader = new JsonTextReader(sr);
-            var authRaw = _jsonSerializer.Deserialize<AccessTokenResponse>(jsonTextReader);
+            var authRaw = await JsonSerializer.DeserializeAsync<AccessTokenResponse>(responseStream, _jsonSerializerOptions);
             if (authRaw?.AccessToken == null || authRaw?.ExpiresIn == null)
                 throw new Exception("Could not parse token.");
 
