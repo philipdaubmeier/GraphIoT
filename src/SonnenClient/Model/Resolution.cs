@@ -29,6 +29,11 @@ namespace PhilipDaubmeier.SonnenClient.Model
             _resolution = new TimeSpan(0, h, m, s, ms);
         }
 
+        public override string ToString()
+        {
+            return _original.ToString();
+        }
+
         public static implicit operator Resolution(string resolution)
         {
             return new Resolution(resolution);
