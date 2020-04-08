@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                                     ""place"": {
                                         ""city"": ""Unittest Town"",
                                         ""country"": ""EN"",
-                                        ""timezone"": ""America/New_York"",
+                                        ""timezone"": ""America/New_York""
                                     },
                                     ""cameras"": [
                                         {

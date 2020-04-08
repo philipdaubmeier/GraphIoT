@@ -54,7 +54,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                     @"{
                         ""access_token"": """ + AppToken + @""",
                         ""expires_in"": 36000,
-                        ""refresh_token"": """ + RefreshToken + @""",
+                        ""refresh_token"": """ + RefreshToken + @"""
                     }");
 
             mockHttp.When($"{BaseUri}/oauth2/token")
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                     @"{
                         ""access_token"": """ + AppToken + @""",
                         ""expires_in"": 36000,
-                        ""refresh_token"": """ + RefreshToken + @""",
+                        ""refresh_token"": """ + RefreshToken + @"""
                     }");
 
             return mockHttp;
