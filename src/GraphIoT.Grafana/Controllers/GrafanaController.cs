@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.Parsers;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
@@ -245,7 +244,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
             return Json(eventViewModel.Events.Select(item => new
             {
                 annotation = annotationInfo.annotation.name,
-                time = Instant.FromDateTimeUtc(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
+                time = new DateTimeOffset(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
                 title = item.Title,
                 tags = item.Tags,
                 text = item.Text

@@ -1,5 +1,4 @@
-﻿using NodaTime;
-using PhilipDaubmeier.DigitalstromClient.Model.Core;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
 using System.Collections.Generic;
 
@@ -22,6 +21,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.PropertyTree
         public double Value { get; set; }
         public long Time { get; set; }
 
-        public DateTime Timestamp { get { return Instant.FromUnixTimeSeconds(Time).ToDateTimeUtc().ToLocalTime(); } }
+        public DateTime Timestamp { get { return DateTimeOffset.FromUnixTimeSeconds(Time).UtcDateTime.ToLocalTime(); } }
     }
 }

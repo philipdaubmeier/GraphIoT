@@ -1,5 +1,4 @@
-﻿using NodaTime;
-using PhilipDaubmeier.DigitalstromClient.Model.Core;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using RichardSzalay.MockHttp;
 using System;
 using System.Collections.Generic;
@@ -66,7 +65,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
                                           {
                                               ""ZoneID"": 32027,
                                               ""sensor"": [" + string.Join(',', Enumerable.Range(0, valueCount)
-                                                  .Select(x => new Tuple<int, long>(x, Instant.FromDateTimeUtc(DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x))).ToUnixTimeSeconds()))
+                                                  .Select(x => new Tuple<int, long>(x, new DateTimeOffset(DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x))).ToUnixTimeSeconds()))
                                                   .Select(x => @"
                                                   {
                                                       ""type"": 9,
@@ -141,7 +140,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
                                           ""resolution"": ""1"",
                                           ""values"": [" + string.Join(',', Enumerable.Range(0, valueCount).Select(x => @"
                                               [
-                                                  " + Instant.FromDateTimeUtc(DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x))).ToUnixTimeSeconds() + @",
+                                                  " + new DateTimeOffset(DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x))).ToUnixTimeSeconds() + @",
                                                   " + (dsuid.StartsWith("9") ? 89 + x : 7 + x * 2) + @"
                                               ]")) + @"
                                           ]

@@ -1,5 +1,4 @@
-﻿using NodaTime;
-using PhilipDaubmeier.CompactTimeSeries;
+﻿using PhilipDaubmeier.CompactTimeSeries;
 using System;
 
 namespace PhilipDaubmeier.GraphIoT.Core.Parsers
@@ -22,8 +21,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
 
             if (long.TryParse(begin, out long beginMillis) && long.TryParse(end, out long endMillis))
             {
-                span = new TimeSeriesSpan(Instant.FromUnixTimeMilliseconds(beginMillis).ToDateTimeUtc(),
-                    Instant.FromUnixTimeMilliseconds(endMillis).ToDateTimeUtc(), countParsed);
+                span = new TimeSeriesSpan(DateTimeOffset.FromUnixTimeMilliseconds(beginMillis).UtcDateTime,
+                    DateTimeOffset.FromUnixTimeMilliseconds(endMillis).UtcDateTime, countParsed);
                 return true;
             }
 

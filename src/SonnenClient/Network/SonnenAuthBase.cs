@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using NodaTime;
 using PhilipDaubmeier.SonnenClient.Model;
 using System;
 using System.Collections.Generic;
@@ -298,7 +297,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
             {
                 var tokenResponse = JsonConvert.DeserializeAnonymousType(await response.Content.ReadAsStringAsync(), definition);
 
-                var expiry = Instant.FromUnixTimeSeconds(tokenResponse.created_at).ToDateTimeUtc().ToLocalTime().AddSeconds(tokenResponse.expires_in);
+                var expiry = DateTimeOffset.FromUnixTimeSeconds(tokenResponse.created_at).UtcDateTime.ToLocalTime().AddSeconds(tokenResponse.expires_in);
                 await _provider.AuthData.UpdateTokenAsync(tokenResponse.access_token, expiry, tokenResponse.refresh_token);
             }
             catch (Exception ex)

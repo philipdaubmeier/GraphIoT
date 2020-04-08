@@ -1,5 +1,4 @@
-﻿using NodaTime;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
+﻿using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.HomeData;
 using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
 using PhilipDaubmeier.NetatmoClient.Network;
@@ -71,8 +70,8 @@ namespace PhilipDaubmeier.NetatmoClient
                 ("module_id", (string)moduleId),
                 ("scale", scale?.ToString() ?? new Scale(MeasureScale.ScaleMax).ToString()),
                 ("type", string.Join(',', types.Select(t => t.ToString()))),
-                ("date_begin", !dateBegin.HasValue ? null : Instant.FromDateTimeUtc(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
-                ("date_end", !dateEnd.HasValue ? null : Instant.FromDateTimeUtc(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
+                ("date_begin", !dateBegin.HasValue ? null : new DateTimeOffset(dateBegin.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
+                ("date_end", !dateEnd.HasValue ? null : new DateTimeOffset(dateEnd.Value.ToUniversalTime()).ToUnixTimeSeconds().ToString()),
                 ("limit", !limit.HasValue ? null : Math.Max(0, Math.Min(1024, limit.Value)).ToString()),
                 ("real_time", realTime?.ToString())
             }), types);

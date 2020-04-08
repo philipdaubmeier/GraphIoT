@@ -1,4 +1,3 @@
-using NodaTime;
 using PhilipDaubmeier.CompactTimeSeries;
 using System;
 using Xunit;
@@ -20,8 +19,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers.Tests
             var beginTime = DateTime.UtcNow;
             var endTime = beginTime.AddDays(1);
 
-            var begin = Instant.FromDateTimeUtc(beginTime).ToUnixTimeMilliseconds().ToString();
-            var end = Instant.FromDateTimeUtc(endTime).ToUnixTimeMilliseconds().ToString();
+            var begin = new DateTimeOffset(beginTime).ToUnixTimeMilliseconds().ToString();
+            var end = new DateTimeOffset(endTime).ToUnixTimeMilliseconds().ToString();
 
             Assert.Equal(expectedParsingResult, TimeSeriesSpanParser.TryParse(begin, end, countIn, out TimeSeriesSpan span));
 

@@ -1,5 +1,4 @@
-﻿using NodaTime;
-using PhilipDaubmeier.CompactTimeSeries;
+﻿using PhilipDaubmeier.CompactTimeSeries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
     public class GraphViewModel
     {
         public DateTime Begin { get; set; }
-        public long BeginUnixTimestamp => Instant.FromDateTimeUtc(Begin.ToUniversalTime()).ToUnixTimeMilliseconds();
+        public long BeginUnixTimestamp => new DateTimeOffset(Begin.ToUniversalTime()).ToUnixTimeMilliseconds();
 
         public TimeSpan Spacing { get; set; }
         public long SpacingMillis => (long)Spacing.TotalMilliseconds;
@@ -21,7 +20,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         public GraphViewModel()
         {
-            Begin = Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc();
+            Begin = DateTimeOffset.FromUnixTimeMilliseconds(0).UtcDateTime;
             Spacing = TimeSpan.FromMilliseconds(0);
             Name = string.Empty;
             Key = string.Empty;
@@ -50,7 +49,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
             Name = name ?? string.Empty;
             Key = key ?? string.Empty;
             Format = format ?? string.Empty;
-            Begin = Max(FindBegin(timeseries), Instant.FromUnixTimeMilliseconds(0).ToDateTimeUtc());
+            Begin = Max(FindBegin(timeseries), DateTimeOffset.FromUnixTimeMilliseconds(0).UtcDateTime);
             Spacing = timeseries.Span.Duration;
             Points = timeseries.Trimmed().Cast<dynamic>().ToList();
         }

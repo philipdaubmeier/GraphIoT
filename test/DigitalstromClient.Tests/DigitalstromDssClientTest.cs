@@ -1,4 +1,3 @@
-using NodaTime;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.DigitalstromDssMock;
@@ -621,7 +620,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Tests
             Assert.Equal(1, result.Resolution);
             Assert.Equal(50, result.Values.Count);
             Assert.Equal(2, result.Values[0].Count);
-            Assert.Equal(Instant.FromDateTimeUtc(DateTime.UtcNow.AddSeconds(-50)).ToUnixTimeSeconds(), result.Values[0][0]);
+            Assert.Equal(new DateTimeOffset(DateTime.UtcNow.AddSeconds(-50)).ToUnixTimeSeconds(), result.Values[0][0]);
             Assert.Equal(89, result.Values[0][1]);
         }
 
