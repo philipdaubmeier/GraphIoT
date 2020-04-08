@@ -1,11 +1,12 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
+﻿using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
 {
     public class Camera
     {
+        [JsonConverter(typeof(ModuleIdConverter))]
         public ModuleId Id { get; set; } = string.Empty;
 
         [JsonConverter(typeof(UnixDateTimeConverter))]

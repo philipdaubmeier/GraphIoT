@@ -1,18 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model
 {
     internal class SecondsTimeSpanConverter : JsonConverter<TimeSpan>
     {
-        public override void WriteJson(JsonWriter writer, TimeSpan value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, TimeSpan value, JsonSerializerOptions options)
         {
-            writer.WriteValue((int)value.TotalSeconds);
+            writer.WriteNumberValue((int)value.TotalSeconds);
         }
 
-        public override TimeSpan ReadJson(JsonReader reader, Type objectType, TimeSpan existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override TimeSpan Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new TimeSpan(0, 0, (int)Math.Min(int.MaxValue, (long)(reader.Value ?? 0)));
+            return new TimeSpan(0, 0, Math.Min(int.MaxValue, reader.GetInt32()));
         }
     }
 }

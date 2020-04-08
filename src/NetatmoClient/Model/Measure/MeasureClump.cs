@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
+﻿using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
 {

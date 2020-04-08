@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 using PhilipDaubmeier.NetatmoClient.Model;
 using PhilipDaubmeier.NetatmoClient.Model.Auth;
 using PhilipDaubmeier.NetatmoClient.Network;
@@ -24,19 +24,24 @@ namespace PhilipDaubmeier.NetatmoClient
 
         private readonly HttpClient _client;
 
-        private readonly JsonSerializer _jsonSerializer = new JsonSerializer()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
         {
-            ContractResolver = new DefaultContractResolver
-            {
-                NamingStrategy = new SnakeCaseNamingStrategy()
-            }
+            PropertyNamingPolicy = new SnakeCaseNamingPolicy()
         };
+
+        public class SnakeCaseNamingPolicy : JsonNamingPolicy
+        {
+            public override string ConvertName(string name) =>
+                string.Concat(name.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
+        }
 
         public NetatmoAuthBase(INetatmoConnectionProvider connectionProvider)
         {
             _provider = connectionProvider;
             _authData = _provider.AuthData;
             _client = _provider.Client;
+
+            _jsonSerializerOptions.Converters.Add(new MeasureConverter());
         }
 
         /// <summary>
@@ -67,9 +72,7 @@ namespace PhilipDaubmeier.NetatmoClient
         {
             var responseStream = await (await RequestNetatmoApi(uri, parameters)).Content.ReadAsStreamAsync();
 
-            using var sr = new StreamReader(responseStream);
-            using var jsonTextReader = new JsonTextReader(sr);
-            var result = _jsonSerializer.Deserialize<TWiremessage>(jsonTextReader)?.Body;
+            var result = (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.Body;
             if (result == null)
                 throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
 
@@ -143,11 +146,7 @@ namespace PhilipDaubmeier.NetatmoClient
             var postData = FormContentFromList(postParameters);
             var responseMessage = await _client.PostAsync(new Uri(new Uri(_baseUri), "/oauth2/token"), postData);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
-
-            AccessTokenResponse? responseData = null;
-            using (var sr = new StreamReader(responseStream))
-            using (var jsonTextReader = new JsonTextReader(sr))
-                responseData = _jsonSerializer.Deserialize<AccessTokenResponse>(jsonTextReader);
+            var responseData = await JsonSerializer.DeserializeAsync<AccessTokenResponse>(responseStream, _jsonSerializerOptions);
 
             await _authData.UpdateTokenAsync(responseData?.AccessToken, DateTime.UtcNow.AddSeconds(responseData?.ExpiresIn ?? 0), responseData?.RefreshToken);
         }

@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.HomeData
 {

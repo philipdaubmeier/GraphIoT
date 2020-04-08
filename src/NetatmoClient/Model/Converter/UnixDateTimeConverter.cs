@@ -1,18 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model
 {
     internal class UnixDateTimeConverter : JsonConverter<DateTime>
     {
-        public override void WriteJson(JsonWriter writer, DateTime value, JsonSerializer serializer)
+        public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
-            writer.WriteValue(new DateTimeOffset(value.ToUniversalTime()).ToUnixTimeSeconds());
+            writer.WriteNumberValue(new DateTimeOffset(value.ToUniversalTime()).ToUnixTimeSeconds());
         }
 
-        public override DateTime ReadJson(JsonReader reader, Type objectType, DateTime existingValue, bool hasExistingValue, JsonSerializer serializer)
+        public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return DateTimeOffset.FromUnixTimeSeconds((long)(reader.Value ?? 0)).UtcDateTime;
+            return DateTimeOffset.FromUnixTimeSeconds(reader.GetInt64()).UtcDateTime;
         }
     }
 }

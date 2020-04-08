@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
@@ -9,6 +9,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         [JsonConverter(typeof(UnixDateTimeConverter))]
         public DateTime TimeUtc { get; set; }
 
+        [JsonPropertyName("Temperature")]
         public double? Temperature { get; set; }
         public string TempTrend { get; set; } = string.Empty;
 
@@ -21,22 +22,28 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public double? MinTemp { get; set; }
         public double? MaxTemp { get; set; }
 
+        [JsonPropertyName("Humidity")]
         public int? Humidity { get; set; }
 
-        [JsonProperty("CO2")]
+        [JsonPropertyName("CO2")]
         public int? CO2 { get; set; }
+
+        [JsonPropertyName("Pressure")]
         public double? Pressure { get; set; }
 
-        [JsonProperty("AbsolutePressure")]
+        [JsonPropertyName("AbsolutePressure")]
         public double? AbsolutePressure { get; set; }
+
+        [JsonPropertyName("Noise")]
         public int? Noise { get; set; }
 
+        [JsonPropertyName("Rain")]
         public double? Rain { get; set; }
 
-        [JsonProperty("sum_rain_1")]
+        [JsonPropertyName("sum_rain_1")]
         public double? SumRain1 { get; set; }
 
-        [JsonProperty("sum_rain_24")]
+        [JsonPropertyName("sum_rain_24")]
         public double? SumRain24 { get; set; }
 
         public int? WindAngle { get; set; }

@@ -1,13 +1,14 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.NetatmoClient.Model.Core;
+﻿using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
 {
     public class ModuleBase
     {
-        [JsonProperty("_id")]
+        [JsonPropertyName("_id")]
+        [JsonConverter(typeof(ModuleIdConverter))]
         public ModuleId Id { get; set; } = string.Empty;
 
         [JsonConverter(typeof(UnixDateTimeConverter))]
