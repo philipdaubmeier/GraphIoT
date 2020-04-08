@@ -1,6 +1,8 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,6 +24,18 @@ namespace PhilipDaubmeier.SonnenClient.Network
         public static string ToSHA256Base64UrlSafe(this string str)
         {
             return new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(str)).ToBase64UrlSafe();
+        }
+
+        public static Dictionary<string, string> ParseQueryString(this Uri uri)
+        {
+            var querystring = uri.ToString().Substring(uri.ToString().IndexOf('?') + 1);
+            var pairs = querystring.Split('&');
+            var dict = pairs.Select(pair =>
+            {
+                var valuePair = pair.Split('=', 2);
+                return new KeyValuePair<string, string>(valuePair[0], valuePair.Length <= 1 ? string.Empty : valuePair[1]);
+            }).ToDictionary((kvp) => kvp.Key, (kvp) => kvp.Value);
+            return dict;
         }
 
         public static string ReadHiddenHtmlInputValue(this string htmlPage, string name)
