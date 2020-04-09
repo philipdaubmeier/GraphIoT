@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Auth
         public string? AccessToken { get; set; }
 
         [JsonPropertyName("expires_in")]
-        public string? ExpiresIn { get; set; }
+        public int ExpiresIn { get; set; }
 
         [JsonPropertyName("token_type")]
         public string? TokenType { get; set; }

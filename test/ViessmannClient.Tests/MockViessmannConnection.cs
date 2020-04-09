@@ -54,7 +54,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             mockHttp.When($"{_tokenUri}")
                     .Respond("application/json", @"{
                                   ""access_token"": """ + AppToken + @""",
-                                  ""expires_in"": ""36000"",
+                                  ""expires_in"": 36000,
                                   ""token_type"": ""Bearer""
                               }");
 

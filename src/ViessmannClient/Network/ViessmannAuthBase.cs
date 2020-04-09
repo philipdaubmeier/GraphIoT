@@ -168,7 +168,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             if (authRaw?.AccessToken == null || authRaw?.ExpiresIn == null)
                 throw new Exception("Could not parse token.");
 
-            return new Tuple<string, DateTime>(authRaw.AccessToken, DateTime.Now.AddSeconds(int.Parse(authRaw.ExpiresIn)));
+            return new Tuple<string, DateTime>(authRaw.AccessToken, DateTime.Now.AddSeconds(authRaw.ExpiresIn));
         }
 
         public void Dispose()
