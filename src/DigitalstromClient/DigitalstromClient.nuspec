@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Digitalstrom Server (DSS) RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+1.5.0 - moved to System.Text.Json and removed dependency to Json.NET
 1.4.0 - upgraded to target framework netcoreapp3.1
 1.3.0 - new package without pre-release dependencies.
 1.2.0-beta1 - added support for HttpClientFactory and Polly. Enabled non-nullable reference types.
