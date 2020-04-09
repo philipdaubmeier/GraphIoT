@@ -68,13 +68,13 @@ Follow these steps to set up the development environment, publish the applicatio
 
 ## Platform Support
 
-GraphIoT is compiled for .NET Core 3.0.
+GraphIoT is compiled for .NET Core 3.1.
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2019 Philip Daubmeier
+Copyright (c) 2019-2020 Philip Daubmeier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
