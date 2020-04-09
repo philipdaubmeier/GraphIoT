@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using PhilipDaubmeier.GraphIoT.Core.Database.Util;
 using System;
 using System.Collections.Generic;
@@ -7,6 +6,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,8 +17,6 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
     {
         private readonly TDbContext db;
 
-        private readonly JsonSerializer _jsonSerializer = new JsonSerializer();
-
         public DatabaseBackupService(TDbContext databaseContext)
         {
             db = databaseContext;
@@ -25,19 +24,19 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         public class BackupRoot
         {
-            [JsonProperty("tables")]
+            [JsonPropertyName("tables")]
             public List<BackupTable> Tables { get; set; } = null!;
         }
 
         public class BackupTable
         {
-            [JsonProperty("table")]
+            [JsonPropertyName("table")]
             public string Table { get; set; } = null!;
 
-            [JsonProperty("columns")]
+            [JsonPropertyName("columns")]
             public List<string> Columns { get; set; } = null!;
 
-            [JsonProperty("rows")]
+            [JsonPropertyName("rows")]
             public List<List<object?>> Rows { get; set; } = null!;
         }
 
@@ -63,10 +62,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         /// </summary>
         public async Task RestoreBackup(Stream backupToLoad, CancellationToken cancellationToken = default)
         {
-            BackupRoot? backupData = null;
-            using (var sr = new StreamReader(backupToLoad))
-            using (var jsonTextReader = new JsonTextReader(sr))
-                backupData = _jsonSerializer.Deserialize<BackupRoot>(jsonTextReader);
+            var backupData = await JsonSerializer.DeserializeAsync<BackupRoot>(backupToLoad);
 
             if (backupData is null)
                 throw new IOException("Backup could not be parsed - wrong format");
