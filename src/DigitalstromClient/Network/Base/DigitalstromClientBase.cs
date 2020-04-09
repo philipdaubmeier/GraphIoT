@@ -1,16 +1,35 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.DigitalstromClient.Model;
+﻿using PhilipDaubmeier.DigitalstromClient.Model;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Network
 {
     public abstract class DigitalstromClientBase : IDisposable
     {
-        private readonly JsonSerializer _jsonSerializer = new JsonSerializer();
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            PropertyNameCaseInsensitive = true
+        };
+
+        private readonly List<JsonConverter> _jsonConverters = new List<JsonConverter>()
+        {
+            new DateTimeConverter(),
+            new DsuidConverter(),
+            new GroupNameConverter(),
+            new IntWrapperConverter<Group>(x => x, x => x),
+            new IntWrapperConverter<Scene>(x => x, x => x),
+            new IntWrapperConverter<Sensor>(x => x, x => x),
+            new IntWrapperConverter<Zone>(x => x, x => x),
+        };
+
         private readonly UriPriorityList _baseUris;
         private readonly HttpClient _client;
         private Task? _initializeTask;
@@ -25,6 +44,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             _baseUris = connectionProvider.Uris.DeepClone();
             _client = connectionProvider.HttpClient;
 
+            foreach (var converter in _jsonConverters)
+                _jsonSerializerOptions.Converters.Add(converter);
+            
             _initializeTask = Initialize();
         }
 
@@ -118,9 +140,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             var responseMessage = await _client.GetAsync(requestUri);
             var responseStream = await responseMessage.Content.ReadAsStreamAsync();
 
-            using var sr = new StreamReader(responseStream);
-            using var jsonTextReader = new JsonTextReader(sr);
-            return _jsonSerializer.Deserialize<Wiremessage<T>>(jsonTextReader);
+            return await JsonSerializer.DeserializeAsync<Wiremessage<T>>(responseStream, _jsonSerializerOptions);
         }
 
         public void Dispose()
