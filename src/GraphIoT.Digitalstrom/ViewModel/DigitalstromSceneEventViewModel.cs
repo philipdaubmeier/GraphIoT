@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using PhilipDaubmeier.DigitalstromClient.Model.Core;
+﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -7,11 +6,31 @@ using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 {
     public class DigitalstromSceneEventViewModel : EventCollectionViewModel
     {
+        private class EventQuery
+        {
+            [JsonPropertyName("event_names")]
+            public List<string> EventNames { get; set; }
+
+            [JsonPropertyName("meter_ids")]
+            public List<string> MeterIds { get; set; }
+
+            [JsonPropertyName("zone_ids")]
+            public List<int> ZoneIds { get; set; }
+
+            [JsonPropertyName("group_ids")]
+            public List<int> GroupIds { get; set; }
+
+            [JsonPropertyName("scene_ids")]
+            public List<int> SceneIds { get; set; }
+        };
+
         private readonly IDigitalstromDbContext _db;
         private readonly IDigitalstromStructureService _dsStructure;
 
@@ -36,26 +55,17 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
             try
             {
-                var definitionQuery = new
-                {
-                    event_names = new List<string>(),
-                    meter_ids = new List<string>(),
-                    zone_ids = new List<int>(),
-                    group_ids = new List<int>(),
-                    scene_ids = new List<int>()
-                };
+                var query = JsonSerializer.Deserialize<EventQuery>(Query);
 
-                var query = JsonConvert.DeserializeAnonymousType(Query, definitionQuery);
-
-                var zonesFromMeters = query?.meter_ids?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
+                var zonesFromMeters = query?.MeterIds?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
                     ?.SelectMany(circuit => _dsStructure.GetCircuitZones(circuit)).ToList() ?? new List<Zone>();
-                var zones = (query?.zone_ids?.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
+                var zones = (query?.ZoneIds.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
 
                 filtered = events
-                    .Where(x => query?.event_names?.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase) ?? true)
+                    .Where(x => query?.EventNames?.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase) ?? true)
                     .Where(x => zones.Contains(x.Properties.ZoneID))
-                    .Where(x => query?.group_ids.Contains(x.Properties.GroupID) ?? true)
-                    .Where(x => query?.scene_ids.Contains(x.Properties.SceneID) ?? true)
+                    .Where(x => query?.GroupIds.Contains(x.Properties.GroupID) ?? true)
+                    .Where(x => query?.SceneIds.Contains(x.Properties.SceneID) ?? true)
                     .ToList();
             }
             catch
