@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.Parsers;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Grafana.Model;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -84,80 +83,22 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [HttpPost("query")]
         public async Task<ActionResult> Query()
         {
-            var definition = new
-            {
-                timezone = "",
-                panelId = (int?)0,
-                dashboardId = (int?)0,
-                range = new
-                {
-                    from = "",
-                    to = "",
-                    raw = new
-                    {
-                        from = "",
-                        to = ""
-                    }
-                },
-                rangeRaw = new
-                {
-                    from = "",
-                    to = ""
-                },
-                interval = "",
-                intervalMs = 0L,
-                targets = new[] { new
-                {
-                    data = new
-                    {
-                        rawMetricId = "",
-                        filterIfNoneOf = new List<string>(),
-                        aggregate = new
-                        {
-                            interval = "",
-                            func = ""
-                        },
-                        correction = new
-                        {
-                            factor = 0d,
-                            offset = 0d
-                        },
-                        overrideMaxDataPoints = (int?)0
-                    },
-                    target = "",
-                    refId = "",
-                    type = "timeserie"
-                } },
-                adhocFilters = new[] { new
-                {
-                    key = "",
-                    @operator = "=",
-                    value = ""
-                } },
-                format = "json",
-                maxDataPoints = 0
-            };
+            var query = await JsonSerializer.DeserializeAsync<GrafanaQuery>(Request.Body);
 
-            string body = string.Empty;
-            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
-                body = await reader.ReadToEndAsync();
-
-            var query = JsonConvert.DeserializeAnonymousType(body, definition);
-
-            if (!DateTime.TryParse(query.range.from, out DateTime fromDate) || !DateTime.TryParse(query.range.to, out DateTime toDate))
+            if (!DateTime.TryParse(query.Range.From, out DateTime fromDate) || !DateTime.TryParse(query.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
 
-            var span = new TimeSeriesSpan(fromDate.ToUniversalTime(), toDate.ToUniversalTime(), query.maxDataPoints);
+            var span = new TimeSeriesSpan(fromDate.ToUniversalTime(), toDate.ToUniversalTime(), query.MaxDataPoints);
 
             var data = new Dictionary<string, List<dynamic[]>>();
-            foreach (var target in query.targets)
+            foreach (var target in query.Targets)
             {
-                var targetId = target?.data?.rawMetricId ?? target?.target;
+                var targetId = target.Data?.RawMetricId ?? target?.Target;
                 if (string.IsNullOrEmpty(targetId))
                     continue;
 
                 // filter if the filterIfNoneOf list is present but the target is not contained
-                var filterIfNoneOf = target?.data?.filterIfNoneOf;
+                var filterIfNoneOf = target?.Data?.FilterIfNoneOf;
                 if (filterIfNoneOf != null && !filterIfNoneOf.Contains(targetId))
                     continue;
 
@@ -170,17 +111,17 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
 
                 // if a custom 'aggregate.interval' or 'overrideMaxDataPoints' was given, take that as time spacing
                 var targetSpan = span;
-                var spanOverride = target?.data?.aggregate?.interval?.ToTimeSpan();
+                var spanOverride = target?.Data?.Aggregate?.Interval?.ToTimeSpan();
                 if (spanOverride.HasValue && spanOverride.Value > span.Duration)
                     targetSpan = new TimeSeriesSpan(fromDate, toDate, spanOverride.Value);
-                else if (target?.data?.overrideMaxDataPoints.HasValue ?? false)
-                    targetSpan = new TimeSeriesSpan(fromDate, toDate, target?.data?.overrideMaxDataPoints ?? 1);
+                else if (target?.Data?.OverrideMaxDataPoints.HasValue ?? false)
+                    targetSpan = new TimeSeriesSpan(fromDate, toDate, target?.Data?.OverrideMaxDataPoints ?? 1);
                 viewModel.Span = targetSpan;
 
                 // if a custom 'aggregate.func' was given, take that as aggregation method
                 Aggregator ToAggregator(string? aggregateRaw)
                 {
-                    return (aggregateRaw?.Substring(0, Math.Min(3, target?.data?.aggregate?.func?.Length ?? 0))?.ToLowerInvariant()) switch
+                    return (aggregateRaw?.Substring(0, Math.Min(3, target?.Data?.Aggregate?.Func?.Length ?? 0))?.ToLowerInvariant()) switch
                     {
                         "min" => Aggregator.Minimum,
                         "max" => Aggregator.Maximum,
@@ -189,14 +130,14 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                         _ => Aggregator.Default,
                     };
                 }
-                viewModel.AggregatorFunction = ToAggregator(target?.data?.aggregate?.func);
+                viewModel.AggregatorFunction = ToAggregator(target?.Data?.Aggregate?.Func);
 
                 // if a custom correction factor and/or offset was given, set them to get them taken into account
-                viewModel.CorrectionFactor = ((decimal?)target?.data?.correction?.factor) ?? 1M;
-                viewModel.CorrectionOffset = ((decimal?)target?.data?.correction?.offset) ?? 0M;
+                viewModel.CorrectionFactor = ((decimal?)target?.Data?.Correction?.Factor) ?? 1M;
+                viewModel.CorrectionOffset = ((decimal?)target?.Data?.Correction?.Offset) ?? 0M;
 
                 // add the resampled target graph to the result
-                data.Add(target?.target ?? targetId, viewModel.Graph(index).TimestampedPoints().ToList());
+                data.Add(target?.Target ?? targetId, viewModel.Graph(index).TimestampedPoints().ToList());
             }
 
             return Json(data.Select(d => new { target = d.Key, datapoints = d.Value }));
@@ -206,44 +147,18 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [HttpPost("annotations")]
         public async Task<ActionResult> AnnotationsAsync()
         {
-            var definition = new
-            {
-                range = new
-                {
-                    from = "",
-                    to = ""
-                },
-                rangeRaw = new
-                {
-                    from = "",
-                    to = ""
-                },
-                annotation = new
-                {
-                    name = "",
-                    datasource = "",
-                    iconColor = "",
-                    enable = true,
-                    query = ""
-                }
-            };
+            var annotationInfo = await JsonSerializer.DeserializeAsync<AnnotationQuery>(Request.Body);
 
-            string body = string.Empty;
-            using (StreamReader reader = new StreamReader(Request.Body, Encoding.UTF8))
-                body = await reader.ReadToEndAsync();
-
-            var annotationInfo = JsonConvert.DeserializeAnonymousType(body, definition);
-
-            if (!DateTime.TryParse(annotationInfo.range.from, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.range.to, out DateTime toDate))
+            if (!DateTime.TryParse(annotationInfo.Range.From, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
 
             var eventViewModel = eventViewModels.FirstOrDefault().Value;
             eventViewModel.Span = new TimeSeriesSpan(fromDate, toDate, 1);
-            eventViewModel.Query = annotationInfo.annotation.query;
+            eventViewModel.Query = annotationInfo.Annotation.Query;
 
             return Json(eventViewModel.Events.Select(item => new
             {
-                annotation = annotationInfo.annotation.name,
+                annotation = annotationInfo.Annotation.Name,
                 time = new DateTimeOffset(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
                 title = item.Title,
                 tags = item.Tags,
