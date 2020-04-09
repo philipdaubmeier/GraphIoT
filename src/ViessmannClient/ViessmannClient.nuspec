@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Viessmann Server interfaces. It supports RESTful Viessmann Plattform services, the Estrella server as well as the legacy Vitotrol SOAP service. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+1.7.1 - bug fixes
 1.7.0 - moved to System.Text.Json and removed dependency to Json.NET
 1.6.0 - upgraded to target framework netcoreapp3.1
 1.5.0 - breaking change: renamed and extended ViessmannPlatformClient interfaces. Added getter methods for strongly typed access of device properties.
