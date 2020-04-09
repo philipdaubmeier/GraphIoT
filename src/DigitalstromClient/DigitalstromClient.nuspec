@@ -19,11 +19,6 @@
     </releaseNotes>
     <copyright>Copyright 2019 Philip Daubmeier</copyright>
     <tags>digitalstrom ds smarthome httpclient</tags>
-    <dependencies>
-      <group targetFramework="netcoreapp3.1">
-        <dependency id="Newtonsoft.Json" version="12.0.3" />
-      </group>
-    </dependencies>
   </metadata>
   <files>
     <file src="bin\$configuration$\netcoreapp3.0\$id$.deps.json" target="lib\netcoreapp3.0" />
