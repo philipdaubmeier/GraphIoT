@@ -35,6 +35,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Reserved2 = 62,
         OutputCurrent16A = 64,
         ActivePowerVA = 65,
+        Temperature = 66,
+        Brightness = 67,
+        Humidity = 68,
+        WaterQuantity = 71,
+        WaterFlowRate = 72,
+        SunAzimuth = 76,
+        SunElevation = 77,
         NotUsed = 253,
         UnknownType = 255,
     };
@@ -47,7 +54,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         {
             int i = Math.Min(Math.Max(typeCode, 0), 255);
             if (i < 4 || i == 7 || i == 8 || i == 23 || i == 24 || (i > 22 && i < 25)
-                || (i > 25 && i < 50) || (i > 51 && i < 60) || i == 63 || (i > 65 && i < 253) || i == 254)
+                || (i > 25 && i < 50) || (i > 51 && i < 60) || i == 63 || (i > 68 && i < 71)
+                || (i > 72 && i < 76) || (i > 77 && i < 253) || i == 254)
                 i = 255;
             _type = (SensorType)i;
         }
@@ -168,6 +176,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 SensorType.Reserved2 => "SensorType 62: Reserved2",
                 SensorType.OutputCurrent16A => "SensorType 64: OutputCurrent16A",
                 SensorType.ActivePowerVA => "SensorType 65: ActivePowerVA",
+                SensorType.Temperature => "SensorType 66: Temperature",
+                SensorType.Brightness => "SensorType 67: Brightness",
+                SensorType.Humidity => "SensorType 68: Humidity",
+                SensorType.WaterQuantity => "SensorType 71: WaterQuantity",
+                SensorType.WaterFlowRate => "SensorType 72: WaterFlowRate",
+                SensorType.SunAzimuth => "SensorType 76: SunAzimuth",
+                SensorType.SunElevation => "SensorType 77: SunElevation",
                 SensorType.NotUsed => "SensorType 253: NotUsed",
                 SensorType.UnknownType => "SensorType 255: UnknownType",
                 _ => string.Format("SensorType {0}: Not defined!", _type),
