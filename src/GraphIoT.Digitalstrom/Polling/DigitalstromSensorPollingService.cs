@@ -51,7 +51,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             var readMidres = new Dictionary<Zone, Dictionary<Sensor, ITimeSeries<double>>>();
             foreach (var zone in sensorValues)
                 if (zone != null && zone.Sensor != null)
-                    readMidres.Add(zone.ZoneID, ReadAndSaveMidresZoneSensorValues(day, zone.ZoneID, zone.Sensor.ToDictionary(x => x.Type, x => x.Value), timestamp));
+                    readMidres.Add(zone.ZoneID, ReadAndSaveMidresZoneSensorValues(day, zone.ZoneID, zone.Sensor.GroupBy(x => x.Type, (key, group) => group.First()).ToDictionary(x => x.Type, x => x.Value), timestamp));
             _dbContext.SaveChanges();
 
             SaveLowresZoneSensorValues(readMidres);
