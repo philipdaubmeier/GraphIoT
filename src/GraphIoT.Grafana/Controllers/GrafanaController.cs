@@ -32,6 +32,11 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
     [Route("api/grafana")]
     public class GrafanaController : Controller
     {
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+
         private List<string>? graphIds = null;
         public List<string> GraphIds
         {
@@ -83,7 +88,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [HttpPost("query")]
         public async Task<ActionResult> Query()
         {
-            var query = await JsonSerializer.DeserializeAsync<GrafanaQuery>(Request.Body);
+            var query = await JsonSerializer.DeserializeAsync<GrafanaQuery>(Request.Body, _jsonSerializerOptions);
 
             if (!DateTime.TryParse(query.Range.From, out DateTime fromDate) || !DateTime.TryParse(query.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
@@ -147,7 +152,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [HttpPost("annotations")]
         public async Task<ActionResult> AnnotationsAsync()
         {
-            var annotationInfo = await JsonSerializer.DeserializeAsync<AnnotationQuery>(Request.Body);
+            var annotationInfo = await JsonSerializer.DeserializeAsync<AnnotationQuery>(Request.Body, _jsonSerializerOptions);
 
             if (!DateTime.TryParse(annotationInfo.Range.From, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
