@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
                                               ""values"": []
                                           },
                                           {
-                                              ""id"": " + ZoneIdKitchen + @",
+                                              ""id"": " + (int)ZoneIdKitchen + @",
                                               ""name"": ""Kitchen"",
                                               ""values"": [" + string.Join(',', Enumerable.Range(0, valueCount)
                                                   .Select(x => new Tuple<int, string>(x, DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x)).ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture)))
