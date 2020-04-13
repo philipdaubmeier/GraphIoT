@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Model
         public int? DashboardId { get; set; }
         public Range Range { get; set; } = new Range();
         public RangeRaw RangeRaw { get; set; } = new RangeRaw();
-        public string Interval { get; set; }
+        public string Interval { get; set; } = string.Empty;
         public long IntervalMs { get; set; }
         public List<TargetDefinition> Targets { get; set; } = new List<TargetDefinition>();
         public List<AdhocFilter>? AdhocFilters { get; set; } = new List<AdhocFilter>();
