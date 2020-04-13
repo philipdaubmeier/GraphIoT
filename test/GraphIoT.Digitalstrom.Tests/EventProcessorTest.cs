@@ -51,18 +51,20 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             // Turn off event sending
             mockHttp.AutoFlush = false;
             mockHttp.Flush();
-            await Task.Delay(200);
 
             // Change the returned event content and reset the database
             _factory.MockedEventResponse.Respond("application/json", SceneCommand.Alarm1.ToMockedSceneEvent());
             await _factory.InitDb();
+
+            await Task.Delay(200);
 
             mockHttp.Flush();
 
             await Task.Delay(200);
 
             storedEvents = db.DsSceneEventDataSet.FirstOrDefault()?.EventStream;
-            Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents?.Last().Properties.SceneID);
+            Assert.NotNull(storedEvents);
+            Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents.Last().Properties.SceneID);
         }
     }
 }
