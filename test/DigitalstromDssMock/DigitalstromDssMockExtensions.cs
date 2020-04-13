@@ -9,6 +9,8 @@ namespace PhilipDaubmeier.DigitalstromDssMock
 {
     public static class DigitalstromDssMockExtensions
     {
+        public static Zone ZoneIdKitchen => 32027;
+
         public static MockHttpMessageHandler AddSensorMocks(this MockHttpMessageHandler mockHttp, int resolution = 60 * 5, int valueCount = 1)
         {
             mockHttp.When($"{MockDigitalstromConnection.BaseUri}/json/apartment/getSensorValues")
@@ -30,7 +32,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
                                               ""values"": []
                                           },
                                           {
-                                              ""id"": 32027,
+                                              ""id"": " + ZoneIdKitchen + @",
                                               ""name"": ""Kitchen"",
                                               ""values"": [" + string.Join(',', Enumerable.Range(0, valueCount)
                                                   .Select(x => new Tuple<int, string>(x, DateTime.UtcNow.AddSeconds(-1 * resolution * (valueCount - x)).ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture)))

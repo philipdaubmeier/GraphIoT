@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             await Task.Delay(200);
 
             storedEvents = db.DsSceneEventDataSet.FirstOrDefault()?.EventStream;
-            Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents.Last().Properties.SceneID);
+            Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents?.Last().Properties.SceneID);
         }
     }
 }

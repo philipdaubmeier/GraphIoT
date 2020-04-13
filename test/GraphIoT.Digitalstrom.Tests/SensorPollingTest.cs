@@ -1,3 +1,4 @@
+using PhilipDaubmeier.DigitalstromDssMock;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -14,7 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
         }
 
         [Fact]
-        public async Task TestEnergyPollingService()
+        public async Task TestSensorPollingService()
         {
             // Create a client, which in turn creates the host with all hosted services
             // and the digitalstrom polling services will start running
@@ -24,26 +25,25 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             var db = await _factory.InitDb();
 
             // We should see that the database is empty at first, with no recorded data
-            Assert.Null(db.DsSensorDataSet.FirstOrDefault()?.TemperatureCurve);
-            Assert.Null(db.DsSensorDataSet.FirstOrDefault()?.HumidityCurve);
+            var sensorDataSet = db.DsSensorDataSet.Where(x => x.ZoneId == DigitalstromDssMockExtensions.ZoneIdKitchen).FirstOrDefault();
+            Assert.Null(sensorDataSet?.TemperatureCurve);
+            Assert.Null(sensorDataSet?.HumidityCurve);
 
             // After 100ms (see configured TimerInterval, plus buffer) the polling hosted service
             // should have written all values to the database that we have mocked with the test setup
             for (int i = 0; i < 100; i++)
             {
+                sensorDataSet = db.DsSensorDataSet.Where(x => x.ZoneId == DigitalstromDssMockExtensions.ZoneIdKitchen).FirstOrDefault();
                 await Task.Delay(100);
-                if (db.DsSensorDataSet.FirstOrDefault()?.TemperatureCurve != null
-                    && db.DsSensorDataSet.FirstOrDefault()?.HumidityCurve != null)
+                if (sensorDataSet?.TemperatureCurve != null && sensorDataSet?.HumidityCurve != null)
                     break;
             }
-            Assert.NotNull(db.DsSensorDataSet.FirstOrDefault()?.TemperatureCurve);
-            Assert.NotNull(db.DsSensorDataSet.FirstOrDefault()?.HumidityCurve);
+            Assert.NotNull(sensorDataSet?.TemperatureCurve);
+            Assert.NotNull(sensorDataSet?.HumidityCurve);
 
             // for both temperature und humidity values that we are mocking (see DigitalstromDssMockExtensions.AddSensorMocks)
-            var storedValuesTemperature = db.DsSensorDataSet.FirstOrDefault()?.TemperatureSeries;
-            var storedValuesHumidity = db.DsSensorDataSet.FirstOrDefault()?.HumiditySeries;
-            Assert.True(1 <= (storedValuesTemperature?.Trimmed()?.Count ?? 0));
-            Assert.True(1 <= (storedValuesHumidity?.Trimmed()?.Count ?? 0));
+            Assert.NotEmpty(sensorDataSet.TemperatureSeries.Trimmed());
+            Assert.NotEmpty(sensorDataSet.HumiditySeries.Trimmed());
         }
     }
 }
