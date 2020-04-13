@@ -106,7 +106,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         public void TestGetTypes()
         {
             var expected = new List<int>() { 4, 5, 6, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                20, 21, 22, 25, 50, 51, 60, 61, 62, 64, 65, 253, 255 };
+                20, 21, 22, 25, 50, 51, 60, 61, 62, 64, 65, 66, 67, 68, 71, 72, 76, 77, 253, 255 };
 
             Assert.Equal(expected.Select(x => (Sensor)x), Sensor.GetTypes());
 
