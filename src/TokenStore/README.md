@@ -80,13 +80,13 @@ You can also have a look at classes where TokenStore is used in GraphIoT, like [
 
 ## Platform Support
 
-CompactTimeSeries is compiled for .NET Core 3.1.
+CompactTimeSeries is targeted for .NET Standard 2.1 or higher.
 
 ## License
 
 The MIT License (MIT)
 
-Copyright (c) 2019 Philip Daubmeier
+Copyright (c) 2019-2020 Philip Daubmeier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

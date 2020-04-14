@@ -11,21 +11,22 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Memory efficient storing, processing, resampling and compressing of time series data.</description>
     <releaseNotes>
+1.6.0 - widened range of supported platforms by targeting netstandard2.1
 1.5.0 - upgraded to target framework netcoreapp3.1
-1.4.0 - migrated to .NET Core 3.0
+1.4.0 - migrated to netcoreapp3.0
 1.3.0 - Reworked TimeSeriesResampler for correctly address sampling multiple series into a single result time bucket
 1.2.0 - Added EventTimeSeriesStream for non-equidistant time series
 1.1.0 - Added TimeSeriesResampler
 1.0.0 - Initial version after completing unit tests and refactoring class structure
     </releaseNotes>
-    <copyright>Copyright 2019 Philip Daubmeier</copyright>
+    <copyright>Copyright 2019-2020 Philip Daubmeier</copyright>
     <tags>timeseries</tags>
     <dependencies>
-      <group targetFramework="netcoreapp3.1"></group>
+      <group targetFramework="netstandard2.1"></group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp3.0\$id$.deps.json" target="lib\netcoreapp3.0" />
+    <file src="bin\$configuration$\netstandard2.1\$id$.deps.json" target="lib\netcoreapp3.0" />
     <file src="..\..\LICENSE" />
   </files>
 </package>
