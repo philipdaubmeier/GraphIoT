@@ -11,18 +11,24 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Digitalstrom Server (DSS) RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+1.6.0 - widened range of supported platforms by targeting netstandard2.1
 1.5.0 - moved to System.Text.Json and removed dependency to Json.NET
 1.4.0 - upgraded to target framework netcoreapp3.1
 1.3.0 - new package without pre-release dependencies.
 1.2.0-beta1 - added support for HttpClientFactory and Polly. Enabled non-nullable reference types.
-1.1.0 - migrated to .NET Core 3.0
+1.1.0 - migrated to netcoreapp3.0
 1.0.0 - Initial version with publishing version 1.0 of GraphIoT
     </releaseNotes>
-    <copyright>Copyright 2019 Philip Daubmeier</copyright>
+    <copyright>Copyright 2019-2020 Philip Daubmeier</copyright>
     <tags>digitalstrom ds smarthome httpclient</tags>
+    <dependencies>
+      <group targetFramework="netstandard2.1">
+        <dependency id="System.Text.Json" version="4.7.1" />
+      </group>
+    </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netcoreapp3.0\$id$.deps.json" target="lib\netcoreapp3.0" />
+    <file src="bin\$configuration$\netstandard2.1\$id$.deps.json" target="lib\netcoreapp3.0" />
     <file src="..\..\LICENSE" />
   </files>
 </package>

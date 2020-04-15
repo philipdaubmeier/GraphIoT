@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
@@ -64,7 +65,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Joker = 8
     }
 
-    public class Group : IComparable, IComparable<Group>, IEquatable<Group>
+    public class Group : IComparable, IComparable<Group>, IEquatable<Group>, IFormattable
     {
         private readonly int _group = (int)Color.Yellow;
 
@@ -179,26 +180,68 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return $"ID {_group}: {(Color)this} - {(GroupType)this}";
         }
 
-        public string ToDisplayString()
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation
+        /// using the specified format and culture-specific format information.
+        /// </summary>
+        /// <param name="format">
+        /// Null for an invariant default format 'ID {group-number}: {color} - {group-name}'.
+        /// "D" or "d" for a localized displayable string in the format '{color} - {group-name}',
+        /// if available for the given language of the format provider.
+        /// </param>
+        /// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>
+        /// The string representation of the value of this instance as specified by format and provider.
+        /// </returns>
+        public string ToString(string? format = null, IFormatProvider? formatProvider = null)
         {
+            if (format is null)
+                return $"ID {_group}: {(Color)this} - {(GroupType)this}";
+
+            if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
+                throw new FormatException($"Did not recognize format '{format}'");
+
+            if (formatProvider is CultureInfo culture && culture.TwoLetterISOLanguageName.Equals("de", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return _group switch
+                {
+                    (int)GroupType.Various => "Weiss - Gerät",
+                    (int)GroupType.Light => "Gelb - Licht",
+                    (int)GroupType.Shading => "Grau - Beschattung",
+                    (int)GroupType.Heating => "Blau - Heizung",
+                    (int)GroupType.Cooling => "Blau - Kühlung",
+                    (int)GroupType.Ventilation => "Blau - Lüftung",
+                    (int)GroupType.Window => "Blau - Fenster",
+                    (int)GroupType.AirRecirculation => "Blau - Luftzirkulation",
+                    (int)GroupType.ApartmentVentilation => "Blau - Lüftungssystem",
+                    (int)GroupType.TemperatureControl => "Blau - Einzelraumregelung",
+                    (int)GroupType.Audio => "Cyan - Audio",
+                    (int)GroupType.Video => "Magenta - Video",
+                    (int)GroupType.Security => "Rot - Sicherheit",
+                    (int)GroupType.Access => "Grün - Zugang",
+                    (int)GroupType.Joker => "Schwarz - Joker",
+                    _ => string.Format("Unbekannt ({0})", _group),
+                };
+            }
+
             return _group switch
             {
-                (int)GroupType.Various => "Weiss - Gerät",
-                (int)GroupType.Light => "Gelb - Licht",
-                (int)GroupType.Shading => "Grau - Beschattung",
-                (int)GroupType.Heating => "Blau - Heizung",
-                (int)GroupType.Cooling => "Blau - Kühlung",
-                (int)GroupType.Ventilation => "Blau - Lüftung",
-                (int)GroupType.Window => "Blau - Fenster",
-                (int)GroupType.AirRecirculation => "Blau - Luftzirkulation",
-                (int)GroupType.ApartmentVentilation => "Blau - Lüftungssystem",
-                (int)GroupType.TemperatureControl => "Blau - Einzelraumregelung",
+                (int)GroupType.Various => "White - Device",
+                (int)GroupType.Light => "Yellow - Light",
+                (int)GroupType.Shading => "Blue - Shading",
+                (int)GroupType.Heating => "Blue - Heating",
+                (int)GroupType.Cooling => "Blue - Cooling",
+                (int)GroupType.Ventilation => "Blue - Ventilation",
+                (int)GroupType.Window => "Blue - Window",
+                (int)GroupType.AirRecirculation => "Blue - Air Recirculation",
+                (int)GroupType.ApartmentVentilation => "Blue - Apartment Ventilation",
+                (int)GroupType.TemperatureControl => "Blue - Temperature Control",
                 (int)GroupType.Audio => "Cyan - Audio",
                 (int)GroupType.Video => "Magenta - Video",
-                (int)GroupType.Security => "Rot - Sicherheit",
-                (int)GroupType.Access => "Grün - Zugang",
-                (int)GroupType.Joker => "Schwarz - Joker",
-                _ => string.Format("Unbekannt ({0})", _group),
+                (int)GroupType.Security => "Red - Security",
+                (int)GroupType.Access => "Green - Access",
+                (int)GroupType.Joker => "Black - Joker",
+                _ => string.Format("Unknown ({0})", _group),
             };
         }
     }
