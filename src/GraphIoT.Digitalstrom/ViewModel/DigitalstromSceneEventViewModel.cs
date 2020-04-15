@@ -17,19 +17,19 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         private class EventQuery
         {
             [JsonPropertyName("event_names")]
-            public List<string> EventNames { get; set; }
+            public List<string>? EventNames { get; set; }
 
             [JsonPropertyName("meter_ids")]
-            public List<string> MeterIds { get; set; }
+            public List<string>? MeterIds { get; set; }
 
             [JsonPropertyName("zone_ids")]
-            public List<int> ZoneIds { get; set; }
+            public List<int>? ZoneIds { get; set; }
 
             [JsonPropertyName("group_ids")]
-            public List<int> GroupIds { get; set; }
+            public List<int>? GroupIds { get; set; }
 
             [JsonPropertyName("scene_ids")]
-            public List<int> SceneIds { get; set; }
+            public List<int>? SceneIds { get; set; }
         };
 
         private readonly IDigitalstromDbContext _db;
@@ -65,8 +65,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                 filtered = events
                     .Where(x => query?.EventNames?.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase) ?? true)
                     .Where(x => zones.Contains(x.Properties.ZoneID))
-                    .Where(x => query?.GroupIds.Contains(x.Properties.GroupID) ?? true)
-                    .Where(x => query?.SceneIds.Contains(x.Properties.SceneID) ?? true)
+                    .Where(x => query?.GroupIds?.Contains(x.Properties.GroupID) ?? true)
+                    .Where(x => query?.SceneIds?.Contains(x.Properties.SceneID) ?? true)
                     .ToList();
             }
             catch

@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             public List<string> Columns { get; set; } = null!;
 
             [JsonPropertyName("rows")]
-            public List<List<object?>> Rows { get; set; } = null!;
+            public List<List<object>> Rows { get; set; } = null!;
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             await db.SaveChangesAsync(cancellationToken);
         }
 
-        private void RestoreBackupRow(IQueryable<object> tableDbSet, List<object?> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
+        private void RestoreBackupRow(IQueryable<object> tableDbSet, List<object> rowData, PropertyInfo tableProperty, IList<PropertyInfo> columnProperties)
         {
             var entityType = tableProperty.PropertyType.GenericTypeArguments.First();
             var newEntity = Activator.CreateInstance(entityType);
@@ -129,7 +129,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             return GetColumnProperties(table).Select(prop => prop.Name).ToList();
         }
 
-        private List<List<object?>> GetColumns(IQueryable<object> table, DateTime start, DateTime end)
+        private List<List<object>> GetColumns(IQueryable<object> table, DateTime start, DateTime end)
         {
             var columnProperties = GetColumnProperties(table);
 

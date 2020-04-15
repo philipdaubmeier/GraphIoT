@@ -39,12 +39,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                     break;
             }
             Assert.NotNull(sensorDataSet);
-            Assert.NotNull(sensorDataSet.TemperatureCurve);
-            Assert.NotNull(sensorDataSet.HumidityCurve);
+            Assert.NotNull(sensorDataSet?.TemperatureCurve);
+            Assert.NotNull(sensorDataSet?.HumidityCurve);
 
             // for both temperature und humidity values that we are mocking (see DigitalstromDssMockExtensions.AddSensorMocks)
-            Assert.NotEmpty(sensorDataSet.TemperatureSeries.Trimmed());
-            Assert.NotEmpty(sensorDataSet.HumiditySeries.Trimmed());
+            Assert.NotEmpty(sensorDataSet?.TemperatureSeries.Trimmed());
+            Assert.NotEmpty(sensorDataSet?.HumiditySeries.Trimmed());
         }
     }
 }
