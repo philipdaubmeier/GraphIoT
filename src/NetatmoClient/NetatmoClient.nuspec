@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>$id$</id>
-    <version>$version$</version>
+    <id>PhilipDaubmeier.NetatmoClient</id>
+    <version>1.6.1</version>
     <title>Client library for communicating to the Netatmo API</title>
     <authors>Philip Daubmeier</authors>
     <owners>Philip Daubmeier</owners>
@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>This class library provides a way to call the Netatmo Cloud RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</description>
     <releaseNotes>
+1.6.1 - improved exception messages
 1.6.0 - widened range of supported platforms by targeting netstandard2.1
 1.5.0 - moved to System.Text.Json and removed dependency to Json.NET
 1.4.1 - bugfix in CO2 dashboard data
@@ -23,13 +24,18 @@
     <copyright>Copyright 2019-2020 Philip Daubmeier</copyright>
     <tags>netatmo smarthome httpclient</tags>
     <dependencies>
+      <group targetFramework="netcoreapp3.1">
+      </group>
       <group targetFramework="netstandard2.1">
         <dependency id="System.Text.Json" version="4.7.1" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netstandard2.1\$id$.deps.json" target="lib\netcoreapp3.0" />
+    <file src="bin\Debug\netcoreapp3.1\PhilipDaubmeier.NetatmoClient.deps.json" target="lib\netcoreapp3.1" />
+    <file src="bin\Debug\netcoreapp3.1\PhilipDaubmeier.NetatmoClient.dll" target="lib\netcoreapp3.1" />
+    <file src="bin\Debug\netstandard2.1\PhilipDaubmeier.NetatmoClient.deps.json" target="lib\netstandard2.1" />
+    <file src="bin\Debug\netstandard2.1\PhilipDaubmeier.NetatmoClient.dll" target="lib\netstandard2.1" />
     <file src="..\..\LICENSE" />
   </files>
 </package>
