@@ -26,7 +26,7 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\netstandard2.1\$id$.deps.json" target="lib\netcoreapp3.0" />
+    <file src="bin\$configuration$\netstandard2.1\$id$.deps.json" target="lib\netcoreapp2.1" />
     <file src="..\..\LICENSE" />
   </files>
 </package>
