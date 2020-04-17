@@ -27,6 +27,7 @@
       </group>
       <group targetFramework="netstandard2.1">
         <dependency id="System.Text.Json" version="4.7.1" />
+        <dependency id="System.Runtime.Loader" version="4.3.0" />
       </group>
     </dependencies>
   </metadata>
