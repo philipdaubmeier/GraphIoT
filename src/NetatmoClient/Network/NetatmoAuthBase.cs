@@ -79,7 +79,7 @@ namespace PhilipDaubmeier.NetatmoClient
             }
             catch (JsonException)
             {
-                throw new IOException($"The API response could not be deserialized. HTTP status code: ${response.StatusCode}");
+                throw new IOException($"The API response could not be deserialized. HTTP status code: {(int)response.StatusCode}");
             }
 
             if (!response.IsSuccessStatusCode && result.Error?.Code == 26)

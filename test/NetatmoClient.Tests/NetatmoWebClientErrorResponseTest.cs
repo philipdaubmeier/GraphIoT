@@ -69,5 +69,55 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                 Assert.Contains(errorMessage, ex.Message);
             }
         }
+
+        [Fact]
+        public async Task TestMissingPayload()
+        {
+            var mockHandler = new MockHttpMessageHandler().AddAuthMock();
+            mockHandler.When($"{MockNetatmoConnection.BaseUri}/api/getstationsdata")
+                .Respond("application/json",
+                @"{
+                    ""status"": ""ok"",
+                    ""time_exec"": 0.03,
+                    ""time_server"": 1585755824
+                }");
+
+            using var netatmoClient = new NetatmoWebClient(mockHandler.ToMockProvider());
+
+            await Assert.ThrowsAsync<IOException>(async () => await netatmoClient.GetWeatherStationData());
+
+            try
+            {
+                await netatmoClient.GetWeatherStationData();
+            }
+            catch (IOException ex)
+            {
+                Assert.Contains("missing a payload", ex.Message);
+            }
+        }
+
+        [Fact]
+        public async Task TestMalformedJson()
+        {
+            var mockHandler = new MockHttpMessageHandler().AddAuthMock();
+            mockHandler.When($"{MockNetatmoConnection.BaseUri}/api/getstationsdata")
+                .Respond("application/json",
+                @"{
+                    ""maformed_json"": ""missing closing bracket""
+                ");
+
+            using var netatmoClient = new NetatmoWebClient(mockHandler.ToMockProvider());
+
+            await Assert.ThrowsAsync<IOException>(async () => await netatmoClient.GetWeatherStationData());
+
+            try
+            {
+                await netatmoClient.GetWeatherStationData();
+            }
+            catch (IOException ex)
+            {
+                Assert.Contains("could not be deserialized", ex.Message);
+            }
+        }
     }
 }
