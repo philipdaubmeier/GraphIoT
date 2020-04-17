@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -135,6 +136,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             var expected = new List<int>() { 0, 1, 2, 3, 4, 5, 6, 7, 8 }.Select(x => (Group)x);
             Assert.Equal(expected, Group.GetGroups());
+        }
+
+        [Fact]
+        public void TestGroupFormatting()
+        {
+            var group = (Group)2;
+            Assert.Equal("bla", group.ToString("d", CultureInfo.CreateSpecificCulture("de")));
         }
     }
 }
