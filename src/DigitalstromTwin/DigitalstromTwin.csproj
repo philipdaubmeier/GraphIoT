@@ -1,27 +1,40 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup Label="Globals">
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-  </PropertyGroup>
-
   <PropertyGroup>
     <AssemblyName>PhilipDaubmeier.DigitalstromTwin</AssemblyName>
     <RootNamespace>PhilipDaubmeier.DigitalstromTwin</RootNamespace>
     <PackageId>PhilipDaubmeier.DigitalstromTwin</PackageId>
+    <Description>This class library provides a DigitalstromDssTwin object as the main class, that automatically synchronizes scene states of all rooms both ways, i.e. if a state is changed programatically it sends a command to the DSS, if a scene is changed within the apartement the event is synched into the twin model.</Description>
+    <PackageTags>digitalstrom;ds;smarthome</PackageTags>
+    <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/DigitalstromTwin</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.6.0</Version>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <Version>1.6.1</Version>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <NuspecFile>DigitalstromTwin.nuspec</NuspecFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalstromClient\DigitalstromClient.csproj" />
   </ItemGroup>
+
+  <Target Name="PopulateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>
+        id=$(PackageId);
+        authors=$(Authors);
+        configuration=$(Configuration);
+        description=$(PackageDescription);
+        projectUrl=$(PackageProjectUrl);
+        tags=$(PackageTags.Replace(';', ' '));
+        targetPath=$(TargetPath);
+        version=$(PackageVersion);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
 
 </Project>
