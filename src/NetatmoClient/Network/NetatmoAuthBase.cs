@@ -72,20 +72,26 @@ namespace PhilipDaubmeier.NetatmoClient
             var response = await RequestNetatmoApi(uri, parameters);
             var responseStream = await response.Content.ReadAsStreamAsync();
 
-            string? content = null;
-            using (var reader = new StreamReader(responseStream))
+            TWiremessage result;
+            try
             {
-                content = await reader.ReadToEndAsync();
+                result = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+            }
+            catch (JsonException)
+            {
+                throw new IOException($"The API response could not be deserialized. HTTP status code: ${response.StatusCode}");
             }
 
+            if (!response.IsSuccessStatusCode && result.Error?.Code == 26)
+                throw new IOException("API rate limit reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+
             if (!response.IsSuccessStatusCode)
-                throw new Exception($"The api response was not succesfull and returned with code: ${response.StatusCode}, message: ${response.ReasonPhrase} and content: ${content ?? ""}");
+                throw new IOException($"The API response was not succesful and returned with HTTP status code: {(int)response.StatusCode}, API error code: {result.Error?.Code} and error message: '{result.Error?.Message ?? string.Empty}'");
 
-            var result = JsonSerializer.Deserialize<TWiremessage>(content, _jsonSerializerOptions)?.Body;
-            if (result == null)
-                throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+            if (result.Body is null)
+                throw new IOException($"The API response is missing a payload.");
 
-            return result;
+            return result.Body;
         }
 
         private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
