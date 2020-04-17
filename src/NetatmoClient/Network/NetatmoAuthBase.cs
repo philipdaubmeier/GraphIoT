@@ -69,13 +69,29 @@ namespace PhilipDaubmeier.NetatmoClient
         protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<(string, string?)>? parameters = null)
             where TWiremessage : IWiremessage<TData> where TData : class
         {
-            var responseStream = await (await RequestNetatmoApi(uri, parameters)).Content.ReadAsStreamAsync();
+            var response = await RequestNetatmoApi(uri, parameters);
+            var responseStream = await response.Content.ReadAsStreamAsync();
 
-            var result = (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.Body;
-            if (result == null)
-                throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+            TWiremessage result;
+            try
+            {
+                result = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+            }
+            catch (JsonException)
+            {
+                throw new IOException($"The API response could not be deserialized. HTTP status code: ${response.StatusCode}");
+            }
 
-            return result;
+            if (!response.IsSuccessStatusCode && result.Error?.Code == 26)
+                throw new IOException("API rate limit reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
+
+            if (!response.IsSuccessStatusCode)
+                throw new IOException($"The API response was not succesful and returned with HTTP status code: {(int)response.StatusCode}, API error code: {result.Error?.Code} and error message: '{result.Error?.Message ?? string.Empty}'");
+
+            if (result.Body is null)
+                throw new IOException($"The API response is missing a payload.");
+
+            return result.Body;
         }
 
         private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)

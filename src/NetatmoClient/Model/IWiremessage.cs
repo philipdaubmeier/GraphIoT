@@ -4,7 +4,8 @@
     {
         T? Body { get; }
         string Status { get; }
-        double TimeExec { get; }
-        int TimeServer { get; }
+        double? TimeExec { get; }
+        int? TimeServer { get; }
+        ErrorInfo? Error { get; }
     }
 }
