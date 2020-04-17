@@ -39,7 +39,7 @@ For more usage examples you can also have a look at the [unit tests](../../test/
 
 ## Platform Support
 
-CompactTimeSeries is targeted for .NET Standard 2.1 or higher.
+DigitalstromTwin is targeted for .NET Standard 2.1 or higher.
 
 ## License
 
