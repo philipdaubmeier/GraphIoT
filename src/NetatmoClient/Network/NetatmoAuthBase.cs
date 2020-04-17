@@ -69,9 +69,19 @@ namespace PhilipDaubmeier.NetatmoClient
         protected async Task<TData> CallNetatmoApi<TWiremessage, TData>(Uri uri, IEnumerable<(string, string?)>? parameters = null)
             where TWiremessage : IWiremessage<TData> where TData : class
         {
-            var responseStream = await (await RequestNetatmoApi(uri, parameters)).Content.ReadAsStreamAsync();
+            var response = await RequestNetatmoApi(uri, parameters);
+            var responseStream = await response.Content.ReadAsStreamAsync();
 
-            var result = (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.Body;
+            string? content = null;
+            using (var reader = new StreamReader(responseStream))
+            {
+                content = await reader.ReadToEndAsync();
+            }
+
+            if (!response.IsSuccessStatusCode)
+                throw new Exception($"The api response was not succesfull and returned with code: ${response.StatusCode}, message: ${response.ReasonPhrase} and content: ${content ?? ""}");
+
+            var result = JsonSerializer.Deserialize<TWiremessage>(content, _jsonSerializerOptions)?.Body;
             if (result == null)
                 throw new IOException("Could not deserialize response - most likely the rate limit was reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
 
