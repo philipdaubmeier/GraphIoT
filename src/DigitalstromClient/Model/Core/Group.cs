@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
@@ -73,7 +74,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
     public class Group : IComparable, IComparable<Group>, IEquatable<Group>, IFormattable
     {
-        private static readonly IStringLocalizer _localizer = new ResourceManagerStringLocalizerFactory(Options.Create(new LocalizationOptions()), new NullLoggerFactory()).Create(typeof(Group));
+        private static readonly IStringLocalizer _localizer = new CustomStringLocalizerFactory().Create(typeof(Group));
 
         private readonly int _group = (int)Color.Yellow;
 
@@ -188,6 +189,25 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return $"ID {_group}: {(Color)this} - {(GroupType)this}";
         }
 
+
+
+        public class CustomStringLocalizerFactory : ResourceManagerStringLocalizerFactory
+        {
+            public CustomStringLocalizerFactory()
+                : base(Options.Create(new LocalizationOptions() { ResourcesPath = "Resources" }), new NullLoggerFactory()) { }
+
+            protected override ResourceManagerStringLocalizer CreateResourceManagerStringLocalizer(Assembly assembly, string baseName)
+            {
+                Stream resource = assembly.GetManifestResourceStream("PhilipDaubmeier.DigitalstromClient.de.resources.dll")!;
+                Assembly embeddedSatelliteAssembly = AssemblyLoadContext.Default.LoadFromStream(resource);
+
+                var deleteme = embeddedSatelliteAssembly.GetManifestResourceNames();
+
+                return base.CreateResourceManagerStringLocalizer(embeddedSatelliteAssembly, baseName);
+            }
+        }
+
+
         /// <summary>
         /// Converts the numeric value of this instance to its equivalent string representation
         /// using the specified format and culture-specific format information.
@@ -217,7 +237,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
 
 
-
+            Stream resource = assembly.GetManifestResourceStream("PhilipDaubmeier.DigitalstromClient.de.resources.dll")!;
 
 
 
@@ -231,12 +251,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             }
 
 
-
+            var basename = "PhilipDaubmeier.DigitalstromClient.Resources.Model.Core.Group.de";
 
             
             var str = blaaasdsdf.GetString("White - Device", formatProvider is CultureInfo culture2 ? culture2 : CultureInfo.InvariantCulture);
 
 
+
+            var localizer2 = new ResourceManagerStringLocalizerFactory(Options.Create(new LocalizationOptions()), new NullLoggerFactory()).Create(typeof(Group));
+
+
+            var localizer3 = new ResourceManagerStringLocalizer(blaaasdsdf, assemb2, basename, new ResourceNamesCache(), new NullLoggerFactory().CreateLogger<ResourceManagerStringLocalizer>());
 
 
 
@@ -247,7 +272,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 throw new FormatException($"Did not recognize format '{format}'");
 
 #pragma warning disable CS0618
-            var localizer = formatProvider is CultureInfo culture ? _localizer.WithCulture(culture) : _localizer;
+            var localizer = false ? localizer3 : formatProvider is CultureInfo culture ? _localizer.WithCulture(culture) : _localizer;
 #pragma warning restore CS0618
 
             return _group switch
