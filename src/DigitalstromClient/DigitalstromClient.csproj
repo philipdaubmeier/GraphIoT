@@ -27,21 +27,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Resources\Model.Core.Group.Designer.cs">
+    <Compile Update="Locale\Group.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>Model.Core.Group.resx</DependentUpon>
+      <DependentUpon>Group.resx</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Resources\Model.Core.Group.resx">
+    <EmbeddedResource Update="Locale\Group.resx">
       <SubType>Designer</SubType>
-      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Resources</CustomToolNamespace>
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Model.Core.Group.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Update="Resources\Model.Core.Group.en-US.resx;Resources\Model.Core.Group.de-DE.resx">
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Group.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
 

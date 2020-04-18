@@ -1,5 +1,4 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Resources;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -203,26 +202,26 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 throw new FormatException($"Did not recognize format '{format}'");
 
             if (formatProvider is CultureInfo culture)
-                Model_Core_Group.Culture = culture;
+                Locale.Group.Culture = culture;
 
             return _group switch
             {
-                (int)GroupType.Various => Model_Core_Group.Device,
-                (int)GroupType.Light => Model_Core_Group.Light,
-                (int)GroupType.Shading => Model_Core_Group.Shading,
-                (int)GroupType.Heating => Model_Core_Group.Heating,
-                (int)GroupType.Cooling => Model_Core_Group.Cooling,
-                (int)GroupType.Ventilation => Model_Core_Group.Ventilation,
-                (int)GroupType.Window => Model_Core_Group.Window,
-                (int)GroupType.AirRecirculation => Model_Core_Group.Air_Recirculation,
-                (int)GroupType.ApartmentVentilation => Model_Core_Group.Apartment_Ventilation,
-                (int)GroupType.TemperatureControl => Model_Core_Group.Temperature_Control,
-                (int)GroupType.Audio => Model_Core_Group.Audio,
-                (int)GroupType.Video => Model_Core_Group.Video,
-                (int)GroupType.Security => Model_Core_Group.Security,
-                (int)GroupType.Access => Model_Core_Group.Access,
-                (int)GroupType.Joker => Model_Core_Group.Joker,
-                _ => $"{Model_Core_Group.Unknown} ({_group})",
+                (int)GroupType.Various => Locale.Group.Device,
+                (int)GroupType.Light => Locale.Group.Light,
+                (int)GroupType.Shading => Locale.Group.Shading,
+                (int)GroupType.Heating => Locale.Group.Heating,
+                (int)GroupType.Cooling => Locale.Group.Cooling,
+                (int)GroupType.Ventilation => Locale.Group.Ventilation,
+                (int)GroupType.Window => Locale.Group.Window,
+                (int)GroupType.AirRecirculation => Locale.Group.Air_Recirculation,
+                (int)GroupType.ApartmentVentilation => Locale.Group.Apartment_Ventilation,
+                (int)GroupType.TemperatureControl => Locale.Group.Temperature_Control,
+                (int)GroupType.Audio => Locale.Group.Audio,
+                (int)GroupType.Video => Locale.Group.Video,
+                (int)GroupType.Security => Locale.Group.Security,
+                (int)GroupType.Access => Locale.Group.Access,
+                (int)GroupType.Joker => Locale.Group.Joker,
+                _ => $"{Locale.Group.Unknown} ({_group})",
             };
         }
     }
