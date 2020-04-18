@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using PhilipDaubmeier.DigitalstromClient.Resources;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -74,8 +75,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
     public class Group : IComparable, IComparable<Group>, IEquatable<Group>, IFormattable
     {
-        private static readonly IStringLocalizer _localizer = new CustomStringLocalizerFactory("de").Create(typeof(Group));
-
         private readonly int _group = (int)Color.Yellow;
 
         private Group(int colorCode)
@@ -189,28 +188,6 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return $"ID {_group}: {(Color)this} - {(GroupType)this}";
         }
 
-
-
-        public class CustomStringLocalizerFactory : ResourceManagerStringLocalizerFactory
-        {
-            private readonly string _suffix;
-
-            public CustomStringLocalizerFactory(string suffix)
-                : base(Options.Create(new LocalizationOptions() { ResourcesPath = "Resources" }), new NullLoggerFactory())
-                => _suffix = suffix;
-
-            protected override ResourceManagerStringLocalizer CreateResourceManagerStringLocalizer(Assembly assembly, string baseName)
-            {
-                var stream = assembly.GetManifestResourceStream(assembly.GetManifestResourceNames().FirstOrDefault() ?? string.Empty);
-                if (stream is null)
-                    return base.CreateResourceManagerStringLocalizer(assembly, baseName);
-
-                Assembly embeddedSatelliteAssembly = AssemblyLoadContext.Default.LoadFromStream(stream);
-                return base.CreateResourceManagerStringLocalizer(embeddedSatelliteAssembly, baseName + "." + _suffix);
-            }
-        }
-
-
         /// <summary>
         /// Converts the numeric value of this instance to its equivalent string representation
         /// using the specified format and culture-specific format information.
@@ -232,28 +209,27 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException($"Did not recognize format '{format}'");
 
-#pragma warning disable CS0618
-            var localizer = true ? _localizer : formatProvider is CultureInfo culture ? _localizer.WithCulture(culture) : _localizer;
-#pragma warning restore CS0618
+            if (formatProvider is CultureInfo culture)
+                Model_Core_Group.Culture = culture;
 
             return _group switch
             {
-                (int)GroupType.Various => localizer["Device"],
-                (int)GroupType.Light => localizer["Light"],
-                (int)GroupType.Shading => localizer["Shading"],
-                (int)GroupType.Heating => localizer["Heating"],
-                (int)GroupType.Cooling => localizer["Cooling"],
-                (int)GroupType.Ventilation => localizer["Ventilation"],
-                (int)GroupType.Window => localizer["Window"],
-                (int)GroupType.AirRecirculation => localizer["Air Recirculation"],
-                (int)GroupType.ApartmentVentilation => localizer["Apartment Ventilation"],
-                (int)GroupType.TemperatureControl => localizer["Temperature Control"],
-                (int)GroupType.Audio => localizer["Audio"],
-                (int)GroupType.Video => localizer["Video"],
-                (int)GroupType.Security => localizer["Security"],
-                (int)GroupType.Access => localizer["Access"],
-                (int)GroupType.Joker => localizer["Joker"],
-                _ => localizer["Unknown"] + string.Format(" ({0})", _group),
+                (int)GroupType.Various => Model_Core_Group.Device,
+                (int)GroupType.Light => Model_Core_Group.Light,
+                (int)GroupType.Shading => Model_Core_Group.Shading,
+                (int)GroupType.Heating => Model_Core_Group.Heating,
+                (int)GroupType.Cooling => Model_Core_Group.Cooling,
+                (int)GroupType.Ventilation => Model_Core_Group.Ventilation,
+                (int)GroupType.Window => Model_Core_Group.Window,
+                (int)GroupType.AirRecirculation => Model_Core_Group.Air_Recirculation,
+                (int)GroupType.ApartmentVentilation => Model_Core_Group.Apartment_Ventilation,
+                (int)GroupType.TemperatureControl => Model_Core_Group.Temperature_Control,
+                (int)GroupType.Audio => Model_Core_Group.Audio,
+                (int)GroupType.Video => Model_Core_Group.Video,
+                (int)GroupType.Security => Model_Core_Group.Security,
+                (int)GroupType.Access => Model_Core_Group.Access,
+                (int)GroupType.Joker => Model_Core_Group.Joker,
+                _ => $"{Model_Core_Group.Unknown} ({_group})",
             };
         }
     }
