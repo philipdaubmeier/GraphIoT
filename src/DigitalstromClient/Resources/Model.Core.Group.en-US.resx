@@ -117,52 +117,52 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="White - Device" xml:space="preserve">
-    <value>Weiss - Gerät</value>
+  <data name="Device" xml:space="preserve">
+    <value>Device</value>
   </data>
-  <data name="Yellow - Light" xml:space="preserve">
-    <value>Gelb - Licht</value>
+  <data name="Light" xml:space="preserve">
+    <value>Light</value>
   </data>
-  <data name="Blue - Shading" xml:space="preserve">
-    <value>Grau - Beschattung</value>
+  <data name="Shading" xml:space="preserve">
+    <value>Shading</value>
   </data>
-  <data name="Blue - Heating" xml:space="preserve">
-    <value>Blau - Heizung</value>
+  <data name="Heating" xml:space="preserve">
+    <value>Heating</value>
   </data>
-  <data name="Blue - Cooling" xml:space="preserve">
-    <value>Blau - Kühlung</value>
+  <data name="Cooling" xml:space="preserve">
+    <value>Cooling</value>
   </data>
-  <data name="Blue - Ventilation" xml:space="preserve">
-    <value>Blau - Lüftung</value>
+  <data name="Ventilation" xml:space="preserve">
+    <value>Ventilation</value>
   </data>
-  <data name="Blue - Window" xml:space="preserve">
-    <value>Blau - Fenster</value>
+  <data name="Window" xml:space="preserve">
+    <value>Window</value>
   </data>
-  <data name="Blue - Air Recirculation" xml:space="preserve">
-    <value>Blau - Luftzirkulation</value>
+  <data name="Air Recirculation" xml:space="preserve">
+    <value>Air Recirculation</value>
   </data>
-  <data name="Blue - Apartment Ventilation" xml:space="preserve">
-    <value>Blau - Lüftungssystem</value>
+  <data name="Apartment Ventilation" xml:space="preserve">
+    <value>Apartment Ventilation</value>
   </data>
-  <data name="Blue - Temperature Control" xml:space="preserve">
-    <value>Blau - Einzelraumregelung</value>
+  <data name="Temperature Control" xml:space="preserve">
+    <value>Temperature Control</value>
   </data>
-  <data name="Cyan - Audio" xml:space="preserve">
-    <value>Cyan - Audio</value>
+  <data name="Audio" xml:space="preserve">
+    <value>Audio</value>
   </data>
-  <data name="Magenta - Video" xml:space="preserve">
-    <value>Magenta - Video</value>
+  <data name="Video" xml:space="preserve">
+    <value>Video</value>
   </data>
-  <data name="Red - Security" xml:space="preserve">
-    <value>Rot - Sicherheit</value>
+  <data name="Security" xml:space="preserve">
+    <value>Security</value>
   </data>
-  <data name="Green - Access" xml:space="preserve">
-    <value>Grün - Zugang</value>
+  <data name="Access" xml:space="preserve">
+    <value>Access</value>
   </data>
-  <data name="Black - Joker" xml:space="preserve">
-    <value>Schwarz - Joker</value>
+  <data name="Joker" xml:space="preserve">
+    <value>Joker</value>
   </data>
-  <data name="Unknown ({0})" xml:space="preserve">
-    <value>Unbekannt ({0})</value>
+  <data name="Unknown" xml:space="preserve">
+    <value>Unknown</value>
   </data>
 </root>
