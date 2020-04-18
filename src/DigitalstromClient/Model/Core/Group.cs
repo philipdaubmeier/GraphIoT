@@ -238,22 +238,22 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
             return _group switch
             {
-                (int)GroupType.Various => localizer["White - Device"],
-                (int)GroupType.Light => localizer["Yellow - Light"],
-                (int)GroupType.Shading => localizer["Blue - Shading"],
-                (int)GroupType.Heating => localizer["Blue - Heating"],
-                (int)GroupType.Cooling => localizer["Blue - Cooling"],
-                (int)GroupType.Ventilation => localizer["Blue - Ventilation"],
-                (int)GroupType.Window => localizer["Blue - Window"],
-                (int)GroupType.AirRecirculation => localizer["Blue - Air Recirculation"],
-                (int)GroupType.ApartmentVentilation => localizer["Blue - Apartment Ventilation"],
-                (int)GroupType.TemperatureControl => localizer["Blue - Temperature Control"],
-                (int)GroupType.Audio => localizer["Cyan - Audio"],
-                (int)GroupType.Video => localizer["Magenta - Video"],
-                (int)GroupType.Security => localizer["Red - Security"],
-                (int)GroupType.Access => localizer["Green - Access"],
-                (int)GroupType.Joker => localizer["Black - Joker"],
-                _ => localizer["Unknown ({0})", _group],
+                (int)GroupType.Various => localizer["Device"],
+                (int)GroupType.Light => localizer["Light"],
+                (int)GroupType.Shading => localizer["Shading"],
+                (int)GroupType.Heating => localizer["Heating"],
+                (int)GroupType.Cooling => localizer["Cooling"],
+                (int)GroupType.Ventilation => localizer["Ventilation"],
+                (int)GroupType.Window => localizer["Window"],
+                (int)GroupType.AirRecirculation => localizer["Air Recirculation"],
+                (int)GroupType.ApartmentVentilation => localizer["Apartment Ventilation"],
+                (int)GroupType.TemperatureControl => localizer["Temperature Control"],
+                (int)GroupType.Audio => localizer["Audio"],
+                (int)GroupType.Video => localizer["Video"],
+                (int)GroupType.Security => localizer["Security"],
+                (int)GroupType.Access => localizer["Access"],
+                (int)GroupType.Joker => localizer["Joker"],
+                _ => localizer["Unknown"] + string.Format(" ({0})", _group),
             };
         }
     }
