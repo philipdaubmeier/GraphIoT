@@ -28,6 +28,25 @@
     <PackageReference Include="Resource.Embedder" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\Model.Core.Group.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Model.Core.Group.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Model.Core.Group.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Resources</CustomToolNamespace>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Model.Core.Group.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Model.Core.Group.en-US.resx;Resources\Model.Core.Group.de-DE.resx">
+    </EmbeddedResource>
+  </ItemGroup>
+
   <Target Name="PopulateNuspec">
     <PropertyGroup>
       <NuspecProperties>
