@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
@@ -195,7 +196,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Unknown = 92
     }
 
-    public class Scene : IComparable, IComparable<Scene>, IEquatable<Scene>
+    public class Scene : IComparable, IComparable<Scene>, IEquatable<Scene>, IFormattable
     {
         private readonly SceneCommand _scene;
 
@@ -282,77 +283,99 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
-            return Enum.GetName(typeof(SceneCommand), _scene) ?? string.Empty;
+            return ToString(null, null);
         }
 
-        public string ToDisplayString()
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation
+        /// using the specified format and culture-specific format information.
+        /// </summary>
+        /// <param name="format">
+        /// Null for an invariant default format 'ID {scene-id}: {scene-name}'.
+        /// "D" or "d" for a localized displayable string of the scene name,
+        /// if available for the given language of the format provider.
+        /// </param>
+        /// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>
+        /// The string representation of the value of this instance as specified by format and provider.
+        /// </returns>
+        public string ToString(string? format = null, IFormatProvider? formatProvider = null)
         {
+            if (format is null)
+                return $"ID {(int)_scene}: {Enum.GetName(typeof(SceneCommand), _scene) ?? string.Empty}";
+
+            if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
+                throw new FormatException($"Did not recognize format '{format}'");
+
+            if (formatProvider is CultureInfo culture)
+                Locale.Group.Culture = culture;
+
             return _scene switch
             {
-                SceneCommand.Preset0 => "Aus",
-                SceneCommand.Preset1 => "Szene 1",
-                SceneCommand.Preset2 => "Szene 2",
-                SceneCommand.Preset3 => "Szene 3",
-                SceneCommand.Preset4 => "Szene 4",
-                SceneCommand.Preset10 => "Szene 10 (Aus)",
-                SceneCommand.Preset11 => "Szene 11",
-                SceneCommand.Preset12 => "Szene 12",
-                SceneCommand.Preset13 => "Szene 13",
-                SceneCommand.Preset14 => "Szene 14",
-                SceneCommand.Preset20 => "Szene 20 (Aus)",
-                SceneCommand.Preset21 => "Szene 21",
-                SceneCommand.Preset22 => "Szene 22",
-                SceneCommand.Preset23 => "Szene 23",
-                SceneCommand.Preset24 => "Szene 24",
-                SceneCommand.Preset30 => "Szene 30 (Aus)",
-                SceneCommand.Preset31 => "Szene 31",
-                SceneCommand.Preset32 => "Szene 32",
-                SceneCommand.Preset33 => "Szene 33",
-                SceneCommand.Preset34 => "Szene 34",
-                SceneCommand.Preset40 => "Szene 40 (Aus)",
-                SceneCommand.Preset41 => "Szene 41",
-                SceneCommand.Preset42 => "Szene 42",
-                SceneCommand.Preset43 => "Szene 43",
-                SceneCommand.Preset44 => "Szene 44",
-                SceneCommand.Area1On => "Bereich1 Ein",
-                SceneCommand.Area2On => "Bereich2 Ein",
-                SceneCommand.Area3On => "Bereich3 Ein",
-                SceneCommand.Area4On => "Bereich4 Ein",
-                SceneCommand.Area1Off => "Bereich1 Aus",
-                SceneCommand.Area2Off => "Bereich2 Aus",
-                SceneCommand.Area3Off => "Bereich3 Aus",
-                SceneCommand.Area4Off => "Bereich4 Aus",
-                SceneCommand.AutoOff => "Langsam Aus",
-                SceneCommand.Impulse => "Impuls",
-                SceneCommand.AutoStandby => "A-Standby",
-                SceneCommand.Decrement => "dunkler",
-                SceneCommand.Increment => "heller",
-                SceneCommand.Minimum => "Min",
-                SceneCommand.Maximum => "Max",
-                SceneCommand.Stop => "Stop",
-                SceneCommand.Panic => "Panik",
-                SceneCommand.Standby => "Standby",
-                SceneCommand.DeepOff => "Raum aus",
-                SceneCommand.Sleeping => "Schlafen",
-                SceneCommand.Wakeup => "Aufwachen",
-                SceneCommand.Present => "Kommen",
-                SceneCommand.Absent => "Gehen",
-                SceneCommand.DoorBell => "Klingeln",
-                SceneCommand.Alarm1 => "Alarm 1",
-                SceneCommand.Alarm2 => "Alarm 2",
-                SceneCommand.Alarm3 => "Alarm 3",
-                SceneCommand.Alarm4 => "Alarm 4",
-                SceneCommand.Fire => "Feuer",
-                SceneCommand.Smoke => "Rauch",
-                SceneCommand.Water => "Wasser",
-                SceneCommand.Gas => "Gas",
-                SceneCommand.Wind => "Wind",
-                SceneCommand.NoWind => "kein Wind",
-                SceneCommand.Rain => "Regen",
-                SceneCommand.NoRain => "kein Regen",
-                SceneCommand.Hail => "Hagel",
-                SceneCommand.NoHail => "kein Hagel",
-                _ => string.Format("Unbekannt ({0})", (int)_scene),
+                SceneCommand.Preset0 => Locale.Scene.Off,
+                SceneCommand.Preset1 => Locale.Scene.Scene1,
+                SceneCommand.Preset2 => Locale.Scene.Scene2,
+                SceneCommand.Preset3 => Locale.Scene.Scene3,
+                SceneCommand.Preset4 => Locale.Scene.Scene4,
+                SceneCommand.Preset10 => Locale.Scene.Scene10,
+                SceneCommand.Preset11 => Locale.Scene.Scene11,
+                SceneCommand.Preset12 => Locale.Scene.Scene12,
+                SceneCommand.Preset13 => Locale.Scene.Scene13,
+                SceneCommand.Preset14 => Locale.Scene.Scene14,
+                SceneCommand.Preset20 => Locale.Scene.Scene20,
+                SceneCommand.Preset21 => Locale.Scene.Scene21,
+                SceneCommand.Preset22 => Locale.Scene.Scene22,
+                SceneCommand.Preset23 => Locale.Scene.Scene23,
+                SceneCommand.Preset24 => Locale.Scene.Scene24,
+                SceneCommand.Preset30 => Locale.Scene.Scene30,
+                SceneCommand.Preset31 => Locale.Scene.Scene31,
+                SceneCommand.Preset32 => Locale.Scene.Scene32,
+                SceneCommand.Preset33 => Locale.Scene.Scene33,
+                SceneCommand.Preset34 => Locale.Scene.Scene34,
+                SceneCommand.Preset40 => Locale.Scene.Scene40,
+                SceneCommand.Preset41 => Locale.Scene.Scene41,
+                SceneCommand.Preset42 => Locale.Scene.Scene42,
+                SceneCommand.Preset43 => Locale.Scene.Scene43,
+                SceneCommand.Preset44 => Locale.Scene.Scene44,
+                SceneCommand.Area1On => Locale.Scene.Area1On,
+                SceneCommand.Area2On => Locale.Scene.Area2On,
+                SceneCommand.Area3On => Locale.Scene.Area3On,
+                SceneCommand.Area4On => Locale.Scene.Area4On,
+                SceneCommand.Area1Off => Locale.Scene.Area1Off,
+                SceneCommand.Area2Off => Locale.Scene.Area2Off,
+                SceneCommand.Area3Off => Locale.Scene.Area3Off,
+                SceneCommand.Area4Off => Locale.Scene.Area4Off,
+                SceneCommand.AutoOff => Locale.Scene.AutoOff,
+                SceneCommand.Impulse => Locale.Scene.Impulse,
+                SceneCommand.AutoStandby => Locale.Scene.AutoStandby,
+                SceneCommand.Decrement => Locale.Scene.DimDown,
+                SceneCommand.Increment => Locale.Scene.DimUp,
+                SceneCommand.Minimum => Locale.Scene.Min,
+                SceneCommand.Maximum => Locale.Scene.Max,
+                SceneCommand.Stop => Locale.Scene.Stop,
+                SceneCommand.Panic => Locale.Scene.Panic,
+                SceneCommand.Standby => Locale.Scene.Standby,
+                SceneCommand.DeepOff => Locale.Scene.RoomOff,
+                SceneCommand.Sleeping => Locale.Scene.Sleeping,
+                SceneCommand.Wakeup => Locale.Scene.Wakeup,
+                SceneCommand.Present => Locale.Scene.ComingHome,
+                SceneCommand.Absent => Locale.Scene.LeaveHome,
+                SceneCommand.DoorBell => Locale.Scene.Doorbell,
+                SceneCommand.Alarm1 => Locale.Scene.Alarm1,
+                SceneCommand.Alarm2 => Locale.Scene.Alarm2,
+                SceneCommand.Alarm3 => Locale.Scene.Alarm3,
+                SceneCommand.Alarm4 => Locale.Scene.Alarm4,
+                SceneCommand.Fire => Locale.Scene.Fire,
+                SceneCommand.Smoke => Locale.Scene.Smoke,
+                SceneCommand.Water => Locale.Scene.Water,
+                SceneCommand.Gas => Locale.Scene.Gas,
+                SceneCommand.Wind => Locale.Scene.Wind,
+                SceneCommand.NoWind => Locale.Scene.Nowind,
+                SceneCommand.Rain => Locale.Scene.Rain,
+                SceneCommand.NoRain => Locale.Scene.NoRain,
+                SceneCommand.Hail => Locale.Scene.Hail,
+                SceneCommand.NoHail => Locale.Scene.Nohail,
+                _ => $"{Locale.Scene.Unknown} ({(int)_scene})"
             };
         }
     }
