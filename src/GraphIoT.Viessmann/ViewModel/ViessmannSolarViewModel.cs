@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using System.Collections.Generic;
@@ -8,12 +9,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
 {
     public class ViessmannSolarViewModel : GraphCollectionViewModelMultiResolutionBase<ViessmannSolarData>
     {
-        public ViessmannSolarViewModel(IViessmannDbContext databaseContext)
+        public ViessmannSolarViewModel(IViessmannDbContext databaseContext, IStringLocalizer<ViessmannSolarViewModel> localizer)
             : base(new Dictionary<Resolution, IQueryable<ViessmannSolarData>>() {
                        { Resolution.LowRes, databaseContext.ViessmannSolarLowresTimeseries },
                        { Resolution.MidRes, databaseContext.ViessmannSolarTimeseries }
                    },
-                   Enumerable.Range(0, 5).ToDictionary(x => x.ToString(), x => x))
+                   Enumerable.Range(0, 5).ToDictionary(x => x.ToString(), x => x),
+                   localizer)
         { }
 
         public override string Key => "solar";

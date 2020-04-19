@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.GraphIoT.Core.Database;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.GraphIoT.Core.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
     {
         protected Dictionary<Resolution, IQueryable<Tentity>> _dataTables;
         protected Dictionary<Resolution, TimeSpan> _spans;
+        protected readonly IStringLocalizer<GraphCollectionViewModelMultiResolutionBase<Tentity>> _localizer;
 
         protected enum Resolution
         {
@@ -25,12 +27,13 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
                  Span.Duration.TotalSeconds >= LowResSeconds ? Resolution.LowRes :
                  Span.Duration.TotalSeconds >= MidResSeconds ? Resolution.MidRes : Resolution.HighRes;
 
-        protected GraphCollectionViewModelMultiResolutionBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns)
+        protected GraphCollectionViewModelMultiResolutionBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, IStringLocalizer<GraphCollectionViewModelMultiResolutionBase<Tentity>> localizer)
             : base(dataTables.FirstOrDefault().Value, columns)
         {
             _dataTables = dataTables;
             _spans = dataTables.Select(t => new Tuple<Resolution, Type>(t.Key, t.Value.GetType().GenericTypeArguments.FirstOrDefault()))
                                .ToDictionary(t => t.Item1, t => (Activator.CreateInstance(t.Item2) as ITimeSeriesDbEntity)!.Span.Duration);
+            _localizer = localizer;
         }
 
         protected override void InvalidateData()

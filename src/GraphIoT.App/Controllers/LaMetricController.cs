@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.App.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
@@ -16,18 +17,22 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
     {
         private readonly PersistenceContext _dbContext;
         private readonly IDigitalstromStructureService _dsStructure;
+        private readonly IStringLocalizer<DigitalstromEnergyViewModel> _dsLocalizer;
+        private readonly IStringLocalizer<SonnenEnergyViewModel> _sonnenLocalizer;
 
-        public LaMetricController(PersistenceContext databaseContext, IDigitalstromStructureService dsStructure)
+        public LaMetricController(PersistenceContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromEnergyViewModel> dsLocalizer, IStringLocalizer<SonnenEnergyViewModel> sonnenLocalizer)
         {
             _dbContext = databaseContext;
             _dsStructure = dsStructure;
+            _dsLocalizer = dsLocalizer;
+            _sonnenLocalizer = sonnenLocalizer;
         }
 
         // GET: api/lametric/powerconsumption
         [HttpGet("powerconsumption")]
         public ActionResult GetLaMetricPowerconsumption()
         {
-            var viewModel = new DigitalstromEnergyViewModel(_dbContext, _dsStructure)
+            var viewModel = new DigitalstromEnergyViewModel(_dbContext, _dsStructure, _dsLocalizer)
             {
                 Span = new TimeSeriesSpan(DateTime.Now.AddMinutes(-37), DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min)
             };
@@ -56,7 +61,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         [HttpGet("sonnen")]
         public ActionResult GetLaMetricSonnen()
         {
-            var viewModel = new SonnenEnergyViewModel(_dbContext)
+            var viewModel = new SonnenEnergyViewModel(_dbContext, _sonnenLocalizer)
             {
                 Span = new TimeSeriesSpan(DateTime.Now.Date, DateTime.Now, TimeSeriesSpan.Spacing.Spacing1Min)
             };

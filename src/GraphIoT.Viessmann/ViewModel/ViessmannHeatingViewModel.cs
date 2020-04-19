@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using System.Collections.Generic;
@@ -8,12 +9,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
 {
     public class ViessmannHeatingViewModel : GraphCollectionViewModelMultiResolutionBase<ViessmannHeatingData>
     {
-        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext)
+        public ViessmannHeatingViewModel(IViessmannDbContext databaseContext, IStringLocalizer<ViessmannHeatingViewModel> localizer)
             : base(new Dictionary<Resolution, IQueryable<ViessmannHeatingData>>() {
                        { Resolution.LowRes, databaseContext.ViessmannHeatingLowresTimeseries },
                        { Resolution.MidRes, databaseContext.ViessmannHeatingTimeseries }
                    },
-                   Enumerable.Range(0, 14).ToDictionary(x => x.ToString(), x => x))
+                   Enumerable.Range(0, 14).ToDictionary(x => x.ToString(), x => x),
+                   localizer)
         { }
 
         public override string Key => "heating";

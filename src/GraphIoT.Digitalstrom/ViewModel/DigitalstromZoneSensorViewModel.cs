@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -12,7 +13,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
     {
         private readonly IDigitalstromStructureService _dsStructure;
 
-        public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
+        public DigitalstromZoneSensorViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromZoneSensorViewModel> localizer)
             : base(new Dictionary<Resolution, IQueryable<DigitalstromZoneSensorData>>() {
                        { Resolution.LowRes, databaseContext.DsSensorLowresDataSet },
                        { Resolution.MidRes, databaseContext.DsSensorDataSet }
@@ -21,7 +22,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                    dsStructure.Zones.Where(x => dsStructure.HasZoneSensor(x, SensorType.TemperatureIndoors)
                                              || dsStructure.HasZoneSensor(x, SensorType.HumidityIndoors)).OrderBy(x => x).ToList(),
                    x => x.ZoneId,
-                   key => { int keyint = key; return x => x.ZoneId == keyint; })
+                   key => { int keyint = key; return x => x.ZoneId == keyint; },
+                   localizer)
         {
             _dsStructure = dsStructure;
         }

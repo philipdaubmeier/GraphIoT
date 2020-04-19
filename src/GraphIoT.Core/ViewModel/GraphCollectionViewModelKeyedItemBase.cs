@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.Database;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         protected readonly Func<Tentity, Tkey> _keySelector;
         protected readonly Func<Tkey, Func<Tentity, bool>> _predicateGenerator;
 
-        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector, Func<Tkey, Func<Tentity, bool>> predicateGenerator)
-            : base(dataTables, columns)
+        protected GraphCollectionViewModelKeyedItemBase(Dictionary<Resolution, IQueryable<Tentity>> dataTables, Dictionary<string, int> columns, List<Tkey> keys, Func<Tentity, Tkey> keySelector, Func<Tkey, Func<Tentity, bool>> predicateGenerator, IStringLocalizer<GraphCollectionViewModelKeyedItemBase<Tentity, Tkey>> localizer)
+            : base(dataTables, columns, localizer)
         {
             _keys = Enumerable.Range(0, keys.Count()).Zip(keys, (i, c) => new Tuple<Tkey, int>(c, i)).ToDictionary(x => x.Item1, x => x.Item2);
             _keySelector = keySelector;

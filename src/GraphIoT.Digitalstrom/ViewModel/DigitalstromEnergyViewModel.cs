@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -16,7 +17,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
         private IQueryable<DigitalstromEnergyHighresData>? dataHigh = null;
 
-        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure)
+        public DigitalstromEnergyViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromEnergyViewModel> localizer)
             : base(new Dictionary<Resolution, IQueryable<DigitalstromEnergyData>>() {
                        { Resolution.LowRes, databaseContext.DsEnergyLowresDataSet },
                        { Resolution.MidRes, databaseContext.DsEnergyMidresDataSet }
@@ -24,7 +25,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                    Enumerable.Range(0, 1).ToDictionary(x => x.ToString(), x => x),
                    dsStructure.Circuits.Where(x => dsStructure.IsMeteringCircuit(x)).OrderBy(x => x).ToList(),
                    x => x.CircuitId,
-                   key => { string keystr = key; return x => x.CircuitId == keystr; })
+                   key => { string keystr = key; return x => x.CircuitId == keystr; },
+                   localizer)
         {
             _db = databaseContext;
             _dsStructure = dsStructure;
@@ -48,7 +50,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             int column = index % _columns.Count;
             return column switch
             {
-                0 => DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => $"Stromverbrauch {_dsStructure?.GetCircuitName(k) ?? k.ToString()}", k => $"stromverbrauch_{k.ToString()}", "# Ws"),
+                0 => DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => $"Stromverbrauch {_dsStructure?.GetCircuitName(k) ?? k.ToString()}", k => $"stromverbrauch_{k}", "# Ws"),
                 _ => new GraphViewModel(),
             };
         }

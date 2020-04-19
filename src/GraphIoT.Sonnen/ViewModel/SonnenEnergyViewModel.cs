@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using System.Collections.Generic;
@@ -8,12 +9,13 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.ViewModel
 {
     public class SonnenEnergyViewModel : GraphCollectionViewModelMultiResolutionBase<SonnenEnergyData>
     {
-        public SonnenEnergyViewModel(ISonnenDbContext databaseContext)
+        public SonnenEnergyViewModel(ISonnenDbContext databaseContext, IStringLocalizer<SonnenEnergyViewModel> localizer)
             : base(new Dictionary<Resolution, IQueryable<SonnenEnergyData>>() {
                        { Resolution.LowRes, databaseContext.SonnenEnergyLowresDataSet },
                        { Resolution.MidRes, databaseContext.SonnenEnergyDataSet }
                    },
-                   Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x))
+                   Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x),
+                   localizer)
         { }
 
         public override string Key => "solarenergy";
