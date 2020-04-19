@@ -117,20 +117,40 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Device" xml:space="preserve">
-    <value>Gerät</value>
+  <data name="_Authors" xml:space="preserve">
+    <value>Original translations extracted from translation files of the digitalSTROM server installer ui:
+https://git.digitalstrom.org/dss-websrc/dss-websrc-mainline/blob/master/webroot/locale/en_US/dss-installer.po
+Copyright (c) 2020 digitalSTROM.org, Zurich, Switzerland
+
+Sergey 'Jin' Bostandzhyan (jin@dev.digitalstrom.org), 2010
+Christian (christian.hitz@digitalstrom.com), 2015-2016,2018-2019
+Christoph Hofmann (christoph.hofmann@digitalstrom.com), 2019
+Cornel Durrer (cornel.durrer@digitalstrom.com), 2015-2019
+Jerome Zuercher (jerome.zuercher@digitalstrom.com), 2014-2015
+Chiappori (martina.chiappori@zetavision.ch), 2014
+Michael Troß (michael.tross@digitalstrom.com), 2020
+Volker Deckers (volker.deckers@digitalstrom.com), 2014</value>
   </data>
-  <data name="Light" xml:space="preserve">
-    <value>Licht</value>
+  <data name="Joker" xml:space="preserve">
+    <value>Joker</value>
   </data>
-  <data name="Shading" xml:space="preserve">
-    <value>Beschattung</value>
+  <data name="AirRecirculation" xml:space="preserve">
+    <value>Umluft</value>
+  </data>
+  <data name="ApartmentVentilation" xml:space="preserve">
+    <value>Wohnungslüftung</value>
+  </data>
+  <data name="Cooling" xml:space="preserve">
+    <value>Kühlung</value>
   </data>
   <data name="Heating" xml:space="preserve">
     <value>Heizung</value>
   </data>
-  <data name="Cooling" xml:space="preserve">
-    <value>Kühlung</value>
+  <data name="Shade" xml:space="preserve">
+    <value>Schatten</value>
+  </data>
+  <data name="TemperatureControl" xml:space="preserve">
+    <value>Temperaturregelung</value>
   </data>
   <data name="Ventilation" xml:space="preserve">
     <value>Lüftung</value>
@@ -138,17 +158,11 @@
   <data name="Window" xml:space="preserve">
     <value>Fenster</value>
   </data>
-  <data name="Air Recirculation" xml:space="preserve">
-    <value>Luftzirkulation</value>
-  </data>
-  <data name="Apartment Ventilation" xml:space="preserve">
-    <value>Lüftungssystem</value>
-  </data>
-  <data name="Temperature Control" xml:space="preserve">
-    <value>Einzelraumregelung</value>
-  </data>
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
+  </data>
+  <data name="Access" xml:space="preserve">
+    <value>Zugang</value>
   </data>
   <data name="Video" xml:space="preserve">
     <value>Video</value>
@@ -156,11 +170,11 @@
   <data name="Security" xml:space="preserve">
     <value>Sicherheit</value>
   </data>
-  <data name="Access" xml:space="preserve">
-    <value>Zugang</value>
+  <data name="Device" xml:space="preserve">
+    <value>Gerät</value>
   </data>
-  <data name="Joker" xml:space="preserve">
-    <value>Joker</value>
+  <data name="Light" xml:space="preserve">
+    <value>Licht</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unbekannt</value>

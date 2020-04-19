@@ -130,20 +130,26 @@ Jerome Zuercher (jerome.zuercher@digitalstrom.com), 2014-2015
 Chiappori (martina.chiappori@zetavision.ch), 2014
 Michael Troß (michael.tross@digitalstrom.com), 2020</value>
   </data>
-  <data name="Device" xml:space="preserve">
-    <value>Device</value>
+  <data name="Joker" xml:space="preserve">
+    <value>Joker</value>
   </data>
-  <data name="Light" xml:space="preserve">
-    <value>Light</value>
+  <data name="AirRecirculation" xml:space="preserve">
+    <value>Air Recirculation</value>
   </data>
-  <data name="Shading" xml:space="preserve">
-    <value>Shading</value>
+  <data name="ApartmentVentilation" xml:space="preserve">
+    <value>Apartment Ventilation</value>
+  </data>
+  <data name="Cooling" xml:space="preserve">
+    <value>Cooling</value>
   </data>
   <data name="Heating" xml:space="preserve">
     <value>Heating</value>
   </data>
-  <data name="Cooling" xml:space="preserve">
-    <value>Cooling</value>
+  <data name="Shade" xml:space="preserve">
+    <value>Shade</value>
+  </data>
+  <data name="TemperatureControl" xml:space="preserve">
+    <value>Temperature control</value>
   </data>
   <data name="Ventilation" xml:space="preserve">
     <value>Ventilation</value>
@@ -151,17 +157,11 @@ Michael Troß (michael.tross@digitalstrom.com), 2020</value>
   <data name="Window" xml:space="preserve">
     <value>Window</value>
   </data>
-  <data name="Air Recirculation" xml:space="preserve">
-    <value>Air Recirculation</value>
-  </data>
-  <data name="Apartment Ventilation" xml:space="preserve">
-    <value>Apartment Ventilation</value>
-  </data>
-  <data name="Temperature Control" xml:space="preserve">
-    <value>Temperature Control</value>
-  </data>
   <data name="Audio" xml:space="preserve">
     <value>Audio</value>
+  </data>
+  <data name="Access" xml:space="preserve">
+    <value>Access</value>
   </data>
   <data name="Video" xml:space="preserve">
     <value>Video</value>
@@ -169,11 +169,11 @@ Michael Troß (michael.tross@digitalstrom.com), 2020</value>
   <data name="Security" xml:space="preserve">
     <value>Security</value>
   </data>
-  <data name="Access" xml:space="preserve">
-    <value>Access</value>
+  <data name="Device" xml:space="preserve">
+    <value>Device</value>
   </data>
-  <data name="Joker" xml:space="preserve">
-    <value>Joker</value>
+  <data name="Light" xml:space="preserve">
+    <value>Light</value>
   </data>
   <data name="Unknown" xml:space="preserve">
     <value>Unknown</value>
