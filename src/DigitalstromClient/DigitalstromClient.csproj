@@ -26,21 +26,6 @@
     <PackageReference Include="Resource.Embedder" Version="2.1.0" />
   </ItemGroup>
 
-  <Target Name="GenerateDesignerFiles" BeforeTargets="BeforeBuild">
-    <Message Text="Deleting old Designer Files..." Importance="High" />
-    <Delete Files="@(EmbeddedResource->'%(RootDir)%(Directory)%(Filename).Designer.cs')" />
-    <Message Text="Generating Designer Files..." Importance="High" />
-    <GenerateResource
-      Sources="@(Resx)"
-      StronglyTypedLanguage="C#"
-      StronglyTypedClassName="%(Filename)"
-      StronglyTypedNamespace="@(Resx->'%(CustomToolNamespace)')"
-      OutputResources="@(Resx->'$(RootDir)%(Directory)%(Filename).Designer.cs')"
-      PublicClass="false">
-    </GenerateResource>
-    <Message Text="Generating Designer Files complete." Importance="High" />
-  </Target>
-
   <ItemGroup>
     <Compile Update="Locale\Group.Designer.cs">
       <DesignTime>True</DesignTime>
