@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
@@ -46,7 +47,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         UnknownType = 255,
     };
 
-    public class Sensor : IComparable, IComparable<Sensor>, IEquatable<Sensor>
+    public class Sensor : IComparable, IComparable<Sensor>, IEquatable<Sensor>, IFormattable
     {
         private readonly SensorType _type = SensorType.UnknownType;
 
@@ -95,7 +96,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public static IEnumerable<Sensor> GetTypes()
         {
-            return ((SensorType[])Enum.GetValues(typeof(SensorType))).Select(x => (Sensor)(int)x);
+            return ((SensorType[])Enum.GetValues(typeof(SensorType))).Select(x =>                            (Sensor)(int)x);
         }
 
         public static bool operator !=(Sensor type1, Sensor type2)
@@ -149,43 +150,70 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
+            return ToString(null, null);
+        }
+
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation
+        /// using the specified format and culture-specific format information.
+        /// </summary>
+        /// <param name="format">
+        /// Null for an invariant default format 'Sensor {sensor-type-num}: {sensor-type-name}'.
+        /// "D" or "d" for a localized displayable string of the sensor type,
+        /// if available for the given language of the format provider.
+        /// </param>
+        /// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>
+        /// The string representation of the value of this instance as specified by format and provider.
+        /// </returns>
+        public string ToString(string? format = null, IFormatProvider? formatProvider = null)
+        {
+            if (format is null)
+                return $"Sensor {(int)_type}: {Enum.GetName(typeof(SensorType), _type) ?? string.Empty}";
+
+            if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
+                throw new FormatException($"Did not recognize format '{format}'");
+
+            if (formatProvider is CultureInfo culture)
+                Locale.Group.Culture = culture;
+
             return _type switch
             {
-                SensorType.ActivePower => "SensorType 4: ActivePower",
-                SensorType.OutputCurrent => "SensorType 5: OutputCurrent",
-                SensorType.ElectricMeter => "SensorType 6: ElectricMeter",
-                SensorType.TemperatureIndoors => "SensorType 9: TemperatureIndoors",
-                SensorType.TemperatureOutdoors => "SensorType 10: TemperatureOutdoors",
-                SensorType.BrightnessIndoors => "SensorType 11: BrightnessIndoors",
-                SensorType.BrightnessOutdoors => "SensorType 12: BrightnessOutdoors",
-                SensorType.HumidityIndoors => "SensorType 13: HumidityIndoors",
-                SensorType.HumidityOutdoors => "SensorType 14: HumidityOutdoors",
-                SensorType.AirPressure => "SensorType 15: AirPressure",
-                SensorType.GustSpeed => "SensorType 16: GustSpeed",
-                SensorType.GustDirection => "SensorType 17: GustDirection",
-                SensorType.WindSpeed => "SensorType 18: WindSpeed",
-                SensorType.WindDirection => "SensorType 19: WindDirection",
-                SensorType.Precipitation => "SensorType 20: Precipitation",
-                SensorType.CO2Concentration => "SensorType 21: CO2Concentration",
-                SensorType.COConcentration => "SensorType 22: COConcentration",
-                SensorType.SoundPressureLevel => "SensorType 25: SoundPressureLevel",
-                SensorType.RoomTemperatureSetpoint => "SensorType 50: RoomTemperatureSetpoint",
-                SensorType.RoomTemperatureControlVariable => "SensorType 51: RoomTemperatureControlVariable",
-                SensorType.Status => "SensorType 60: Status",
-                SensorType.Reserved1 => "SensorType 61: Reserved1",
-                SensorType.Reserved2 => "SensorType 62: Reserved2",
-                SensorType.OutputCurrent16A => "SensorType 64: OutputCurrent16A",
-                SensorType.ActivePowerVA => "SensorType 65: ActivePowerVA",
-                SensorType.Temperature => "SensorType 66: Temperature",
-                SensorType.Brightness => "SensorType 67: Brightness",
-                SensorType.Humidity => "SensorType 68: Humidity",
-                SensorType.WaterQuantity => "SensorType 71: WaterQuantity",
-                SensorType.WaterFlowRate => "SensorType 72: WaterFlowRate",
-                SensorType.SunAzimuth => "SensorType 76: SunAzimuth",
-                SensorType.SunElevation => "SensorType 77: SunElevation",
-                SensorType.NotUsed => "SensorType 253: NotUsed",
-                SensorType.UnknownType => "SensorType 255: UnknownType",
-                _ => string.Format("SensorType {0}: Not defined!", _type),
+                SensorType.ActivePower => Locale.Sensor.ActivePower,
+                SensorType.OutputCurrent => Locale.Sensor.OutputCurrent,
+                SensorType.ElectricMeter => Locale.Sensor.ElectricMeter,
+                SensorType.TemperatureIndoors => Locale.Sensor.TemperatureIndoors,
+                SensorType.TemperatureOutdoors => Locale.Sensor.TemperatureOutdoors,
+                SensorType.BrightnessIndoors => Locale.Sensor.BrightnessIndoors,
+                SensorType.BrightnessOutdoors => Locale.Sensor.BrightnessOutdoors,
+                SensorType.HumidityIndoors => Locale.Sensor.RelativeHumidityIndoors,
+                SensorType.HumidityOutdoors => Locale.Sensor.RelativeHumidityOutdoors,
+                SensorType.AirPressure => Locale.Sensor.AirPressure,
+                SensorType.GustSpeed => Locale.Sensor.WindGustspeed,
+                SensorType.GustDirection => Locale.Sensor.WindGustdirection,
+                SensorType.WindSpeed => Locale.Sensor.WindSpeed,
+                SensorType.WindDirection => Locale.Sensor.WindDirection,
+                SensorType.Precipitation => Locale.Sensor.Precipitation,
+                SensorType.CO2Concentration => Locale.Sensor.CarbonDioxideConcentration,
+                SensorType.COConcentration => Locale.Sensor.CarbonMonoxideConcentration,
+                SensorType.SoundPressureLevel => Locale.Sensor.SoundPressureLevel,
+                SensorType.RoomTemperatureSetpoint => Locale.Sensor.RoomTemperatureSetpoint,
+                SensorType.RoomTemperatureControlVariable => Locale.Sensor.RoomTemperatureControl,
+                SensorType.Status => Locale.Sensor.Reserved,
+                SensorType.Reserved1 => Locale.Sensor.Reserved,
+                SensorType.Reserved2 => Locale.Sensor.Reserved,
+                SensorType.OutputCurrent16A => Locale.Sensor.OutputCurrentH,
+                SensorType.ActivePowerVA => Locale.Sensor.PowerConsumption,
+                SensorType.Temperature => Locale.Sensor.Temperature,
+                SensorType.Brightness => Locale.Sensor.Brightness,
+                SensorType.Humidity => Locale.Sensor.RelativeHumidity,
+                SensorType.WaterQuantity => Locale.Sensor.Reserved,
+                SensorType.WaterFlowRate => Locale.Sensor.Reserved,
+                SensorType.SunAzimuth => Locale.Sensor.SunAzimuth,
+                SensorType.SunElevation => Locale.Sensor.SunElevation,
+                SensorType.NotUsed => Locale.Sensor.NotUsed,
+                SensorType.UnknownType => Locale.Sensor.Unknown,
+                _ => Locale.Sensor.Unknown,
             };
         }
     }
