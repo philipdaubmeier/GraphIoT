@@ -177,7 +177,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override string ToString()
         {
-            return $"ID {_group}: {(Color)this} - {(GroupType)this}";
+            return ToString(null, null);
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         /// </summary>
         /// <param name="format">
         /// Null for an invariant default format 'ID {group-number}: {color} - {group-name}'.
-        /// "D" or "d" for a localized displayable string in the format '{color} - {group-name}',
+        /// "D" or "d" for a localized displayable string of the group name,
         /// if available for the given language of the format provider.
         /// </param>
         /// <param name="formatProvider">An object that supplies culture-specific formatting information.</param>
