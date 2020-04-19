@@ -32,14 +32,36 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Group.resx</DependentUpon>
     </Compile>
+    <Compile Update="Locale\Scene.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Scene.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Locale\Sensor.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Sensor.resx</DependentUpon>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Update="Locale\Group.resx">
       <SubType>Designer</SubType>
       <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
-      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Group.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\Scene.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <LastGenOutput>Scene.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\Sensor.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <LastGenOutput>Sensor.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
     </EmbeddedResource>
   </ItemGroup>
 
