@@ -56,6 +56,8 @@ namespace PhilipDaubmeier.GraphIoT.App
                 }
             });
 
+            services.AddLocalization(config => config.ResourcesPath = "Locale");
+
             services.AddOptions();
 
             services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig);
