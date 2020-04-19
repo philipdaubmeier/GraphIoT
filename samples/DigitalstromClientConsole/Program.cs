@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
@@ -51,7 +52,7 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             var reachableScenes = await client.GetReachableScenes(zone, group);
 
             Console.WriteLine($"Reachable scenes in zone '{zone}', group '{group}':");
-            Console.WriteLine(string.Join("\n", reachableScenes.ReachableScenes.Select(s => "\t" + s.ToDisplayString())));
+            Console.WriteLine(string.Join("\n", reachableScenes.ReachableScenes.Select(s => "\t" + s.ToString("d", CultureInfo.CurrentUICulture))));
         }
     }
 }

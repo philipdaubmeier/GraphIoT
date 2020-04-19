@@ -80,7 +80,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                     time: dssEvent.TimestampUtc,
                     title: $"{dssEvent.SystemEvent.Name}",
                     text: $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
-                    tags: new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToString(null, CultureInfo.CurrentUICulture), dssEvent.Properties.SceneID.ToDisplayString() }
+                    tags: new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToString("d", CultureInfo.CurrentUICulture), dssEvent.Properties.SceneID.ToString("d", CultureInfo.CurrentUICulture) }
                 );
             }
         }
