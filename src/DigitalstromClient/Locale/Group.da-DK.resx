@@ -119,7 +119,7 @@
   </resheader>
   <data name="_Authors" xml:space="preserve">
     <value>Original translations extracted from translation files of the digitalSTROM server installer ui:
-https://git.digitalstrom.org/dss-websrc/dss-websrc-mainline/blob/master/webroot/locale/en_US/dss-installer.po
+https://git.digitalstrom.org/dss-websrc/dss-websrc-mainline/blob/master/webroot/locale/da_DK/dss-installer.po
 Copyright (c) 2020 digitalSTROM.org, Zurich, Switzerland
 
 Christian (christian.hitz@digitalstrom.com), 2016,2018-2019
