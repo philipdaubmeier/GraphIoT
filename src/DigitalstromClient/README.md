@@ -42,7 +42,7 @@ var lastCalledScenes = await dssClient.GetZonesAndLastCalledScenes();
 foreach (var zone in lastCalledScenes.Zones)
 {
     var yellowScene = zone.Groups.First(g => g.Group == Color.Yellow).LastCalledScene;
-    Console.WriteLine($"zone id {zone.ZoneID} has yellow group scene: {yellowScene.ToDisplayString()}");
+    Console.WriteLine($"zone id {zone.ZoneID} has yellow group scene: {yellowScene.ToString("d")}");
 }
 ```
 
