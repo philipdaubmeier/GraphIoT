@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.ViewModel
         {
             return DeferredLoadGraph<TimeSeries<double>, double>(index,
                 k => $"{(MeasureType)(_netatmoStructure.GetMeasure(k) ?? MeasureType.Temperature)} {_netatmoStructure.GetModuleName(_netatmoStructure.GetModuleId(k) ?? string.Empty)} {_netatmoStructure.GetDeviceName(_netatmoStructure.GetDeviceId(k) ?? string.Empty)}",
-                k => $"measure_{_netatmoStructure.GetModuleId(k)}_{_netatmoStructure.GetMeasure(k)}", "#.#");
+                k => _localizer["measure_{0}_{1}", _netatmoStructure.GetModuleId(k), _netatmoStructure.GetMeasure(k)], "#.#");
         }
     }
 }

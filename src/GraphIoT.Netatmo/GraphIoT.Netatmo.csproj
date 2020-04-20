@@ -23,4 +23,10 @@
     <ProjectReference Include="..\TokenStore\TokenStore.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Locale\ViewModel.NetatmoMeasureViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
