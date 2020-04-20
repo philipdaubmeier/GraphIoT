@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.GraphIoT.Core.Config;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Config;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -21,14 +23,15 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 {
     public static class DigitalstromHostExtensions
     {
-        public static IServiceCollection AddDigitalstromHost(this IServiceCollection serviceCollection, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig)
+        public static IServiceCollection AddDigitalstromHost(this IServiceCollection serviceCollection, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig)
         {
             serviceCollection.Configure<DigitalstromConfig>(digitalstromConfig);
+
+            serviceCollection.Configure<NetworkConfig>(networkConfig);
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
 
-            serviceCollection.AddTransient<DigitalstromConfigConnectionBuilder>();
             serviceCollection.AddDssHttpClient();
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
             serviceCollection.AddScoped<DigitalstromDssClient>();
@@ -50,12 +53,12 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
             return serviceCollection;
         }
 
-        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
+        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
         {
             serviceCollection.AddDbContext<IDigitalstromDbContext, TDbContext>(dbConfig);
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
 
-            return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig);
+            return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig, networkConfig);
         }
 
         public static IServiceCollection AddDssHttpClient(this IServiceCollection serviceCollection)
@@ -84,19 +87,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
                 {
                     client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
                 })
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-                {
-                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
-                })
+                .ConfigurePrimaryHttpMessageHandler(services => new HttpClientHandler().SetProxy(services.GetService<IOptions<NetworkConfig>>()))
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);
 
             serviceCollection.AddHttpClient<DigitalstromLongPollingHttpClient>()
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-                {
-                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
-                });
+                .ConfigurePrimaryHttpMessageHandler(services => new HttpClientHandler().SetProxy(services.GetService<IOptions<NetworkConfig>>()));
 
             return serviceCollection;
         }

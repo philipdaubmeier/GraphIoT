@@ -86,7 +86,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                 // Add all digitalstrom services using the mocked in-memory db
                 services.AddDigitalstromHost<IntegrationTestDbContext>(dbConfig,
                     integrationTestConfig.GetSection("DigitalstromConfig"),
-                    integrationTestConfig.GetSection("TokenStoreConfig")
+                    integrationTestConfig.GetSection("TokenStoreConfig"),
+                    integrationTestConfig.GetSection("Network")
                 );
 
                 // Replace the digitalstrom connection provider with a http mock for testing

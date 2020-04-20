@@ -21,6 +21,13 @@
       }
     }
   },
+  "Network": {
+    "Proxy": {
+      "UseProxy": false,
+      "Address": "127.0.0.1",
+      "Port": 8080
+    }
+  },
   "ConnectionStrings": {
     "DigitalstromTimeSeriesDB": "<sql server connection string>"
   },
@@ -47,8 +54,6 @@
     "DssUriCloudredir": "https://domain.tld/redir?adr={CloudDssId}&token={CloudredirToken}&path=",
     "CloudDssId": "mock",
     "CloudredirToken": "",
-    "UseCloudredir": false,
-    "Proxy": "",
-    "ProxyPort": ""
+    "UseCloudredir": false
   }
 }

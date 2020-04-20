@@ -46,7 +46,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// client that does not follow redirects. Use this handler for that
         /// purpose.
         /// </summary>
-        public static HttpMessageHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
+        public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
 
         public string PlattformApiClientId { get; set; } = string.Empty;
         public string PlattformApiClientSecret { get; set; } = string.Empty;

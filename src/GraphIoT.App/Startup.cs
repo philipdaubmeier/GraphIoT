@@ -36,6 +36,7 @@ namespace PhilipDaubmeier.GraphIoT.App
             void smarthomeSqlServer(DbContextOptionsBuilder options) =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
 
+            var networkConfig = Configuration.GetSection("Network");
             var tokenConfig = Configuration.GetSection("TokenStoreConfig");
 
             services.AddDbContext<PersistenceContext>(smarthomeSqlServer);
@@ -60,13 +61,13 @@ namespace PhilipDaubmeier.GraphIoT.App
 
             services.AddOptions();
 
-            services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig);
+            services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig, networkConfig);
 
-            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), tokenConfig);
+            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), tokenConfig, networkConfig);
 
-            services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig);
+            services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig, networkConfig);
 
-            services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), tokenConfig);
+            services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), tokenConfig, networkConfig);
 
             services.AddDatabaseBackupService<PersistenceContext>();
 
