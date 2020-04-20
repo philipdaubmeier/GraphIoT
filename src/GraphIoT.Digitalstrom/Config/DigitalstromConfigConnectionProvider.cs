@@ -23,15 +23,22 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
         public HttpClient? Client { get; private set; }
     }
 
+    public class DigitalstromConfigConnectionBuilder : DigitalstromConfigConnectionProvider
+    {
+        public DigitalstromConfigConnectionBuilder(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
+            : base(tokenStore, config, null, null)
+        { }
+    }
+
     public class DigitalstromConfigConnectionProvider : DigitalstromConnectionProvider
     {
-        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, DigitalstromHttpClient client, DigitalstromLongPollingHttpClient longPollingClient)
+        public DigitalstromConfigConnectionProvider(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config, DigitalstromHttpClient? client, DigitalstromLongPollingHttpClient? longPollingClient)
             : base(UrisFromConfig(config), AuthFromConfig(tokenStore, config), CertFromConfig(config))
         {
-            if (client.Client is HttpClient innerClient)
+            if (client?.Client is HttpClient innerClient)
                 HttpClient = innerClient;
 
-            if (longPollingClient.Client is HttpClient innerLongPollingClient)
+            if (longPollingClient?.Client is HttpClient innerLongPollingClient)
                 LongPollingHttpClient = innerLongPollingClient;
         }
 
