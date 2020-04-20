@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Config;
@@ -15,6 +16,7 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
 using System;
+using System.Net;
 using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
@@ -28,7 +30,6 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
 
-            serviceCollection.AddTransient<DigitalstromConfigConnectionBuilder>();
             serviceCollection.AddDssHttpClient();
             serviceCollection.AddTransient<IDigitalstromConnectionProvider, DigitalstromConfigConnectionProvider>();
             serviceCollection.AddScoped<DigitalstromDssClient>();
@@ -60,6 +61,20 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 
         public static IServiceCollection AddDssHttpClient(this IServiceCollection serviceCollection)
         {
+            static HttpClientHandler ConfigureHandlerWithProxy(IServiceProvider serviceProvider)
+            {
+                var handler = new HttpClientHandler();
+
+                var config = serviceProvider.GetService<IOptions<DigitalstromConfig>>();
+                if (!string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
+                {
+                    handler.UseProxy = true;
+                    handler.Proxy = new WebProxy(config.Value.Proxy, port);
+                }
+
+                return handler;
+            }
+
             var retryPolicy = HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .Or<TimeoutRejectedException>()
@@ -84,19 +99,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
                 {
                     client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
                 })
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-                {
-                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
-                })
+                .ConfigurePrimaryHttpMessageHandler(ConfigureHandlerWithProxy)
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);
 
             serviceCollection.AddHttpClient<DigitalstromLongPollingHttpClient>()
-                .ConfigurePrimaryHttpMessageHandler(serviceProvider =>
-                {
-                    return (serviceProvider.GetRequiredService<DigitalstromConfigConnectionBuilder>() as DigitalstromConfigConnectionBuilder)?.Handler;
-                });
+                .ConfigurePrimaryHttpMessageHandler(ConfigureHandlerWithProxy);
 
             return serviceCollection;
         }
