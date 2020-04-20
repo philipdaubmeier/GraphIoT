@@ -32,11 +32,11 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.ViewModel
 
             return index switch
             {
-                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, "Produktion Wh", null, "# Wh", PreprocessSolarProduction),
-                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, "Kollektortemperatur °C", null, "#.# °C"),
-                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, "Warmwassertemperatur °C", null, "#.# °C"),
-                3 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, "Solarpumpe", null, "# (aus/ein)"),
-                4 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, "Nachheizunterdrückung", null, "# (aus/ein)"),
+                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Solar Wh"], null, "# Wh", PreprocessSolarProduction),
+                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Solar collector temperature °C"], null, "#.# °C"),
+                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Solar hot water temperature °C"], null, "#.# °C"),
+                3 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Solar pump"], null, _localizer["# (off/on)"]),
+                4 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Solar suppression"], null, _localizer["# (off/on)"]),
                 _ => new GraphViewModel(),
             };
         }

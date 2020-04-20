@@ -23,4 +23,13 @@
     <ProjectReference Include="..\ViessmannClient\ViessmannClient.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Update="Locale\ViewModel.ViessmannSolarViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\ViewModel.ViessmannHeatingViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>
