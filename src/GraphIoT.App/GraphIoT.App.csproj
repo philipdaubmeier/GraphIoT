@@ -61,10 +61,4 @@
     <ProjectReference Include="..\GraphIoT.Viessmann\GraphIoT.Viessmann.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Locale\Digitalstrom.ViewModel.DigitalstromEnergyViewModel.de-DE.resx">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-
 </Project>
