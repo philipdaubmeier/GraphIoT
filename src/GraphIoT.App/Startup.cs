@@ -36,6 +36,7 @@ namespace PhilipDaubmeier.GraphIoT.App
             void smarthomeSqlServer(DbContextOptionsBuilder options) =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));
 
+            var networkConfig = Configuration.GetSection("Network");
             var tokenConfig = Configuration.GetSection("TokenStoreConfig");
 
             services.AddDbContext<PersistenceContext>(smarthomeSqlServer);
@@ -60,7 +61,7 @@ namespace PhilipDaubmeier.GraphIoT.App
 
             services.AddSonnenHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("SonnenConfig"), tokenConfig);
 
-            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), tokenConfig);
+            services.AddDigitalstromHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("DigitalstromConfig"), tokenConfig, networkConfig);
 
             services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig);
 

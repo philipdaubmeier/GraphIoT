@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using PhilipDaubmeier.DigitalstromClient;
+using PhilipDaubmeier.GraphIoT.Core.Config;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Config;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -16,16 +17,17 @@ using Polly;
 using Polly.Extensions.Http;
 using Polly.Timeout;
 using System;
-using System.Net;
 using System.Net.Http;
 
 namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
 {
     public static class DigitalstromHostExtensions
     {
-        public static IServiceCollection AddDigitalstromHost(this IServiceCollection serviceCollection, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig)
+        public static IServiceCollection AddDigitalstromHost(this IServiceCollection serviceCollection, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig)
         {
             serviceCollection.Configure<DigitalstromConfig>(digitalstromConfig);
+
+            serviceCollection.Configure<NetworkConfig>(networkConfig);
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<PersistingDigitalstromAuth>();
@@ -51,30 +53,16 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
             return serviceCollection;
         }
 
-        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
+        public static IServiceCollection AddDigitalstromHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration digitalstromConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig) where TDbContext : DbContext, IDigitalstromDbContext, ITokenStoreDbContext
         {
             serviceCollection.AddDbContext<IDigitalstromDbContext, TDbContext>(dbConfig);
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
 
-            return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig);
+            return serviceCollection.AddDigitalstromHost(digitalstromConfig, tokenStoreConfig, networkConfig);
         }
 
         public static IServiceCollection AddDssHttpClient(this IServiceCollection serviceCollection)
         {
-            static HttpClientHandler ConfigureHandlerWithProxy(IServiceProvider serviceProvider)
-            {
-                var handler = new HttpClientHandler();
-
-                var config = serviceProvider.GetService<IOptions<DigitalstromConfig>>();
-                if (!string.IsNullOrWhiteSpace(config.Value.Proxy) && int.TryParse(config.Value.ProxyPort, out int port))
-                {
-                    handler.UseProxy = true;
-                    handler.Proxy = new WebProxy(config.Value.Proxy, port);
-                }
-
-                return handler;
-            }
-
             var retryPolicy = HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .Or<TimeoutRejectedException>()
@@ -99,13 +87,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.DependencyInjection
                 {
                     client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
                 })
-                .ConfigurePrimaryHttpMessageHandler(ConfigureHandlerWithProxy)
+                .ConfigurePrimaryHttpMessageHandler(services => new HttpClientHandler().SetProxy(services.GetService<IOptions<NetworkConfig>>()))
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);
 
             serviceCollection.AddHttpClient<DigitalstromLongPollingHttpClient>()
-                .ConfigurePrimaryHttpMessageHandler(ConfigureHandlerWithProxy);
+                .ConfigurePrimaryHttpMessageHandler(services => new HttpClientHandler().SetProxy(services.GetService<IOptions<NetworkConfig>>()));
 
             return serviceCollection;
         }
