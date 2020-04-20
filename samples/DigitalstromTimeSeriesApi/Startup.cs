@@ -52,7 +52,8 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
                         options.UseSqlServer(connectionString);
                     },
                     Configuration.GetSection("DigitalstromConfig"),
-                    Configuration.GetSection("TokenStoreConfig")
+                    Configuration.GetSection("TokenStoreConfig"),
+                    Configuration.GetSection("Network")
                 )
                 .AddGrafanaHost();
         }
