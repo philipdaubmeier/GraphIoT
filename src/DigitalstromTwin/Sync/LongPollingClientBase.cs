@@ -30,6 +30,29 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
         private readonly CancellationToken cancellationToken;
 
+        protected ExponentialBackoff Backoff { get; } = new ExponentialBackoff();
+
+        protected class ExponentialBackoff
+        {
+            private const int _initialMs = 200;
+            private const int _maxMs = 60000;
+            private const double _factor = 1.5d;
+
+            private int _current = _initialMs;
+
+            public void Reset()
+            {
+                _current = _initialMs;
+            }
+
+            public async Task Delay()
+            {
+                await Task.Delay(_current);
+
+                _current = Math.Min(_maxMs, (int)(_current * _factor));
+            }
+        }
+
         public LongPollingClientBase()
         {
             cancellationToken = cancellationSource.Token;
@@ -46,10 +69,13 @@ namespace PhilipDaubmeier.DigitalstromTwin
                 {
                     foreach (var apiEvent in await ProcessEventPolling())
                         OnApiEventRaised(apiEvent);
+
+                    Backoff.Reset();
                 }
                 catch (Exception ex)
                 {
                     OnErrorOccured(ex);
+                    await Backoff.Delay();
                 }
             }
         }

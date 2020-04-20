@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
     {
         private class DigitalstromLongPollingConnectionProvider : IDigitalstromConnectionProvider
         {
-            private IDigitalstromConnectionProvider inner;
+            private readonly IDigitalstromConnectionProvider inner;
 
             public DigitalstromLongPollingConnectionProvider(IDigitalstromConnectionProvider inner) => this.inner = inner;
 
