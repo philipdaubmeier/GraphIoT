@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using PhilipDaubmeier.GraphIoT.Core.Config;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Sonnen.Config;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
@@ -20,9 +22,11 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection
 {
     public static class SonnenHostExtensions
     {
-        public static IServiceCollection AddSonnenHost(this IServiceCollection serviceCollection, IConfiguration sonnenConfig, IConfiguration tokenStoreConfig)
+        public static IServiceCollection AddSonnenHost(this IServiceCollection serviceCollection, IConfiguration sonnenConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig)
         {
             serviceCollection.Configure<SonnenConfig>(sonnenConfig);
+
+            serviceCollection.Configure<NetworkConfig>(networkConfig);
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<SonnenPortalClient>();
@@ -39,12 +43,12 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection
             return serviceCollection;
         }
 
-        public static IServiceCollection AddSonnenHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration sonnenConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, ISonnenDbContext, ITokenStoreDbContext
+        public static IServiceCollection AddSonnenHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration sonnenConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig) where TDbContext : DbContext, ISonnenDbContext, ITokenStoreDbContext
         {
             serviceCollection.AddDbContext<ISonnenDbContext, TDbContext>(dbConfig);
             serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
 
-            return serviceCollection.AddSonnenHost(sonnenConfig, tokenStoreConfig);
+            return serviceCollection.AddSonnenHost(sonnenConfig, tokenStoreConfig, networkConfig);
         }
 
         public static IServiceCollection AddSonnenHttpClient(this IServiceCollection serviceCollection)
@@ -73,7 +77,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection
             {
                 client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
             })
-                .ConfigurePrimaryHttpMessageHandler(() => SonnenConnectionProvider.CreateHandler())
+                .ConfigurePrimaryHttpMessageHandler(services => SonnenConnectionProvider.CreateHandler().SetProxy(services.GetService<IOptions<NetworkConfig>>()))
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);

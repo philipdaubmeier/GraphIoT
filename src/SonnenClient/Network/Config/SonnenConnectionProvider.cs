@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// For authentication on my.sonnen.de portal we need a handler that supports cookies.
         /// Always use this as inner handler if you create an own HttpClient to inject.
         /// </summary>
-        public static HttpMessageHandler CreateHandler() => new HttpClientHandler()
+        public static HttpClientHandler CreateHandler() => new HttpClientHandler()
         {
             UseCookies = true,
             CookieContainer = cookieContainer

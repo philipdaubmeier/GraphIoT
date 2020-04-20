@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using PhilipDaubmeier.GraphIoT.Core.Config;
 using PhilipDaubmeier.GraphIoT.Core.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Viessmann.Config;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
@@ -20,14 +22,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 {
     public static class ViessmannHostExtensions
     {
-        public static IServiceCollection AddViessmannHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration viessmannConfig, IConfiguration tokenStoreConfig) where TDbContext : DbContext, IViessmannDbContext, ITokenStoreDbContext
+        public static IServiceCollection AddViessmannHost(this IServiceCollection serviceCollection, IConfiguration viessmannConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig)
         {
-            serviceCollection.AddDbContext<IViessmannDbContext, TDbContext>(dbConfig);
-
             serviceCollection.Configure<ViessmannConfig>(viessmannConfig);
 
+            serviceCollection.Configure<NetworkConfig>(networkConfig);
+
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
-            serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
             serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
@@ -49,6 +50,14 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
             serviceCollection.AddGraphCollectionViewModel<ViessmannSolarViewModel>();
 
             return serviceCollection;
+        }
+
+        public static IServiceCollection AddViessmannHost<TDbContext>(this IServiceCollection serviceCollection, Action<DbContextOptionsBuilder> dbConfig, IConfiguration viessmannConfig, IConfiguration tokenStoreConfig, IConfiguration networkConfig) where TDbContext : DbContext, IViessmannDbContext, ITokenStoreDbContext
+        {
+            serviceCollection.AddDbContext<IViessmannDbContext, TDbContext>(dbConfig);
+            serviceCollection.AddTokenStoreDbContext<TDbContext>(dbConfig);
+
+            return serviceCollection.AddViessmannHost(viessmannConfig, tokenStoreConfig, networkConfig);
         }
 
         public static IServiceCollection AddViessmannHttpClient<TClient>(this IServiceCollection serviceCollection) where TClient : class
@@ -79,7 +88,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
             {
                 client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
             })
-                .ConfigurePrimaryHttpMessageHandler(() => useAuthHandler ? ViessmannConnectionProvider<TClient>.CreateAuthHandler() : new HttpClientHandler())
+                .ConfigurePrimaryHttpMessageHandler(services =>
+                    (useAuthHandler ? ViessmannConnectionProvider<TClient>.CreateAuthHandler() : new HttpClientHandler())
+                    .SetProxy(services.GetService<IOptions<NetworkConfig>>())
+                )
                 .AddPolicyHandler(retryPolicy)
                 .AddPolicyHandler(timeoutIndividualTryPolicy)
                 .AddPolicyHandler(circuitBreakerPolicy);
