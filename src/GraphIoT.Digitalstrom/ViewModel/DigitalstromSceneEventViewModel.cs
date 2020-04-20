@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.DigitalstromClient.Model.Core;
+﻿using Microsoft.Extensions.Localization;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
@@ -34,11 +35,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
         private readonly IDigitalstromDbContext _db;
         private readonly IDigitalstromStructureService _dsStructure;
+        private readonly IStringLocalizer<DigitalstromSceneEventViewModel> _localizer;
 
-        public DigitalstromSceneEventViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure) : base()
+        public DigitalstromSceneEventViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromSceneEventViewModel> localizer) : base()
         {
             _db = databaseContext;
             _dsStructure = dsStructure;
+            _localizer = localizer;
         }
 
         public override string Key => "sceneevents";
@@ -78,8 +81,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             {
                 yield return new EventViewModel(
                     time: dssEvent.TimestampUtc,
-                    title: $"{dssEvent.SystemEvent.Name}",
-                    text: $"{dssEvent.SystemEvent.Name}, zone {(int)dssEvent.Properties.ZoneID}, group {(int)dssEvent.Properties.GroupID}, scene {(int)dssEvent.Properties.SceneID}",
+                    title: _localizer["event: {0}", dssEvent.SystemEvent.Name],
+                    text: _localizer["{0}, zone {1}, group {2}, scene {3}", dssEvent.SystemEvent.Name, (int)dssEvent.Properties.ZoneID, (int)dssEvent.Properties.GroupID, (int)dssEvent.Properties.SceneID],
                     tags: new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToString("d", CultureInfo.CurrentUICulture), dssEvent.Properties.SceneID.ToString("d", CultureInfo.CurrentUICulture) }
                 );
             }

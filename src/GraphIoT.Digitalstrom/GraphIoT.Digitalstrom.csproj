@@ -24,6 +24,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Locale\ViewModel.DigitalstromZoneSensorViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\ViewModel.DigitalstromSceneEventViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Locale\ViewModel.DigitalstromEnergyViewModel.de-DE.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
