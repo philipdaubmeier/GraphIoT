@@ -17,6 +17,9 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private const string _authUri = "https://identity.vwgroup.io";
 
+        private const string _baseUri = "https://www.portal.volkswagen-we.com";
+        private const string _landingPageUri = "https://www.portal.volkswagen-we.com/portal/en_GB/web/guest/home";
+
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
@@ -62,6 +65,15 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             {
                 _renewTokenSemaphore.WaitOne();
 
+                var state = new AuthState();
+                await GetInitialCsrf(state);
+                await GetLoginPageUri(state);
+                await GetLoginRelayState(state);
+                await GetLoginHmacToken(state);
+                await LoginIdentifier(state);
+                await LoginAuthenticate(state);
+                await CompleteLogin(state);
+                await GetFinalCsrf(state);
 
                 throw new IOException("Could not authenticate");
             }
@@ -71,5 +83,104 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             }
         }
 
+        private class AuthState
+        {
+            public string Csrf { get; set; } = string.Empty;
+            public string Referrer { get; set; } = string.Empty;
+            public string BaseJsonUri { get; set; } = string.Empty;
+            public string LoginUri { get; set; } = string.Empty;
+            public string ClientId { get; set; } = string.Empty;
+            public string RelayStateToken { get; set; } = string.Empty;
+            public string HmacToken1 { get; set; } = string.Empty;
+            public string HmacToken2 { get; set; } = string.Empty;
+            public string LoginCsrf { get; set; } = string.Empty;
+            public string PortletAuthCode { get; set; } = string.Empty;
+            public string PortletAuthState { get; set; } = string.Empty;
+        }
+
+        /// <summary>
+        /// Step 1
+        /// Get initial CSRF from landing page to get login process started. HttpClient
+        /// stores JSESSIONID cookie.
+        ///
+        /// Step 1a,1b
+        /// Note: Portal performs a get-supported-browsers and get-countries at this point.
+        /// Those steps are skipped - we assume en_GB
+        /// </summary>
+        private async Task GetInitialCsrf(AuthState state)
+        {
+            //_landingPageUri
+        }
+
+        /// <summary>
+        /// Step 2
+        /// Get login page url. POST returns JSON with loginURL for next step. Returned
+        /// loginURL includes client_id for step 4.
+        /// </summary>
+        private async Task GetLoginPageUri(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 3
+        /// Get login form url we are told to use, it will give us a new location.
+        /// response header location (redirect URL) includes relayState for step 5
+        /// https://identity.vwgroup.io/oidc/v1/authorize...
+        /// </summary>
+        private async Task GetLoginRelayState(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 4
+        /// Get login action url, relay state. hmac token 1 and login CSRF from form contents
+        /// https://identity.vwgroup.io/signin-service/v1/signin/<client_id>@relayState=<relay_state>
+        /// </summary>
+        private async Task GetLoginHmacToken(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 5
+        /// Post initial login data
+        /// https://identity.vwgroup.io/signin-service/v1/<client_id>/login/identifier
+        /// </summary>
+        private async Task LoginIdentifier(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 6
+        /// Post login data to "login action 2" url
+        /// https://identity.vwgroup.io/signin-service/v1/<client_id>/login/authenticate
+        /// </summary>
+        private async Task LoginAuthenticate(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 7
+        /// Site first does a POST https://www.portal.volkswagen-we.com/portal/web/guest/complete-login/-/mainnavigation/get-countries
+        /// Post login data to complete login url
+        /// https://www.portal.volkswagen-we.com/portal/web/guest/complete-login?p_auth=<state>&p_p_id=33_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_33_WAR_cored5portlet_javax.portlet.action=getLoginStatus
+        /// </summary>
+        private async Task CompleteLogin(AuthState state)
+        {
+            // TODO
+        }
+
+        /// <summary>
+        /// Step 8
+        /// Get base JSON url for commands
+        /// </summary>
+        private async Task GetFinalCsrf(AuthState state)
+        {
+            // TODO
+        }
     }
 }
