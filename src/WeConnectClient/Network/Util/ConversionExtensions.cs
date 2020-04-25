@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 
 namespace PhilipDaubmeier.WeConnectClient.Network
@@ -17,6 +18,11 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 return new KeyValuePair<string, string>(valuePair[0], valuePair.Length <= 1 ? string.Empty : valuePair[1]);
             }).ToDictionary((kvp) => kvp.Key, (kvp) => kvp.Value);
             return dict;
+        }
+
+        public static void FormUrlEncoded(this HttpRequestMessage request, IEnumerable<(string, string)> values)
+        {
+            request.Content = new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
         }
 
         public static bool TryGetValue(this GroupCollection groupCollection, string key, out Group? value)

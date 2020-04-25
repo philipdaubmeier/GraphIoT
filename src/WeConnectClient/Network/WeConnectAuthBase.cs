@@ -100,6 +100,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             public string LoginUri { get; set; } = string.Empty;
             public string ClientId { get; set; } = string.Empty;
             public string RelayStateToken { get; set; } = string.Empty;
+            public string LoginFormUrl { get; set; } = string.Empty;
             public string HmacToken1 { get; set; } = string.Empty;
             public string HmacToken2 { get; set; } = string.Empty;
             public string LoginCsrf { get; set; } = string.Empty;
@@ -194,6 +195,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to get relay state.");
 
             state.RelayStateToken = loginRelayStateToken;
+            state.LoginFormUrl = loginFormUrl.ToString();
         }
 
         /// <summary>
@@ -203,7 +205,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetLoginHmacToken(AuthState state)
         {
-            var loginFormLocationRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginUri);
+            var loginFormLocationRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginFormUrl);
             AddCommonAuthHeaders(loginFormLocationRequest.Headers, state.Csrf, state.Referrer);
             var loginFormLocationResponse = await _client.SendAsync(loginFormLocationRequest);
 
@@ -220,6 +222,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             state.HmacToken1 = hmac;
             state.LoginCsrf = csrf;
+            state.Referrer = state.LoginFormUrl;
         }
 
         /// <summary>
@@ -229,7 +232,28 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task LoginIdentifier(AuthState state)
         {
-            // TODO
+            var loginActionUri = new Uri(new Uri(_authUri), $"/signin-service/v1/{state.ClientId}/login/identifier");
+            var loginActionUrlRequest = new HttpRequestMessage(HttpMethod.Post, loginActionUri);
+            AddCommonAuthHeaders(loginActionUrlRequest.Headers, null, state.Referrer);
+            loginActionUrlRequest.FormUrlEncoded(new[]
+            {
+                ("email", _connectionProvider.AuthData.Username),
+                ("relayState", state.RelayStateToken),
+                ("hmac", state.HmacToken1),
+                ("_csrf", state.LoginCsrf)
+            });
+            var loginActionUrlResponse = await _client.SendAsync(loginActionUrlRequest);
+
+            // performs a 303 redirect to https://identity.vwgroup.io/signin-service/v1/<client_id>/login/authenticate?relayState=<relayState>&email=<email>
+            // redirected GET returns form used below.
+            if (!loginActionUrlResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to get login/identifier page.");
+
+            var loginActionBody = (await loginActionUrlResponse.Content.ReadAsStringAsync()).Replace("\n", "").Replace("\r", "");
+            if (!loginActionBody.TryExtractLoginHmac(out string hmac))
+                throw new IOException("Failed to get 2nd HMAC token.");
+
+            state.HmacToken2 = hmac;
         }
 
         /// <summary>
