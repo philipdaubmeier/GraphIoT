@@ -254,6 +254,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to get 2nd HMAC token.");
 
             state.HmacToken2 = hmac;
+            state.Referrer = loginActionUri.ToString();
         }
 
         /// <summary>
@@ -263,7 +264,39 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task LoginAuthenticate(AuthState state)
         {
-            // TODO
+            var loginAction2Uri = new Uri(new Uri(_authUri), $"/signin-service/v1/{state.ClientId}/login/authenticate");
+            var loginAction2UrlRequest = new HttpRequestMessage(HttpMethod.Post, loginAction2Uri);
+            AddCommonAuthHeaders(loginAction2UrlRequest.Headers, null, state.Referrer);
+            loginAction2UrlRequest.FormUrlEncoded(new[]
+            {
+                ("email", _connectionProvider.AuthData.Username),
+                ("password", _connectionProvider.AuthData.UserPassword),
+                ("relayState", state.RelayStateToken),
+                ("hmac", state.HmacToken2),
+                ("_csrf", state.LoginCsrf),
+                ("login", "true")
+            });
+            var loginAction2UrlResponse = await _authClient.SendAsync(loginAction2UrlRequest);
+
+            // performs a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/oauth/sso?clientId=<client_id>&relayState=<relay_state>&userId=<userID>&HMAC=<...>"
+            // then a 302 redirect to GET https://identity.vwgroup.io/consent/v1/users/<userID>/<client_id>?scopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&relay_state=1bc582f3ff177afde55b590af92e17a006f9c532&callback=https://identity.vwgroup.io/oidc/v1/oauth/client/callback&hmac=<.....>
+            // then a 302 redirect to https://identity.vwgroup.io/oidc/v1/oauth/client/callback/success?user_id=<userID>&client_id=<client_id>&scopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&consentedScopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&relay_state=<relayState>&hmac=<...>
+            // then a 302 redirect to https://www.portal.volkswagen-we.com/portal/web/guest/complete-login?state=<csrf>&code=<....>
+            Uri? lastLocation = null;
+            while (loginAction2UrlResponse.StatusCode == HttpStatusCode.Found)
+                loginAction2UrlResponse = await _authClient.GetAsync(lastLocation = loginAction2UrlResponse.Headers.Location);
+
+            if (!loginAction2UrlResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to process login sequence.");
+            if (lastLocation is null)
+                throw new IOException("Failed to read auth code and state from url.");
+            if (!lastLocation.TryExtractUriParameter("code", out string authCode))
+                throw new IOException("Failed to get portlet code.");
+            if (!lastLocation.TryExtractUriParameter("state", out string authState))
+                throw new IOException("Failed to get state.");
+
+            state.PortletAuthCode = authCode;
+            state.PortletAuthState = authState;
         }
 
         /// <summary>

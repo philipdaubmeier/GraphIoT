@@ -54,10 +54,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             return found;
         }
 
-        public static bool TryExtractUriParameter(this Uri uri, string paramName, out string hmac)
+        public static bool TryExtractUriParameter(this Uri uri, string paramName, out string value)
         {
-            var found = uri.ParseQueryString().TryGetValue(paramName, out string? hmacOrNull);
-            hmac = hmacOrNull ?? string.Empty;
+            var found = uri.ParseQueryString().TryGetValue(paramName, out string? valueOrNull);
+            value = valueOrNull ?? string.Empty;
             return found;
         }
     }
