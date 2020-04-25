@@ -12,6 +12,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
     {
         protected readonly IWeConnectConnectionProvider _connectionProvider;
 
+        private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0";
+
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
 
@@ -102,6 +104,20 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             public string PortletAuthState { get; set; } = string.Empty;
         }
 
+        private void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
+        {
+            headers.Add("Accept-Language", "en-US,en;q=0.5");
+            headers.Add("Accept", "text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8");
+            headers.Add("Connection", "keep-alive");
+            headers.Add("Pragma", "no-cache");
+            headers.Add("Cache-Control", "no-cache");
+            if (!string.IsNullOrWhiteSpace(csrf))
+                headers.Add("X-CSRF-Token", csrf);
+            if (!string.IsNullOrWhiteSpace(referrer))
+                headers.Referrer = new Uri(referrer);
+            headers.TryAddWithoutValidation("User-Agent", _userAgent);
+        }
+
         /// <summary>
         /// Step 1
         /// Get initial CSRF from landing page to get login process started. HttpClient
@@ -126,6 +142,16 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             state.Referrer = landingPageUri.ToString();
         }
 
+        private class LoginResponse
+        {
+            public LoginUrl? LoginURL { get; set; }
+        }
+
+        private class LoginUrl
+        {
+            public string? Path { get; set; }
+        }
+
         /// <summary>
         /// Step 2
         /// Get login page url. POST returns JSON with loginURL for next step. Returned
@@ -133,7 +159,23 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetLoginPageUri(AuthState state)
         {
-            // TODO
+            var getLoginUri = new Uri(new Uri(_baseUri), "/portal/en_GB/web/guest/home/-/csrftokenhandling/get-login-url");
+            var getLoginRequest = new HttpRequestMessage(HttpMethod.Post, getLoginUri);
+            AddCommonAuthHeaders(getLoginRequest.Headers, state.Csrf, state.Referrer);
+            var getLoginResponse = await _client.SendAsync(getLoginRequest);
+
+            if (!getLoginResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to get login url.");
+
+            var getLoginBody = await JsonSerializer.DeserializeAsync<LoginResponse>(await getLoginResponse.Content.ReadAsStreamAsync());
+            if (getLoginBody?.LoginURL?.Path is null)
+                throw new IOException("Failed to deserialize body to get login url.");
+
+            state.LoginUri = getLoginBody.LoginURL.Path;
+            if (!new Uri(state.LoginUri).TryExtractUriParameter("client_id", out string hmac))
+                throw new IOException("Failed to get client_id.");
+
+            state.ClientId = hmac;
         }
 
         /// <summary>
