@@ -297,6 +297,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             state.PortletAuthCode = authCode;
             state.PortletAuthState = authState;
+            state.Referrer = lastLocation.ToString();
         }
 
         /// <summary>
@@ -307,7 +308,21 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task CompleteLogin(AuthState state)
         {
-            // TODO
+            var finalLoginUrl = new Uri(new Uri(_baseUri), $"/portal/web/guest/complete-login?p_auth={state.PortletAuthState}&p_p_id=33_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_33_WAR_cored5portlet_javax.portlet.action=getLoginStatus");
+            var finalLoginUrlRequest = new HttpRequestMessage(HttpMethod.Post, finalLoginUrl);
+            AddCommonAuthHeaders(finalLoginUrlRequest.Headers, null, state.Referrer);
+            finalLoginUrlRequest.FormUrlEncoded(new[]
+            {
+                ("_33_WAR_cored5portlet_code", state.PortletAuthCode)
+            });
+            var finalLoginUrlResponse = await _authClient.SendAsync(finalLoginUrlRequest);
+
+            if (finalLoginUrlResponse.StatusCode != HttpStatusCode.Found)
+                throw new IOException("Failed to post portlet page.");
+            if (finalLoginUrlResponse.Headers.Location is null)
+                throw new IOException("Failed to get base json url.");
+
+            state.BaseJsonUri = finalLoginUrlResponse.Headers.Location.ToString();
         }
 
         /// <summary>
@@ -316,7 +331,16 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetFinalCsrf(AuthState state)
         {
-            // TODO
+            var baseJsonResponse = await _client.GetAsync(state.BaseJsonUri);
+            if (!baseJsonResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to load base json page.");
+
+            var landingPageBody = await baseJsonResponse.Content.ReadAsStringAsync();
+            if (!landingPageBody.TryExtractCsrf(out string csrf))
+                throw new IOException("Failed to get final CSRF.");
+
+            state.Csrf = csrf;
+            state.Referrer = state.BaseJsonUri;
         }
     }
 }
