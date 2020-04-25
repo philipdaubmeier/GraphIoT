@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -161,7 +162,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
             var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
-            if (getLoginBody.ErrorCode != 0)
+            if (int.TryParse(getLoginBody.ErrorCode, out int errorCode) && errorCode != 0)
                 throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
             if (getLoginBody?.LoginUrl?.Path is null)
                 throw new IOException("Failed to deserialize body to get login url.");
@@ -181,7 +182,18 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetLoginRelayState(AuthState state)
         {
-            // TODO
+            var loginUrlRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginUri);
+            AddCommonAuthHeaders(loginUrlRequest.Headers, state.Csrf, state.Referrer);
+            var loginUrlResponse = await _authClient.SendAsync(loginUrlRequest);
+
+            if (loginUrlResponse.StatusCode != HttpStatusCode.Found)
+                throw new IOException("Failed to get authorization page.");
+
+            var loginFormUrl = loginUrlResponse.Headers.Location;
+            if (!loginFormUrl.TryExtractUriParameter("relayState", out string loginRelayStateToken))
+                throw new IOException("Failed to get relay state.");
+
+            state.RelayStateToken = loginRelayStateToken;
         }
 
         /// <summary>

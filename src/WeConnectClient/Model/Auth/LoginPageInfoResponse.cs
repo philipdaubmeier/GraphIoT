@@ -4,7 +4,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 {
     internal class LoginPageInfoResponse
     {
-        public int ErrorCode { get; set; } = 0;
+        public string ErrorCode { get; set; } = string.Empty;
 
         [JsonPropertyName("loginURL")]
         public LoginUrl? LoginUrl { get; set; }
