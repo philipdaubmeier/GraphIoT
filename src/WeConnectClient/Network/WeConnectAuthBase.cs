@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 {
     public abstract class WeConnectAuthBase
     {
-        protected readonly IWeConnectConnectionProvider<WeConnectPortalClient> _connectionProvider;
+        protected readonly IWeConnectConnectionProvider _connectionProvider;
 
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
 
-        public WeConnectAuthBase(IWeConnectConnectionProvider<WeConnectPortalClient> connectionProvider)
+        public WeConnectAuthBase(IWeConnectConnectionProvider connectionProvider)
         {
             _connectionProvider = connectionProvider;
             _client = connectionProvider.Client;

@@ -2,7 +2,7 @@
 
 namespace PhilipDaubmeier.WeConnectClient.Network
 {
-    public interface IWeConnectConnectionProvider<T>
+    public interface IWeConnectConnectionProvider
     {
         /// <summary>
         /// Credential information and a token store object.

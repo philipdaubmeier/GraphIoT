@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.WeConnectClient
     {
         private const string _baseUri = "https://www.portal.volkswagen-we.com";
 
-        public WeConnectPortalClient(IWeConnectConnectionProvider<WeConnectPortalClient> connectionProvider)
+        public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
 
         public async Task<HttpResponseMessage> GetEManager()

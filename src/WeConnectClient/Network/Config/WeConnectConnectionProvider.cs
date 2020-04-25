@@ -3,7 +3,7 @@ using System.Net.Http;
 
 namespace PhilipDaubmeier.WeConnectClient.Network
 {
-    public class WeConnectConnectionProvider<T> : IWeConnectConnectionProvider<T>, IDisposable
+    public class WeConnectConnectionProvider : IWeConnectConnectionProvider, IDisposable
     {
         private bool skipDisposingClient = false;
         private bool skipDisposingAuthClient = false;
@@ -11,12 +11,12 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private HttpClient? authClient = null;
 
         /// <summary>
-        /// See <see cref="IWeConnectConnectionProvider{T}.AuthData"/>
+        /// See <see cref="IWeConnectConnectionProvider.AuthData"/>
         /// </summary>
         public IWeConnectAuth AuthData { get; set; }
 
         /// <summary>
-        /// See <see cref="IWeConnectConnectionProvider{T}.Client"/>
+        /// See <see cref="IWeConnectConnectionProvider.Client"/>
         /// </summary>
         public HttpClient Client
         {
@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// See <see cref="IWeConnectConnectionProvider{T}.AuthClient"/>
+        /// See <see cref="IWeConnectConnectionProvider.AuthClient"/>
         /// </summary>
         public HttpClient AuthClient
         {
