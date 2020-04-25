@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 
 namespace PhilipDaubmeier.WeConnectClient.Network
@@ -10,6 +11,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private HttpClient? client = null;
         private HttpClient? authClient = null;
 
+        public static readonly CookieContainer cookieContainer = new CookieContainer();
+
         /// <summary>
         /// See <see cref="IWeConnectConnectionProvider.AuthData"/>
         /// </summary>
@@ -20,7 +23,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient());
+            get => client ?? (client = new HttpClient(CreateHandler()));
             protected set
             {
                 client = value;
@@ -41,11 +44,22 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             }
         }
 
+        public static HttpClientHandler CreateHandler() => new HttpClientHandler()
+        {
+            UseCookies = true,
+            CookieContainer = cookieContainer
+        };
+
         /// <summary>
         /// During authentication we need a separate client that does not
         /// follow redirects. Use this handler for that purpose.
         /// </summary>
-        public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
+        public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler()
+        {
+            AllowAutoRedirect = false,
+            UseCookies = true,
+            CookieContainer = cookieContainer
+        };
 
         public WeConnectConnectionProvider(IWeConnectAuth authData)
             => AuthData = authData;

@@ -203,7 +203,23 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetLoginHmacToken(AuthState state)
         {
-            // TODO
+            var loginFormLocationRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginUri);
+            AddCommonAuthHeaders(loginFormLocationRequest.Headers, state.Csrf, state.Referrer);
+            var loginFormLocationResponse = await _client.SendAsync(loginFormLocationRequest);
+
+            if (!loginFormLocationResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to get sign-in page.");
+
+            // We get a SESSION set-cookie here!
+            // Get hmac and csrf tokens from form content.
+            var loginFormPageBody = (await loginFormLocationResponse.Content.ReadAsStringAsync()).Replace("\n", "").Replace("\r", "");
+            if (!loginFormPageBody.TryExtractLoginHmac(out string hmac))
+                throw new IOException("Failed to get 1st HMAC token.");
+            if (!loginFormPageBody.TryExtractLoginCsrf(out string csrf))
+                throw new IOException("Failed to get login CSRF.");
+
+            state.HmacToken1 = hmac;
+            state.LoginCsrf = csrf;
         }
 
         /// <summary>
