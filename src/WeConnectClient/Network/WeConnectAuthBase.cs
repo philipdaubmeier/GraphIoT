@@ -1,8 +1,10 @@
-﻿using System;
+﻿using PhilipDaubmeier.WeConnectClient.Model.Auth;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -142,16 +144,6 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             state.Referrer = landingPageUri.ToString();
         }
 
-        private class LoginResponse
-        {
-            public LoginUrl? LoginURL { get; set; }
-        }
-
-        private class LoginUrl
-        {
-            public string? Path { get; set; }
-        }
-
         /// <summary>
         /// Step 2
         /// Get login page url. POST returns JSON with loginURL for next step. Returned
@@ -167,15 +159,18 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             if (!getLoginResponse.IsSuccessStatusCode)
                 throw new IOException("Failed to get login url.");
 
-            var getLoginBody = await JsonSerializer.DeserializeAsync<LoginResponse>(await getLoginResponse.Content.ReadAsStreamAsync());
-            if (getLoginBody?.LoginURL?.Path is null)
+            var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
+            var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
+            if (getLoginBody.ErrorCode != 0)
+                throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
+            if (getLoginBody?.LoginUrl?.Path is null)
                 throw new IOException("Failed to deserialize body to get login url.");
 
-            state.LoginUri = getLoginBody.LoginURL.Path;
-            if (!new Uri(state.LoginUri).TryExtractUriParameter("client_id", out string hmac))
+            state.LoginUri = getLoginBody.LoginUrl.Path;
+            if (!new Uri(state.LoginUri).TryExtractUriParameter("client_id", out string clientId))
                 throw new IOException("Failed to get client_id.");
 
-            state.ClientId = hmac;
+            state.ClientId = clientId;
         }
 
         /// <summary>
