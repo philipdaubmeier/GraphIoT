@@ -17,6 +17,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0";
 
+        private readonly AuthState _state = new AuthState();
+
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
 
@@ -40,22 +42,26 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
+        /// Calls the given endpoint  at the WeConnect Portal api and ensures the request is authenticated
+        /// and parses the result afterwards.
+        /// </summary>
+        protected async Task<T> CallApi<T>(string path)
+        {
+            var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
+
+            return (await JsonSerializer.DeserializeAsync<T>(responseStream, _jsonSerializerOptions));
+        }
+
+        /// <summary>
         /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi(Uri uri)
+        protected async Task<HttpResponseMessage> RequestApi(string path)
         {
             await Authenticate();
 
-            if (_connectionProvider.AuthData.AccessToken is null)
-                throw new IOException("Can not request data without access token.");
-
-            var request = new HttpRequestMessage()
-            {
-                RequestUri = uri,
-                Method = HttpMethod.Get
-            };
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
-            request.Headers.Add("Accept", "application/json");
+            var uri = new Uri($"{_state.BaseJsonUri}{path}");
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            AddCommonAuthHeaders(request.Headers, _state.Csrf, _state.Referrer);
 
             return await _client.SendAsync(request);
         }
@@ -70,17 +76,17 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             {
                 _renewTokenSemaphore.WaitOne();
 
-                var state = new AuthState();
-                await GetInitialCsrf(state);
-                await GetLoginPageUri(state);
-                await GetLoginRelayState(state);
-                await GetLoginHmacToken(state);
-                await LoginIdentifier(state);
-                await LoginAuthenticate(state);
-                await CompleteLogin(state);
-                await GetFinalCsrf(state);
+                if (!string.IsNullOrEmpty(_state.BaseJsonUri))
+                    return;
 
-                throw new IOException("Could not authenticate");
+                await GetInitialCsrf(_state);
+                await GetLoginPageUri(_state);
+                await GetLoginRelayState(_state);
+                await GetLoginHmacToken(_state);
+                await LoginIdentifier(_state);
+                await LoginAuthenticate(_state);
+                await CompleteLogin(_state);
+                await GetFinalCsrf(_state);
             }
             catch (Exception innerEx)
             {

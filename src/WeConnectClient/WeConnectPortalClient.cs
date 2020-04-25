@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.WeConnectClient.Network;
+﻿using PhilipDaubmeier.WeConnectClient.Model.Emanager;
+using PhilipDaubmeier.WeConnectClient.Network;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -12,10 +13,9 @@ namespace PhilipDaubmeier.WeConnectClient
         public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
 
-        public async Task<HttpResponseMessage> GetEManager()
+        public async Task<EmanagerResponse> GetEManager()
         {
-            var uri = $"{_baseUri}/-/emanager/get-emanager";
-            return await RequestApi(new Uri(uri));
+            return await CallApi<EmanagerResponse>("/-/emanager/get-emanager");
         }
     }
 }
