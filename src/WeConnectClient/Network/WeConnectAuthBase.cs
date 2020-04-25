@@ -77,6 +77,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
                 throw new IOException("Could not authenticate");
             }
+            catch (Exception innerEx)
+            {
+                throw new IOException("Could not authenticate, see inner exception for details", innerEx);
+            }
             finally
             {
                 _renewTokenSemaphore.Release();
@@ -109,7 +113,17 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         private async Task GetInitialCsrf(AuthState state)
         {
-            //_landingPageUri
+            var landingPageUri = new Uri(new Uri(_baseUri), "/portal/en_GB/web/guest/home");
+            var landingPageResponse = await _client.GetAsync(landingPageUri);
+            if (!landingPageResponse.IsSuccessStatusCode)
+                throw new IOException("Failed getting to portal landing page.");
+
+            var landingPageBody = await landingPageResponse.Content.ReadAsStringAsync();
+            if (!landingPageBody.TryExtractCsrf(out string csrf))
+                throw new IOException("Failed to get CSRF from landing page.");
+
+            state.Csrf = csrf;
+            state.Referrer = landingPageUri.ToString();
         }
 
         /// <summary>
