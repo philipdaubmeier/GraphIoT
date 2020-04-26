@@ -1,0 +1,222 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="_Authors" xml:space="preserve">
+    <value>Original translations extracted from translation files of the digitalSTROM server installer ui:
+https://git.digitalstrom.org/dss-websrc/dss-websrc-mainline/blob/master/webroot/locale/pl_PL/dss-installer.po
+Copyright (c) 2020 digitalSTROM.org, Zurich, Switzerland
+
+Jin_eLD (jin@dev.digitalstrom.org), 2010
+Christian (christian.hitz@digitalstrom.com), 2016,2018-2019
+Christoph Hofmann (christoph.hofmann@digitalstrom.com), 2019
+Cornel Durrer (cornel.durrer@digitalstrom.com), 2016
+Krzysztof Klimek (krzysztof.klimek@digitalstrom.com), 2015-2016
+Chiappori (martina.chiappori@zetavision.ch), 2014</value>
+  </data>
+  <data name="ActivePower" xml:space="preserve">
+    <value>Moc [W]</value>
+  </data>
+  <data name="OutputCurrent" xml:space="preserve">
+    <value>Prąd wyjściowy [mA]</value>
+  </data>
+  <data name="ElectricMeter" xml:space="preserve">
+    <value>Miernik elektryczny [kWh]</value>
+  </data>
+  <data name="TemperatureIndoors" xml:space="preserve">
+    <value>Temperatura wewnątrz [°C]</value>
+  </data>
+  <data name="TemperatureOutdoors" xml:space="preserve">
+    <value>Temperatura na zewnątrz [°C]</value>
+  </data>
+  <data name="BrightnessIndoors" xml:space="preserve">
+    <value>Jasność wewnątrz [lux]</value>
+  </data>
+  <data name="BrightnessOutdoors" xml:space="preserve">
+    <value>Jasność na zewnątrz [lux]</value>
+  </data>
+  <data name="RelativeHumidityIndoors" xml:space="preserve">
+    <value>Wilgotność względna wewnątrz [%]</value>
+  </data>
+  <data name="RelativeHumidityOutdoors" xml:space="preserve">
+    <value>Wilgotność względna na zewnątrz [%]</value>
+  </data>
+  <data name="AirPressure" xml:space="preserve">
+    <value>Ciśnienie powietrza [hPa]</value>
+  </data>
+  <data name="WindGustspeed" xml:space="preserve">
+    <value>Prędkość podmuchu wiatru</value>
+  </data>
+  <data name="WindGustdirection" xml:space="preserve">
+    <value>Kierunek podmuchu wiatru</value>
+  </data>
+  <data name="WindSpeed" xml:space="preserve">
+    <value>Prędkość wiatru [m/s]</value>
+  </data>
+  <data name="WindDirection" xml:space="preserve">
+    <value>Kierunek wiatru [° stopnie]</value>
+  </data>
+  <data name="Precipitation" xml:space="preserve">
+    <value>Opady deszczu [mm/m2] </value>
+  </data>
+  <data name="CarbonDioxideConcentration" xml:space="preserve">
+    <value>Stężenie dwutlenku węgla [ppm]</value>
+  </data>
+  <data name="CarbonMonoxideConcentration" xml:space="preserve">
+    <value>Stężenie tlenku węgla [ppm]</value>
+  </data>
+  <data name="SoundPressureLevel" xml:space="preserve">
+    <value>Poziom ciśnienia akustycznego</value>
+  </data>
+  <data name="RoomTemperatureSetpoint" xml:space="preserve">
+    <value>Ustawienie temperatury pomieszczenia [°C]</value>
+  </data>
+  <data name="RoomTemperatureControl" xml:space="preserve">
+    <value>Kontrola temperatury pomieszczenia [%]</value>
+  </data>
+  <data name="OutputCurrentH" xml:space="preserve">
+    <value>Prąd wyjściowy (H) [mA]</value>
+  </data>
+  <data name="PowerConsumption" xml:space="preserve">
+    <value>Moc pozorna [VA]</value>
+  </data>
+  <data name="Temperature" xml:space="preserve">
+    <value>Temperatura</value>
+  </data>
+  <data name="Brightness" xml:space="preserve">
+    <value>Jasność</value>
+  </data>
+  <data name="RelativeHumidity" xml:space="preserve">
+    <value>Wilgotność względna wewnątrz</value>
+  </data>
+  <data name="SunAzimuth" xml:space="preserve">
+    <value>Azymut Słońca</value>
+  </data>
+  <data name="SunElevation" xml:space="preserve">
+    <value>Wysokość Słońca</value>
+  </data>
+  <data name="Reserved" xml:space="preserve">
+    <value>Zarezerwowane</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Nieznany</value>
+  </data>
+  <data name="NotUsed" xml:space="preserve">
+    <value>Nieużywane</value>
+  </data>
+</root>

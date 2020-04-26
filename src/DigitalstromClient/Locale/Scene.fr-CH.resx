@@ -1,0 +1,325 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="_Authors" xml:space="preserve">
+    <value>Original translations extracted from translation files of the digitalSTROM server installer ui:
+https://git.digitalstrom.org/dss-websrc/dss-websrc-mainline/blob/master/webroot/locale/fr_CH/dss-installer.po
+Copyright (c) 2020 digitalSTROM.org, Zurich, Switzerland
+
+Sergey 'Jin' Bostandzhyan (jin@dev.digitalstrom.org), 2010
+Christian (christian.hitz@digitalstrom.com), 2015-2016,2018-2019
+Christoph Hofmann (christoph.hofmann@digitalstrom.com), 2019
+Cornel Durrer (cornel.durrer@digitalstrom.com), 2015-2019
+Jerome Zuercher (jerome.zuercher@digitalstrom.com), 2014-2015
+Chiappori (martina.chiappori@zetavision.ch), 2014
+pschoeffel (pierre.schoeffel@keyboost.ch), 2014-2017</value>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+  </data>
+  <data name="Scene1" xml:space="preserve">
+    <value>Ambiance 1</value>
+  </data>
+  <data name="Scene2" xml:space="preserve">
+    <value>Ambiance 2</value>
+  </data>
+  <data name="Scene3" xml:space="preserve">
+    <value>Ambiance 3</value>
+  </data>
+  <data name="Scene4" xml:space="preserve">
+    <value>Ambiance 4</value>
+  </data>
+  <data name="Scene10" xml:space="preserve">
+    <value>Ambiance 10</value>
+  </data>
+  <data name="Scene11" xml:space="preserve">
+    <value>Ambiance 11</value>
+  </data>
+  <data name="Scene12" xml:space="preserve">
+    <value>Ambiance 12</value>
+  </data>
+  <data name="Scene13" xml:space="preserve">
+    <value>Ambiance 13</value>
+  </data>
+  <data name="Scene14" xml:space="preserve">
+    <value>Ambiance 14</value>
+  </data>
+  <data name="Scene20" xml:space="preserve">
+    <value>Ambiance 20</value>
+  </data>
+  <data name="Scene21" xml:space="preserve">
+    <value>Ambiance 21</value>
+  </data>
+  <data name="Scene22" xml:space="preserve">
+    <value>Ambiance 22</value>
+  </data>
+  <data name="Scene23" xml:space="preserve">
+    <value>Ambiance 23</value>
+  </data>
+  <data name="Scene24" xml:space="preserve">
+    <value>Ambiance 24</value>
+  </data>
+  <data name="Scene30" xml:space="preserve">
+    <value>Ambiance 30</value>
+  </data>
+  <data name="Scene31" xml:space="preserve">
+    <value>Ambiance 31</value>
+  </data>
+  <data name="Scene32" xml:space="preserve">
+    <value>Ambiance 32</value>
+  </data>
+  <data name="Scene33" xml:space="preserve">
+    <value>Ambiance 33</value>
+  </data>
+  <data name="Scene34" xml:space="preserve">
+    <value>Ambiance 34</value>
+  </data>
+  <data name="Scene40" xml:space="preserve">
+    <value>Ambiance 40</value>
+  </data>
+  <data name="Scene41" xml:space="preserve">
+    <value>Ambiance 41</value>
+  </data>
+  <data name="Scene42" xml:space="preserve">
+    <value>Ambiance 42</value>
+  </data>
+  <data name="Scene43" xml:space="preserve">
+    <value>Ambiance 43</value>
+  </data>
+  <data name="Scene44" xml:space="preserve">
+    <value>Ambiance 44</value>
+  </data>
+  <data name="Area1On" xml:space="preserve">
+    <value>Secteur 1 on</value>
+  </data>
+  <data name="Area2On" xml:space="preserve">
+    <value>Secteur 2 on</value>
+  </data>
+  <data name="Area3On" xml:space="preserve">
+    <value>Secteur 3 on</value>
+  </data>
+  <data name="Area4On" xml:space="preserve">
+    <value>Secteur 4 on</value>
+  </data>
+  <data name="Area1Off" xml:space="preserve">
+    <value>Secteur 1 off</value>
+  </data>
+  <data name="Area2Off" xml:space="preserve">
+    <value>Secteur 2 off</value>
+  </data>
+  <data name="Area3Off" xml:space="preserve">
+    <value>Secteur 3 off</value>
+  </data>
+  <data name="Area4Off" xml:space="preserve">
+    <value>Secteur 4 off</value>
+  </data>
+  <data name="AutoOff" xml:space="preserve">
+    <value>Off lent</value>
+  </data>
+  <data name="Impulse" xml:space="preserve">
+    <value>Impulsion</value>
+  </data>
+  <data name="AutoStandby" xml:space="preserve">
+    <value>Auto Standby</value>
+  </data>
+  <data name="DimDown" xml:space="preserve">
+    <value>Plus sombre</value>
+  </data>
+  <data name="DimUp" xml:space="preserve">
+    <value>Plus clair</value>
+  </data>
+  <data name="Min" xml:space="preserve">
+    <value>Min</value>
+  </data>
+  <data name="Max" xml:space="preserve">
+    <value>Max</value>
+  </data>
+  <data name="Stop" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="Panic" xml:space="preserve">
+    <value>Panique</value>
+  </data>
+  <data name="Standby" xml:space="preserve">
+    <value>Standby</value>
+  </data>
+  <data name="RoomOff" xml:space="preserve">
+    <value>Zone off</value>
+  </data>
+  <data name="Sleeping" xml:space="preserve">
+    <value>Dormir</value>
+  </data>
+  <data name="Wakeup" xml:space="preserve">
+    <value>Se réveiller</value>
+  </data>
+  <data name="ComingHome" xml:space="preserve">
+    <value>Arriver</value>
+  </data>
+  <data name="LeaveHome" xml:space="preserve">
+    <value>Partir</value>
+  </data>
+  <data name="Doorbell" xml:space="preserve">
+    <value>Sonner</value>
+  </data>
+  <data name="Alarm1" xml:space="preserve">
+    <value>Alarme 1</value>
+  </data>
+  <data name="Alarm2" xml:space="preserve">
+    <value>Alarme 2</value>
+  </data>
+  <data name="Alarm3" xml:space="preserve">
+    <value>Alarme 3</value>
+  </data>
+  <data name="Alarm4" xml:space="preserve">
+    <value>Alarme 4</value>
+  </data>
+  <data name="Fire" xml:space="preserve">
+    <value>Feu</value>
+  </data>
+  <data name="Smoke" xml:space="preserve">
+    <value>Fumée</value>
+  </data>
+  <data name="Water" xml:space="preserve">
+    <value>Eau</value>
+  </data>
+  <data name="Gas" xml:space="preserve">
+    <value>Gaz</value>
+  </data>
+  <data name="Wind" xml:space="preserve">
+    <value>Vent</value>
+  </data>
+  <data name="Nowind" xml:space="preserve">
+    <value>Pas de vent</value>
+  </data>
+  <data name="Rain" xml:space="preserve">
+    <value>Pluie</value>
+  </data>
+  <data name="NoRain" xml:space="preserve">
+    <value>Pas de pluie</value>
+  </data>
+  <data name="Hail" xml:space="preserve">
+    <value>Grêle</value>
+  </data>
+  <data name="Nohail" xml:space="preserve">
+    <value>Pas de grêle</value>
+  </data>
+  <data name="Unknown" xml:space="preserve">
+    <value>Inconnu</value>
+  </data>
+</root>

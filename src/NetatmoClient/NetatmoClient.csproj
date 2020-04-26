@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.NetatmoClient</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.NetatmoClient</RootNamespace>
+    <PackageId>PhilipDaubmeier.NetatmoClient</PackageId>
+    <Description>This class library provides a way to call the Netatmo Cloud RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
+    <PackageTags>netatmo;smarthome;httpclient</PackageTags>
+    <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/NetatmoClient</PackageProjectUrl>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.6.1</Version>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <NuspecFile>NetatmoClient.nuspec</NuspecFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+  </ItemGroup>
+  
+  <Target Name="PopulateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>
+        id=$(PackageId);
+        authors=$(Authors);
+        configuration=$(Configuration);
+        description=$(PackageDescription);
+        projectUrl=$(PackageProjectUrl);
+        tags=$(PackageTags.Replace(';', ' '));
+        targetPath=$(TargetPath);
+        version=$(PackageVersion);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
+
+</Project>

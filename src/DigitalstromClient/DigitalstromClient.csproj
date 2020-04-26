@@ -1,0 +1,83 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.DigitalstromClient</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.DigitalstromClient</RootNamespace>
+    <PackageId>PhilipDaubmeier.DigitalstromClient</PackageId>
+    <Description>This class library provides a way to call the Digitalstrom Server (DSS) RESTful JSON interface. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
+    <PackageTags>digitalstrom;ds;smarthome;httpclient</PackageTags>
+    <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/DigitalstromClient</PackageProjectUrl>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.7.0</Version>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <NuspecFile>DigitalstromClient.nuspec</NuspecFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Resource.Embedder" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Locale\Group.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Group.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Locale\Scene.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Scene.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Locale\Sensor.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Sensor.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Locale\Group.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <LastGenOutput>Group.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\Scene.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <LastGenOutput>Scene.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Locale\Sensor.resx">
+      <SubType>Designer</SubType>
+      <CustomToolNamespace>PhilipDaubmeier.DigitalstromClient.Locale</CustomToolNamespace>
+      <LastGenOutput>Sensor.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <Target Name="PopulateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>
+        id=$(PackageId);
+        authors=$(Authors);
+        configuration=$(Configuration);
+        description=$(PackageDescription);
+        projectUrl=$(PackageProjectUrl);
+        tags=$(PackageTags.Replace(';', ' '));
+        targetPath=$(TargetPath);
+        version=$(PackageVersion);
+      </NuspecProperties>
+    </PropertyGroup>
+  </Target>
+
+</Project>

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>PhilipDaubmeier.GraphIoT.Grafana</AssemblyName>
+    <RootNamespace>PhilipDaubmeier.GraphIoT.Grafana</RootNamespace>
+    <Authors>PhilipDaubmeier</Authors>
+    <Company>PhilipDaubmeier</Company>
+    <Version>1.0.0</Version>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <LangVersion>8.0</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ProxyKit" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Grafana\**\*" CopyToPublishDirectory="PreserveNewest" />
+    <None Remove="Grafana\data\grafana.db" />
+    <None Remove="Grafana\conf\production\custom.ini" />
+    <None Remove="Grafana\conf\custom.ini" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\GraphIoT.Core\GraphIoT.Core.csproj" />
+  </ItemGroup>
+  
+</Project>
