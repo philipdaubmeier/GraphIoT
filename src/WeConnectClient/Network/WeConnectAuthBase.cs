@@ -48,8 +48,12 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             where TWiremessage : IWiremessage<TData> where TData : class
         {
             var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
+            var response = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
 
-            return (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions)).Body;
+            if (response.HasError)
+                throw new IOException($"The API response returned the error code: {response.ErrorCode}");
+
+            return response.Body;
         }
 
         /// <summary>
