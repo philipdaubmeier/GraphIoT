@@ -6,12 +6,16 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.WeConnectClient.Network
 {
+    /// <remarks>
+    /// Built based on the excellent work of github users bgewehr, wez3 and reneboer and
+    /// the volkswagen carnet python client, see newest version here:
+    /// https://github.com/bgewehr/volkswagen-carnet-client
+    /// </remarks>
     public abstract class WeConnectAuthBase
     {
         protected readonly IWeConnectConnectionProvider _connectionProvider;
