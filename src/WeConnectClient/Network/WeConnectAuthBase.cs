@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.WeConnectClient.Model.Auth;
+﻿using PhilipDaubmeier.WeConnectClient.Model;
+using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using System;
 using System.IO;
 using System.Net;
@@ -22,10 +23,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
 
-        private const string _authUri = "https://identity.vwgroup.io";
-
         private const string _baseUri = "https://www.portal.volkswagen-we.com";
-        private const string _landingPageUri = "https://www.portal.volkswagen-we.com/portal/en_GB/web/guest/home";
+        private const string _authUri = "https://identity.vwgroup.io";
 
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
@@ -43,13 +42,14 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         /// <summary>
         /// Calls the given endpoint  at the WeConnect Portal api and ensures the request is authenticated
-        /// and parses the result afterwards.
+        /// and parses the result afterwards, including unpacking of the wiremessage.
         /// </summary>
-        protected async Task<T> CallApi<T>(string path)
+        private protected async Task<TData> CallApi<TWiremessage, TData>(string path)
+            where TWiremessage : IWiremessage<TData> where TData : class
         {
             var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
 
-            return (await JsonSerializer.DeserializeAsync<T>(responseStream, _jsonSerializerOptions));
+            return (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions)).Body;
         }
 
         /// <summary>
@@ -169,12 +169,12 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
             var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
-            if (int.TryParse(getLoginBody.ErrorCode, out int errorCode) && errorCode != 0)
+            if (getLoginBody.HasError)
                 throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
-            if (getLoginBody?.LoginUrl?.Path is null)
+            if (string.IsNullOrEmpty(getLoginBody.Body.Path))
                 throw new IOException("Failed to deserialize body to get login url.");
 
-            state.LoginUri = getLoginBody.LoginUrl.Path;
+            state.LoginUri = getLoginBody.Body.Path;
             if (!new Uri(state.LoginUri).TryExtractUriParameter("client_id", out string clientId))
                 throw new IOException("Failed to get client_id.");
 

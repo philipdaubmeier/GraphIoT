@@ -2,16 +2,14 @@
 
 namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 {
-    internal class LoginPageInfoResponse
+    internal class LoginPageInfoResponse : Wiremessage<LoginUrl>
     {
-        public string ErrorCode { get; set; } = string.Empty;
-
         [JsonPropertyName("loginURL")]
-        public LoginUrl? LoginUrl { get; set; }
+        public override LoginUrl Body { get; set; } = new LoginUrl();
     }
 
     internal class LoginUrl
     {
-        public string? Path { get; set; }
+        public string Path { get; set; } = string.Empty;
     }
 }
