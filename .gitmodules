@@ -1,9 +1,0 @@
-[submodule "vw_carnet_extended_parameters"]
-	path = vw_carnet_extended_parameters
-	url = https://github.com/robinostlund/volkswagen-carnet
-[submodule "vw_carnet_home_assistant"]
-	path = vw_carnet_home_assistant
-	url = https://github.com/robinostlund/homeassistant-volkswagen-carnet
-[submodule "vw_carnet_python3_module"]
-	path = vw_carnet_python3_module
-	url = https://github.com/robinostlund/volkswagencarnet
