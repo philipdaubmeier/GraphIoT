@@ -1,4 +1,4 @@
-﻿using PhilipDaubmeier.WeConnectClient.Model;
+using PhilipDaubmeier.WeConnectClient.Model;
 using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using System;
 using System.IO;
