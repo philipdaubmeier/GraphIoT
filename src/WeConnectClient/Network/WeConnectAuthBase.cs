@@ -2,6 +2,7 @@ using PhilipDaubmeier.WeConnectClient.Model;
 using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -49,15 +50,38 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// and parses the result afterwards, including unpacking of the wiremessage.
         /// </summary>
         private protected async Task<TData> CallApi<TWiremessage, TData>(string path)
-            where TWiremessage : IWiremessage<TData> where TData : class
+            where TWiremessage : class, IWiremessage<TData> where TData : class
         {
-            var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
-            var response = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+            var response = await RequestApi(path);
+            if (!response.IsSuccessStatusCode)
+                throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
 
-            if (response.HasError)
-                throw new IOException($"The API response returned the error code: {response.ErrorCode}");
+            TWiremessage? responseJson = null;
+            try
+            {
+                var responseStream = await response.Content.ReadAsStreamAsync();
+                responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+            }
+            catch
+            {
+                // json deserialization error most likely is a cause of an invalid login session - retry login
+                _state.ForceRelogin();
 
-            return response.Body;
+                try
+                {
+                    var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
+                    responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+                }
+                catch (Exception ex)
+                {
+                    throw new IOException($"Login retry unsucessful, API response could not be parsed, see inner exception.", ex);
+                }
+            }
+
+            if (responseJson.HasError)
+                throw new IOException($"The API response returned the error code: {responseJson.ErrorCode}");
+
+            return responseJson.Body;
         }
 
         /// <summary>
@@ -65,7 +89,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         protected async Task<HttpResponseMessage> RequestApi(string path)
         {
-            await Authenticate();
+            await Authenticate(_state);
 
             var uri = new Uri($"{_state.BaseJsonUri}{path}");
             var request = new HttpRequestMessage(HttpMethod.Post, uri);
@@ -78,23 +102,26 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// Ensures that after the completion of this task, a valid base json uri and
         /// a session cookie is present to be able to query the portal json apis.
         /// </summary>
-        protected async Task Authenticate()
+        private protected async Task Authenticate(AuthState state)
         {
             try
             {
                 _renewTokenSemaphore.WaitOne();
 
-                TryRestoreSession(_state);
+                if (state.MustForceRelogin())
+                    ClearCookies(state);
+                else
+                    TryRestoreSession(state);
 
-                if (_state.HasValidLogin())
+                if (state.HasValidLogin())
                     return;
 
-                await LoginSession(_state);
+                await LoginSession(state);
 
-                if (!_state.HasValidLogin())
+                if (!state.HasValidLogin())
                     throw new IOException("Invalid login state after completed login.");
 
-                await StoreSession(_state);
+                await StoreSession(state);
             }
             catch (Exception innerEx)
             {
@@ -106,23 +133,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             }
         }
 
-        private class AuthState
+        private void ClearCookies(AuthState state)
         {
-            public string Csrf { get; set; } = string.Empty;
-            public string Referrer { get; set; } = string.Empty;
-            public string BaseJsonUri { get; set; } = string.Empty;
-            public string LoginUri { get; set; } = string.Empty;
-            public string ClientId { get; set; } = string.Empty;
-            public string RelayStateToken { get; set; } = string.Empty;
-            public string LoginFormUrl { get; set; } = string.Empty;
-            public string HmacToken1 { get; set; } = string.Empty;
-            public string HmacToken2 { get; set; } = string.Empty;
-            public string LoginCsrf { get; set; } = string.Empty;
-            public string PortletAuthCode { get; set; } = string.Empty;
-            public string PortletAuthState { get; set; } = string.Empty;
-
-            public void Reset() { BaseJsonUri = string.Empty; }
-            public bool HasValidLogin() => !string.IsNullOrEmpty(BaseJsonUri);
+            foreach (var cookie in _connectionProvider.CookieContainer.GetCookies(state.BaseUri).Cast<Cookie>())
+                cookie.Expired = true;
         }
 
         private void TryRestoreSession(AuthState state)
@@ -137,7 +151,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 state.Csrf = persisted.Csrf;
                 persisted.AddToCookieContainer(_connectionProvider.CookieContainer);
             }
-            catch (Exception ex)
+            catch
             {
                 state.Reset();
             }
