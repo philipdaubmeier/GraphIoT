@@ -75,8 +75,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// Ensures that after the completion of this task, a valid non-expired access token is
-        /// present in the authentication data object, or throws an exception if unsuccessful.
+        /// Ensures that after the completion of this task, a valid base json uri and
+        /// a session cookie is present to be able to query the portal json apis.
         /// </summary>
         protected async Task Authenticate()
         {
@@ -84,17 +84,17 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             {
                 _renewTokenSemaphore.WaitOne();
 
-                if (!string.IsNullOrEmpty(_state.BaseJsonUri))
+                TryRestoreSession(_state);
+
+                if (_state.HasValidLogin())
                     return;
 
-                await GetInitialCsrf(_state);
-                await GetLoginPageUri(_state);
-                await GetLoginRelayState(_state);
-                await GetLoginHmacToken(_state);
-                await LoginIdentifier(_state);
-                await LoginAuthenticate(_state);
-                await CompleteLogin(_state);
-                await GetFinalCsrf(_state);
+                await LoginSession(_state);
+
+                if (!_state.HasValidLogin())
+                    throw new IOException("Invalid login state after completed login.");
+
+                await StoreSession(_state);
             }
             catch (Exception innerEx)
             {
@@ -120,6 +120,45 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             public string LoginCsrf { get; set; } = string.Empty;
             public string PortletAuthCode { get; set; } = string.Empty;
             public string PortletAuthState { get; set; } = string.Empty;
+
+            public void Reset() { BaseJsonUri = string.Empty; }
+            public bool HasValidLogin() => !string.IsNullOrEmpty(BaseJsonUri);
+        }
+
+        private void TryRestoreSession(AuthState state)
+        {
+            if (_connectionProvider.AuthData.AccessToken is null)
+                return;
+
+            try
+            {
+                var persisted = JsonSerializer.Deserialize<PersistedSession>(_connectionProvider.AuthData.AccessToken);
+                state.BaseJsonUri = persisted.BaseJsonUri;
+                state.Csrf = persisted.Csrf;
+                persisted.AddToCookieContainer(_connectionProvider.CookieContainer);
+            }
+            catch (Exception ex)
+            {
+                state.Reset();
+            }
+        }
+
+        private async Task StoreSession(AuthState state)
+        {
+            var serializableSession = new PersistedSession(state.BaseJsonUri, state.Csrf, _connectionProvider.CookieContainer);
+            await _connectionProvider.AuthData.UpdateTokenAsync(JsonSerializer.Serialize(serializableSession), DateTime.MinValue, string.Empty);
+        }
+
+        private async Task LoginSession(AuthState state)
+        {
+            await GetInitialCsrf(state);
+            await GetLoginPageUri(state);
+            await GetLoginRelayState(state);
+            await GetLoginHmacToken(state);
+            await LoginIdentifier(state);
+            await LoginAuthenticate(state);
+            await CompleteLogin(state);
+            await GetFinalCsrf(state);
         }
 
         private void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
