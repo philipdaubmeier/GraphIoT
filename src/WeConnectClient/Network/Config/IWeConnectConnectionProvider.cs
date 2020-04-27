@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Net;
+using System.Net.Http;
 
 namespace PhilipDaubmeier.WeConnectClient.Network
 {
@@ -19,5 +20,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// A HttpClient to inject for authentication that does not follow redirects.
         /// </summary>
         HttpClient AuthClient { get; }
+
+        /// <summary>
+        /// The cookie container that will contain the session cookie needed for staying logged in.
+        /// </summary>
+        CookieContainer CookieContainer { get; }
     }
 }
