@@ -14,6 +14,9 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
     /// </summary>
     internal class PersistedSession
     {
+        public PersistedSession()
+            => (BaseJsonUri, Csrf, Cookies) = (string.Empty, string.Empty, new List<PersistedCookie>());
+
         public PersistedSession(string baseJsonUri, string csrf, CookieContainer cookieContainer)
         {
             BaseJsonUri = baseJsonUri;

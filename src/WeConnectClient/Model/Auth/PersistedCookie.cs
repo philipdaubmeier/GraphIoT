@@ -11,6 +11,9 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
     /// </summary>
     internal class PersistedCookie
     {
+        public PersistedCookie() => (Name, Value, Path, Domain, Expires)
+            = (string.Empty, string.Empty, string.Empty, string.Empty, DateTime.MinValue);
+
         public PersistedCookie(Cookie cookie) => (Name, Value, Path, Domain, Expires)
             = (cookie.Name, cookie.Value, cookie.Path, cookie.Domain, cookie.Expires);
 
