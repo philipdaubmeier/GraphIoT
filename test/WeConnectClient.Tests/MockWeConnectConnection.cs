@@ -37,11 +37,11 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             }
         }
 
-        private static readonly IWeConnectAuth auth = new WeConnectAuth("john@doe.com", "secretpassword");
+        private static readonly IWeConnectAuth mockAuth = new WeConnectAuth("john@doe.com", "secretpassword");
 
-        public static WeConnectConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler)
+        public static WeConnectConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler, IWeConnectAuth? auth = null)
         {
-            return new WeConnectMockConnectionProvider(auth, new HttpClient(mockHandler), new HttpClient(mockHandler));
+            return new WeConnectMockConnectionProvider(auth ?? mockAuth, new HttpClient(mockHandler), new HttpClient(mockHandler));
         }
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)
