@@ -166,6 +166,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private async Task LoginSession(AuthState state)
         {
             await GetInitialCsrf(state);
+            await SetInvariantLanguage(state);
             await GetLoginPageUri(state);
             await GetLoginRelayState(state);
             await GetLoginHmacToken(state);
@@ -193,10 +194,6 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// Step 1
         /// Get initial CSRF from landing page to get login process started. HttpClient
         /// stores JSESSIONID cookie.
-        ///
-        /// Step 1a,1b
-        /// Note: Portal performs a get-supported-browsers and get-countries at this point.
-        /// Those steps are skipped - we assume en_GB
         /// </summary>
         private async Task GetInitialCsrf(AuthState state)
         {
@@ -211,6 +208,27 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             state.Csrf = csrf;
             state.Referrer = landingPageUri.ToString();
+        }
+
+        /// <summary>
+        /// Step 1b
+        /// Note: Portal performs a get-supported-browsers and get-countries at this point.
+        /// Those steps are skipped - but we trigger the market switch to en_GB
+        /// </summary>
+        private async Task SetInvariantLanguage(AuthState state)
+        {
+            var changeLanguageUrl = new Uri(new Uri(_baseUri), $"/portal/en_GB/web/guest/home?p_auth={state.Csrf}&p_p_id=10_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=2&_10_WAR_cored5portlet_javax.portlet.action=changeMarket");
+            var changeLanguageUrlRequest = new HttpRequestMessage(HttpMethod.Post, changeLanguageUrl);
+            AddCommonAuthHeaders(changeLanguageUrlRequest.Headers, null, state.Referrer);
+            changeLanguageUrlRequest.FormUrlEncoded(new[]
+            {
+                ("_10_WAR_cored5portlet_country", "gb"),
+                ("_10_WAR_cored5portlet_language", "en")
+            });
+            var finalLoginUrlResponse = await _client.SendAsync(changeLanguageUrlRequest);
+
+            if (!finalLoginUrlResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to set language before logging in.");
         }
 
         /// <summary>
