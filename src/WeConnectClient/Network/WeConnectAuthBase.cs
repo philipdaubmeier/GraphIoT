@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
 
-            TWiremessage? responseJson = null;
+            TWiremessage? responseJson;
             try
             {
                 var responseStream = await response.Content.ReadAsStreamAsync();
