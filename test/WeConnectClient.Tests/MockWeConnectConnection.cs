@@ -22,6 +22,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         private const string _relaystate = "0f9d7eaae_unittest_relaystate_1980e977e5";
         private const string _hmac2 = "8e208cd992bd_unittest_hmac2_f9f218793ed78945be3f232b4180129cf9bf";
         private const string _jwtToken = "eyJraWQiOiI2YTE1NzUyMTY3OGY3N2JhIiwiYWxnIjoiUlMyNTYifQ.ewogICJzdWIiOiAiYjEyMzQxYzktZDEyMy00YWJjLTljZGUtODlhYmNkZWYxMjM0IiwKICAiYXVkIjogImIyMzQ1Njc4LWQxMjMtNGFiYy05Y2RlLTg5YWJjZGVmMTIzNEBhcHBzX3Z3LWRpbGFiX2NvbSIsCiAgImFjciI6ICJodHRwczovL2lkZW50aXR5LnZ3Z3JvdXAuaW8vYXNzdXJhbmNlL2xvYS0yIiwKICAic2NwIjogIm9wZW5pZCBwcm9maWxlIGJpcnRoZGF0ZSBuaWNrbmFtZSBhZGRyZXNzIHBob25lIGNhcnMgbWJiIiwKICAiYWF0IjogImlkZW50aXR5a2l0IiwKICAiaXNzIjogImh0dHBzOi8vaWRlbnRpdHkudndncm91cC5pbyIsCiAgImp0dCI6ICJhdXRob3JpemF0aW9uX2NvZGUiLAogICJleHAiOiAxNTg4MDIwOTk4LAogICJpYXQiOiAxNTg4MDIwNjk4LAogICJub25jZSI6ICJjNjU0ODg5Yi0wZjliLTRiYTgtYTkzNi1iZDc0ODFkMjY4NmIiLAogICJqdGkiOiAiN2M4ZTBjNmYtMDc1MC00OGQ1LWIzNzAtNDVjYzQ1YTI5MWY4Igp9.PtzseyO4M3Qnsgj9WaQopUikn4yfDktkhAQ2tvVenkeqXtwPuFi8JA0-xDTPd2tU1DhVmuMTAeXRSS0Y8uaWfxfh8DBe19vPvY5I5zsFwQ6GRFYJ_UZ6MLwPvJniSa2ov1nRo4fO7fVZD2nHXsmM7bHa73f394YT_WhDQ7hGbPMBUsCK77H2KtwCeHtROWQV4rdlbRZ21TIL4A5YROw8bvWmpclwSC8UNUqweiDpZDfxSMiiwjpuOiwWRHPap4pTrsPOyUXRYj7yNg9sEnu88wMOVoaO7L6upV0oBLi_Iz2gZFhvGJnV38wmhB1gf2XEHQNPzl68uTs_J15MQGKRhwWYqtrwT9Gj46PefbQnhfWfBLPBsrxT5nAG74W-0-I0T_CNP87oq3CNV-emxMMR_qE5hH_FVjH0fgjlkXl_sgFmcRNpoGGejoP73Digv73VnRVHba50oaU-pGtxBkXCyiAZkTQFg6vA8g1RmBFG0Jplt2OxshQrC1IGkbxNuQPwLZaTwsxUciNkMcYWdzy3j-4urYeXBLPDmF46ju5rzWHfBhifxg43l8fZ8KOpDPTdkkrIyNeGOLoF-Rw4KPh5fdTjJlO4zpOxHJC-fXK9wCc0riPpYJrLjfjEyh9tNHlbrXwdnuZm4Q-HusB_trb7oE9ys3jLBlbRNFQ0ZmyLnKU";
+        private const string _sessionId = "ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx";
 
         public static string Vin => "WVWZZZABCD1234567";
         public static string BaseUri => $"{_portalUri}/portal/delegate/dashboard/{Vin}";
@@ -47,7 +48,13 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         {
             // Step 1
             mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
-                    .Respond("text/html",
+                    .WithExactQueryString(string.Empty)
+                    .Respond(new[]{
+                        new KeyValuePair<string, string>("Set-Cookie", "COOKIE_SUPPORT=true; Expires=Wed, 28-Apr-2021 20:44:04 GMT; Path=/; Secure; HttpOnly"),
+                        new KeyValuePair<string, string>("Set-Cookie", $"JSESSIONID={_sessionId}; Path=/; Secure; HttpOnly"),
+                        new KeyValuePair<string, string>("Set-Cookie", "GUEST_LANGUAGE_ID=en_GB; Expires=Wed, 28-Apr-2021 20:44:04 GMT; Path=/; Secure; HttpOnly"),
+                        new KeyValuePair<string, string>("Set-Cookie", "CARNET_LANGUAGE_ID=en_GB; Expires=Sat, 11-Dec-2066 23:26:12 GMT; Path=/; Secure; HttpOnly")
+                    }, "text/html",
                     @"<html>
                     <head>
                         <title>We Connect</title>
@@ -55,6 +62,11 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                     </head>
                     <body></body>
                     </html>");
+
+            // Step 1b
+            mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
+                    .WithExactQueryString($"p_auth={_csrf1}&p_p_id=10_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=2&_10_WAR_cored5portlet_javax.portlet.action=changeMarket")
+                    .Respond("text/plain", "");
 
             // Step 2
             mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home/-/csrftokenhandling/get-login-url")
@@ -71,7 +83,9 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             // Step 4
             mockHttp.When($"{_baseUri}/signin-service/v1/signin/{_clientId}?relayState={_relaystate}")
-                    .Respond("text/html",
+                    .Respond(new []{
+                        new KeyValuePair<string, string>("Set-Cookie", $"SESSION={_sessionId}; Path=/signin-service/v1/; Secure; HttpOnly; SameSite=Lax")
+                    }, "text/html",
                     @"<!DOCTYPE html>
                     <html>
                     <body>
