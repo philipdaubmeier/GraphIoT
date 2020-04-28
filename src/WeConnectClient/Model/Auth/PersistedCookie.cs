@@ -11,23 +11,17 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
     /// </summary>
     internal class PersistedCookie
     {
-        public PersistedCookie() => (Name, Value, Path, Domain, Expires)
-            = (string.Empty, string.Empty, string.Empty, string.Empty, DateTime.MinValue);
+        public PersistedCookie() => (Name, Value, Expires)
+            = (string.Empty, string.Empty, DateTime.MinValue);
 
-        public PersistedCookie(Cookie cookie) => (Name, Value, Path, Domain, Expires)
-            = (cookie.Name, cookie.Value, cookie.Path, cookie.Domain, cookie.Expires);
+        public PersistedCookie(Cookie cookie) => (Name, Value, Expires)
+            = (cookie.Name, cookie.Value, cookie.Expires);
 
         [JsonPropertyName("n")]
         public string Name { get; set; }
 
         [JsonPropertyName("v")]
         public string Value { get; set; }
-
-        [JsonPropertyName("p")]
-        public string Path { get; set; }
-
-        [JsonPropertyName("d")]
-        public string Domain { get; set; }
 
         [JsonPropertyName("e")]
         public DateTime Expires { get; set; }
