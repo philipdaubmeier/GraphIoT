@@ -33,24 +33,24 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         public static bool TryExtractCsrf(this string body, out string csrf)
         {
             var csrfRegex = new Regex("<meta name=\"_csrf\" content=\"(?<csrf>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group group);
-            csrf = found ? group.Value : string.Empty;
+            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group? group);
+            csrf = found && group != null ? group.Value : string.Empty;
             return found;
         }
 
         public static bool TryExtractLoginHmac(this string body, out string hmac)
         {
             var csrfRegex = new Regex("<input.*?id=\"hmac\".*?value=\"(?<hmac>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("hmac", out Group group);
-            hmac = found ? group.Value : string.Empty;
+            bool found = csrfRegex.Match(body).Groups.TryGetValue("hmac", out Group? group);
+            hmac = found && group != null ? group.Value : string.Empty;
             return found;
         }
 
         public static bool TryExtractLoginCsrf(this string body, out string csrf)
         {
             var csrfRegex = new Regex("<input.*?id=\"csrf\".*?value=\"(?<csrf>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group group);
-            csrf = found ? group.Value : string.Empty;
+            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group? group);
+            csrf = found && group != null ? group.Value : string.Empty;
             return found;
         }
 
