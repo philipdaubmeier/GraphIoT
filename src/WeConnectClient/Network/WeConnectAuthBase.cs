@@ -1,6 +1,7 @@
 using PhilipDaubmeier.WeConnectClient.Model;
 using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -96,6 +97,21 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             AddCommonAuthHeaders(request.Headers, _state.Csrf, _state.Referrer);
 
             return await _client.SendAsync(request);
+        }
+
+        /// <summary>
+        /// Gets the CultureInfo that the portal responded via the 'CARNET_LANGUAGE_ID' cookie,
+        /// which is the locale that the server side uses for formatting date and time strings.
+        /// </summary>
+        private protected CultureInfo GetCarNetLocale()
+        {
+            var cookies = _connectionProvider.CookieContainer?.GetCookies(_state.BaseUri).Cast<Cookie>()
+                .ToDictionary(c => c.Name.ToUpperInvariant(), c => c.Value);
+
+            if (cookies is null || !cookies.TryGetValue("CARNET_LANGUAGE_ID", out string? locale) || locale is null)
+                return CultureInfo.InvariantCulture;
+
+            return CultureInfo.CreateSpecificCulture(locale);
         }
 
         /// <summary>
