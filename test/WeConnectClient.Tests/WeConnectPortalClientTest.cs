@@ -1,5 +1,4 @@
 using PhilipDaubmeier.WeConnectClient.Network;
-using RichardSzalay.MockHttp;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,7 +9,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         [Fact]
         public async Task TestGetEManager()
         {
-            var client = new WeConnectPortalClient(new MockHttpMessageHandler()
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddEmanager()
                 .ToMockProvider());
@@ -95,14 +94,18 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         {
             var auth = new WeConnectAuth("john@doe.com", "secretpassword");
 
-            var client = new WeConnectPortalClient(new MockHttpMessageHandler()
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddEmanager()
                 .ToMockProvider(auth));
 
             await client.GetEManager();
 
-            Assert.Equal("{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\",\"csrf\":\"agkWdVBw\",\"c\":[]}", auth.AccessToken);
+            Assert.Equal("{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
+                "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"COOKIE_SUPPORT\",\"v\":\"true\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}," +
+                "{\"n\":\"GUEST_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                "{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}]}", auth.AccessToken);
         }
     }
 }

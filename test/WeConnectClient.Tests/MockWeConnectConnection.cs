@@ -41,7 +41,13 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
         public static WeConnectConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler, IWeConnectAuth? auth = null)
         {
-            return new WeConnectMockConnectionProvider(auth ?? mockAuth, new HttpClient(mockHandler), new HttpClient(mockHandler));
+            var connProvider = new WeConnectMockConnectionProvider(auth ?? mockAuth, new HttpClient(mockHandler), new HttpClient(mockHandler));
+
+            // Hook up cookie container, so that the mock handler fills the cookie container of the connection provider
+            if (mockHandler is MockCookieHttpMessageHandler cookieHandler)
+                cookieHandler.CookieContainer = connProvider.CookieContainer;
+
+            return connProvider;
         }
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)
