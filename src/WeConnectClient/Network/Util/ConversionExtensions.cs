@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HtmlAgilityPack;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -32,26 +33,38 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         public static bool TryExtractCsrf(this string body, out string csrf)
         {
-            var csrfRegex = new Regex("<meta name=\"_csrf\" content=\"(?<csrf>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group? group);
-            csrf = found && group != null ? group.Value : string.Empty;
-            return found;
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(body);
+
+            var node = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name=\"_csrf\"]");
+
+            string? value = node.GetAttributeValue("content", null);
+            csrf = value ?? string.Empty;
+            return value != null;
         }
 
         public static bool TryExtractLoginHmac(this string body, out string hmac)
         {
-            var csrfRegex = new Regex("<input.*?id=\"hmac\".*?value=\"(?<hmac>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("hmac", out Group? group);
-            hmac = found && group != null ? group.Value : string.Empty;
-            return found;
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(body);
+
+            var node = htmlDoc.DocumentNode.SelectSingleNode($"//input[@type=\"hidden\"][@id=\"hmac\"]");
+
+            string? value = node.GetAttributeValue("value", null);
+            hmac = value ?? string.Empty;
+            return value != null;
         }
 
         public static bool TryExtractLoginCsrf(this string body, out string csrf)
         {
-            var csrfRegex = new Regex("<input.*?id=\"csrf\".*?value=\"(?<csrf>.*?)\".*?/>");
-            bool found = csrfRegex.Match(body).Groups.TryGetValue("csrf", out Group? group);
-            csrf = found && group != null ? group.Value : string.Empty;
-            return found;
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(body);
+
+            var node = htmlDoc.DocumentNode.SelectSingleNode($"//input[@type=\"hidden\"][@id=\"csrf\"]");
+
+            string? value = node.GetAttributeValue("value", null);
+            csrf = value ?? string.Empty;
+            return value != null;
         }
 
         public static bool TryExtractUriParameter(this Uri uri, string paramName, out string value)

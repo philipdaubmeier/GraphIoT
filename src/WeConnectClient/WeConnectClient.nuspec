@@ -17,8 +17,10 @@
     <tags>$tags$</tags>
     <dependencies>
       <group targetFramework="netcoreapp3.1">
+        <dependency id="HtmlAgilityPack" version="1.11.23" />
       </group>
       <group targetFramework="netstandard2.1">
+        <dependency id="HtmlAgilityPack" version="1.11.23" />
         <dependency id="System.Text.Json" version="4.7.1" />
       </group>
     </dependencies>
