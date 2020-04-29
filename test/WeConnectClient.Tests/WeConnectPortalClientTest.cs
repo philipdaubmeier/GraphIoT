@@ -1,4 +1,6 @@
 using PhilipDaubmeier.WeConnectClient.Network;
+using RichardSzalay.MockHttp;
+using System;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -6,6 +8,52 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 {
     public class WeConnectPortalClientTest
     {
+        public static string expectedSessionToken = "{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
+                "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"COOKIE_SUPPORT\",\"v\":\"true\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}," +
+                "{\"n\":\"GUEST_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                "{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}]}";
+
+        [Fact]
+        public async Task TestAuthSerialization()
+        {
+            var auth = new WeConnectAuth("john@doe.com", "secretpassword");
+
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddEmanager()
+                .ToMockProvider(auth));
+
+            await client.GetEManager();
+
+            Assert.Equal(expectedSessionToken, auth.AccessToken);
+        }
+
+        [Fact]
+        public async Task TestAuthDeserialization()
+        {
+            // explicitly not providing any credentials
+            var auth = new WeConnectAuth(string.Empty, string.Empty);
+
+            // emulate that the session was persisted and is now restored.
+            // this should give us access without a username and password
+            await auth.UpdateTokenAsync(expectedSessionToken, DateTime.MinValue, null);
+
+            var mockedHandler = new MockCookieHttpMessageHandler();
+            var client = new WeConnectPortalClient(mockedHandler
+                .AddAuthMock(out MockedRequest mockedRequest)
+                .AddEmanager()
+                .ToMockProvider(auth));
+
+            var result = await client.GetEManager();
+
+            // assert we could load data successfully
+            Assert.Equal("AVAILABLE", result.Rbc.Status?.ExtPowerSupplyState);
+
+            // assert that no new authentication was needed to be called
+            Assert.Equal(0, mockedHandler.GetMatchCount(mockedRequest));
+        }
+
         [Fact]
         public async Task TestGetEManager()
         {
@@ -87,25 +135,6 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             Assert.False(result.ActionPending);
             Assert.True(result.RdtAvailable);
-        }
-
-        [Fact]
-        public async Task TestAuthSerialization()
-        {
-            var auth = new WeConnectAuth("john@doe.com", "secretpassword");
-
-            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
-                .AddAuthMock()
-                .AddEmanager()
-                .ToMockProvider(auth));
-
-            await client.GetEManager();
-
-            Assert.Equal("{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
-                "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"COOKIE_SUPPORT\",\"v\":\"true\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
-                "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}," +
-                "{\"n\":\"GUEST_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
-                "{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}]}", auth.AccessToken);
         }
     }
 }

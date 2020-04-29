@@ -1,5 +1,6 @@
 using PhilipDaubmeier.WeConnectClient.Network;
 using RichardSzalay.MockHttp;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -52,8 +53,13 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)
         {
+            return mockHttp.AddAuthMock(out MockedRequest _);
+        }
+
+        public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp, out MockedRequest mocketRequest)
+        {
             // Step 1
-            mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
+            mocketRequest = mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
                     .WithExactQueryString(string.Empty)
                     .Respond(new[]{
                         new KeyValuePair<string, string>("Set-Cookie", "COOKIE_SUPPORT=true; Expires=Wed, 28-Apr-2021 20:44:04 GMT; Path=/; Secure; HttpOnly"),
