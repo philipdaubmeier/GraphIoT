@@ -136,5 +136,78 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.False(result.ActionPending);
             Assert.True(result.RdtAvailable);
         }
+
+        [Fact]
+        public async Task TestGetTripStatistics()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddTripStatistics()
+                .ToMockProvider());
+
+            var result = await client.GetTripStatistics();
+
+            Assert.Equal(30, result.DaysInMonth);
+            Assert.Equal(2, result.FirstWeekday);
+            Assert.Equal(4, result.Month);
+            Assert.Equal(2020, result.Year);
+            Assert.Equal(2020, result.FirstTripYear);
+            Assert.Null(result.CyclicData);
+            Assert.False(result.TripFromLastRefuelAvailable);
+
+            Assert.Null(result.TripStatistics[0]);
+            Assert.Equal(30, result.TripStatistics.Count);
+            Assert.Equal(123412344, result.TripStatistics[27].AggregatedStatistics.TripId);
+            Assert.Equal(12.8, result.TripStatistics[27].AggregatedStatistics.AverageElectricConsumption);
+            Assert.Null(result.TripStatistics[27].AggregatedStatistics.AverageFuelConsumption);
+            Assert.Null(result.TripStatistics[27].AggregatedStatistics.AverageCngConsumption);
+            Assert.Equal(50, result.TripStatistics[27].AggregatedStatistics.AverageSpeed);
+            Assert.Equal(70, result.TripStatistics[27].AggregatedStatistics.TripDuration);
+            Assert.Equal(58, result.TripStatistics[27].AggregatedStatistics.TripLength);
+            Assert.Equal("28.04.2020", result.TripStatistics[27].AggregatedStatistics.Timestamp);
+            Assert.Equal("1:10", result.TripStatistics[27].AggregatedStatistics.TripDurationFormatted);
+            Assert.Null(result.TripStatistics[27].AggregatedStatistics.Recuperation);
+            Assert.Null(result.TripStatistics[27].AggregatedStatistics.AverageAuxiliaryConsumption);
+            Assert.Equal(12.8, result.TripStatistics[27].AggregatedStatistics.TotalElectricConsumption);
+            Assert.Null(result.TripStatistics[27].AggregatedStatistics.LongFormattedTimestamp);
+
+            Assert.Equal(123412344, result.TripStatistics[27].TripStatistics[0].TripId);
+            Assert.Equal(12.8, result.TripStatistics[27].TripStatistics[0].AverageElectricConsumption);
+            Assert.Null(result.TripStatistics[27].TripStatistics[0].AverageFuelConsumption);
+            Assert.Null(result.TripStatistics[27].TripStatistics[0].AverageCngConsumption);
+            Assert.Equal(50, result.TripStatistics[27].TripStatistics[0].AverageSpeed);
+            Assert.Equal(70, result.TripStatistics[27].TripStatistics[0].TripDuration);
+            Assert.Equal(58, result.TripStatistics[27].TripStatistics[0].TripLength);
+            Assert.Equal("Today, 14:34", result.TripStatistics[27].TripStatistics[0].Timestamp);
+            Assert.Equal("1:10", result.TripStatistics[27].TripStatistics[0].TripDurationFormatted);
+            Assert.Null(result.TripStatistics[27].TripStatistics[0].Recuperation);
+            Assert.Null(result.TripStatistics[27].TripStatistics[0].AverageAuxiliaryConsumption);
+            Assert.Null(result.TripStatistics[27].TripStatistics[0].TotalElectricConsumption);
+            Assert.Equal("Trip ended: Tue, 28.04.2020, 14:34", result.TripStatistics[27].TripStatistics[0].LongFormattedTimestamp);
+
+            Assert.Equal(123412344, result.LongTermData.TripId);
+            Assert.Equal(13.1, result.LongTermData.AverageElectricConsumption);
+            Assert.Null(result.LongTermData.AverageFuelConsumption);
+            Assert.Null(result.LongTermData.AverageCngConsumption);
+            Assert.Equal(26, result.LongTermData.AverageSpeed);
+            Assert.Equal(642, result.LongTermData.TripDuration);
+            Assert.Equal(275, result.LongTermData.TripLength);
+            Assert.Equal("Heute, 14:34", result.LongTermData.Timestamp);
+            Assert.Equal("10:42", result.LongTermData.TripDurationFormatted);
+            Assert.Null(result.LongTermData.Recuperation);
+            Assert.Null(result.LongTermData.AverageAuxiliaryConsumption);
+            Assert.Null(result.LongTermData.TotalElectricConsumption);
+            Assert.Equal("Trip ended: Tue, 28.04.2020, 14:34", result.LongTermData.LongFormattedTimestamp);
+
+            Assert.False(result.ServiceConfiguration.ElectricConsumption);
+            Assert.True(result.ServiceConfiguration.TriptypeShort);
+            Assert.False(result.ServiceConfiguration.AuxiliaryConsumption);
+            Assert.False(result.ServiceConfiguration.FuelOverallConsumption);
+            Assert.True(result.ServiceConfiguration.TriptypeCyclic);
+            Assert.True(result.ServiceConfiguration.ElectricOverallConsumption);
+            Assert.True(result.ServiceConfiguration.TriptypeLong);
+            Assert.False(result.ServiceConfiguration.CngOverallConsumption);
+            Assert.False(result.ServiceConfiguration.Recuperation);
+        }
     }
 }
