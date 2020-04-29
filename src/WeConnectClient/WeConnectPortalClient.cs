@@ -17,7 +17,9 @@ namespace PhilipDaubmeier.WeConnectClient
 
         public async Task<Rts> GetTripStatistics()
         {
-            return await CallApi<TripStatisticsResponse, Rts>("/-/rts/get-latest-trip-statistics");
+            var res = await CallApi<TripStatisticsResponse, Rts>("/-/rts/get-latest-trip-statistics");
+            res.DateTimeLocale = GetCarNetLocale();
+            return res;
         }
     }
 }
