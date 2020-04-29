@@ -1,6 +1,7 @@
 using PhilipDaubmeier.WeConnectClient.Network;
 using RichardSzalay.MockHttp;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -208,6 +209,22 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.True(result.ServiceConfiguration.TriptypeLong);
             Assert.False(result.ServiceConfiguration.CngOverallConsumption);
             Assert.False(result.ServiceConfiguration.Recuperation);
+        }
+
+        [Fact]
+        public async Task TestGetTripStatisticsAllEntries()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddTripStatistics()
+                .ToMockProvider());
+
+            var result = await client.GetTripStatistics();
+
+            var allEntries = result.AllEntries.ToList();
+            Assert.Equal(new DateTime(2020, 04, 28, 13, 24, 0, DateTimeKind.Local), allEntries[0].start);
+            Assert.Equal(new TimeSpan(1, 10, 0), allEntries[0].duration);
+            Assert.Equal(50d, allEntries[0].trip.AverageSpeed);
         }
     }
 }
