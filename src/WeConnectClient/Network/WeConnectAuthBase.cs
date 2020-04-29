@@ -106,7 +106,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private protected CultureInfo GetCarNetLocale()
         {
             var cookies = _connectionProvider.CookieContainer?.GetCookies(_state.BaseUri).Cast<Cookie>()
-                .ToDictionary(c => c.Name.ToUpperInvariant(), c => c.Value);
+                .GroupBy(c => c.Name.ToUpperInvariant()).ToDictionary(c => c.Key, c => c.First().Value);
 
             if (cookies is null || !cookies.TryGetValue("CARNET_LANGUAGE_ID", out string? locale) || locale is null)
                 return CultureInfo.InvariantCulture;
