@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using PhilipDaubmeier.WeConnectClient.Model.Core;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.WeConnectClient.Model.VehicleList
 {
     public class VehicleEntry
     {
-        public string Vin { get; set; } = string.Empty;
+        [JsonConverter(typeof(VinConverter))]
+        public Vin Vin { get; set; } = Vin.Empty;
+
         public string Name { get; set; } = string.Empty;
         public bool Expired { get; set; }
         public string Model { get; set; } = string.Empty;

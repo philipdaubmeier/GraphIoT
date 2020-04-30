@@ -20,6 +20,8 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
 
         private static readonly Regex vinPattern = new Regex(@"^[A-HJ-NPR-Z\d]{9}[A-HJ-NPR-Z\d-]{2}[\d]{6}$", RegexOptions.Compiled);
 
+        public static Vin Empty => new Vin("S0000000000000000");
+
         public Vin(string vin)
         {
             _vin = vin.Trim().ToUpperInvariant();
