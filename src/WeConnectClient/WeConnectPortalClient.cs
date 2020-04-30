@@ -1,5 +1,7 @@
-﻿using PhilipDaubmeier.WeConnectClient.Model.Emanager;
+﻿using PhilipDaubmeier.WeConnectClient.Model.Carfinder;
+using PhilipDaubmeier.WeConnectClient.Model.Emanager;
 using PhilipDaubmeier.WeConnectClient.Model.TripStatistics;
+using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
 using PhilipDaubmeier.WeConnectClient.Network;
 using System.Threading.Tasks;
 
@@ -9,6 +11,16 @@ namespace PhilipDaubmeier.WeConnectClient
     {
         public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
+
+        public async Task<Location> GetLastKnownLocation()
+        {
+            return await CallApi<LocationResponse, Location>("/-/cf/get-location");
+        }
+
+        public async Task<VehicleDetails> GetVehicleDetails()
+        {
+            return await CallApi<VehicleDetailsResponse, VehicleDetails>("/-/vehicle-info/get-vehicle-details");
+        }
 
         public async Task<Emanager> GetEManager()
         {
