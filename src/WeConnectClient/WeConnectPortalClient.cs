@@ -2,8 +2,10 @@
 using PhilipDaubmeier.WeConnectClient.Model.Emanager;
 using PhilipDaubmeier.WeConnectClient.Model.TripStatistics;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
+using PhilipDaubmeier.WeConnectClient.Model.VehicleList;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleStatus;
 using PhilipDaubmeier.WeConnectClient.Network;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.WeConnectClient
@@ -16,6 +18,11 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<Location> GetLastKnownLocation()
         {
             return await CallApi<LocationResponse, Location>("/-/cf/get-location");
+        }
+
+        public async Task<IEnumerable<VehicleEntry>> GetVehicleList()
+        {
+            return await CallApi<VehicleListResponse, IEnumerable<VehicleEntry>>("/-/mainnavigation/get-fully-loaded-cars");
         }
 
         public async Task<VehicleDetails> GetVehicleDetails()
