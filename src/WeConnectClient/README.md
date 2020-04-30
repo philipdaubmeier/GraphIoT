@@ -48,7 +48,7 @@ For more usage examples you can also have a look at the [unit tests](../../test/
 
 WeConnectClient is targeted for .NET Standard 2.1 or higher.
 
-# Credits
+## Credits
 
 The core of this client, the authentication mechanism, is based on the excellent work of bgewehr, reneboer and wez3 and ported from their python client to c#. See details in this repository [here](https://github.com/bgewehr/volkswagen-carnet-client/)
 
