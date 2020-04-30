@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PhilipDaubmeier.WeConnectClient.Model.Core;
+using System;
 
 namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 {
@@ -18,6 +19,18 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         public string PortletAuthState { get; set; } = string.Empty;
 
         public Uri BaseUri => new Uri(new Uri(BaseJsonUri), "/");
+
+        public string BaseJsonUriForVin(Vin? vin)
+        {
+            if (vin is null)
+                return BaseJsonUri;
+
+            var pos = BaseJsonUri.LastIndexOf('/', Math.Max(0, BaseJsonUri.Length - 2));
+            if (pos <= 0)
+                return BaseJsonUri;
+
+            return BaseJsonUri.Substring(0, pos + 1) + vin;
+        }
 
         private bool forceRelogin = false;
         public void ForceRelogin() { forceRelogin = true; Reset(); }

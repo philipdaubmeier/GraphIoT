@@ -1,5 +1,6 @@
 using PhilipDaubmeier.WeConnectClient.Model;
 using PhilipDaubmeier.WeConnectClient.Model.Auth;
+using PhilipDaubmeier.WeConnectClient.Model.Core;
 using System;
 using System.Globalization;
 using System.IO;
@@ -50,10 +51,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// Calls the given endpoint  at the WeConnect Portal api and ensures the request is authenticated
         /// and parses the result afterwards, including unpacking of the wiremessage.
         /// </summary>
-        private protected async Task<TData> CallApi<TWiremessage, TData>(string path)
+        private protected async Task<TData> CallApi<TWiremessage, TData>(string path, Vin? vin = null)
             where TWiremessage : class, IWiremessage<TData> where TData : class
         {
-            var response = await RequestApi(path);
+            var response = await RequestApi(path, vin);
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
 
@@ -88,11 +89,11 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// <summary>
         /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi(string path)
+        protected async Task<HttpResponseMessage> RequestApi(string path, Vin? vin = null)
         {
             await Authenticate(_state);
 
-            var uri = new Uri($"{_state.BaseJsonUri}{path}");
+            var uri = new Uri($"{_state.BaseJsonUriForVin(vin)}{path}");
             var request = new HttpRequestMessage(HttpMethod.Post, uri);
             AddCommonAuthHeaders(request.Headers, _state.Csrf, _state.Referrer);
 
