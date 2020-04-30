@@ -92,6 +92,40 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                         }
                     }");
 
+            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/rts/get-last-refuel-trip-statistics")
+                    .Respond("application/json",
+                    @"{
+                        ""errorCode"": ""0"",
+                        ""rtsViewModel"":
+                        {
+                            ""daysInMonth"": 30,
+                            ""firstWeekday"": 2,
+                            ""month"": 4,
+                            ""year"": 2020,
+                            ""firstTripYear"": 2020,
+                            ""tripStatistics"": null,
+                            ""longTermData"": null,
+                            ""cyclicData"":
+                            {
+                                ""tripId"": 123412344,
+                                ""averageElectricConsumption"": 12.8,
+                                ""averageFuelConsumption"": null,
+                                ""averageCngConsumption"": null,
+                                ""averageSpeed"": 50,
+                                ""tripDuration"": 70,
+                                ""tripLength"": 58,
+                                ""timestamp"": ""Today, 14:34"",
+                                ""tripDurationFormatted"": ""1:10"",
+                                ""recuperation"": null,
+                                ""averageAuxiliaryConsumption"": null,
+                                ""totalElectricConsumption"": null,
+                                ""longFormattedTimestamp"": ""Trip ended: Tue, 28.04.2020, 14:34""
+                            },
+                            ""serviceConfiguration"": null,
+                            ""tripFromLastRefuelAvailable"": true
+                        }
+                    }");
+
             return mockHttp;
         }
     }

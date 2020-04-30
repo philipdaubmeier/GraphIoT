@@ -139,14 +139,14 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         }
 
         [Fact]
-        public async Task TestGetTripStatistics()
+        public async Task TestGetLatestTripStatistics()
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddTripStatistics()
                 .ToMockProvider());
 
-            var result = await client.GetTripStatistics();
+            var result = await client.GetLatestTripStatistics();
 
             Assert.Equal(30, result.DaysInMonth);
             Assert.Equal(2, result.FirstWeekday);
@@ -212,14 +212,65 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         }
 
         [Fact]
-        public async Task TestGetTripStatisticsAllEntries()
+        public async Task TestGetLastRefuelTripStatistics()
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddTripStatistics()
                 .ToMockProvider());
 
-            var result = await client.GetTripStatistics();
+            var result = await client.GetLastRefuelTripStatistics();
+
+            Assert.Equal(30, result.DaysInMonth);
+            Assert.Equal(2, result.FirstWeekday);
+            Assert.Equal(4, result.Month);
+            Assert.Equal(2020, result.Year);
+            Assert.Equal(2020, result.FirstTripYear);
+            Assert.Null(result.TripStatistics);
+            Assert.Null(result.LongTermData);
+            Assert.Null(result.ServiceConfiguration);
+            Assert.True(result.TripFromLastRefuelAvailable);
+
+            Assert.Equal(123412344, result.CyclicData.TripId);
+            Assert.Equal(12.8, result.CyclicData.AverageElectricConsumption);
+            Assert.Null(result.CyclicData.AverageFuelConsumption);
+            Assert.Null(result.CyclicData.AverageCngConsumption);
+            Assert.Equal(50, result.CyclicData.AverageSpeed);
+            Assert.Equal(70, result.CyclicData.TripDuration);
+            Assert.Equal(58, result.CyclicData.TripLength);
+            Assert.Equal("Today, 14:34", result.CyclicData.Timestamp);
+            Assert.Equal("1:10", result.CyclicData.TripDurationFormatted);
+            Assert.Null(result.CyclicData.Recuperation);
+            Assert.Null(result.CyclicData.AverageAuxiliaryConsumption);
+            Assert.Null(result.CyclicData.TotalElectricConsumption);
+            Assert.Equal("Trip ended: Tue, 28.04.2020, 14:34", result.CyclicData.LongFormattedTimestamp);
+        }
+
+        [Fact]
+        public async Task TestGetLatestTripStatisticsAllEntries()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddTripStatistics()
+                .ToMockProvider());
+
+            var result = await client.GetLatestTripStatistics();
+
+            var allEntries = result.AllEntries.ToList();
+            Assert.Equal(new DateTime(2020, 04, 28, 13, 24, 0, DateTimeKind.Local), allEntries[0].start);
+            Assert.Equal(new TimeSpan(1, 10, 0), allEntries[0].duration);
+            Assert.Equal(50d, allEntries[0].trip.AverageSpeed);
+        }
+
+        [Fact]
+        public async Task TestGetLastRefuelTripStatisticsAllEntries()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddTripStatistics()
+                .ToMockProvider());
+
+            var result = await client.GetLastRefuelTripStatistics();
 
             var allEntries = result.AllEntries.ToList();
             Assert.Equal(new DateTime(2020, 04, 28, 13, 24, 0, DateTimeKind.Local), allEntries[0].start);
