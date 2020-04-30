@@ -111,7 +111,14 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             if (cookies is null || !cookies.TryGetValue("CARNET_LANGUAGE_ID", out string? locale) || locale is null)
                 return CultureInfo.InvariantCulture;
 
-            return CultureInfo.CreateSpecificCulture(locale);
+            try
+            {
+                return CultureInfo.CreateSpecificCulture(locale.Replace('_', '-').Trim());
+            }
+            catch (CultureNotFoundException)
+            {
+                return CultureInfo.InvariantCulture;
+            }
         }
 
         /// <summary>
