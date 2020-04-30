@@ -1,3 +1,4 @@
+using PhilipDaubmeier.WeConnectClient.Model.Core;
 using PhilipDaubmeier.WeConnectClient.Network;
 using RichardSzalay.MockHttp;
 using System;
@@ -365,6 +366,24 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         }
 
         [Fact]
+        public async Task TestGetLocationDifferentVins()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddCarfinder()
+                .ToMockProvider());
+
+            var resultVin1 = await client.GetLastKnownLocation(new Vin("WVWZZZABCD1234567"));
+            var resultVin2 = await client.GetLastKnownLocation(new Vin("TESTVHCLE22222222"));
+
+            Assert.Equal(37.377166, resultVin1.Latitude);
+            Assert.Equal(-122.086966, resultVin1.Longitude);
+
+            Assert.Equal(52.433921, resultVin2.Latitude);
+            Assert.Equal(10.7957444, resultVin2.Longitude);
+        }
+
+        [Fact]
         public async Task TestGetVehicleList()
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
@@ -444,12 +463,12 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
-                .AddLoadCarDetails("WVWZZZOTHERVIN123")
+                .AddLoadCarDetails("WVWZZZ0THER777777")
                 .ToMockProvider());
 
-            var result = await client.GetVehicle("WVWZZZOTHERVIN123");
+            var result = await client.GetVehicle("WVWZZZ0THER777777");
 
-            Assert.Equal("WVWZZZOTHERVIN123", result.Vin);
+            Assert.Equal("WVWZZZ0THER777777", result.Vin);
             Assert.Equal("My Car", result.Name);
             Assert.False(result.Expired);
             Assert.Null(result.Model);
@@ -458,7 +477,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Null(result.ImageUrl);
             Assert.Null(result.VehicleSpecificFallbackImageUrl);
             Assert.Null(result.ModelSpecificFallbackImageUrl);
-            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZOTHERVIN123", result.DefaultImageUrl);
+            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZ0THER777777", result.DefaultImageUrl);
             Assert.Equal("v", result.VehicleBrand);
             Assert.Equal("20200101", result.EnrollmentDate);
             Assert.Null(result.DeviceOCU1);

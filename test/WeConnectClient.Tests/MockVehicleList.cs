@@ -27,7 +27,8 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
         public static MockHttpMessageHandler AddLoadCarDetails(this MockHttpMessageHandler mockHttp, string vin = "WVWZZZABCD1234567")
         {
-            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/mainnavigation/load-car-details/{vin}")
+            var alternateVinBaseUri = MockWeConnectConnection.BaseUri.Replace(MockWeConnectConnection.Vin, vin);
+            mockHttp.When($"{alternateVinBaseUri}/-/mainnavigation/load-car-details/{vin}")
                     .Respond("application/json",
                     @"{
                         ""errorCode"": ""0"",

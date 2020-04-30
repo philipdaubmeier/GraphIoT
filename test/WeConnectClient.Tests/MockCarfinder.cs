@@ -17,6 +17,18 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                         }
                     }");
 
+            var alternateVinBaseUri = MockWeConnectConnection.BaseUri.Replace(MockWeConnectConnection.Vin, "TESTVHCLE22222222");
+            mockHttp.When($"{alternateVinBaseUri}/-/cf/get-location")
+                    .Respond("application/json",
+                    @"{
+                        ""errorCode"": ""0"",
+                        ""position"":
+                        {
+                            ""lat"": 52.433921,
+                            ""lng"": 10.7957444
+                        }
+                    }");
+
             return mockHttp;
         }
     }
