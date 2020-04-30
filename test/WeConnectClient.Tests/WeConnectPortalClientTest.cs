@@ -511,5 +511,49 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.False(result.Dkyenabled);
             Assert.True(result.Selected);
         }
+
+        [Fact]
+        public async Task TestGetGeofences()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddGeofence()
+                .ToMockProvider());
+
+            var result = await client.GetGeofences();
+
+            Assert.Single(result.GeoFenceList);
+
+            Assert.False(result.GeoFenceList[0].Active);
+            Assert.Equal("123456", result.GeoFenceList[0].Id);
+            Assert.Equal("1607-1601 Miramonte Ave, Mountain View, CA 94040, USA", result.GeoFenceList[0].DefinitionName);
+            Assert.Equal("RED", result.GeoFenceList[0].ZoneType);
+            Assert.Equal("ELLIPSE", result.GeoFenceList[0].ShapeType);
+            Assert.Equal(37.377166, result.GeoFenceList[0].Latitude);
+            Assert.Equal(-122.086966, result.GeoFenceList[0].Longitude);
+            Assert.Equal(0, result.GeoFenceList[0].RotationAngle);
+            Assert.Equal(0, result.GeoFenceList[0].RectHeight);
+            Assert.Equal(0, result.GeoFenceList[0].RectWidth);
+            Assert.Equal(375, result.GeoFenceList[0].EllipseFirstRadius);
+            Assert.Equal(375, result.GeoFenceList[0].EllipseSecondRadius);
+            Assert.False(result.GeoFenceList[0].Updated);
+
+            Assert.Equal(2, result.GeoFenceList[0].Schedule.Type);
+            Assert.Equal(15, result.GeoFenceList[0].Schedule.Start.Hours);
+            Assert.Equal(0, result.GeoFenceList[0].Schedule.Start.Minutes);
+            Assert.Equal(20, result.GeoFenceList[0].Schedule.End.Hours);
+            Assert.Equal(0, result.GeoFenceList[0].Schedule.End.Minutes);
+            Assert.Null(result.GeoFenceList[0].Schedule.Index);
+            Assert.Equal("Y", result.GeoFenceList[0].Schedule.Daypicker[0]);
+            Assert.Equal("28.04.2020", result.GeoFenceList[0].Schedule.StartDateActive);
+            Assert.Equal("28.04.2020", result.GeoFenceList[0].Schedule.EndDateActive);
+
+            Assert.Equal("28.04.2020", result.GeoFenceList[0].StartDateActive);
+            Assert.Equal("15:00 - 20:00", result.GeoFenceList[0].TimeRangeActive);
+            Assert.Equal(10, result.MaxNumberOfGeos);
+            Assert.Equal(4, result.MaxNumberOfActiveGeos);
+            Assert.Equal("ACKNOWLEDGED", result.Status);
+            Assert.Equal("/portal/web/de/content/-/content/legal/carnet-terms-and-conditions", result.TermAndConditionsURL);
+        }
     }
 }
