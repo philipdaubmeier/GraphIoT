@@ -555,5 +555,40 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Equal("ACKNOWLEDGED", result.Status);
             Assert.Equal("/portal/web/de/content/-/content/legal/carnet-terms-and-conditions", result.TermAndConditionsURL);
         }
+
+        [Fact]
+        public async Task TestGetLatestHealthReports()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddHealthReport()
+                .ToMockProvider());
+
+            var result = (await client.GetLatestHealthReports()).ToList();
+
+            Assert.Single(result);
+
+            Assert.Equal("23.04.2020", result[0].CreationDate);
+            Assert.Equal("21:24", result[0].CreationTime);
+            Assert.Empty(result[0].DiagnosticMessages);
+            Assert.True(result[0].HasValidData);
+            Assert.Equal("123456", result[0].ReportId);
+            Assert.False(result[0].IsOlderSixMonths);
+            Assert.Equal("150", result[0].MileageValue);
+            Assert.Equal(1587669881536, result[0].Timestamp);
+
+            Assert.Equal("", result[0].HeaderData.RangeMileage);
+            Assert.Equal("23.04.2020", result[0].HeaderData.LastRefreshTime[0]);
+            Assert.Equal("21:24", result[0].HeaderData.LastRefreshTime[1]);
+            Assert.False(result[0].HeaderData.ServiceOverdue);
+            Assert.False(result[0].HeaderData.OilOverdue);
+            Assert.Equal("89", result[0].HeaderData.Mileage);
+            Assert.False(result[0].HeaderData.ShowOil);
+            Assert.Null(result[0].HeaderData.VhrNoDataText);
+            Assert.True(result[0].HeaderData.ShowService);
+
+            Assert.Equal("ACKNOWLEDGED", result[0].JobStatus);
+            Assert.False(result[0].FetchFailed);
+        }
     }
 }
