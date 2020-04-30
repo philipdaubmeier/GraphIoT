@@ -25,6 +25,11 @@ namespace PhilipDaubmeier.WeConnectClient
             return await CallApi<VehicleListResponse, IEnumerable<VehicleEntry>>("/-/mainnavigation/get-fully-loaded-cars");
         }
 
+        public async Task<VehicleEntry> GetVehicle()
+        {
+            return await CallApi<LoadCarDetailsResponse, VehicleEntry>("/-/mainnavigation/load-car-details/");
+        }
+
         public async Task<VehicleDetails> GetVehicleDetails()
         {
             return await CallApi<VehicleDetailsResponse, VehicleDetails>("/-/vehicle-info/get-vehicle-details");

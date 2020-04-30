@@ -438,5 +438,78 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.False(result[0].Dkyenabled);
             Assert.True(result[0].Selected);
         }
+
+        [Fact]
+        public async Task TestGetVehicle()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddLoadCarDetails()
+                .ToMockProvider());
+
+            var result = await client.GetVehicle();
+
+            Assert.Equal("WVWZZZABCD1234567", result.Vin);
+            Assert.Equal("My Car", result.Name);
+            Assert.False(result.Expired);
+            Assert.Null(result.Model);
+            Assert.Null(result.ModelCode);
+            Assert.Null(result.ModelYear);
+            Assert.Null(result.ImageUrl);
+            Assert.Null(result.VehicleSpecificFallbackImageUrl);
+            Assert.Null(result.ModelSpecificFallbackImageUrl);
+            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZABCD1234567", result.DefaultImageUrl);
+            Assert.Equal("v", result.VehicleBrand);
+            Assert.Equal("20200101", result.EnrollmentDate);
+            Assert.Null(result.DeviceOCU1);
+            Assert.Null(result.DeviceOCU2);
+            Assert.Null(result.DeviceMIB);
+            Assert.False(result.EngineTypeCombustian);
+            Assert.True(result.EngineTypeHybridOCU1);
+            Assert.False(result.EngineTypeHybridOCU2);
+            Assert.False(result.EngineTypeElectric);
+            Assert.False(result.EngineTypeCNG);
+            Assert.False(result.EngineTypeDefault);
+            Assert.Equal("UNAVAILABLE", result.StpStatus);
+            Assert.True(result.WindowstateSupported);
+            Assert.Equal("/portal/user/12341234-1234-1234-1234-123412341234/abcdefg_unit_test_xprofile_id_12", result.DashboardUrl);
+            Assert.False(result.VhrRequested);
+            Assert.False(result.VsrRequested);
+            Assert.False(result.VhrConfigAvailable);
+            Assert.False(result.VerifiedByDealer);
+            Assert.False(result.Vhr2);
+            Assert.True(result.RoleEnabled);
+            Assert.True(result.IsEL2Vehicle);
+            Assert.False(result.WorkshopMode);
+            Assert.False(result.HiddenUserProfiles);
+            Assert.Null(result.MobileKeyActivated);
+            Assert.Equal("MILEAGE", result.EnrollmentType);
+            Assert.False(result.Ocu3Low);
+
+            Assert.Equal("NET.500.010.F", result.PackageServices[0].PackageServiceId);
+            Assert.Equal("NET.500.010.1", result.PackageServices[0].PropertyKeyReference);
+            Assert.Equal("e-Remote", result.PackageServices[0].PackageServiceName);
+            Assert.Equal("e-Remote", result.PackageServices[0].TrackingName);
+            Assert.Equal("01-01-2020", result.PackageServices[0].ActivationDate);
+            Assert.Equal("01-01-2021", result.PackageServices[0].ExpirationDate);
+            Assert.False(result.PackageServices[0].Expired);
+            Assert.False(result.PackageServices[0].ExpireInAMonth);
+            Assert.Equal("er", result.PackageServices[0].PackageType);
+            Assert.Equal("er", result.PackageServices[0].EnrollmentPackageType);
+
+            Assert.True(result.DefaultCar);
+            Assert.False(result.VwConnectPowerLayerAvailable);
+            Assert.Equal("abcdefg_unit_test_xprofile_id_12", result.XprofileId);
+            Assert.Null(result.SmartCardKeyActivated);
+            Assert.True(result.FullyEnrolled);
+            Assert.False(result.SecondaryUser);
+            Assert.False(result.Fleet);
+            Assert.False(result.Touareg);
+            Assert.False(result.IceSupported);
+            Assert.False(result.FlightMode);
+            Assert.False(result.EsimCompatible);
+            Assert.False(result.Dkyenabled);
+            Assert.True(result.Selected);
+        }
     }
 }
