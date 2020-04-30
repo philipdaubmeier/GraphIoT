@@ -16,6 +16,7 @@ The main server application consists of these two major parts for this purpose:
         * Netatmo (Cloud API)
         * Sonnen (Cloud API)
         * Viessmann (Cloud API)
+        * WeConnect (Cloud API)
 2. **Data Visualization**
     * A set of RESTful APIs to retrieve the time series data
     * Grafana visualization via:
@@ -35,6 +36,7 @@ It is structured as follows:
   * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.NetatmoClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.NetatmoClient/) [NetatmoClient](src/NetatmoClient)
   * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.SonnenClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.SonnenClient/) [SonnenClient](src/SonnenClient)
   * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.ViessmannClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.ViessmannClient/) [ViessmannClient](src/ViessmannClient)
+  * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.WeConnectClient.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.WeConnectClient/) [WeConnectClient](src/WeConnectClient)
 * **Shared Libraries** for common functionality:
   * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.CompactTimeSeries.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.CompactTimeSeries/) [CompactTimeSeries](src/CompactTimeSeries)
   * [![NuGet](http://img.shields.io/nuget/v/PhilipDaubmeier.TokenStore.svg?style=flat-square)](https://www.nuget.org/packages/PhilipDaubmeier.TokenStore/) [TokenStore](src/TokenStore)
