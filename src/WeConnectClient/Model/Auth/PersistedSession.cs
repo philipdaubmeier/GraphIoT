@@ -21,7 +21,8 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         {
             BaseJsonUri = baseJsonUri;
             Csrf = csrf;
-            Cookies = cookieContainer.GetCookies(BaseUri).Cast<Cookie>().Select(c => new PersistedCookie(c)).ToList();
+            Cookies = cookieContainer.GetCookies(BaseUri).Cast<Cookie>().Select(c => new PersistedCookie(c))
+                .GroupBy(c => c.Name).Select(g => g.First()).OrderBy(c => c.Name).ToList();
         }
 
         [JsonPropertyName("u")]
