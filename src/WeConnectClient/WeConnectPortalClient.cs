@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.WeConnectClient.Model.Carfinder;
+﻿using PhilipDaubmeier.WeConnectClient.Model.ActionParams;
+using PhilipDaubmeier.WeConnectClient.Model.Carfinder;
 using PhilipDaubmeier.WeConnectClient.Model.Core;
 using PhilipDaubmeier.WeConnectClient.Model.Emanager;
 using PhilipDaubmeier.WeConnectClient.Model.Geofence;
@@ -67,6 +68,36 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<Rts> GetLastRefuelTripStatistics(Vin? vin = null)
         {
             return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics", vin);
+        }
+
+        public async Task StartCharge(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/charge-battery", vin, new ChargeParams(true, 100));
+        }
+
+        public async Task StopCharge(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/charge-battery", vin, new ChargeParams(false, 99));
+        }
+
+        public async Task StartClimate(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/trigger-climatisation", vin, new ClimateParams(true, true));
+        }
+
+        public async Task StopClimate(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/trigger-climatisation", vin, new ClimateParams(false, true));
+        }
+
+        public async Task StartWindowMelt(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/trigger-windowheating", vin, new WindowsMeltParams(true));
+        }
+
+        public async Task StopWindowMelt(Vin? vin = null)
+        {
+            await RequestApi("/-/emanager/trigger-windowheating", vin, new WindowsMeltParams(true));
         }
 
         /// <summary>

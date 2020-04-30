@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -91,11 +92,25 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         protected async Task<HttpResponseMessage> RequestApi(string path, Vin? vin = null)
         {
+            return await RequestApi<object>(path, vin, null);
+        }
+
+        /// <summary>
+        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated.
+        /// It sends the given action params object as json serialized request body.
+        /// </summary>
+        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(string path, Vin? vin = null, TActionParams? actionParams = null)
+            where TActionParams : class
+        {
             await Authenticate(_state);
 
             var uri = new Uri($"{_state.BaseJsonUriForVin(vin)}{path}");
             var request = new HttpRequestMessage(HttpMethod.Post, uri);
             AddCommonAuthHeaders(request.Headers, _state.Csrf, _state.Referrer);
+
+            var requestJson = actionParams != null ? JsonSerializer.Serialize(actionParams, _jsonSerializerOptions) : null;
+            if (requestJson != null)
+                request.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
 
             return await _client.SendAsync(request);
         }
