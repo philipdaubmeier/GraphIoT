@@ -363,5 +363,80 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Equal(37.377166, result.Latitude);
             Assert.Equal(-122.086966, result.Longitude);
         }
+
+        [Fact]
+        public async Task TestGetVehicleList()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddVehicleList()
+                .ToMockProvider());
+
+            var result = (await client.GetVehicleList()).ToList();
+
+            Assert.Single(result);
+
+            Assert.Equal("WVWZZZABCD1234567", result[0].Vin);
+            Assert.Equal("My Car", result[0].Name);
+            Assert.False(result[0].Expired);
+            Assert.Null(result[0].Model);
+            Assert.Null(result[0].ModelCode);
+            Assert.Null(result[0].ModelYear);
+            Assert.Null(result[0].ImageUrl);
+            Assert.Null(result[0].VehicleSpecificFallbackImageUrl);
+            Assert.Null(result[0].ModelSpecificFallbackImageUrl);
+            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZABCD1234567", result[0].DefaultImageUrl);
+            Assert.Equal("v", result[0].VehicleBrand);
+            Assert.Equal("20200101", result[0].EnrollmentDate);
+            Assert.Null(result[0].DeviceOCU1);
+            Assert.Null(result[0].DeviceOCU2);
+            Assert.Null(result[0].DeviceMIB);
+            Assert.False(result[0].EngineTypeCombustian);
+            Assert.True(result[0].EngineTypeHybridOCU1);
+            Assert.False(result[0].EngineTypeHybridOCU2);
+            Assert.False(result[0].EngineTypeElectric);
+            Assert.False(result[0].EngineTypeCNG);
+            Assert.False(result[0].EngineTypeDefault);
+            Assert.Equal("UNAVAILABLE", result[0].StpStatus);
+            Assert.True(result[0].WindowstateSupported);
+            Assert.Equal("/portal/user/12341234-1234-1234-1234-123412341234/abcdefg_unit_test_xprofile_id_12", result[0].DashboardUrl);
+            Assert.False(result[0].VhrRequested);
+            Assert.False(result[0].VsrRequested);
+            Assert.False(result[0].VhrConfigAvailable);
+            Assert.False(result[0].VerifiedByDealer);
+            Assert.False(result[0].Vhr2);
+            Assert.True(result[0].RoleEnabled);
+            Assert.True(result[0].IsEL2Vehicle);
+            Assert.False(result[0].WorkshopMode);
+            Assert.False(result[0].HiddenUserProfiles);
+            Assert.Null(result[0].MobileKeyActivated);
+            Assert.Equal("MILEAGE", result[0].EnrollmentType);
+            Assert.False(result[0].Ocu3Low);
+
+            Assert.Equal("NET.500.010.F", result[0].PackageServices[0].PackageServiceId);
+            Assert.Equal("NET.500.010.1", result[0].PackageServices[0].PropertyKeyReference);
+            Assert.Equal("e-Remote", result[0].PackageServices[0].PackageServiceName);
+            Assert.Equal("e-Remote", result[0].PackageServices[0].TrackingName);
+            Assert.Equal("03-11-2015", result[0].PackageServices[0].ActivationDate);
+            Assert.Equal("03-11-2020", result[0].PackageServices[0].ExpirationDate);
+            Assert.False(result[0].PackageServices[0].Expired);
+            Assert.False(result[0].PackageServices[0].ExpireInAMonth);
+            Assert.Equal("er", result[0].PackageServices[0].PackageType);
+            Assert.Equal("er", result[0].PackageServices[0].EnrollmentPackageType);
+
+            Assert.True(result[0].DefaultCar);
+            Assert.False(result[0].VwConnectPowerLayerAvailable);
+            Assert.Equal("abcdefg_unit_test_xprofile_id_12", result[0].XprofileId);
+            Assert.Null(result[0].SmartCardKeyActivated);
+            Assert.True(result[0].FullyEnrolled);
+            Assert.False(result[0].SecondaryUser);
+            Assert.False(result[0].Fleet);
+            Assert.False(result[0].Touareg);
+            Assert.False(result[0].IceSupported);
+            Assert.False(result[0].FlightMode);
+            Assert.False(result[0].EsimCompatible);
+            Assert.False(result[0].Dkyenabled);
+            Assert.True(result[0].Selected);
+        }
     }
 }
