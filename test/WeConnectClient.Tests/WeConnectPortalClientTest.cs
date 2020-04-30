@@ -444,12 +444,12 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
-                .AddLoadCarDetails()
+                .AddLoadCarDetails("WVWZZZOTHERVIN123")
                 .ToMockProvider());
 
-            var result = await client.GetVehicle();
+            var result = await client.GetVehicle("WVWZZZOTHERVIN123");
 
-            Assert.Equal("WVWZZZABCD1234567", result.Vin);
+            Assert.Equal("WVWZZZOTHERVIN123", result.Vin);
             Assert.Equal("My Car", result.Name);
             Assert.False(result.Expired);
             Assert.Null(result.Model);
@@ -458,7 +458,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Null(result.ImageUrl);
             Assert.Null(result.VehicleSpecificFallbackImageUrl);
             Assert.Null(result.ModelSpecificFallbackImageUrl);
-            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZABCD1234567", result.DefaultImageUrl);
+            Assert.Equal("/portal/delegate/vehicle-image/WVWZZZOTHERVIN123", result.DefaultImageUrl);
             Assert.Equal("v", result.VehicleBrand);
             Assert.Equal("20200101", result.EnrollmentDate);
             Assert.Null(result.DeviceOCU1);

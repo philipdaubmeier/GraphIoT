@@ -25,13 +25,13 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             return mockHttp;
         }
 
-        public static MockHttpMessageHandler AddLoadCarDetails(this MockHttpMessageHandler mockHttp)
+        public static MockHttpMessageHandler AddLoadCarDetails(this MockHttpMessageHandler mockHttp, string vin = "WVWZZZABCD1234567")
         {
-            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/mainnavigation/load-car-details/")
+            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/mainnavigation/load-car-details/{vin}")
                     .Respond("application/json",
                     @"{
                         ""errorCode"": ""0"",
-                        ""completeVehicleJson"": " + GetVehicleDetailJson("WVWZZZABCD1234567") + @"
+                        ""completeVehicleJson"": " + GetVehicleDetailJson(vin) + @"
                     }");
 
             return mockHttp;
@@ -49,7 +49,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                         ""imageUrl"": null,
                         ""vehicleSpecificFallbackImageUrl"": null,
                         ""modelSpecificFallbackImageUrl"": null,
-                        ""defaultImageUrl"": ""/portal/delegate/vehicle-image/WVWZZZABCD1234567"",
+                        ""defaultImageUrl"": ""/portal/delegate/vehicle-image/" + vin + @""",
                         ""vehicleBrand"": ""v"",
                         ""enrollmentDate"": ""20200101"",
                         ""deviceOCU1"": null,
