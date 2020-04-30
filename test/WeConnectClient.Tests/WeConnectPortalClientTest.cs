@@ -417,8 +417,8 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Equal("NET.500.010.1", result[0].PackageServices[0].PropertyKeyReference);
             Assert.Equal("e-Remote", result[0].PackageServices[0].PackageServiceName);
             Assert.Equal("e-Remote", result[0].PackageServices[0].TrackingName);
-            Assert.Equal("03-11-2015", result[0].PackageServices[0].ActivationDate);
-            Assert.Equal("03-11-2020", result[0].PackageServices[0].ExpirationDate);
+            Assert.Equal("01-01-2020", result[0].PackageServices[0].ActivationDate);
+            Assert.Equal("01-01-2021", result[0].PackageServices[0].ExpirationDate);
             Assert.False(result[0].PackageServices[0].Expired);
             Assert.False(result[0].PackageServices[0].ExpireInAMonth);
             Assert.Equal("er", result[0].PackageServices[0].PackageType);

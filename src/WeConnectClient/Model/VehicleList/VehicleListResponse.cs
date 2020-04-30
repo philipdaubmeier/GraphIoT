@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.VehicleList
             }
         }
 
-        internal VehicleListContainer FullyLoadedVehiclesResponse { get; set; } = new VehicleListContainer();
+        public VehicleListContainer FullyLoadedVehiclesResponse { get; set; } = new VehicleListContainer();
     }
 
     internal class VehicleListContainer
