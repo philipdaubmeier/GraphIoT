@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
 
         public TripStatisticEntry LongTermData { get; set; } = new TripStatisticEntry();
 
-        public object CyclicData { get; set; } = string.Empty;
+        public TripStatisticEntry CyclicData { get; set; } = new TripStatisticEntry();
         public RtsConfiguration ServiceConfiguration { get; set; } = new RtsConfiguration();
         public bool TripFromLastRefuelAvailable { get; set; }
 
@@ -30,6 +30,9 @@ namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
         {
             get
             {
+                // extract date and times from culture-dependend formatted strings.
+                // luckily we got the culture setting of the server via cookie, which
+                // was injected into this object by the WeConnectPortalClient
                 DateTime ParseTimeStamp(string formattedTimestamp, int fallbackDay)
                 {
                     var timeString = formattedTimestamp.Split(':', 2).Last().Trim();
@@ -40,8 +43,12 @@ namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
                     return new DateTime(Year, Month, fallbackDay);
                 }
 
-                return Enumerable.Range(1, DaysInMonth)
-                    .Zip(TripStatistics, (day, trips) => (day, trips))
+                // use TripStatistics list by default ('latest-trip-statistics') if available or fall back to CyclicData ('last-refuel-trip-statistics')
+                var data = !TripFromLastRefuelAvailable ? Enumerable.Range(1, DaysInMonth).Zip(TripStatistics, (day, trips) => (day, trips)) :
+                    Enumerable.Range(1, 1).Select(day => (day, trips: new TripStatisticGroup() { TripStatistics = new List<TripStatisticEntry>() { CyclicData } }));
+
+                // extract date and times and flatten out the structure to a list of trips with start time and duration
+                return data
                     .SelectMany(x => x.trips?.TripStatistics?.Select(trip => (x.day, trip)).ToList() ?? new List<(int, TripStatisticEntry)>())
                     .Select(x => (end: ParseTimeStamp(x.trip.LongFormattedTimestamp, x.day), duration: TimeSpan.FromMinutes(x.trip.TripDuration), x.trip))
                     .Select(x => (start: x.end.Subtract(x.duration), x.duration, x.trip));
