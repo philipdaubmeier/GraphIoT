@@ -1,6 +1,7 @@
 ﻿using PhilipDaubmeier.WeConnectClient.Model.Carfinder;
 using PhilipDaubmeier.WeConnectClient.Model.Emanager;
 using PhilipDaubmeier.WeConnectClient.Model.Geofence;
+using PhilipDaubmeier.WeConnectClient.Model.HealthReport;
 using PhilipDaubmeier.WeConnectClient.Model.TripStatistics;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleList;
@@ -39,6 +40,11 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<VehicleStatus> GetVehicleStatus()
         {
             return await CallApi<VehicleStatusResponse, VehicleStatus>("/-/vsr/get-vsr");
+        }
+
+        public async Task<IEnumerable<HealthReport>> GetLatestHealthReports()
+        {
+            return await CallApi<HealthReportResponse, List<HealthReport>>("/-/vhr/get-latest-report");
         }
 
         public async Task<GeofenceCollection> GetGeofences()
