@@ -15,9 +15,19 @@ namespace PhilipDaubmeier.WeConnectClient
             return await CallApi<EmanagerResponse, Emanager>("/-/emanager/get-emanager");
         }
 
-        public async Task<Rts> GetTripStatistics()
+        public async Task<Rts> GetLatestTripStatistics()
         {
-            var res = await CallApi<TripStatisticsResponse, Rts>("/-/rts/get-latest-trip-statistics");
+            return await LoadTripStatistics("/-/rts/get-latest-trip-statistics");
+        }
+
+        public async Task<Rts> GetLastRefuelTripStatistics()
+        {
+            return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics");
+        }
+
+        private async Task<Rts> LoadTripStatistics(string path)
+        {
+            var res = await CallApi<TripStatisticsResponse, Rts>(path);
             res.DateTimeLocale = GetCarNetLocale();
             return res;
         }
