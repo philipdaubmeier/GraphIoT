@@ -303,6 +303,54 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
         }
 
         [Fact]
+        public async Task TestGetVehicleStatus()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddVehicleStatus()
+                .ToMockProvider());
+
+            var result = await client.GetVehicleStatus();
+
+            Assert.True(result.WindowStatusSupported);
+            Assert.Equal(2, result.CarRenderData.ParkingLights);
+            Assert.Equal(3, result.CarRenderData.Hood);
+            Assert.Equal(3, result.CarRenderData.Sunroof);
+
+            Assert.Equal(3, result.CarRenderData.Doors.LeftFront);
+            Assert.Equal(3, result.CarRenderData.Doors.RightFront);
+            Assert.Equal(3, result.CarRenderData.Doors.LeftBack);
+            Assert.Equal(3, result.CarRenderData.Doors.RightBack);
+            Assert.Equal(3, result.CarRenderData.Doors.Trunk);
+            Assert.Equal(4, result.CarRenderData.Doors.NumberOfDoors);
+
+            Assert.Equal(3, result.CarRenderData.Windows.LeftFront);
+            Assert.Equal(3, result.CarRenderData.Windows.RightFront);
+            Assert.Equal(3, result.CarRenderData.Windows.LeftBack);
+            Assert.Equal(3, result.CarRenderData.Windows.RightBack);
+
+            Assert.Equal(2, result.LockData.LeftFront);
+            Assert.Equal(2, result.LockData.RightFront);
+            Assert.Equal(2, result.LockData.LeftBack);
+            Assert.Equal(2, result.LockData.RightBack);
+            Assert.Equal(2, result.LockData.Trunk);
+
+            Assert.False(result.LockDisabled);
+            Assert.False(result.UnlockDisabled);
+            Assert.True(result.RluDisabled);
+            Assert.False(result.HideCngFuelLevel);
+            Assert.Equal(41, result.TotalRange);
+            Assert.Equal(41, result.PrimaryEngineRange);
+            Assert.Null(result.FuelRange);
+            Assert.Null(result.CngRange);
+            Assert.Equal(41, result.BatteryRange);
+            Assert.Null(result.FuelLevel);
+            Assert.Null(result.CngFuelLevel);
+            Assert.Equal(100, result.BatteryLevel);
+            Assert.Equal("https://www.portal.volkswagen-we.com/static/slices/phev_golf/phev_golf", result.SliceRootPath);
+        }
+
+        [Fact]
         public async Task TestGetLocation()
         {
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
