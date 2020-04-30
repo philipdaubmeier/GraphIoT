@@ -2,6 +2,7 @@
 using PhilipDaubmeier.WeConnectClient.Model.Emanager;
 using PhilipDaubmeier.WeConnectClient.Model.TripStatistics;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
+using PhilipDaubmeier.WeConnectClient.Model.VehicleStatus;
 using PhilipDaubmeier.WeConnectClient.Network;
 using System.Threading.Tasks;
 
@@ -20,6 +21,11 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<VehicleDetails> GetVehicleDetails()
         {
             return await CallApi<VehicleDetailsResponse, VehicleDetails>("/-/vehicle-info/get-vehicle-details");
+        }
+
+        public async Task<VehicleStatus> GetVehicleStatus()
+        {
+            return await CallApi<VehicleStatusResponse, VehicleStatus>("/-/vsr/get-vsr");
         }
 
         public async Task<Emanager> GetEManager()
