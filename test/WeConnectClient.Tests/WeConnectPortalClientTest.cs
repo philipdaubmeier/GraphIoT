@@ -277,5 +277,43 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             Assert.Equal(new TimeSpan(1, 10, 0), allEntries[0].duration);
             Assert.Equal(50d, allEntries[0].trip.AverageSpeed);
         }
+
+        [Fact]
+        public async Task TestGetVehicleDetails()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddVehicleDetails()
+                .ToMockProvider());
+
+            var result = await client.GetVehicleDetails();
+
+            Assert.Equal("28-04-2020", result.LastConnectionTimeStamp[0]);
+            Assert.Equal("14:39", result.LastConnectionTimeStamp[1]);
+
+            Assert.Equal(new DateTime(2020, 04, 28, 12, 39, 0, DateTimeKind.Utc), result.LastConnection);
+
+            Assert.Equal("64.803", result.DistanceCovered);
+            Assert.Equal("41", result.Range);
+            Assert.Equal("225 Day(s) / 25.400 km", result.ServiceInspectionData);
+            Assert.Equal(string.Empty, result.OilInspectionData);
+            Assert.False(result.ShowOil);
+            Assert.True(result.ShowService);
+            Assert.False(result.FlightMode);
+        }
+
+        [Fact]
+        public async Task TestGetLocation()
+        {
+            var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
+                .AddAuthMock()
+                .AddCarfinder()
+                .ToMockProvider());
+
+            var result = await client.GetLastKnownLocation();
+
+            Assert.Equal(37.377166, result.Latitude);
+            Assert.Equal(-122.086966, result.Longitude);
+        }
     }
 }
