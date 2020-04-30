@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0";
 
-        private readonly AuthState _state = new AuthState();
+        private protected readonly AuthState _state = new AuthState();
 
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;

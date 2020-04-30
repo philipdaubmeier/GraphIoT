@@ -8,6 +8,7 @@ using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleList;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleStatus;
 using PhilipDaubmeier.WeConnectClient.Network;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -66,6 +67,17 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<Rts> GetLastRefuelTripStatistics(Vin? vin = null)
         {
             return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics", vin);
+        }
+
+        /// <summary>
+        /// Logs out the session on the portal server, clears all state data of this client
+        /// and removes the persisted state token in the IWeConnectAuth object.
+        /// </summary>
+        public async Task Logout()
+        {
+            await RequestApi("/-/logout/revoke");
+            await _connectionProvider.AuthData.UpdateTokenAsync(null, DateTime.MinValue, null);
+            _state.Reset();
         }
 
         private async Task<Rts> LoadTripStatistics(string path, Vin? vin = null)
