@@ -29,10 +29,17 @@ If you have the connection providers in place, you can create and use the WeConn
 ```csharp
 var client = new WeConnectPortalClient(connectionProvider);
 
+// Get all vehicles of the logged in user
+foreach (var vehicle in await weclient.GetVehicleList())
+    Console.WriteLine($"VIN: {vehicle.Vin} name: {vehicle.Name}");
+
 // Get statistics about latest trips
 var trips = await client.GetTripStatistics();
 foreach (var trip in trips.TripStatistics.SelectMany(t => t.TripStatistics))
     Console.WriteLine($"Trip {trip.Timestamp}: avg. speed: {trip.AverageSpeed}");
+
+// Trigger actions on a specific vehicle
+await client.StartWindowMelt("WVWZZZAAAAA111111");
 ```
 
 For more usage examples you can also have a look at the [unit tests](../../test/WeConnectClient.Tests).
