@@ -13,6 +13,7 @@ using PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection;
+using PhilipDaubmeier.GraphIoT.WeConnect.DependencyInjection;
 using System;
 
 namespace PhilipDaubmeier.GraphIoT.App
@@ -68,6 +69,8 @@ namespace PhilipDaubmeier.GraphIoT.App
             services.AddNetatmoHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("NetatmoConfig"), tokenConfig, networkConfig);
 
             services.AddViessmannHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("ViessmannConfig"), tokenConfig, networkConfig);
+
+            services.AddWeConnectHost<PersistenceContext>(smarthomeSqlServer, Configuration.GetSection("WeConnectConfig"), tokenConfig, networkConfig);
 
             services.AddDatabaseBackupService<PersistenceContext>();
 

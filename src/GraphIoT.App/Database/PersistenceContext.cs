@@ -3,11 +3,12 @@ using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Netatmo.Database;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
+using PhilipDaubmeier.GraphIoT.WeConnect.Database;
 using PhilipDaubmeier.TokenStore.Database;
 
 namespace PhilipDaubmeier.GraphIoT.App.Database
 {
-    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext
+    public class PersistenceContext : DbContext, ITokenStoreDbContext, IDigitalstromDbContext, INetatmoDbContext, IViessmannDbContext, ISonnenDbContext, IWeConnectDbContext
     {
         #region ITokenStoreDbContext
         public DbSet<AuthData> AuthDataSet { get; set; } = null!;
@@ -57,6 +58,13 @@ namespace PhilipDaubmeier.GraphIoT.App.Database
         public DbSet<SonnenEnergyLowresData> SonnenEnergyLowresDataSet { get; set; } = null!;
 
         public DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; } = null!;
+        #endregion
+
+
+        #region IWeConnectDbContext
+        public DbSet<WeConnectLowresData> WeConnectLowresDataSet { get; set; } = null!;
+
+        public DbSet<WeConnectMidresData> WeConnectDataSet { get; set; } = null!;
         #endregion
 
 
