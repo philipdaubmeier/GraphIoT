@@ -72,27 +72,27 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Database
         public TimeSeries<int> BatterySocSeries => BatterySocCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<double> ConsumedKwhSeries => ConsumedKwhCurve.ToTimeseries<double>(Span);
+        public TimeSeries<double> ConsumedKwhSeries => ConsumedKwhCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
-        public TimeSeries<double> AverageConsumptionSeries => AverageConsumptionCurve.ToTimeseries<double>(Span);
+        public TimeSeries<double> AverageConsumptionSeries => AverageConsumptionCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
-        public TimeSeries<double> AverageSpeedSeries => AverageSpeedCurve.ToTimeseries<double>(Span);
+        public TimeSeries<double> AverageSpeedSeries => AverageSpeedCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
         public TimeSeries<bool> ChargingStateSeries => ChargingStateCurve.ToTimeseries<bool>(Span);
 
         [NotMapped]
-        public TimeSeries<double> ClimateTempSeries => ClimateTempCurve.ToTimeseries<double>(Span);
+        public TimeSeries<double> ClimateTempSeries => ClimateTempCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
         public TimeSeries<bool> ClimateStateSeries => ClimateStateCurve.ToTimeseries<bool>(Span);
 
         [NotMapped]
-        public TimeSeries<bool> WindowMeltStateSeries => WindowMeltStateCurve.ToTimeseries<bool>(Span, DecimalPlaces);
+        public TimeSeries<bool> WindowMeltStateSeries => WindowMeltStateCurve.ToTimeseries<bool>(Span);
 
         [NotMapped]
-        public TimeSeries<bool> RemoteHeatingStateSeries => RemoteHeatingStateCurve.ToTimeseries<bool>(Span, DecimalPlaces);
+        public TimeSeries<bool> RemoteHeatingStateSeries => RemoteHeatingStateCurve.ToTimeseries<bool>(Span);
     }
 }

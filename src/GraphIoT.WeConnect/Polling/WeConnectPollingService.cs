@@ -53,7 +53,7 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
 
             var batterySoc = status.BatteryLevel ?? emanager.Rbc.Status?.BatteryPercentage ?? 0;
 
-            var consumedKwh = trips.AllEntries.Select(x => (x.start + x.duration, (x.trip.AverageElectricConsumption ?? 0d) / Math.Max(1d, x.trip.TripLength))).ToList();
+            var consumedKwh = trips.AllEntries.Select(x => (x.start + x.duration, (x.trip.AverageElectricConsumption ?? 0d) * x.trip.TripLength / 100)).ToList();
             var averageConsumption = trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageElectricConsumption ?? 0d)).ToList();
             var averageSpeed = trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageSpeed)).ToList();
 
@@ -86,17 +86,17 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
 
             var series3 = dbData.ConsumedKwhSeries;
             foreach ((var timestamp, var value) in consumedKwh)
-                series3[timestamp] = value;
+                series3[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(2, series3);
 
             var series4 = dbData.AverageConsumptionSeries;
             foreach ((var timestamp, var value) in averageConsumption)
-                series3[timestamp] = value;
+                series3[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(3, series4);
 
             var series5 = dbData.AverageSpeedSeries;
             foreach ((var timestamp, var value) in averageSpeed)
-                series3[timestamp] = value;
+                series3[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(4, series5);
 
             var series6 = dbData.ChargingStateSeries;
