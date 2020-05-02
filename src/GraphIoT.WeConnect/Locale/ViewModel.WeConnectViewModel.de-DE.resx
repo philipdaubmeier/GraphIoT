@@ -123,14 +123,20 @@
   <data name="Battery SoC" xml:space="preserve">
     <value>Batterieladestand</value>
   </data>
-  <data name="Consumed kWh" xml:space="preserve">
-    <value>Verbrauchte kWh</value>
+  <data name="Trip length km" xml:space="preserve">
+    <value>Fahrtlänge km</value>
   </data>
-  <data name="Average consumption kWh/100 km" xml:space="preserve">
-    <value>Durchschnittsverbrauch kWh/100 km</value>
+  <data name="Trip duration min" xml:space="preserve">
+    <value>Fahrtdauer min</value>
   </data>
-  <data name="Average speed km/h" xml:space="preserve">
-    <value>Durchschnittsgeschwindigkeit km/h</value>
+  <data name="Trip average speed km/h" xml:space="preserve">
+    <value>Fahrt Durchschnittsgeschwindigkeit km/h</value>
+  </data>
+  <data name="Trip consumed kWh" xml:space="preserve">
+    <value>Fahrt Gesamtverbrauch kWh</value>
+  </data>
+  <data name="Trip average consumption kWh/100 km" xml:space="preserve">
+    <value>Fahrt Durchschnittsverbrauch kWh/100 km</value>
   </data>
   <data name="Charging state" xml:space="preserve">
     <value>Ladestatus</value>
@@ -161,6 +167,9 @@
   </data>
   <data name="#.# kWh" xml:space="preserve">
     <value>#.# kWh</value>
+  </data>
+  <data name="# min" xml:space="preserve">
+    <value># min</value>
   </data>
   <data name="#.# km/h" xml:space="preserve">
     <value>#.# km/h</value>

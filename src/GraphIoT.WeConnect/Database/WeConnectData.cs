@@ -42,13 +42,19 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Database
         public string? BatterySocCurve { get; set; }
 
         [MaxLength(800)]
-        public string? ConsumedKwhCurve { get; set; }
+        public string? TripLengthKmCurve { get; set; }
 
         [MaxLength(800)]
-        public string? AverageConsumptionCurve { get; set; }
+        public string? TripDurationCurve { get; set; }
 
         [MaxLength(800)]
-        public string? AverageSpeedCurve { get; set; }
+        public string? TripAverageSpeedCurve { get; set; }
+
+        [MaxLength(800)]
+        public string? TripConsumedKwhCurve { get; set; }
+
+        [MaxLength(800)]
+        public string? TripAverageConsumptionCurve { get; set; }
 
         [MaxLength(100)]
         public string? ChargingStateCurve { get; set; }
@@ -72,13 +78,19 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Database
         public TimeSeries<int> BatterySocSeries => BatterySocCurve.ToTimeseries<int>(Span);
 
         [NotMapped]
-        public TimeSeries<double> ConsumedKwhSeries => ConsumedKwhCurve.ToTimeseries<double>(Span, DecimalPlaces);
+        public TimeSeries<double> TripLengthKmSeries => TripLengthKmCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
-        public TimeSeries<double> AverageConsumptionSeries => AverageConsumptionCurve.ToTimeseries<double>(Span, DecimalPlaces);
+        public TimeSeries<double> TripDurationSeries => TripDurationCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
-        public TimeSeries<double> AverageSpeedSeries => AverageSpeedCurve.ToTimeseries<double>(Span, DecimalPlaces);
+        public TimeSeries<double> TripAverageSpeedSeries => TripAverageSpeedCurve.ToTimeseries<double>(Span, DecimalPlaces);
+
+        [NotMapped]
+        public TimeSeries<double> TripConsumedKwhSeries => TripConsumedKwhCurve.ToTimeseries<double>(Span, DecimalPlaces);
+
+        [NotMapped]
+        public TimeSeries<double> TripAverageConsumptionSeries => TripAverageConsumptionCurve.ToTimeseries<double>(Span, DecimalPlaces);
 
         [NotMapped]
         public TimeSeries<bool> ChargingStateSeries => ChargingStateCurve.ToTimeseries<bool>(Span);

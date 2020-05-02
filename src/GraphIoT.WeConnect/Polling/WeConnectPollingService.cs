@@ -53,6 +53,8 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
 
             var batterySoc = status.BatteryLevel ?? emanager.Rbc.Status?.BatteryPercentage ?? 0;
 
+            var length = trips.AllEntries.Select(x => (x.start + x.duration, x.trip.TripLength)).ToList();
+            var duration = trips.AllEntries.Select(x => (x.start + x.duration, x.duration.TotalMinutes)).ToList();
             var consumedKwh = trips.AllEntries.Select(x => (x.start + x.duration, (x.trip.AverageElectricConsumption ?? 0d) * x.trip.TripLength / 100)).ToList();
             var averageConsumption = trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageElectricConsumption ?? 0d)).ToList();
             var averageSpeed = trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageSpeed)).ToList();
@@ -63,10 +65,10 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             var windowMeltState = ToBool(emanager.Rpc.Status?.WindowHeatingStateFront?.ToString());
             var remoteHeatingState = emanager.Rdt.AuxHeatingEnabled;
 
-            SaveSolarValues(_dbContext, time, vin, mileage, batterySoc, consumedKwh, averageConsumption, averageSpeed, climateTemp, chargingState, climateState, windowMeltState, remoteHeatingState);
+            SaveSolarValues(_dbContext, time, vin, mileage, batterySoc, length, duration, averageSpeed, consumedKwh, averageConsumption, climateTemp, chargingState, climateState, windowMeltState, remoteHeatingState);
         }
 
-        public static void SaveSolarValues(IWeConnectDbContext dbContext, DateTime time, string vin, int mileage, int batterySoc, List<(DateTime, double)> consumedKwh, List<(DateTime, double)> averageConsumption, List<(DateTime, double)> averageSpeed, double climateTemp, bool chargingState, bool climateState, bool windowMeltState, bool remoteHeatingState)
+        public static void SaveSolarValues(IWeConnectDbContext dbContext, DateTime time, string vin, int mileage, int batterySoc, List<(DateTime, double)> length, List<(DateTime, double)> duration, List<(DateTime, double)> averageSpeed, List<(DateTime, double)> consumedKwh, List<(DateTime, double)> averageConsumption, double climateTemp, bool chargingState, bool climateState, bool windowMeltState, bool remoteHeatingState)
         {
             var day = time.Date;
 
@@ -84,47 +86,57 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             series2[time] = batterySoc;
             dbData.SetSeries(1, series2);
 
-            var series3 = dbData.ConsumedKwhSeries;
-            foreach ((var timestamp, var value) in consumedKwh)
+            var series3 = dbData.TripLengthKmSeries;
+            foreach ((var timestamp, var value) in length)
                 series3[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(2, series3);
 
-            var series4 = dbData.AverageConsumptionSeries;
-            foreach ((var timestamp, var value) in averageConsumption)
-                series3[timestamp.ToUniversalTime()] = value;
+            var series4 = dbData.TripDurationSeries;
+            foreach ((var timestamp, var value) in duration)
+                series4[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(3, series4);
 
-            var series5 = dbData.AverageSpeedSeries;
+            var series5 = dbData.TripAverageSpeedSeries;
             foreach ((var timestamp, var value) in averageSpeed)
-                series3[timestamp.ToUniversalTime()] = value;
+                series5[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(4, series5);
 
-            var series6 = dbData.ChargingStateSeries;
-            series6[time] = chargingState;
+            var series6 = dbData.TripConsumedKwhSeries;
+            foreach ((var timestamp, var value) in consumedKwh)
+                series6[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(5, series6);
 
-            var series7 = dbData.ClimateTempSeries;
-            series7[time] = climateTemp;
+            var series7 = dbData.TripAverageConsumptionSeries;
+            foreach ((var timestamp, var value) in averageConsumption)
+                series7[timestamp.ToUniversalTime()] = value;
             dbData.SetSeries(6, series7);
 
-            var series8 = dbData.ClimateStateSeries;
-            series8[time] = climateState;
+            var series8 = dbData.ChargingStateSeries;
+            series8[time] = chargingState;
             dbData.SetSeries(7, series8);
 
-            var series9 = dbData.WindowMeltStateSeries;
-            series9[time] = windowMeltState;
+            var series9 = dbData.ClimateTempSeries;
+            series9[time] = climateTemp;
             dbData.SetSeries(8, series9);
 
-            var series10 = dbData.RemoteHeatingStateSeries;
-            series10[time] = remoteHeatingState;
+            var series10 = dbData.ClimateStateSeries;
+            series10[time] = climateState;
             dbData.SetSeries(9, series10);
 
-            SaveLowresSolarValues(dbContext, day, vin, series1, series2, series3, series4, series5, series6, series7, series8, series9, series10);
+            var series11 = dbData.WindowMeltStateSeries;
+            series11[time] = windowMeltState;
+            dbData.SetSeries(10, series11);
+
+            var series12 = dbData.RemoteHeatingStateSeries;
+            series12[time] = remoteHeatingState;
+            dbData.SetSeries(11, series12);
+
+            SaveLowresSolarValues(dbContext, day, vin, series1, series2, series3, series4, series5, series6, series7, series8, series9, series10, series11, series12);
 
             dbContext.SaveChanges();
         }
 
-        private static void SaveLowresSolarValues(IWeConnectDbContext dbContext, DateTime day, string vin, TimeSeries<int> series1Src, TimeSeries<int> series2Src, TimeSeries<double> series3Src, TimeSeries<double> series4Src, TimeSeries<double> series5Src, TimeSeries<bool> series6Src, TimeSeries<double> series7Src, TimeSeries<bool> series8Src, TimeSeries<bool> series9Src, TimeSeries<bool> series10Src)
+        private static void SaveLowresSolarValues(IWeConnectDbContext dbContext, DateTime day, string vin, TimeSeries<int> series1Src, TimeSeries<int> series2Src, TimeSeries<double> series3Src, TimeSeries<double> series4Src, TimeSeries<double> series5Src, TimeSeries<double> series6Src, TimeSeries<double> series7Src, TimeSeries<bool> series8Src, TimeSeries<double> series9Src, TimeSeries<bool> series10Src, TimeSeries<bool> series11Src, TimeSeries<bool> series12Src)
         {
             static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
@@ -150,45 +162,55 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             resampler2.SampleAggregate(series2Src, x => (int)x.Average());
             dbSolarSeries.SetSeries(1, resampler2.Resampled);
 
-            var series3 = dbSolarSeries.ConsumedKwhSeries;
+            var series3 = dbSolarSeries.TripLengthKmSeries;
             var resampler3 = new TimeSeriesResampler<TimeSeries<double>, double>(series3.Span) { Resampled = series3 };
             resampler3.SampleAggregate(series3Src, x => x.Average());
-            dbSolarSeries.SetSeries(2, resampler3.Resampled);
+            dbSolarSeries.SetSeries(4, resampler3.Resampled);
 
-            var series4 = dbSolarSeries.AverageConsumptionSeries;
+            var series4 = dbSolarSeries.TripDurationSeries;
             var resampler4 = new TimeSeriesResampler<TimeSeries<double>, double>(series4.Span) { Resampled = series4 };
             resampler4.SampleAggregate(series4Src, x => x.Average());
-            dbSolarSeries.SetSeries(3, resampler4.Resampled);
+            dbSolarSeries.SetSeries(4, resampler4.Resampled);
 
-            var series5 = dbSolarSeries.AverageSpeedSeries;
+            var series5 = dbSolarSeries.TripAverageSpeedSeries;
             var resampler5 = new TimeSeriesResampler<TimeSeries<double>, double>(series5.Span) { Resampled = series5 };
             resampler5.SampleAggregate(series5Src, x => x.Average());
             dbSolarSeries.SetSeries(4, resampler5.Resampled);
 
-            var series6 = dbSolarSeries.ChargingStateSeries;
-            var resampler6 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series6.Span) { Resampled = series6 };
-            resampler6.SampleAggregate(series6Src, x => x.Any(v => v));
-            dbSolarSeries.SetSeries(4, resampler6.Resampled);
+            var series6 = dbSolarSeries.TripConsumedKwhSeries;
+            var resampler6 = new TimeSeriesResampler<TimeSeries<double>, double>(series6.Span) { Resampled = series6 };
+            resampler6.SampleAggregate(series6Src, x => x.Average());
+            dbSolarSeries.SetSeries(2, resampler6.Resampled);
 
-            var series7 = dbSolarSeries.ClimateTempSeries;
+            var series7 = dbSolarSeries.TripAverageConsumptionSeries;
             var resampler7 = new TimeSeriesResampler<TimeSeries<double>, double>(series7.Span) { Resampled = series7 };
             resampler7.SampleAggregate(series7Src, x => x.Average());
-            dbSolarSeries.SetSeries(4, resampler7.Resampled);
+            dbSolarSeries.SetSeries(3, resampler7.Resampled);
 
-            var series8 = dbSolarSeries.ClimateStateSeries;
+            var series8 = dbSolarSeries.ChargingStateSeries;
             var resampler8 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series8.Span) { Resampled = series8 };
             resampler8.SampleAggregate(series8Src, x => x.Any(v => v));
             dbSolarSeries.SetSeries(4, resampler8.Resampled);
 
-            var series9 = dbSolarSeries.WindowMeltStateSeries;
-            var resampler9 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series9.Span) { Resampled = series9 };
-            resampler9.SampleAggregate(series9Src, x => x.Any(v => v));
+            var series9 = dbSolarSeries.ClimateTempSeries;
+            var resampler9 = new TimeSeriesResampler<TimeSeries<double>, double>(series9.Span) { Resampled = series9 };
+            resampler9.SampleAggregate(series9Src, x => x.Average());
             dbSolarSeries.SetSeries(4, resampler9.Resampled);
 
-            var series10 = dbSolarSeries.RemoteHeatingStateSeries;
+            var series10 = dbSolarSeries.ClimateStateSeries;
             var resampler10 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series10.Span) { Resampled = series10 };
             resampler10.SampleAggregate(series10Src, x => x.Any(v => v));
             dbSolarSeries.SetSeries(4, resampler10.Resampled);
+
+            var series11 = dbSolarSeries.WindowMeltStateSeries;
+            var resampler11 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series11.Span) { Resampled = series11 };
+            resampler11.SampleAggregate(series11Src, x => x.Any(v => v));
+            dbSolarSeries.SetSeries(4, resampler11.Resampled);
+
+            var series12 = dbSolarSeries.RemoteHeatingStateSeries;
+            var resampler12 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series12.Span) { Resampled = series12 };
+            resampler12.SampleAggregate(series12Src, x => x.Any(v => v));
+            dbSolarSeries.SetSeries(4, resampler12.Resampled);
         }
     }
 }
