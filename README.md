@@ -47,6 +47,7 @@ It is structured as follows:
   * [GraphIoT.Netatmo](src/GraphIoT.Netatmo)
   * [GraphIoT.Sonnen](src/GraphIoT.Sonnen)
   * [GraphIoT.Viessmann](src/GraphIoT.Viessmann)
+  * [GraphIoT.WeConnect](src/GraphIoT.WeConnect)
 * **Visualization Library**:
   * [GraphIoT.Grafana](src/GraphIoT.Grafana)
 * **Main Host Application**:
