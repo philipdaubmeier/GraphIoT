@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.ViewModel
                        { Resolution.LowRes, databaseContext.WeConnectLowresDataSet },
                        { Resolution.MidRes, databaseContext.WeConnectDataSet }
                    },
-                   Enumerable.Range(0, 8).ToDictionary(x => x.ToString(), x => x),
+                   Enumerable.Range(0, 10).ToDictionary(x => x.ToString(), x => x),
                    localizer)
         { }
 
