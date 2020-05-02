@@ -37,6 +37,8 @@
     <Compile Remove="Migrations\20190829082954_Digitalstrom_Energy_v2.Designer.cs" />
     <Compile Remove="Migrations\20190910093208_Netatmo_v1.cs" />
     <Compile Remove="Migrations\20190910093208_Netatmo_v1.Designer.cs" />
+    <Compile Remove="Migrations\20200501215535_WeConnect_v1.cs" />
+    <Compile Remove="Migrations\20200501215535_WeConnect_v1.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

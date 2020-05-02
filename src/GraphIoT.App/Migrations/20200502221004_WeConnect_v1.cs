@@ -21,6 +21,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                 maxLength: 34,
                 nullable: false,
                 oldClrType: typeof(string),
+                oldType: "nvarchar(34)",
                 oldMaxLength: 34,
                 oldNullable: true);
 
@@ -30,6 +31,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                 maxLength: 34,
                 nullable: false,
                 oldClrType: typeof(string),
+                oldType: "nvarchar(34)",
                 oldMaxLength: 34,
                 oldNullable: true);
 
@@ -41,9 +43,11 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                     Vin = table.Column<string>(maxLength: 20, nullable: false),
                     DrivenKilometersCurve = table.Column<string>(maxLength: 800, nullable: true),
                     BatterySocCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    ConsumedKwhCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    AverageConsumptionCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    AverageSpeedCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripLengthKmCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripDurationCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripAverageSpeedCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripConsumedKwhCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripAverageConsumptionCurve = table.Column<string>(maxLength: 800, nullable: true),
                     ChargingStateCurve = table.Column<string>(maxLength: 100, nullable: true),
                     ClimateTempCurve = table.Column<string>(maxLength: 800, nullable: true),
                     ClimateStateCurve = table.Column<string>(maxLength: 100, nullable: true),
@@ -65,9 +69,11 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                     Vin = table.Column<string>(maxLength: 20, nullable: false),
                     DrivenKilometersCurve = table.Column<string>(maxLength: 800, nullable: true),
                     BatterySocCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    ConsumedKwhCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    AverageConsumptionCurve = table.Column<string>(maxLength: 800, nullable: true),
-                    AverageSpeedCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripLengthKmCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripDurationCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripAverageSpeedCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripConsumedKwhCurve = table.Column<string>(maxLength: 800, nullable: true),
+                    TripAverageConsumptionCurve = table.Column<string>(maxLength: 800, nullable: true),
                     ChargingStateCurve = table.Column<string>(maxLength: 100, nullable: true),
                     ClimateTempCurve = table.Column<string>(maxLength: 800, nullable: true),
                     ClimateStateCurve = table.Column<string>(maxLength: 100, nullable: true),
@@ -116,6 +122,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "CircuitId",
                 table: "DsEnergyMidresDataSet",
+                type: "nvarchar(34)",
                 maxLength: 34,
                 nullable: true,
                 oldClrType: typeof(string),
@@ -124,6 +131,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
             migrationBuilder.AlterColumn<string>(
                 name: "CircuitId",
                 table: "DsEnergyLowresDataSet",
+                type: "nvarchar(34)",
                 maxLength: 34,
                 nullable: true,
                 oldClrType: typeof(string),

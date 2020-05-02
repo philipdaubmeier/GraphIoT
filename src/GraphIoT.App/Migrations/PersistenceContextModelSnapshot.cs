@@ -601,14 +601,6 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AverageConsumptionCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("AverageSpeedCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
                     b.Property<string>("BatterySocCurve")
                         .HasColumnType("nvarchar(800)")
                         .HasMaxLength(800);
@@ -625,10 +617,6 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                         .HasColumnType("nvarchar(800)")
                         .HasMaxLength(800);
 
-                    b.Property<string>("ConsumedKwhCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
                     b.Property<string>("DrivenKilometersCurve")
                         .HasColumnType("nvarchar(800)")
                         .HasMaxLength(800);
@@ -640,6 +628,26 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                     b.Property<string>("RemoteHeatingStateCurve")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
+
+                    b.Property<string>("TripAverageConsumptionCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripAverageSpeedCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripConsumedKwhCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripDurationCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripLengthKmCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
 
                     b.Property<string>("Vin")
                         .IsRequired()
@@ -661,14 +669,6 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AverageConsumptionCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("AverageSpeedCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
                     b.Property<string>("BatterySocCurve")
                         .HasColumnType("nvarchar(800)")
                         .HasMaxLength(800);
@@ -682,10 +682,6 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                         .HasMaxLength(100);
 
                     b.Property<string>("ClimateTempCurve")
-                        .HasColumnType("nvarchar(800)")
-                        .HasMaxLength(800);
-
-                    b.Property<string>("ConsumedKwhCurve")
                         .HasColumnType("nvarchar(800)")
                         .HasMaxLength(800);
 
@@ -703,6 +699,26 @@ namespace PhilipDaubmeier.GraphIoT.App.Migrations
                     b.Property<string>("RemoteHeatingStateCurve")
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
+
+                    b.Property<string>("TripAverageConsumptionCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripAverageSpeedCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripConsumedKwhCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripDurationCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
+
+                    b.Property<string>("TripLengthKmCurve")
+                        .HasColumnType("nvarchar(800)")
+                        .HasMaxLength(800);
 
                     b.Property<string>("Vin")
                         .IsRequired()
