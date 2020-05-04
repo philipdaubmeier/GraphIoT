@@ -20,16 +20,16 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         private readonly DigitalstromSensorPollingService _sensorPollingService;
         private readonly ViessmannHeatingPollingService _heatingPollingService;
         private readonly ViessmannSolarPollingService _solarPollingService;
-        private readonly ISonnenPollingService _sonnenPollingService;
+        private readonly SonnenEnergyPollingService _sonnenPollingService;
         private readonly INetatmoPollingService _netatmoPollingService;
 
-        public TriggerPollingController(IEnumerable<IDigitalstromPollingService> dsPollingServices, IEnumerable<IViessmannPollingService> viessPollingServices, ISonnenPollingService sonnenPollingService, INetatmoPollingService netatmoPollingService)
+        public TriggerPollingController(IEnumerable<IDigitalstromPollingService> dsPollingServices, IEnumerable<IViessmannPollingService> viessPollingServices, IEnumerable<ISonnenPollingService> sonnenPollingService, INetatmoPollingService netatmoPollingService)
         {
             _energyPollingService = dsPollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).First()!;
             _sensorPollingService = dsPollingServices.Select(x => x as DigitalstromSensorPollingService).Where(x => x != null).First()!;
             _heatingPollingService = viessPollingServices.Select(x => x as ViessmannHeatingPollingService).Where(x => x != null).First()!;
             _solarPollingService = viessPollingServices.Select(x => x as ViessmannSolarPollingService).Where(x => x != null).First()!;
-            _sonnenPollingService = sonnenPollingService;
+            _sonnenPollingService = sonnenPollingService.Select(x => x as SonnenEnergyPollingService).Where(x => x != null).First()!;
             _netatmoPollingService = netatmoPollingService;
         }
 
