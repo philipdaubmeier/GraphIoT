@@ -317,5 +317,141 @@ namespace PhilipDaubmeier.SonnenClient.Tests
             Assert.Equal(24, result.GridPurchase.First());
             Assert.Equal(91, result.BatteryUsoc.First());
         }
+
+        [Fact]
+        public async Task TestGetSiteChargers()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockSonnenConnection.BaseUri}sites/{MockSonnenConnection.SiteId}/chargers")
+                    .Respond("application/json",
+                    @"{
+                        ""data"": [
+                            {
+                                ""id"": """ + MockSonnenConnection.ChargerId + @""",
+                                ""type"": ""chargers"",
+                                ""attributes"": {
+                                    ""serial_number"": ""12345678"",
+                                    ""vendor"": ""Etrel"",
+                                    ""model"": ""G-HABCDEFGH-A00"",
+                                    ""charge_point_id"": ""19998877"",
+                                    ""default_charging_mode"": ""SMART"",
+                                    ""default_departure_time"": ""06:00:00"",
+                                    ""charging_authorization_type"": ""plug_and_charge"",
+                                    ""charging_unit_type"": ""KW"",
+                                    ""smartmode_paused"": true,
+                                    ""max_current_model"": null,
+                                    ""max_current_config"": null,
+                                    ""last_seen_at"": null,
+                                    ""websocket_token"": ""eyJh1234123412341234.eyJp1234123412341234123412341234123412341234.baPtf-eR1n6OyvXSpEbP8Q""
+                                },
+                                ""relationships"": {
+                                    ""cars"": {
+                                        ""links"": {
+                                            ""related"": ""https://my-api.sonnen.de/v1/chargers/" + MockSonnenConnection.ChargerId + @"/cars""
+                                        }
+                                    }
+                                },
+                                ""links"": {
+                                    ""self"": ""https://my-api.sonnen.de/v1/chargers/" + MockSonnenConnection.ChargerId + @"""
+                                }
+                            }
+                        ]
+                    }");
+
+            using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+        }
+
+        [Fact]
+        public async Task TestGetChargerCars()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockSonnenConnection.BaseUri}chargers/{MockSonnenConnection.ChargerId}/cars")
+                    .Respond("application/json",
+                    @"{
+                        ""data"": [
+                            {
+                                ""id"": ""12car123-1234-3456-1234-986765432111"",
+                                ""type"": ""cars"",
+                                ""attributes"": {
+                                    ""consumption_kwh_100km"": 15.0,
+                                    ""manufacturer"": ""VW"",
+                                    ""model"": ""e-Golf"",
+                                    ""active"": true,
+                                    ""capacity_kwh"": 35.0,
+                                    ""charged_energy"": null,
+                                    ""charged_km"": null,
+                                    ""created_at"": ""2020-01-01T01:02:03.000Z""
+                                },
+                                ""relationships"": {
+                                    ""charger"": {
+                                        ""links"": {
+                                            ""related"": ""https://my-api.sonnen.de/v1/chargers/" + MockSonnenConnection.ChargerId + @"""
+                                        },
+                                        ""data"": {
+                                            ""type"": ""chargers"",
+                                            ""id"": """ + MockSonnenConnection.ChargerId + @"""
+                                        }
+                                    },
+                                    ""car-model"": {
+                                        ""links"": {
+                                            ""related"": ""https://my-api.sonnen.de/v1/car-models/carmodel-1234-1234-1234-999887776655""
+                                        },
+                                        ""data"": {
+                                            ""type"": ""car-models"",
+                                            ""id"": ""carmodel-1234-1234-1234-999887776655""
+                                        }
+                                    }
+                                },
+                                ""links"": {
+                                    ""self"": ""https://my-api.sonnen.de/v1/cars/12car123-1234-3456-1234-986765432111""
+                                }
+                            }
+                        ],
+                        ""meta"": {
+                            ""total_resource_count"": 1
+                        },
+                        ""links"": {
+                            ""first"": ""https://my-api.sonnen.de/v1/chargers/" + MockSonnenConnection.ChargerId + @"/cars?page[limit]=20"",
+                            ""last"": ""https://my-api.sonnen.de/v1/chargers/" + MockSonnenConnection.ChargerId + @"/cars?page[limit]=20""
+                        }
+                    }");
+
+            using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+        }
+
+        [Fact]
+        public async Task TestGetChargerLiveState()
+        {
+            var mockHttp = new MockHttpMessageHandler();
+
+            mockHttp.When($"{MockSonnenConnection.BaseUri}chargers/{MockSonnenConnection.ChargerId}/live-state")
+                    .Respond("application/json",
+                    @"{
+                        ""data"": {
+                            ""id"": """ + MockSonnenConnection.ChargerId + @""",
+                            ""type"": ""charger-live-states"",
+                            ""attributes"": {
+                                ""measured_at"": ""2020-05-23T01:02:03.000Z"",
+                                ""active_power"": 0.0,
+                                ""current"": 0.032,
+                                ""charge_speed_kmh"": 0.0,
+                                ""car"": ""CONNECTED"",
+                                ""status"": ""CHARGING"",
+                                ""max_charge_current"": 7.2,
+                                ""smartmode"": true,
+                                ""departure_at"": ""2020-05-23T12:00:00.000Z"",
+                                ""transaction_charged_km"": 17.1,
+                                ""total_charged_km"": 82.2,
+                                ""total_charged_energy"": 1234.56599999999,
+                                ""charging_behaviour"": ""FIRST_SCHEDULE"",
+                                ""charging_authorization_required"": false
+                            }
+                        }
+                    }");
+
+            using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+        }
     }
 }

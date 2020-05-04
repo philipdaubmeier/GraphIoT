@@ -21,6 +21,7 @@ namespace PhilipDaubmeier.SonnenClient.Tests
         public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";
         public static string RefreshToken => "716289babc_dummy_unittest_refresh_token_83025a07162890587bea58987be";
         public static string SiteId => "3b8914b2-1934-4376-a593-ddfb0226eca5";
+        public static string ChargerId => "charger1-4f4c-4f2e-b991-a792cf020245";
 
         private static readonly ISonnenAuth auth = new SonnenAuth(_username, _password);
 
