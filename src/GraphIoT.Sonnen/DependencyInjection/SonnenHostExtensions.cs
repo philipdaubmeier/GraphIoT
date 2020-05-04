@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection
             serviceCollection.AddScoped<ISonnenConnectionProvider, SonnenConfigConnectionProvider>();
             serviceCollection.AddScoped<SonnenPortalClient>();
 
-            serviceCollection.AddPollingService<ISonnenPollingService, SonnenPollingService>();
+            serviceCollection.AddPollingService<ISonnenPollingService, SonnenEnergyPollingService>();
             serviceCollection.AddTimedPollingHost<ISonnenPollingService>(sonnenConfig.GetSection("PollingService"));
 
             serviceCollection.AddGraphCollectionViewModel<SonnenEnergyViewModel>();

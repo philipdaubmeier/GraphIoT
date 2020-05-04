@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 {
-    public class SonnenPollingService : ISonnenPollingService
+    public class SonnenEnergyPollingService : ISonnenPollingService
     {
         private readonly ILogger _logger;
         private readonly ISonnenDbContext _dbContext;
@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 
         private string? _siteId = null;
 
-        public SonnenPollingService(ILogger<SonnenPollingService> logger, ISonnenDbContext databaseContext, SonnenPortalClient sonnenClient)
+        public SonnenEnergyPollingService(ILogger<SonnenEnergyPollingService> logger, ISonnenDbContext databaseContext, SonnenPortalClient sonnenClient)
         {
             _logger = logger;
             _dbContext = databaseContext;
