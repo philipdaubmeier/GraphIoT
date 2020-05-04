@@ -50,5 +50,29 @@ namespace PhilipDaubmeier.SonnenClient
             var uri = new Uri($"{_baseUri}sites/{siteId}/statistics{query}");
             return await CallSonnenApi<Wiremessage<StatisticsSeries>, StatisticsSeries>(uri);
         }
+
+        /// <summary>
+        /// Returns all sonnenchargers associated with the given site.
+        /// </summary>
+        public async Task<List<Charger>> GetSiteChargers(string siteId)
+        {
+            return await CallSonnenApi<ListWiremessage<Charger>, List<Charger>>(new Uri($"{_baseUri}sites/{siteId}/chargers"));
+        }
+
+        /// <summary>
+        /// Returns all cars associated with the given sonnencharger.
+        /// </summary>
+        public async Task<List<Car>> GetChargerCars(string chargerId)
+        {
+            return await CallSonnenApi<ListWiremessage<Car>, List<Car>>(new Uri($"{_baseUri}chargers/{chargerId}/cars"));
+        }
+
+        /// <summary>
+        /// Returns the current charging state, the current transaction energy and overall charged energy info.
+        /// </summary>
+        public async Task<ChargerLiveState> GetChargerLiveState(string chargerId)
+        {
+            return await CallSonnenApi<Wiremessage<ChargerLiveState>, ChargerLiveState>(new Uri($"{_baseUri}chargers/{chargerId}/live-state"));
+        }
     }
 }
