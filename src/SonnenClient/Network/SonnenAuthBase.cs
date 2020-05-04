@@ -92,12 +92,12 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// If no valid access token is present yet, this method will trigger a fresh sign-in
         /// or refresh the token with a refresh token if present and append it to the request.
         /// </summary>
-        protected async Task<TData?> CallSonnenApi<TWiremessage, TData>(Uri uri)
-            where TWiremessage : IWiremessage<TData> where TData : class
+        protected async Task<TData> CallSonnenApi<TWiremessage, TData>(Uri uri)
+            where TWiremessage : IWiremessage<TData> where TData : class, new()
         {
             var responseStream = await (await RequestSonnenApi(uri)).Content.ReadAsStreamAsync();
 
-            return (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.ContainedData;
+            return (await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions))?.ContainedData ?? new TData();
         }
 
         /// <summary>
