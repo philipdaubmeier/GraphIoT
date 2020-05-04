@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.SonnenClient
         /// </summary>
         public async Task<List<Charger>> GetSiteChargers(string siteId)
         {
-            return await CallSonnenApi<ListWiremessage<Charger>, List<Charger>>(new Uri($"{_baseUri}sites/{siteId}/chargers"));
+            return await CallSonnenApi<ChargerWiremessage, List<Charger>>(new Uri($"{_baseUri}sites/{siteId}/chargers"));
         }
 
         /// <summary>

@@ -366,6 +366,7 @@ namespace PhilipDaubmeier.SonnenClient.Tests
 
             Assert.NotNull(result);
             Assert.Single(result);
+            Assert.Equal(MockSonnenConnection.ChargerId, result[0].Id);
             Assert.Equal("12345678", result[0].SerialNumber);
             Assert.Equal("Etrel", result[0].Vendor);
             Assert.Equal("G-HABCDEFGH-A00", result[0].Model);

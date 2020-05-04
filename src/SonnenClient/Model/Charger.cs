@@ -4,6 +4,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
 {
     public class Charger
     {
+        public string Id { get; set; } = string.Empty;
         public string SerialNumber { get; set; } = string.Empty;
         public string Vendor { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
