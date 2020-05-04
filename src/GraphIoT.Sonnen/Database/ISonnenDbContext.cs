@@ -9,6 +9,10 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
 
         DbSet<SonnenEnergyMidresData> SonnenEnergyDataSet { get; set; }
 
+        DbSet<SonnenChargerLowresData> SonnenChargerLowresDataSet { get; set; }
+
+        DbSet<SonnenChargerMidresData> SonnenChargerDataSet { get; set; }
+
         int SaveChanges();
     }
 }
