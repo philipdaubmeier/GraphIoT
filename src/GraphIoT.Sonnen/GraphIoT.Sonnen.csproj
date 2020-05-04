@@ -24,6 +24,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Locale\ViewModel.SonnenChargerViewModel.de-DE.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Update="Locale\ViewModel.SonnenEnergyViewModel.de-DE.resx">
       <SubType>Designer</SubType>
     </EmbeddedResource>
