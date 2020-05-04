@@ -1,5 +1,6 @@
 using RichardSzalay.MockHttp;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -360,6 +361,22 @@ namespace PhilipDaubmeier.SonnenClient.Tests
                     }");
 
             using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var result = await sonnenClient.GetSiteChargers(MockSonnenConnection.SiteId);
+
+            Assert.NotNull(result);
+            Assert.Single(result);
+            Assert.Equal("12345678", result[0].SerialNumber);
+            Assert.Equal("Etrel", result[0].Vendor);
+            Assert.Equal("G-HABCDEFGH-A00", result[0].Model);
+            Assert.Equal("19998877", result[0].ChargePointId);
+            Assert.Equal("SMART", result[0].DefaultChargingMode);
+            Assert.Equal("06:00:00", result[0].DefaultDepartureTime);
+            Assert.Equal("plug_and_charge", result[0].ChargingAuthorizationType);
+            Assert.Equal("KW", result[0].ChargingUnitType);
+            Assert.True(result[0].SmartmodePaused);
+            Assert.Null(result[0].LastSeenAt);
+            Assert.Equal("eyJh1234123412341234.eyJp1234123412341234123412341234123412341234.baPtf-eR1n6OyvXSpEbP8Q", result[0].WebsocketToken);
         }
 
         [Fact]
@@ -419,6 +436,17 @@ namespace PhilipDaubmeier.SonnenClient.Tests
                     }");
 
             using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var result = await sonnenClient.GetChargerCars(MockSonnenConnection.ChargerId);
+
+            Assert.Equal(15, result[0].ConsumptionKwh100km);
+            Assert.Equal("VW", result[0].Manufacturer);
+            Assert.Equal("e-Golf", result[0].Model);
+            Assert.True(result[0].Active);
+            Assert.Equal(35.0, result[0].CapacityKwh);
+            Assert.Null(result[0].ChargedEnergy);
+            Assert.Null(result[0].ChargedKm);
+            Assert.Equal(DateTime.Parse("2020-01-01T01:02:03.000Z", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal), result[0].CreatedAt);
         }
 
         [Fact]
@@ -452,6 +480,23 @@ namespace PhilipDaubmeier.SonnenClient.Tests
                     }");
 
             using var sonnenClient = new SonnenPortalClient(mockHttp.AddAuthMock().ToMockProvider());
+
+            var result = await sonnenClient.GetChargerLiveState(MockSonnenConnection.ChargerId);
+
+            Assert.Equal(DateTime.Parse("2020-05-23T01:02:03.000Z", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal), result.MeasuredAt);
+            Assert.Equal(0.0, result.ActivePower);
+            Assert.Equal(0.032, result.Current);
+            Assert.Equal(0.0, result.ChargeSpeedKmh);
+            Assert.Equal("CONNECTED", result.Car);
+            Assert.Equal("CHARGING", result.Status);
+            Assert.Equal(7.2, result.MaxChargeCurrent);
+            Assert.True(result.Smartmode);
+            Assert.Equal(DateTime.Parse("2020-05-23T12:00:00.000Z", CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal), result.DepartureAt);
+            Assert.Equal(17.1, result.TransactionChargedKm);
+            Assert.Equal(82.2, result.TotalChargedKm);
+            Assert.Equal(1234.56599999999, result.TotalChargedEnergy);
+            Assert.Equal("FIRST_SCHEDULE", result.ChargingBehaviour);
+            Assert.False(result.ChargingAuthorizationRequired);
         }
     }
 }
