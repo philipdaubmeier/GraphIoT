@@ -33,6 +33,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
         public Guid Id { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? ChargedEnergyCurve { get; set; }
 
         [MaxLength(800)]
