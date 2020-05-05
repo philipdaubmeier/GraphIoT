@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Xunit;
 
@@ -91,15 +92,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         }
 
         [Theory]
-        [InlineData("SensorType 4: ActivePower", 4)]
-        [InlineData("SensorType 13: HumidityIndoors", 13)]
-        [InlineData("SensorType 21: CO2Concentration", 21)]
-        [InlineData("SensorType 61: Reserved1", 61)]
-        public void TestToString(string expected, int inputVal)
+        [InlineData("Sensor 4: ActivePower", "Active power [W]", "Wirkleistung [W]", 4)]
+        [InlineData("Sensor 13: HumidityIndoors", "Relative humidity indoors [%]", "Relative Feuchte Innen [%]", 13)]
+        [InlineData("Sensor 21: CO2Concentration", "Carbon dioxide concentration [ppm]", "Kohlendioxidkonzentration [ppm]", 21)]
+        [InlineData("Sensor 61: Reserved1", "Reserved", "Reserviert", 61)]
+        public void TestToString(string expectedInvariant, string expectedEn, string expectedDe, int inputVal)
         {
             Sensor sensorType = inputVal;
 
-            Assert.Equal(expected, sensorType.ToString());
+            Assert.Equal(expectedInvariant, sensorType.ToString());
+
+            Assert.Equal(expectedEn, sensorType.ToString("d", CultureInfo.CreateSpecificCulture("en")));
+            Assert.Equal(expectedDe, sensorType.ToString("d", CultureInfo.CreateSpecificCulture("de-DE")));
         }
 
         [Fact]

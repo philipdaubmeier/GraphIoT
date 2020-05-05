@@ -175,7 +175,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 throw new FormatException($"Did not recognize format '{format}'");
 
             if (formatProvider is CultureInfo culture)
-                Locale.Group.Culture = culture;
+                Locale.Sensor.Culture = culture;
 
             return _type switch
             {

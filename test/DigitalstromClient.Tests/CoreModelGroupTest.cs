@@ -142,10 +142,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         public void TestGroupFormatting()
         {
             var group = (Group)2;
-            Assert.Equal("Shading", group.ToString("d", CultureInfo.CreateSpecificCulture("en")));
-            Assert.Equal("Shading", group.ToString("d", CultureInfo.CreateSpecificCulture("en_US")));
-            Assert.Equal("Beschattung", group.ToString("d", CultureInfo.CreateSpecificCulture("de_DE")));
-            Assert.Equal("Beschattung", group.ToString("d", CultureInfo.CreateSpecificCulture("de")));
+            Assert.Equal("Shade", group.ToString("d", CultureInfo.CreateSpecificCulture("en")));
+            Assert.Equal("Shade", group.ToString("d", CultureInfo.CreateSpecificCulture("en-US")));
+            Assert.Equal("Schatten", group.ToString("d", CultureInfo.CreateSpecificCulture("de-DE")));
+            Assert.Equal("Schatten", group.ToString("d", CultureInfo.CreateSpecificCulture("de")));
         }
     }
 }

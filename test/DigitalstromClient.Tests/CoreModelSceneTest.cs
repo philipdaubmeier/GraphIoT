@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Xunit;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
@@ -90,14 +91,17 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         }
 
         [Theory]
-        [InlineData("DeepOff", SceneCommand.DeepOff)]
-        [InlineData("Area1Stop", SceneCommand.Area1Stop)]
-        [InlineData("Preset4", SceneCommand.Preset4)]
-        public void TestToString(string expected, SceneCommand inputVal)
+        [InlineData("ID 68: DeepOff", "Room off", "Raum Aus", SceneCommand.DeepOff)]
+        [InlineData("ID 1: Area1Off", "Area 1 off", "Bereich 1 Aus", SceneCommand.Area1Off)]
+        [InlineData("ID 19: Preset4", "Preset 4", "Stimmung 4", SceneCommand.Preset4)]
+        public void TestToString(string expectedInvariant, string expectedEn, string expectedDe, SceneCommand inputVal)
         {
             Scene scene = new Scene(inputVal);
 
-            Assert.Equal(expected, scene.ToString());
+            Assert.Equal(expectedInvariant, scene.ToString());
+
+            Assert.Equal(expectedEn, scene.ToString("d", CultureInfo.CreateSpecificCulture("en")));
+            Assert.Equal(expectedDe, scene.ToString("d", CultureInfo.CreateSpecificCulture("de-DE")));
         }
     }
 }
