@@ -37,6 +37,13 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             if (method is null)
                 throw new Exception($"There is no readable curve property at index {index}");
 
+            var attribute = CurveProperty(index).GetCustomAttribute<TimeSeriesAttribute>();
+            if (attribute is null)
+                throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+
+            if (typeof(T) != attribute.Type)
+                throw new Exception($"Can not read property at index {index} as time series of type {typeof(T)}, it is defined to be {attribute.Type}");
+
             return (method.Invoke(this, null) as string).ToTimeseries<T>(Span, DecimalPlaces);
         }
 
@@ -45,6 +52,13 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             var property = CurveProperty(index);
             if (property is null)
                 throw new Exception($"There is no curve property at index {index}");
+
+            var attribute = property.GetCustomAttribute<TimeSeriesAttribute>();
+            if (attribute is null)
+                throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+
+            if (typeof(T) != attribute.Type)
+                throw new Exception($"Can not set property at index {index} with time series of type {typeof(T)}, it is defined to be {attribute.Type}");
 
             property.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
         }
