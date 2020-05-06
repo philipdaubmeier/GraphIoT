@@ -31,6 +31,18 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             SetSeries(index, series);
         }
 
+        public void CopyInto<T>(int index, TimeSeries<T> value) where T : struct
+        {
+            var series = GetSeries<T>(index);
+            for (int i = 0; i < value.Span.Count; i++)
+            {
+                var time = value.Span.Begin + (i * value.Span.Duration);
+                series[time] = value[time];
+            }
+
+            SetSeries(index, series);
+        }
+
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
             var method = CurveProperty(index)?.GetGetMethod();
