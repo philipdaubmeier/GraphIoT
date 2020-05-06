@@ -2,7 +2,6 @@
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.SonnenClient;
-using PhilipDaubmeier.SonnenClient.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

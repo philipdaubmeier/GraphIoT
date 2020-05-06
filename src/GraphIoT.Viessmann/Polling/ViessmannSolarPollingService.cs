@@ -42,20 +42,11 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             var data = await _vitotrolClient.GetData(new List<int>() { 5272, 5273, 5274, 5276, 7895 });
             var time = data.First().timestamp.ToUniversalTime();
 
-            var item = data.First(d => d.id == 7895.ToString());
-            var solarWhTotal = int.Parse(item.value);
-
-            item = data.First(d => d.id == 5272.ToString());
-            var solarCollectorTemp = double.Parse(item.value, CultureInfo.InvariantCulture);
-
-            item = data.First(d => d.id == 5276.ToString());
-            var solarHotwaterTemp = double.Parse(item.value, CultureInfo.InvariantCulture);
-
-            item = data.First(d => d.id == 5274.ToString());
-            var solarPumpState = item.value.Trim() != "0";
-
-            item = data.First(d => d.id == 5273.ToString());
-            var solarSuppression = item.value.Trim() != "0";
+            var solarWhTotal = int.Parse(data.First(d => d.id == 7895.ToString()).value);
+            var solarCollectorTemp = double.Parse(data.First(d => d.id == 5272.ToString()).value, CultureInfo.InvariantCulture);
+            var solarHotwaterTemp = double.Parse(data.First(d => d.id == 5276.ToString()).value, CultureInfo.InvariantCulture);
+            var solarPumpState = data.First(d => d.id == 5274.ToString()).value.Trim() != "0";
+            var solarSuppression = data.First(d => d.id == 5273.ToString()).value.Trim() != "0";
 
             SaveSolarValues(_dbContext, time, solarWhTotal, solarCollectorTemp, solarHotwaterTemp, solarPumpState, solarSuppression);
         }
@@ -74,23 +65,12 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             dbSolarSeries.SetSeries(0, series1);
             dbSolarSeries.SolarWhTotal = solarWhTotal;
 
-            var series2 = dbSolarSeries.SolarCollectorTempSeries;
-            series2[time] = solarCollectorTemp;
-            dbSolarSeries.SetSeries(1, series2);
+            dbSolarSeries.SetSeriesValue(1, time, solarCollectorTemp);
+            dbSolarSeries.SetSeriesValue(2, time, solarHotwaterTemp);
+            dbSolarSeries.SetSeriesValue(3, time, solarPumpState);
+            dbSolarSeries.SetSeriesValue(4, time, solarSuppression);
 
-            var series3 = dbSolarSeries.SolarHotwaterTempSeries;
-            series3[time] = solarHotwaterTemp;
-            dbSolarSeries.SetSeries(2, series3);
-
-            var series4 = dbSolarSeries.SolarPumpStateSeries;
-            series4[time] = solarPumpState;
-            dbSolarSeries.SetSeries(3, series4);
-
-            var series5 = dbSolarSeries.SolarSuppressionSeries;
-            series5[time] = solarSuppression;
-            dbSolarSeries.SetSeries(4, series5);
-
-            SaveLowresSolarValues(dbContext, day, series1, series2, series3, series4, series5);
+            SaveLowresSolarValues(dbContext, day, dbSolarSeries);
 
             dbContext.SaveChanges();
         }
@@ -103,12 +83,12 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
                 if (dbSolarSeries == null)
                     continue;
 
-                SaveLowresSolarValues(_dbContext, day, dbSolarSeries.SolarWhSeries, dbSolarSeries.SolarCollectorTempSeries, dbSolarSeries.SolarHotwaterTempSeries, dbSolarSeries.SolarPumpStateSeries, dbSolarSeries.SolarSuppressionSeries);
+                SaveLowresSolarValues(_dbContext, day, dbSolarSeries);
                 _dbContext.SaveChanges();
             }
         }
 
-        private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, TimeSeries<int> series1Src, TimeSeries<double> series2Src, TimeSeries<double> series3Src, TimeSeries<bool> series4Src, TimeSeries<bool> series5Src)
+        private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, ViessmannSolarMidresData midRes)
         {
             static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
             var month = FirstOfMonth(day);
@@ -124,30 +104,11 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
                 return input;
             }
 
-            var series1 = dbSolarSeries.SolarWhSeries;
-            var resampler1 = new TimeSeriesResampler<TimeSeries<int>, int>(series1.Span) { Resampled = series1 };
-            resampler1.SampleAggregate(PreprocessSolarProduction(series1Src), x => (int)x.Average());
-            dbSolarSeries.SetSeries(0, resampler1.Resampled);
-
-            var series2 = dbSolarSeries.SolarCollectorTempSeries;
-            var resampler2 = new TimeSeriesResampler<TimeSeries<double>, double>(series2.Span) { Resampled = series2 };
-            resampler2.SampleAggregate(series2Src, x => x.Average());
-            dbSolarSeries.SetSeries(1, resampler2.Resampled);
-
-            var series3 = dbSolarSeries.SolarHotwaterTempSeries;
-            var resampler3 = new TimeSeriesResampler<TimeSeries<double>, double>(series3.Span) { Resampled = series3 };
-            resampler3.SampleAggregate(series3Src, x => x.Average());
-            dbSolarSeries.SetSeries(2, resampler3.Resampled);
-
-            var series4 = dbSolarSeries.SolarPumpStateSeries;
-            var resampler4 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series4.Span) { Resampled = series4 };
-            resampler4.SampleAggregate(series4Src, x => x.Any(v => v));
-            dbSolarSeries.SetSeries(3, resampler4.Resampled);
-
-            var series5 = dbSolarSeries.SolarSuppressionSeries;
-            var resampler5 = new TimeSeriesResampler<TimeSeries<bool>, bool>(series5.Span) { Resampled = series5 };
-            resampler5.SampleAggregate(series5Src, x => x.Any(v => v));
-            dbSolarSeries.SetSeries(4, resampler5.Resampled);
+            dbSolarSeries.ResampleFrom<int>(midRes, 0, x => (int)x.Average(), PreprocessSolarProduction);
+            dbSolarSeries.ResampleFrom<double>(midRes, 1, x => x.Average());
+            dbSolarSeries.ResampleFrom<double>(midRes, 2, x => x.Average());
+            dbSolarSeries.ResampleFrom<bool>(midRes, 3, x => x.Any(v => v));
+            dbSolarSeries.ResampleFrom<bool>(midRes, 4, x => x.Any(v => v));
         }
     }
 }
