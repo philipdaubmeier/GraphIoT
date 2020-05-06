@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Database;
 using PhilipDaubmeier.GraphIoT.Viessmann.Config;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using PhilipDaubmeier.ViessmannClient;
@@ -77,10 +78,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private void SaveHeatingValues(DateTime time, double burnerHoursTotal, int burnerStartsTotal, int burnerModulation, double outsideTemp, double boilerTemp, double boilerTempMain, double circuit0Temp, double circuit1Temp, double dhwTemp, bool burnerActive, bool circuit0Pump, bool circuit1Pump, bool dhwPrimPump, bool dhwCircPump)
         {
-            var day = time.Date;
-            var dbHeatingSeries = _dbContext.ViessmannHeatingTimeseries.Where(x => x.Key == day).FirstOrDefault();
-            if (dbHeatingSeries == null)
-                _dbContext.ViessmannHeatingTimeseries.Add(dbHeatingSeries = new ViessmannHeatingMidresData() { Key = day, BurnerHoursTotal = 0d, BurnerStartsTotal = 0 });
+            var dbHeatingSeries = TimeSeriesDbEntityBase.LoadOrCreateDay(_dbContext.ViessmannHeatingTimeseries, time.Date);
 
             var oldHours = dbHeatingSeries.BurnerHoursTotal;
             var minutes = (burnerHoursTotal - oldHours) * 60;
@@ -109,7 +107,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             dbHeatingSeries.SetSeriesValue(12, time, dhwPrimPump);
             dbHeatingSeries.SetSeriesValue(13, time, dhwCircPump);
 
-            SaveLowresHeatingValues(day, dbHeatingSeries);
+            SaveLowresHeatingValues(time.Date, dbHeatingSeries);
 
             _dbContext.SaveChanges();
         }
@@ -129,11 +127,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private void SaveLowresHeatingValues(DateTime day, ViessmannHeatingMidresData midRes)
         {
-            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
-            var month = FirstOfMonth(day);
-            var dbHeatingSeries = _dbContext.ViessmannHeatingLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
-            if (dbHeatingSeries == null)
-                _dbContext.ViessmannHeatingLowresTimeseries.Add(dbHeatingSeries = new ViessmannHeatingLowresData() { Key = month });
+            var dbHeatingSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(_dbContext.ViessmannHeatingLowresTimeseries, day);
 
             dbHeatingSeries.ResampleFrom<double>(midRes, 0, x => x.Average());
             dbHeatingSeries.ResampleFrom<int>(midRes, 1, x => (int)x.Average());

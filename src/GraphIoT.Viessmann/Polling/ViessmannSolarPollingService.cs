@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Database;
 using PhilipDaubmeier.GraphIoT.Viessmann.Database;
 using PhilipDaubmeier.ViessmannClient;
 using System;
@@ -53,11 +54,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         public static void SaveSolarValues(IViessmannDbContext dbContext, DateTime time, int solarWhTotal, double solarCollectorTemp, double solarHotwaterTemp, bool solarPumpState, bool solarSuppression)
         {
-            var day = time.Date;
-
-            var dbSolarSeries = dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
-            if (dbSolarSeries == null)
-                dbContext.ViessmannSolarTimeseries.Add(dbSolarSeries = new ViessmannSolarMidresData() { Key = day });
+            var dbSolarSeries = TimeSeriesDbEntityBase.LoadOrCreateDay(dbContext.ViessmannSolarTimeseries, time.Date);
 
             var oldSolarWhTotal = dbSolarSeries.SolarWhTotal;
             var series1 = dbSolarSeries.SolarWhSeries;
@@ -70,7 +67,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             dbSolarSeries.SetSeriesValue(3, time, solarPumpState);
             dbSolarSeries.SetSeriesValue(4, time, solarSuppression);
 
-            SaveLowresSolarValues(dbContext, day, dbSolarSeries);
+            SaveLowresSolarValues(dbContext, time.Date, dbSolarSeries);
 
             dbContext.SaveChanges();
         }
@@ -90,11 +87,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, ViessmannSolarMidresData midRes)
         {
-            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
-            var month = FirstOfMonth(day);
-            var dbSolarSeries = dbContext.ViessmannSolarLowresTimeseries.Where(x => x.Key == month).FirstOrDefault();
-            if (dbSolarSeries == null)
-                dbContext.ViessmannSolarLowresTimeseries.Add(dbSolarSeries = new ViessmannSolarLowresData() { Key = month });
+            var dbSolarSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.ViessmannSolarLowresTimeseries, day);
 
             // Hack: remove first 5 elements due to bug in day-boundaries
             static ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)

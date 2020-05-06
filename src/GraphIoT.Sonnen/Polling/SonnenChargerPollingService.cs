@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using PhilipDaubmeier.GraphIoT.Core.Database;
 using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.SonnenClient;
 using System;
@@ -61,11 +62,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 
         public static void SaveChargerValues(ISonnenDbContext dbContext, DateTime time, double chargedEnergyTotal, double activePower, double current, bool connected, bool charging, bool smartMode)
         {
-            var day = time.Date;
-
-            var dbChargerSeries = dbContext.SonnenChargerDataSet.Where(x => x.Key == day).FirstOrDefault();
-            if (dbChargerSeries == null)
-                dbContext.SonnenChargerDataSet.Add(dbChargerSeries = new SonnenChargerMidresData() { Key = day });
+            var dbChargerSeries = TimeSeriesDbEntityBase.LoadOrCreateDay(dbContext.SonnenChargerDataSet, time.Date);
 
             var oldChargedEnergyTotal = dbChargerSeries.ChargedEnergyTotal;
             var series1 = dbChargerSeries.ChargedEnergySeries;
@@ -79,18 +76,14 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             dbChargerSeries.SetSeriesValue(4, time, charging);
             dbChargerSeries.SetSeriesValue(5, time, smartMode);
 
-            SaveLowresChargerValues(dbContext, day, dbChargerSeries);
+            SaveLowresChargerValues(dbContext, time.Date, dbChargerSeries);
 
             dbContext.SaveChanges();
         }
 
         private static void SaveLowresChargerValues(ISonnenDbContext dbContext, DateTime day, SonnenChargerMidresData midRes)
         {
-            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
-            var month = FirstOfMonth(day);
-            var dbChargerSeries = dbContext.SonnenChargerLowresDataSet.Where(x => x.Key == month).FirstOrDefault();
-            if (dbChargerSeries == null)
-                dbContext.SonnenChargerLowresDataSet.Add(dbChargerSeries = new SonnenChargerLowresData() { Key = month });
+            var dbChargerSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.SonnenChargerLowresDataSet, day);
 
             dbChargerSeries.ResampleFrom<double>(midRes, 0, x => x.Average());
             dbChargerSeries.ResampleFrom<double>(midRes, 1, x => x.Average());

@@ -1,9 +1,11 @@
-﻿using PhilipDaubmeier.CompactTimeSeries;
+﻿using Microsoft.EntityFrameworkCore;
+using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.Parsers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 
@@ -23,6 +25,27 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
         protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
         protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+
+        public static T LoadOrCreateDay<T>(DbSet<T> dbTable, DateTime day, Expression<Func<T, bool>>? additionalQuery = null) where T : TimeSeriesDbEntityBase, new()
+        {
+            var query = dbTable.Where(x => x.Key == day);
+            if (additionalQuery != null)
+                query = query.Where(additionalQuery);
+
+            var dbEntity = query.FirstOrDefault();
+            if (dbEntity == null)
+                dbTable.Add(dbEntity = new T() { Key = day });
+
+            return dbEntity;
+        }
+
+        public static T LoadOrCreateMonth<T>(DbSet<T> dbTable, DateTime day, Expression<Func<T, bool>>? additionalQuery = null) where T : TimeSeriesDbEntityBase, new()
+        {
+            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
+            var month = FirstOfMonth(day);
+
+            return LoadOrCreateDay(dbTable, month, additionalQuery);
+        }
 
         public void SetSeriesValue<T>(int index, DateTime time, T value) where T : struct
         {
@@ -75,11 +98,15 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             property.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
         }
 
-        public void ResampleFrom<T>(TimeSeriesDbEntityBase other, int index, Func<IEnumerable<T>, T> aggregate) where T : struct
+        public void ResampleFrom<T>(TimeSeriesDbEntityBase other, int index, Func<IEnumerable<T>, T> aggregate, Func<ITimeSeries<T>, ITimeSeries<T>>? preprocessor = null) where T : struct
         {
             var series = GetSeries<T>(index);
             var resampler = new TimeSeriesResampler<TimeSeries<T>, T>(series.Span) { Resampled = series };
-            resampler.SampleAggregate(other.GetSeries<T>(index), aggregate);
+            if (preprocessor is null)
+                resampler.SampleAggregate(other.GetSeries<T>(index), aggregate);
+            else
+                resampler.SampleAggregate(preprocessor(other.GetSeries<T>(index)), aggregate);
+
             SetSeries(index, resampler.Resampled);
         }
 

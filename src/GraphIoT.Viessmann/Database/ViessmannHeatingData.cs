@@ -23,10 +23,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
         public override DateTime Key { get; set; }
 
         [Required]
-        public double BurnerHoursTotal { get; set; }
+        public double BurnerHoursTotal { get; set; } = 0d;
 
         [Required]
-        public int BurnerStartsTotal { get; set; }
+        public int BurnerStartsTotal { get; set; } = 0;
     }
 
     public abstract class ViessmannHeatingData : TimeSeriesDbEntityBase

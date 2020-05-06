@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Database;
 using PhilipDaubmeier.GraphIoT.WeConnect.Database;
 using PhilipDaubmeier.WeConnectClient;
 using System;
@@ -78,11 +79,8 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
 
         public static void SaveSolarValues(IWeConnectDbContext dbContext, DateTime time, string vin, int mileage, int batterySoc, TimeSeries<double> length, TimeSeries<double> duration, TimeSeries<double> averageSpeed, TimeSeries<double> consumedKwh, TimeSeries<double> averageConsumption, double climateTemp, bool chargingState, bool climateState, bool windowMeltState, bool remoteHeatingState)
         {
-            var day = time.Date;
-
-            var dbData = dbContext.WeConnectDataSet.Where(x => x.Key == day && x.Vin == vin).FirstOrDefault();
-            if (dbData == null)
-                dbContext.WeConnectDataSet.Add(dbData = new WeConnectMidresData() { Key = day, Vin = vin });
+            var dbData = TimeSeriesDbEntityBase.LoadOrCreateDay(dbContext.WeConnectDataSet, time.Date, x => x.Vin == vin);
+            dbData.Vin = vin;
 
             var oldMileage = dbData.Mileage;
             var series1 = dbData.DrivenKilometersSeries;
@@ -102,18 +100,15 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             dbData.SetSeriesValue(10, time, windowMeltState);
             dbData.SetSeriesValue(11, time, remoteHeatingState);
 
-            SaveLowresSolarValues(dbContext, day, vin, dbData);
+            SaveLowresSolarValues(dbContext, time.Date, vin, dbData);
 
             dbContext.SaveChanges();
         }
 
         private static void SaveLowresSolarValues(IWeConnectDbContext dbContext, DateTime day, string vin, WeConnectMidresData midRes)
         {
-            static DateTime FirstOfMonth(DateTime date) => date.AddDays(-1 * (date.Day - 1));
-            var month = FirstOfMonth(day);
-            var dbData = dbContext.WeConnectLowresDataSet.Where(x => x.Key == month && x.Vin == vin).FirstOrDefault();
-            if (dbData == null)
-                dbContext.WeConnectLowresDataSet.Add(dbData = new WeConnectLowresData() { Key = month, Vin = vin });
+            var dbData = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.WeConnectLowresDataSet, day, x => x.Vin == vin);
+            dbData.Vin = vin;
 
             // Hack: remove first 5 elements due to bug in day-boundaries
             static ITimeSeries<int> PreprocessMileage(ITimeSeries<int> input)
