@@ -31,51 +31,35 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
         public Guid Id { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? ProductionPowerCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? ConsumptionPowerCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? DirectUsagePowerCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? BatteryChargingCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? BatteryDischargingCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? GridFeedinCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(int))]
         public string? GridPurchaseCurve { get; set; }
 
         [MaxLength(4000)]
+        [TimeSeries(typeof(double))]
         public string? BatteryUsocCurve { get; set; }
-
-        [NotMapped]
-        public TimeSeries<int> ProductionPowerSeries => ProductionPowerCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> ConsumptionPowerSeries => ConsumptionPowerCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> DirectUsagePowerSeries => DirectUsagePowerCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> BatteryChargingSeries => BatteryChargingCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> BatteryDischargingSeries => BatteryDischargingCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> GridFeedinSeries => GridFeedinCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> GridPurchaseSeries => GridPurchaseCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<double> BatteryUsocSeries => BatteryUsocCurve.ToTimeseries<double>(Span, DecimalPlaces);
     }
 }

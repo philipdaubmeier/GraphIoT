@@ -36,9 +36,11 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public DigitalstromZone Zone { get; set; } = null!;
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TemperatureCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? HumidityCurve { get; set; }
 
         [NotMapped]

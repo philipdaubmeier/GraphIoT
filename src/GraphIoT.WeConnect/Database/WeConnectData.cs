@@ -36,75 +36,54 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Database
         public string Vin { get; set; } = string.Empty;
 
         [MaxLength(800)]
+        [TimeSeries(typeof(int))]
         public string? DrivenKilometersCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(int))]
         public string? BatterySocCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TripLengthKmCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TripDurationCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TripAverageSpeedCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TripConsumedKwhCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? TripAverageConsumptionCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? ChargingStateCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? ClimateTempCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? ClimateStateCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? WindowMeltStateCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? RemoteHeatingStateCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<int> DrivenKilometersSeries => DrivenKilometersCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<int> BatterySocSeries => BatterySocCurve.ToTimeseries<int>(Span);
-
-        [NotMapped]
-        public TimeSeries<double> TripLengthKmSeries => TripLengthKmCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> TripDurationSeries => TripDurationCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> TripAverageSpeedSeries => TripAverageSpeedCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> TripConsumedKwhSeries => TripConsumedKwhCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> TripAverageConsumptionSeries => TripAverageConsumptionCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<bool> ChargingStateSeries => ChargingStateCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<double> ClimateTempSeries => ClimateTempCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<bool> ClimateStateSeries => ClimateStateCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> WindowMeltStateSeries => WindowMeltStateCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> RemoteHeatingStateSeries => RemoteHeatingStateCurve.ToTimeseries<bool>(Span);
     }
 }

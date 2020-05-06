@@ -33,18 +33,23 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
         public Guid Id { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(int))]
         public string? SolarWhCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? SolarCollectorTempCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? SolarHotwaterTempCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? SolarPumpStateCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? SolarSuppressionCurve { get; set; }
 
         [NotMapped]
@@ -52,14 +57,5 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Database
 
         [NotMapped]
         public TimeSeries<double> SolarCollectorTempSeries => SolarCollectorTempCurve.ToTimeseries<double>(Span);
-
-        [NotMapped]
-        public TimeSeries<double> SolarHotwaterTempSeries => SolarHotwaterTempCurve.ToTimeseries<double>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> SolarPumpStateSeries => SolarPumpStateCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> SolarSuppressionSeries => SolarSuppressionCurve.ToTimeseries<bool>(Span);
     }
 }

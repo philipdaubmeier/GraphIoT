@@ -37,36 +37,26 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
         public string? ChargedEnergyCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? ActivePowerCurve { get; set; }
 
         [MaxLength(800)]
+        [TimeSeries(typeof(double))]
         public string? CurrentCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? ConnectedCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? ChargingCurve { get; set; }
 
         [MaxLength(100)]
+        [TimeSeries(typeof(bool))]
         public string? SmartModeCurve { get; set; }
 
         [NotMapped]
         public TimeSeries<double> ChargedEnergySeries => ChargedEnergyCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> ActivePowerSeries => ActivePowerCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<double> CurrentSeries => CurrentCurve.ToTimeseries<double>(Span, DecimalPlaces);
-
-        [NotMapped]
-        public TimeSeries<bool> ConnectedSeries => ConnectedCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> ChargingSeries => ChargingCurve.ToTimeseries<bool>(Span);
-
-        [NotMapped]
-        public TimeSeries<bool> SmartModeSeries => SmartModeCurve.ToTimeseries<bool>(Span);
     }
 }
