@@ -24,6 +24,13 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
         protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
+        public void SetSeriesValue<T>(int index, DateTime time, T value) where T : struct
+        {
+            var series = GetSeries<T>(index);
+            series[time] = value;
+            SetSeries(index, series);
+        }
+
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
             var method = CurveProperty(index)?.GetGetMethod();
@@ -35,7 +42,19 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
         {
-            CurveProperty(index)?.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
+            var property = CurveProperty(index);
+            if (property is null)
+                throw new Exception($"There is no curve property at index {index}");
+
+            property.GetSetMethod()?.Invoke(this, new object[] { series.ToBase64(DecimalPlaces) });
+        }
+
+        public void ResampleFrom<T>(TimeSeriesDbEntityBase other, int index, Func<IEnumerable<T>, T> aggregate) where T : struct
+        {
+            var series = GetSeries<T>(index);
+            var resampler = new TimeSeriesResampler<TimeSeries<T>, T>(series.Span) { Resampled = series };
+            resampler.SampleAggregate(other.GetSeries<T>(index), aggregate);
+            SetSeries(index, resampler.Resampled);
         }
 
         private static readonly Semaphore _loadPropertiesSemaphore = new Semaphore(1, 1);
