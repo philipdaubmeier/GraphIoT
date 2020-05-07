@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Database
 
     public abstract class SonnenChargerData : TimeSeriesDbEntityBase
     {
-        protected override int DecimalPlaces => 2;
+        protected override int DecimalPlaces => 1;
 
         [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
