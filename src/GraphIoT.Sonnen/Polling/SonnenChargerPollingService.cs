@@ -83,14 +83,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 
         private static void SaveLowresChargerValues(ISonnenDbContext dbContext, DateTime day, SonnenChargerMidresData midRes)
         {
-            var dbChargerSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.SonnenChargerLowresDataSet, day);
-
-            dbChargerSeries.ResampleFrom<double>(midRes, 0, x => x.Average());
-            dbChargerSeries.ResampleFrom<double>(midRes, 1, x => x.Average());
-            dbChargerSeries.ResampleFrom<double>(midRes, 2, x => x.Average());
-            dbChargerSeries.ResampleFrom<bool>(midRes, 3, x => x.Any(v => v));
-            dbChargerSeries.ResampleFrom<bool>(midRes, 4, x => x.Any(v => v));
-            dbChargerSeries.ResampleFrom<bool>(midRes, 5, x => x.Any(v => v));
+            TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.SonnenChargerLowresDataSet, day).ResampleFromAll(midRes);
         }
     }
 }

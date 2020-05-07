@@ -98,10 +98,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             }
 
             dbSolarSeries.ResampleFrom<int>(midRes, 0, x => (int)x.Average(), PreprocessSolarProduction);
-            dbSolarSeries.ResampleFrom<double>(midRes, 1, x => x.Average());
-            dbSolarSeries.ResampleFrom<double>(midRes, 2, x => x.Average());
-            dbSolarSeries.ResampleFrom<bool>(midRes, 3, x => x.Any(v => v));
-            dbSolarSeries.ResampleFrom<bool>(midRes, 4, x => x.Any(v => v));
+            dbSolarSeries.ResampleFromAll(midRes, 0);
         }
     }
 }

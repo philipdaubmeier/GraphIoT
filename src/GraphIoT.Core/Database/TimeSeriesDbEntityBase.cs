@@ -110,9 +110,33 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             SetSeries(index, resampler.Resampled);
         }
 
+        public void ResampleFromAll(TimeSeriesDbEntityBase other, params int[] exceptIndices)
+        {
+            var count = CurvePropertyCount();
+            foreach (var index in Enumerable.Range(0, count))
+            {
+                if (exceptIndices.Contains(index))
+                    continue;
+
+                var attribute = CurveProperty(index).GetCustomAttribute<TimeSeriesAttribute>();
+                if (attribute is null)
+                    throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+
+                switch (attribute.Type)
+                {
+                    case Type intType when intType == typeof(int):
+                        ResampleFrom<int>(other, index, x => (int)x.Average()); break;
+                    case Type doubleType when doubleType == typeof(double):
+                        ResampleFrom<double>(other, index, x => x.Average()); break;
+                    case Type boolType when boolType == typeof(bool):
+                        ResampleFrom<bool>(other, index, x => x.Any(v => v)); break;
+                }
+            }
+        }
+
         private static readonly Semaphore _loadPropertiesSemaphore = new Semaphore(1, 1);
         private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();
-        private PropertyInfo? CurveProperty(int index)
+        private (PropertyInfo property, int count)? CurvePropertyAndCount(int index)
         {
             try
             {
@@ -131,9 +155,21 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
                 if (props == null || index < 0 || index >= props.Count)
                     return null;
 
-                return props[index];
+                return (props[index], props.Count);
             }
             finally { _loadPropertiesSemaphore.Release(); }
+        }
+
+        private PropertyInfo? CurveProperty(int index)
+        {
+            var tuple = CurvePropertyAndCount(index);
+            return tuple.HasValue ? tuple.Value.property : null;
+        }
+
+        private int CurvePropertyCount()
+        {
+            var tuple = CurvePropertyAndCount(0);
+            return tuple.HasValue ? tuple.Value.count : 0;
         }
     }
 }

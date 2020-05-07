@@ -119,17 +119,7 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             }
 
             dbData.ResampleFrom<int>(midRes, 0, x => x.Sum(), PreprocessMileage);
-            dbData.ResampleFrom<int>(midRes, 1, x => (int)x.Average());
-            dbData.ResampleFrom<double>(midRes, 2, x => x.Average());
-            dbData.ResampleFrom<double>(midRes, 3, x => x.Average());
-            dbData.ResampleFrom<double>(midRes, 4, x => x.Average());
-            dbData.ResampleFrom<double>(midRes, 5, x => x.Average());
-            dbData.ResampleFrom<double>(midRes, 6, x => x.Average());
-            dbData.ResampleFrom<bool>(midRes, 7, x => x.Any(v => v));
-            dbData.ResampleFrom<double>(midRes, 8, x => x.Average());
-            dbData.ResampleFrom<bool>(midRes, 9, x => x.Any(v => v));
-            dbData.ResampleFrom<bool>(midRes, 10, x => x.Any(v => v));
-            dbData.ResampleFrom<bool>(midRes, 11, x => x.Any(v => v));
+            dbData.ResampleFromAll(midRes, 0);
         }
     }
 }

@@ -127,22 +127,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private void SaveLowresHeatingValues(DateTime day, ViessmannHeatingMidresData midRes)
         {
-            var dbHeatingSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(_dbContext.ViessmannHeatingLowresTimeseries, day);
-
-            dbHeatingSeries.ResampleFrom<double>(midRes, 0, x => x.Average());
-            dbHeatingSeries.ResampleFrom<int>(midRes, 1, x => (int)x.Average());
-            dbHeatingSeries.ResampleFrom<int>(midRes, 2, x => (int)x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 3, x => x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 4, x => x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 5, x => x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 6, x => x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 7, x => x.Average());
-            dbHeatingSeries.ResampleFrom<double>(midRes, 8, x => x.Average());
-            dbHeatingSeries.ResampleFrom<bool>(midRes, 9, x => x.Any(v => v));
-            dbHeatingSeries.ResampleFrom<bool>(midRes, 10, x => x.Any(v => v));
-            dbHeatingSeries.ResampleFrom<bool>(midRes, 11, x => x.Any(v => v));
-            dbHeatingSeries.ResampleFrom<bool>(midRes, 12, x => x.Any(v => v));
-            dbHeatingSeries.ResampleFrom<bool>(midRes, 13, x => x.Any(v => v));
+            TimeSeriesDbEntityBase.LoadOrCreateMonth(_dbContext.ViessmannHeatingLowresTimeseries, day).ResampleFromAll(midRes);
         }
     }
 }
