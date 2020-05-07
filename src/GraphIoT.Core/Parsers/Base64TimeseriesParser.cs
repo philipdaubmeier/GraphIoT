@@ -78,8 +78,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers
 
         private static string ToBase64(IEnumerable<int?> timeseries)
         {
-            var array = timeseries.Select(d => d.HasValue ?
-                Math.Min(short.MaxValue, Math.Max(short.MinValue - 1, (short)d.Value)) : short.MinValue)
+            var array = timeseries.Select(d => (short)(d.HasValue ?
+                Math.Min(short.MaxValue, Math.Max(short.MinValue - 1, d.Value)) : short.MinValue))
                 .SelectMany(d => new byte[] { (byte)(d >> 8), (byte)(d & 0xff) }).ToArray();
 
             return Convert.ToBase64String(array);
