@@ -66,9 +66,9 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
 
             var oldChargedEnergyTotal = dbChargerSeries.ChargedEnergyTotal;
             var series1 = dbChargerSeries.ChargedEnergySeries;
-            series1.Accumulate(time, oldChargedEnergyTotal.HasValue ? chargedEnergyTotal - oldChargedEnergyTotal.Value : 0);
+            series1.Accumulate(time, oldChargedEnergyTotal.HasValue ? Math.Round(chargedEnergyTotal, 1) - Math.Round(oldChargedEnergyTotal.Value, 1) : 0);
             dbChargerSeries.SetSeries(0, series1);
-            dbChargerSeries.ChargedEnergyTotal = chargedEnergyTotal;
+            dbChargerSeries.ChargedEnergyTotal = Math.Round(chargedEnergyTotal, 1);
 
             dbChargerSeries.SetSeriesValue(1, time, activePower);
             dbChargerSeries.SetSeriesValue(2, time, current);

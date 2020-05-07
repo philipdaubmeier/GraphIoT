@@ -49,37 +49,49 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// Calls the given endpoint  at the WeConnect Portal api and ensures the request is authenticated
-        /// and parses the result afterwards, including unpacking of the wiremessage.
+        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated
+        /// and parses the result afterwards, including unpacking of the wiremessage. If the first request
+        /// fails, it tries to reauthenticate and tries it again before throwing the exception to the caller.
         /// </summary>
         private protected async Task<TData> CallApi<TWiremessage, TData>(string path, Vin? vin = null)
             where TWiremessage : class, IWiremessage<TData> where TData : class
         {
-            var response = await RequestApi(path, vin);
-            if (!response.IsSuccessStatusCode)
-                throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
-
-            TWiremessage? responseJson;
+            TData? result;
             try
             {
-                var responseStream = await response.Content.ReadAsStreamAsync();
-                responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+                result = await CallApiNoRetry<TWiremessage, TData>(path, vin);
             }
             catch
             {
-                // json deserialization error most likely is a cause of an invalid login session - retry login
+                // retry login
                 _state.ForceRelogin();
 
                 try
                 {
-                    var responseStream = await (await RequestApi(path)).Content.ReadAsStreamAsync();
-                    responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
+                    result = await CallApiNoRetry<TWiremessage, TData>(path, vin);
                 }
                 catch (Exception ex)
                 {
                     throw new IOException($"Login retry unsucessful, API response could not be parsed, see inner exception.", ex);
                 }
             }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated
+        /// and parses the result afterwards, including unpacking of the wiremessage.
+        /// </summary>
+        private protected async Task<TData> CallApiNoRetry<TWiremessage, TData>(string path, Vin? vin = null)
+            where TWiremessage : class, IWiremessage<TData> where TData : class
+        {
+            var response = await RequestApi(path, vin);
+            if (!response.IsSuccessStatusCode)
+                throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
+
+            var responseStream = await response.Content.ReadAsStreamAsync();
+            var responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
 
             if (responseJson.HasError)
                 throw new IOException($"The API response returned the error code: {responseJson.ErrorCode}");
