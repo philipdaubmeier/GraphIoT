@@ -90,7 +90,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeConnectClient", "src\WeCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WeConnectClient.Tests", "test\WeConnectClient.Tests\WeConnectClient.Tests.csproj", "{DCB324DE-7791-4D94-80F4-B3EC82C71DF3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphIoT.WeConnect", "src\GraphIoT.WeConnect\GraphIoT.WeConnect.csproj", "{264B3871-2BCD-4FDC-A95A-ABCC077B9A80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphIoT.WeConnect", "src\GraphIoT.WeConnect\GraphIoT.WeConnect.csproj", "{264B3871-2BCD-4FDC-A95A-ABCC077B9A80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphIoT.Graphite", "src\GraphIoT.Graphite\GraphIoT.Graphite.csproj", "{60AC2BDA-70CD-455B-99C8-A927DA009AB8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphIoT.Graphite.Tests", "test\GraphIoT.Graphite.Tests\GraphIoT.Graphite.Tests.csproj", "{5186D2B3-ECF1-42DC-A8E3-D2D61167F026}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -216,6 +220,14 @@ Global
 		{264B3871-2BCD-4FDC-A95A-ABCC077B9A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{264B3871-2BCD-4FDC-A95A-ABCC077B9A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{264B3871-2BCD-4FDC-A95A-ABCC077B9A80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60AC2BDA-70CD-455B-99C8-A927DA009AB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60AC2BDA-70CD-455B-99C8-A927DA009AB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60AC2BDA-70CD-455B-99C8-A927DA009AB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60AC2BDA-70CD-455B-99C8-A927DA009AB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5186D2B3-ECF1-42DC-A8E3-D2D61167F026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5186D2B3-ECF1-42DC-A8E3-D2D61167F026}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5186D2B3-ECF1-42DC-A8E3-D2D61167F026}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5186D2B3-ECF1-42DC-A8E3-D2D61167F026}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -251,6 +263,8 @@ Global
 		{879B0976-CE78-41B4-A740-A7369F819195} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{DCB324DE-7791-4D94-80F4-B3EC82C71DF3} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 		{264B3871-2BCD-4FDC-A95A-ABCC077B9A80} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{60AC2BDA-70CD-455B-99C8-A927DA009AB8} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
+		{5186D2B3-ECF1-42DC-A8E3-D2D61167F026} = {BACF690E-BFC9-4008-9831-FFBA91968BB9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CE7F4465-E461-40BE-AFCE-AF6E36AFBF5F}
