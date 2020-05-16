@@ -62,6 +62,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GraphIoT.Digitalstrom\GraphIoT.Digitalstrom.csproj" />
     <ProjectReference Include="..\GraphIoT.Grafana\GraphIoT.Grafana.csproj" />
+    <ProjectReference Include="..\GraphIoT.Graphite\GraphIoT.Graphite.csproj" />
     <ProjectReference Include="..\GraphIoT.Netatmo\GraphIoT.Netatmo.csproj" />
     <ProjectReference Include="..\GraphIoT.Sonnen\GraphIoT.Sonnen.csproj" />
     <ProjectReference Include="..\GraphIoT.Viessmann\GraphIoT.Viessmann.csproj" />
