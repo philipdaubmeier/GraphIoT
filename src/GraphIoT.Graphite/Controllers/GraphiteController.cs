@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Graphite.Parser;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
@@ -47,12 +49,12 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 || !formData.TryGetValue("from", out StringValues fromRaw)
                 || !formData.TryGetValue("until", out StringValues untilRaw)
                 || !formData.TryGetValue("format", out StringValues formatRaw)
-                || !formData.TryGetValue("maxDataPoints", out StringValues maxPointsRaw))
+                || !formData.TryGetValue("maxDataPoints", out StringValues maxPointsRaw)
+                || !fromRaw.FirstOrDefault().TryParseGraphiteTime(out DateTime from)
+                || !untilRaw.FirstOrDefault().TryParseGraphiteTime(out DateTime until)
+                || !int.TryParse(maxPointsRaw.FirstOrDefault(), out int maxDataPoints))
                 return StatusCode((int)HttpStatusCode.OK);
 
-            var from = DateTimeOffset.FromUnixTimeSeconds(int.Parse(fromRaw.FirstOrDefault())).UtcDateTime;
-            var until = DateTimeOffset.FromUnixTimeSeconds(int.Parse(untilRaw.FirstOrDefault())).UtcDateTime;
-            var maxDataPoints = int.Parse(maxPointsRaw.FirstOrDefault());
             if (!(formatRaw.FirstOrDefault()?.Equals("json", StringComparison.InvariantCultureIgnoreCase) ?? false))
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
@@ -66,11 +68,17 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 return viewModel.Graph(index).TimestampedPoints().ToList();
             }
 
-            return Json(targetRaw.Select(t => new
+            IEnumerable<string> GetTargets(string query)
+            {
+                var q = new TargetQuery(query);
+                return GraphIds.Where(g => q.IsMatch(g));
+            }
+
+            return Json(targetRaw.SelectMany(tq => GetTargets(tq).Select(t => new
             {
                 target = t,
                 datapoints = GetDataPoints(t)
-            }));
+            })));
         }
 
         // GET: api/graphite/metrics/find
@@ -79,11 +87,10 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [SuppressMessage("Style", "IDE0060", Justification = "'from' and 'until' are passed in by grafana but not used to exclude graphs.")]
         public ActionResult FindMetrics(int from, int until, string query)
         {
-            query = string.IsNullOrWhiteSpace(query) || !query.EndsWith('*') ? string.Empty : query[0..^1];
+            var q = new TargetQuery(query);
 
-            return Json(GraphIds.Where(g => g.StartsWith(query, StringComparison.InvariantCultureIgnoreCase))
-                .Select(g => g.Substring(query.Length))
-                .Select(g => new { expandable = g.Contains('.'), text = g.Split('.').FirstOrDefault() }).Distinct());
+            return Json(GraphIds.Where(g => q.IsMatch(g)).Select(g => q.NextSegment(g))
+                .Select(g => new { g.expandable, text = g.segment }).Distinct());
         }
 
         // GET: api/graphite/tags/autoComplete/tags
