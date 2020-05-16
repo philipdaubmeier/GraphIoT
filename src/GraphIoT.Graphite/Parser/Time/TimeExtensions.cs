@@ -4,6 +4,12 @@ using System.Linq;
 
 namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
 {
+    /// <summary>
+    /// Extension methods for parsing Graphite time strings.
+    ///
+    /// This is a manual port to c# of Graphite's attime.py that can be found here:
+    /// https://github.com/graphite-project/graphite-web/blob/master/webapp/graphite/render/attime.py
+    /// </summary>
     public static class TimeExtensions
     {
         private static readonly List<string> Months = new List<string> { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
@@ -26,8 +32,8 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
 
         public static DateTime ParseGraphiteTime(this string s)
         {
-            var split = SplitReferenceOffset(s);
-            return split.result ?? ParseTimeReference(split.reference!) + ParseTimeOffset(split.offset!);
+            var (result, reference, offset) = SplitReferenceOffset(s);
+            return result ?? ParseTimeReference(reference!) + ParseTimeOffset(offset!);
         }
 
         public static bool TryParseGraphiteTime(this string s, out DateTime result)
@@ -68,7 +74,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             {
                 var split = s.Split(splitChar, 2);
                 s = split.FirstOrDefault();
-                offset = "+" + split.LastOrDefault();
+                offset = splitChar + split.LastOrDefault();
             }
 
             if (s.Contains('+'))
@@ -90,7 +96,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             var i = s.IndexOf(':');
             var hour = 0;
             var minute = 0;
-            if (0 < i && i < 3 && s.Length > i + 3
+            if (0 < i && i < 3 && s.Length >= i + 3
                 && int.TryParse(s[..i], out hour)
                 && int.TryParse(s[(i + 1)..(i + 3)], out minute))
             {
@@ -137,12 +143,14 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             else if (s.Where(c => c == '/').Count() == 2)
             {
                 // MM/DD/YY[YY]
-                var parts = s.Split("/").Select(x => int.TryParse(x, out int res) ? res : 0).ToArray();
-                int m = parts[0], d = parts[1], y = parts[2];
-                if (y < 1900)
+                var parts = s.Split('/').Select(x => (value: int.TryParse(x, out int res) ? res : 0, length: x.Length)).ToArray();
+                int m = parts[0].value, d = parts[1].value, y = parts[2].value;
+                if (parts[2].length < 4)
+                {
                     y += 1900;
-                if (y < 1970)
-                    y += 100;
+                    if (y < 1970)
+                        y += 100;
+                }
 
                 refDate = new DateTime(y, m, d, hour, minute, 0, refDate.Kind);
             }
@@ -162,8 +170,8 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             else if (s.Length >= 3 && Weekdays.Contains(s[..3].ToLowerInvariant()))
             {
                 // DayOfWeek (Monday, etc)
-                var dayOffset = (int)refDate.DayOfWeek - Months.IndexOf(s[..3].ToLowerInvariant());
-                refDate.AddDays(-1 * (dayOffset < 0 ? dayOffset + 7 : dayOffset));
+                var dayOffset = (int)refDate.DayOfWeek - Weekdays.IndexOf(s[..3].ToLowerInvariant());
+                refDate = refDate.AddDays(-1 * (dayOffset < 0 ? dayOffset + 7 : dayOffset));
             }
             else if (!string.IsNullOrWhiteSpace(s))
                 throw new ArgumentException($"Unknown day reference: {rawRef}");
