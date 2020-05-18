@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
     {
         private static readonly List<TokenDefinition> _tokenDefinitions = new List<TokenDefinition>()
         {
-            new TokenDefinition(TokenType.Identifier, @"[\w\.:_]+( [\w\.:_]+)*", 3),
+            new TokenDefinition(TokenType.Identifier, @"[\w\.\*:_]+( [\w\.\*:_]+)*", 3),
             new TokenDefinition(TokenType.Comma, @",", 1),
             new TokenDefinition(TokenType.OpenParanthesis, @"\(", 1),
             new TokenDefinition(TokenType.CloseParanthesis, @"\)", 1),

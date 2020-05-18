@@ -13,7 +13,14 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         public override DateTime Begin => _graphViewModel.Begin;
         public override TimeSpan Spacing => _graphViewModel.Spacing;
 
-        public override IEnumerable<double?> Points => _graphViewModel.Points.Cast<double?>();
+        public override IEnumerable<double?> Points => _graphViewModel.Points.Select(p => p switch
+        {
+            bool boolVal => boolVal ? (double?)1d : 0d,
+            int intVal => intVal,
+            double doubleVal => doubleVal,
+            null => null,
+            _ => throw new NotImplementedException("type not supported yet")
+        });
 
         public SourceGraph(GraphViewModel graphViewModel)
             => _graphViewModel = graphViewModel;
