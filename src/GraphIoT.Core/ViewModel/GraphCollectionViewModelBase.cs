@@ -76,6 +76,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         public abstract int GraphCount();
 
+        public abstract IEnumerable<string> GraphKeys();
+
         public abstract GraphViewModel Graph(int index);
 
         public abstract IEnumerable<GraphViewModel> Graphs();

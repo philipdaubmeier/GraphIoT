@@ -14,6 +14,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         protected readonly Dictionary<int, GraphViewModel> _graphs = new Dictionary<int, GraphViewModel>();
         protected readonly Dictionary<string, int> _columns;
 
+        private List<string>? _keys = null;
+        private bool _onlyKeys = false;
+
         public GraphCollectionViewModelDeferredLoadBase(IQueryable<Tentity> dataTable, Dictionary<string, int> columns) : base()
         {
             _dataTable = dataTable;
@@ -35,6 +38,21 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         public override int GraphCount() => _columns.Count;
 
+        public override IEnumerable<string> GraphKeys()
+        {
+            if (_keys is null)
+            {
+                try
+                {
+                    _onlyKeys = true;
+                    _keys = Enumerable.Range(0, GraphCount()).Select(i => Graph(i).Key).ToList();
+                    InvalidateData();
+                }
+                finally { _onlyKeys = false; }
+            }
+            return _keys ?? new List<string>();
+        }
+
         public override IEnumerable<GraphViewModel> Graphs()
         {
             return Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
@@ -42,8 +60,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         protected GraphViewModel DeferredLoadGraph<Tseries, Tval>(int index, string name, string? key, string format, Func<ITimeSeries<Tval>, ITimeSeries<Tval>>? preprocess = null) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            // initial, i.e. empty graph view model
-            if (IsInitialSpan)
+            // initial, i.e. empty graph view model or we should only load keys
+            if (IsInitialSpan || _onlyKeys)
                 _graphs.Add(index, new GraphViewModel() { Name = name, Key = key ?? name, Format = format, Begin = Span.Begin, Spacing = Span.Duration, Points = new dynamic[] { } });
 
             // already loaded
