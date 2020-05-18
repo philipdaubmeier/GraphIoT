@@ -60,6 +60,16 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             }
         }
 
+        public static bool TryParseGraphiteOffset(this string s, out TimeSpan result)
+        {
+            try
+            {
+                result = ParseTimeOffset(s);
+                return true;
+            }
+            catch { result = new TimeSpan(); return false; }
+        }
+
         private static (DateTime? result, string? reference, string? offset) SplitReferenceOffset(string s)
         {
             s = s.Trim().ToLowerInvariant().Replace("_", "").Replace(",", "").Replace(" ", "");

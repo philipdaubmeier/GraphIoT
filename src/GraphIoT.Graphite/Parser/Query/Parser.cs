@@ -1,5 +1,8 @@
-﻿using PhilipDaubmeier.GraphIoT.Graphite.Model;
+﻿using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Graphite.Model;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 {
@@ -35,7 +38,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
         {
             var current = _lookahead;
             if (current.TokenType != tokenType)
-                throw new ParserException($"Expected {tokenType.ToString().ToUpper()} but found: '{current.Value}'");
+                throw new ParserException($"Expected {tokenType.ToString().ToUpper()} but found: '{current.Value}' at pos {current.StartIndex}");
 
             DiscardToken();
             return current;
@@ -50,9 +53,19 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 case TokenType.OpenParanthesis:
                     {
                         ReadToken(TokenType.OpenParanthesis);
-                        var expr = ReadExpression();
+                        var innerExpr = ReadExpression();
+                        var expr = identifier.Value switch
+                        {
+                            "movingAverage" => ReadMovingWindowFunction(innerExpr, Aggregator.Average),
+                            "movingSum" => ReadMovingWindowFunction(innerExpr, Aggregator.Sum),
+                            "movingMax" => ReadMovingWindowFunction(innerExpr, Aggregator.Maximum),
+                            "movingMin" => ReadMovingWindowFunction(innerExpr, Aggregator.Minimum),
+                            "movingWindow" => ReadMovingWindowFunction(innerExpr),
+                            "offset" => ReadOffsetFunction(innerExpr),
+                            _ => throw new ParserException($"Unrecognized function '{identifier}'")
+                        };
                         ReadToken(TokenType.CloseParanthesis);
-                        return new ScalarFunctionExpression(expr, value => value * 10d);
+                        return expr;
                     }
                 case TokenType.Comma:
                 case TokenType.CloseParanthesis:
@@ -63,6 +76,59 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 default:
                     throw new ParserException($"Unexpected {_lookahead.TokenType.ToString().ToUpper()}");
             }
+        }
+
+        private IGraphiteExpression ReadOffsetFunction(IGraphiteExpression seriesParam)
+        {
+            var offset = ReadDoubleParam();
+            return new ScalarFunctionExpression(seriesParam, value => value + offset);
+        }
+
+        private IGraphiteExpression ReadMovingWindowFunction(IGraphiteExpression seriesParam, Aggregator? func = null)
+        {
+            var windowSize = ReadTimeParam();
+            var aggregate = func ?? Aggregator.Default;
+            if (aggregate == Aggregator.Default)
+            {
+                var aggregatorParam = ReadStringParam();
+                aggregate = aggregatorParam switch
+                {
+                    "min" => Aggregator.Minimum,
+                    "max" => Aggregator.Maximum,
+                    "sum" => Aggregator.Sum,
+                    var x when x == "avg" ||
+                               x == "average" => Aggregator.Average,
+                    _ => throw new ParserException($"Unrecognized aggregator function '{aggregatorParam}'")
+                };
+            }
+            return new MovingWindowFunctionExpression(seriesParam, windowSize, aggregate);
+        }
+
+        private double ReadDoubleParam()
+        {
+            ReadToken(TokenType.Comma);
+            var numberToken = ReadToken(TokenType.NumberValue);
+            if (!double.TryParse(numberToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
+                throw new ParserException($"Expected a valid floating point number but found: '{numberToken.Value}' at pos {numberToken.StartIndex}");
+            return result;
+        }
+
+        private string ReadStringParam()
+        {
+            ReadToken(TokenType.Comma);
+            var stringToken = ReadToken(TokenType.StringValue);
+            var rawString = stringToken.Value;
+            if (rawString.Length < 2 || rawString[0] != '\'' || rawString[^1] != '\'')
+                throw new ParserException($"Expected a valid string but found: '{stringToken.Value}' at pos {stringToken.StartIndex}");
+            return rawString[1..^1];
+        }
+
+        private TimeSpan ReadTimeParam()
+        {
+            var str = ReadStringParam();
+            if (!("+" + str).TryParseGraphiteOffset(out TimeSpan result))
+                throw new ParserException($"Expected a valid time offset string but found: '{str}'");
+            return result;
         }
     }
 }
