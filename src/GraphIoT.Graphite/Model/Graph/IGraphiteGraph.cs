@@ -8,8 +8,8 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         string Name { get; }
         DateTime Begin { get; }
         TimeSpan Spacing { get; }
-        IEnumerable<double> Points { get; }
+        IEnumerable<double?> Points { get; }
 
-        IEnumerable<dynamic[]> TimestampedPoints();
+        IEnumerable<dynamic?[]> TimestampedPoints();
     }
 }

@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         public override DateTime Begin => _graphViewModel.Begin;
         public override TimeSpan Spacing => _graphViewModel.Spacing;
 
-        public override IEnumerable<double> Points => _graphViewModel.Points.Cast<double>();
+        public override IEnumerable<double?> Points => _graphViewModel.Points.Cast<double?>();
 
         public SourceGraph(GraphViewModel graphViewModel)
             => _graphViewModel = graphViewModel;

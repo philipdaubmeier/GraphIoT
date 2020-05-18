@@ -8,14 +8,14 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         public abstract string Name { get; }
         public abstract DateTime Begin { get; }
         public abstract TimeSpan Spacing { get; }
-        public abstract IEnumerable<double> Points { get; }
+        public abstract IEnumerable<double?> Points { get; }
 
-        public IEnumerable<dynamic[]> TimestampedPoints()
+        public IEnumerable<dynamic?[]> TimestampedPoints()
         {
             var timestamp = new DateTimeOffset(Begin.ToUniversalTime()).ToUnixTimeMilliseconds();
             foreach (var point in Points)
             {
-                yield return new dynamic[] { point, timestamp };
+                yield return new dynamic?[] { point, timestamp };
                 timestamp += (long)Spacing.TotalMilliseconds;
             }
         }
