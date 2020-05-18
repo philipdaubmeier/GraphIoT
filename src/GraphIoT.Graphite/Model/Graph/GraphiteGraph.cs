@@ -12,11 +12,11 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 
         public IEnumerable<dynamic?[]> TimestampedPoints()
         {
-            var timestamp = new DateTimeOffset(Begin.ToUniversalTime()).ToUnixTimeMilliseconds();
+            var timestamp = new DateTimeOffset(Begin.ToUniversalTime()).ToUnixTimeSeconds();
             foreach (var point in Points)
             {
                 yield return new dynamic?[] { point, timestamp };
-                timestamp += (long)Spacing.TotalMilliseconds;
+                timestamp += (int)Spacing.TotalSeconds;
             }
         }
     }
