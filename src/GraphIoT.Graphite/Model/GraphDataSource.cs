@@ -1,0 +1,69 @@
+﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Graphite.Parser;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace PhilipDaubmeier.GraphIoT.Graphite.Model
+{
+    public class GraphDataSource
+    {
+        private readonly List<IGraphCollectionViewModel> _viewModels;
+
+        public GraphDataSource(IEnumerable<IGraphCollectionViewModel> viewModels) => _viewModels = viewModels.ToList();
+
+        public TimeSeriesSpan Span { set { foreach (var model in _viewModels) model.Span = value; } }
+
+        public Aggregator AggregatorFunction { set { foreach (var model in _viewModels) model.AggregatorFunction = value; } }
+
+        public decimal CorrectionFactor { set { foreach (var model in _viewModels) model.CorrectionFactor = value; } }
+
+        public decimal CorrectionOffset { set { foreach (var model in _viewModels) model.CorrectionOffset = value; } }
+
+        private List<string>? _graphKeys = null;
+        public List<string> GraphKeys
+        {
+            get
+            {
+                if (_graphKeys is null)
+                {
+                    _graphKeys = _viewModels.SelectMany(collection => collection.GraphKeys()
+                        .Select(graphKey => $"{collection.Key}.{graphKey}".Replace('_', '.'))).ToList();
+                }
+
+                return _graphKeys;
+            }
+        }
+
+        public IEnumerable<GraphViewModel> Query(string query)
+        {
+            var q = new TargetQuery(query);
+            foreach (var key in GraphKeys.Where(g => q.IsMatch(g)))
+            {
+                GraphViewModel? graph = null;
+                try
+                {
+                    var splitted = key.Split('.');
+                    if (splitted.Length < 1)
+                        continue;
+                    var viewModelKey = splitted[0];
+
+                    var viewModelIndex = GraphKeys.FindIndex(k => k.StartsWith(viewModelKey));
+                    var graphIndex = GraphKeys.FindIndex(k => k == key);
+                    var index = graphIndex - viewModelIndex;
+
+                    var viewModel = _viewModels.Find(x => x.Key == viewModelKey);
+                    if (viewModel is null || index < 0 || index >= viewModel.GraphCount())
+                        continue;
+
+                    graph = viewModel.Graph(index);
+                }
+                catch { continue; }
+
+                if (graph != null)
+                    yield return graph;
+            }
+            yield break;
+        }
+    }
+}

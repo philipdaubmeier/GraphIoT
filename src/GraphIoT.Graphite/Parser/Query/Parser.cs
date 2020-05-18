@@ -11,6 +11,8 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
         private Queue<TokenMatch> _tokenSequence = new Queue<TokenMatch>(0);
         private TokenMatch _lookahead = new TokenMatch(TokenType.SequenceTerminator);
 
+        public GraphDataSource DataSource { get; set; } = new GraphDataSource(new List<IGraphCollectionViewModel>());
+
         public Parser() { }
 
         public IGraphiteExpression Parse(string input)
@@ -71,7 +73,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 case TokenType.CloseParanthesis:
                 case TokenType.SequenceTerminator:
                     {
-                        return new SourceExpression(new List<IGraphiteGraph>());
+                        return SourceExpression.CreateFromQueryExpression(DataSource, queryExpression: identifier.Value);
                     }
                 default:
                     throw new ParserException($"Unexpected {_lookahead.TokenType.ToString().ToUpper()}");
