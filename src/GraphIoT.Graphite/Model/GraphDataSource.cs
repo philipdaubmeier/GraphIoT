@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Parser;
 using System.Collections.Generic;
@@ -16,9 +17,9 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 
         public Aggregator AggregatorFunction { set { foreach (var model in _viewModels) model.AggregatorFunction = value; } }
 
-        public decimal CorrectionFactor { set { foreach (var model in _viewModels) model.CorrectionFactor = value; } }
+        public double CorrectionFactor { set { foreach (var model in _viewModels) model.CorrectionFactor = value; } }
 
-        public decimal CorrectionOffset { set { foreach (var model in _viewModels) model.CorrectionOffset = value; } }
+        public double CorrectionOffset { set { foreach (var model in _viewModels) model.CorrectionOffset = value; } }
 
         private List<string>? _graphKeys = null;
         public List<string> GraphKeys

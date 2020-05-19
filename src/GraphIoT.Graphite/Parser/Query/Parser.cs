@@ -1,4 +1,5 @@
-﻿using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+﻿using PhilipDaubmeier.GraphIoT.Core.Aggregation;
+using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Model;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
-using PhilipDaubmeier.GraphIoT.Core.ViewModel;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
