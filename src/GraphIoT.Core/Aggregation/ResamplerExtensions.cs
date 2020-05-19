@@ -19,14 +19,12 @@ namespace PhilipDaubmeier.GraphIoT.Core.Aggregation
 
         public static void Aggregate<Tseries, Tval>(this TimeSeriesResampler<Tseries, Tval> resampler, IEnumerable<ITimeSeries<Tval>> series, Aggregator aggregator, Func<Tval, double> selector, Func<double, Tval> resultCast, double correctionFactor = 1d, double correctionOffset = 0d) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            var resamplingFactor = Math.Max(1d, series.First().Span.Duration / resampler.Resampled.Span.Duration);
-
             Func<IEnumerable<Tval>, double> aggregationFunc = aggregator switch
             {
                 var a when
                     a == Aggregator.Average ||
+                    a == Aggregator.AverageZero ||
                     a == Aggregator.Default => x => x.Average(selector),
-                Aggregator.AverageZero => x => x.Sum(selector) / resamplingFactor,
                 Aggregator.Median => x => x.Median(selector),
                 Aggregator.Sum => x => x.Sum(selector),
                 Aggregator.Minimum => x => x.Min(selector),
@@ -41,6 +39,12 @@ namespace PhilipDaubmeier.GraphIoT.Core.Aggregation
             };
 
             resampler.SampleAggregate(series, x => resultCast(aggregationFunc(x) * correctionFactor + correctionOffset));
+
+            if (aggregator == Aggregator.AverageZero)
+            {
+                var resamplingRate = Math.Max(1d, series.First().Span.Duration / resampler.Resampled.Span.Duration);
+                resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) / resamplingRate * correctionFactor + correctionOffset));
+            }
         }
 
         private static double Median<TSource>(this IEnumerable<TSource> values, Func<TSource, double> selector)
