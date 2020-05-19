@@ -32,26 +32,19 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
 
         // POST: api/graphite/render
         [HttpPost("render")]
-        public async Task<ActionResult> Render()
+        public ActionResult Render([FromForm] string target, [FromForm] string from, [FromForm] string until, [FromForm] string format, [FromForm] string maxDataPoints)
         {
-            var formData = await Request.ReadFormAsync();
-            if (!formData.TryGetValue("target", out StringValues targets)
-                || !formData.TryGetValue("from", out StringValues fromRaw)
-                || !formData.TryGetValue("until", out StringValues untilRaw)
-                || !formData.TryGetValue("format", out StringValues formatRaw)
-                || !formData.TryGetValue("maxDataPoints", out StringValues maxPointsRaw)
-                || !fromRaw.FirstOrDefault().TryParseGraphiteTime(out DateTime from)
-                || !untilRaw.FirstOrDefault().TryParseGraphiteTime(out DateTime until)
-                || !int.TryParse(maxPointsRaw.FirstOrDefault(), out int maxDataPoints))
+            if (!from.TryParseGraphiteTime(out DateTime fromDate)
+                || !until.TryParseGraphiteTime(out DateTime toDate)
+                || !int.TryParse(maxDataPoints, out int count))
                 return StatusCode((int)HttpStatusCode.OK);
 
-            if (!(formatRaw.FirstOrDefault()?.Equals("json", StringComparison.InvariantCultureIgnoreCase) ?? false))
+            if (!format.Equals("json", StringComparison.InvariantCultureIgnoreCase))
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
-            dataSource.Span = new TimeSeriesSpan(from.ToUniversalTime(), until.ToUniversalTime(), maxDataPoints);
-
+            dataSource.Span = new TimeSeriesSpan(fromDate, toDate, count);
             var parser = new Parser() { DataSource = dataSource };
-            return Json(targets.SelectMany(target => parser.Parse(target).Graphs).Select(g => new
+            return Json(parser.Parse(target).Graphs.Select(g => new
             {
                 target = g.Name,
                 datapoints = g.TimestampedPoints()
