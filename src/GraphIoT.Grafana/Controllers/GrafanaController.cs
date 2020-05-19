@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using PhilipDaubmeier.GraphIoT.Core.Parsers;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Grafana.Model;
@@ -126,7 +127,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 // if a custom 'aggregate.func' was given, take that as aggregation method
                 Aggregator ToAggregator(string? aggregateRaw)
                 {
-                    return (aggregateRaw?.Substring(0, Math.Min(3, target?.Data?.Aggregate?.Func?.Length ?? 0))?.ToLowerInvariant()) switch
+                    return (aggregateRaw?.Substring(0, Math.Min(3, aggregateRaw.Length))?.ToLowerInvariant()) switch
                     {
                         "min" => Aggregator.Minimum,
                         "max" => Aggregator.Maximum,
@@ -138,8 +139,8 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 viewModel.AggregatorFunction = ToAggregator(target?.Data?.Aggregate?.Func);
 
                 // if a custom correction factor and/or offset was given, set them to get them taken into account
-                viewModel.CorrectionFactor = ((decimal?)target?.Data?.Correction?.Factor) ?? 1M;
-                viewModel.CorrectionOffset = ((decimal?)target?.Data?.Correction?.Offset) ?? 0M;
+                viewModel.CorrectionFactor = target?.Data?.Correction?.Factor ?? 1d;
+                viewModel.CorrectionOffset = target?.Data?.Correction?.Offset ?? 0d;
 
                 // add the resampled target graph to the result
                 data.Add(target?.Target ?? targetId, viewModel.Graph(index).TimestampedPoints().ToList());
