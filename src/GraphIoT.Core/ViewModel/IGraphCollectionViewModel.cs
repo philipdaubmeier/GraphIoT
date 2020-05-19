@@ -6,10 +6,18 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
     public enum Aggregator
     {
         Default,
+        Average,
+        AverageZero,
+        Median,
+        Sum,
         Minimum,
         Maximum,
-        Average,
-        Sum
+        Diff,
+        Stddev,
+        Count,
+        Range,
+        Multiply,
+        Last
     }
 
     public interface IGraphCollectionViewModel
