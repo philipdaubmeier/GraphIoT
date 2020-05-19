@@ -89,8 +89,60 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         protected void Aggregate<Tseries, Tval>(TimeSeriesResampler<Tseries, Tval> resampler, IEnumerable<ITimeSeries<Tval>> series, Aggregator defaultFunc, Func<Tval, decimal> selector, Func<decimal, Tval> resultCast) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
+            static decimal Diff(IEnumerable<decimal> values)
+            {
+                bool first = true;
+                decimal result = 0;
+                foreach (var val in values)
+                    result = first ? val : result - val;
+                return result;
+            }
+
+            static decimal Multiply(IEnumerable<decimal> values)
+            {
+                bool first = true;
+                decimal result = 0;
+                foreach (var val in values)
+                    result = first ? val : result * val;
+                return result;
+            }
+
+            static decimal Stddev(IEnumerable<decimal> values)
+            {
+                var vals = values.ToList();
+                var sum = vals.Sum();
+                var len = vals.Count;
+                var avg = sum / len;
+                sum = 0;
+                foreach (var val in vals)
+                    sum += (val - avg) * (val - avg);
+                return (decimal)Math.Sqrt((double)(sum / len));
+            }
+
+            var resamplingFactor = (decimal)Math.Max(1d, series.First().Span.Duration / resampler.Resampled.Span.Duration);
             switch (AggregatorFunction == Aggregator.Default ? defaultFunc : AggregatorFunction)
             {
+                case Aggregator.Average:
+                default:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Average(selector) * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.AverageZero:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) / resamplingFactor * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Median:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Select(selector).OrderBy(x => x).Skip(Math.Max(0, Math.Min(x.Count() / 2, x.Count() - 1))).First() * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Sum:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
                 case Aggregator.Minimum:
                     {
                         resampler.SampleAggregate(series, x => resultCast(x.Min(selector) * CorrectionFactor + CorrectionOffset));
@@ -101,15 +153,34 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
                         resampler.SampleAggregate(series, x => resultCast(x.Max(selector) * CorrectionFactor + CorrectionOffset));
                         break;
                     }
-                case Aggregator.Sum:
+                case Aggregator.Diff:
                     {
-                        resampler.SampleAggregate(series, x => resultCast(x.Sum(selector) * CorrectionFactor + CorrectionOffset));
+                        resampler.SampleAggregate(series, x => resultCast(Diff(x.Select(selector)) * CorrectionFactor + CorrectionOffset));
                         break;
                     }
-                case Aggregator.Average: goto default;
-                default:
+                case Aggregator.Stddev:
                     {
-                        resampler.SampleAggregate(series, x => resultCast(x.Average(selector) * CorrectionFactor + CorrectionOffset));
+                        resampler.SampleAggregate(series, x => resultCast(Stddev(x.Select(selector)) * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Count:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Count() * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Range:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast((x.Max(selector) - x.Min(selector)) * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Multiply:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(Multiply(x.Select(selector)) * CorrectionFactor + CorrectionOffset));
+                        break;
+                    }
+                case Aggregator.Last:
+                    {
+                        resampler.SampleAggregate(series, x => resultCast(x.Select(selector).Last() * CorrectionFactor + CorrectionOffset));
                         break;
                     }
             }
