@@ -22,15 +22,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
                 var series = ToTimeSeries(Points, Begin, Spacing);
                 var newSpan = new TimeSeriesSpan(series.Begin, series.End, Spacing);
                 var resampler = new TimeSeriesResampler<TimeSeries<double>, double>(newSpan, SamplingConstraint.NoOversampling);
-                Func<IEnumerable<double>, double> aggregate = _func switch
-                {
-                    Aggregator.Minimum => x => x.Min(),
-                    Aggregator.Maximum => x => x.Max(),
-                    Aggregator.Sum => x => x.Sum(),
-                    _ => x => x.Average()
-                };
-
-                resampler.SampleAggregate(series, aggregate);
+                resampler.Aggregate(series, _func);
                 return resampler.Resampled.Select(x => x.Value);
             }
         }

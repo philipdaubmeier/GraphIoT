@@ -96,11 +96,26 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 var aggregatorParam = ReadStringParam();
                 aggregate = aggregatorParam switch
                 {
+                    var x when
+                        x == "avg" ||
+                        x == "average" => Aggregator.Average,
+                    "avg_zero" => Aggregator.AverageZero,
+                    "median" => Aggregator.Median,
+                    var x when
+                        x == "sum" ||
+                        x == "total" => Aggregator.Sum,
                     "min" => Aggregator.Minimum,
                     "max" => Aggregator.Maximum,
-                    "sum" => Aggregator.Sum,
-                    var x when x == "avg" ||
-                               x == "average" => Aggregator.Average,
+                    "diff" => Aggregator.Diff,
+                    "stddev" => Aggregator.Stddev,
+                    "count" => Aggregator.Count,
+                    var x when
+                        x == "range" ||
+                        x == "rangeOf" => Aggregator.Range,
+                    "multiply" => Aggregator.Multiply,
+                    var x when
+                        x == "last" ||
+                        x == "current" => Aggregator.Last,
                     _ => throw new ParserException($"Unrecognized aggregator function '{aggregatorParam}'")
                 };
             }
