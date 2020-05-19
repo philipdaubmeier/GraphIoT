@@ -22,10 +22,12 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
     public class GraphiteController : Controller
     {
         private readonly GraphDataSource dataSource;
+        private readonly Dictionary<string, IEventCollectionViewModel> eventViewModels;
 
         public GraphiteController(IEnumerable<IGraphCollectionViewModel> graphViewModels, IEnumerable<IEventCollectionViewModel> eventViewModels)
         {
             dataSource = new GraphDataSource(graphViewModels);
+            this.eventViewModels = eventViewModels.ToDictionary(x => x.Key, x => x);
         }
 
         // POST: api/graphite/render
@@ -73,6 +75,30 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         public ActionResult GetTags()
         {
             return Json(new string[] { });
+        }
+
+        // GET: api/graphite/events/get_data
+        // Grafana calls it like this: events/get_data?from=-2d&until=now&tags=mytag
+        [HttpGet("events/get_data")]
+        public ActionResult GetEvents(string tags, string from, string until)
+        {
+            if (!from.TryParseGraphiteTime(out DateTime fromDate)
+                || !until.TryParseGraphiteTime(out DateTime toDate))
+                return StatusCode((int)HttpStatusCode.BadRequest);
+
+            var eventViewModel = eventViewModels.FirstOrDefault().Value;
+            eventViewModel.Span = new TimeSeriesSpan(fromDate, toDate, 1);
+            eventViewModel.Query = tags;
+
+            var counter = 0;
+            return Json(eventViewModel.Events.Select(item => new
+            {
+                id = counter++,
+                what = item.Title,
+                when = new DateTimeOffset(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
+                tags = item.Tags,
+                data = item.Text
+            }));
         }
     }
 }
