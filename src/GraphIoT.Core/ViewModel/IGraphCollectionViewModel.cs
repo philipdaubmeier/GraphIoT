@@ -1,25 +1,9 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using System.Collections.Generic;
 
 namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
-    public enum Aggregator
-    {
-        Default,
-        Average,
-        AverageZero,
-        Median,
-        Sum,
-        Minimum,
-        Maximum,
-        Diff,
-        Stddev,
-        Count,
-        Range,
-        Multiply,
-        Last
-    }
-
     public interface IGraphCollectionViewModel
     {
         string Key { get; }
@@ -36,8 +20,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
         Aggregator AggregatorFunction { get; set; }
 
-        decimal CorrectionFactor { get; set; }
+        double CorrectionFactor { get; set; }
 
-        decimal CorrectionOffset { get; set; }
+        double CorrectionOffset { get; set; }
     }
 }

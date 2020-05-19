@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using PhilipDaubmeier.GraphIoT.Core.Database;
 using System;
 using System.Collections.Generic;
@@ -90,20 +91,15 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
             if (preprocess != null)
                 dataToResample = dataToResample.Select(x => preprocess(x));
 
-            if (typeof(Tval) == typeof(int))
-            {
-                if (typeof(Tseries) == typeof(TimeSeries<int>))
-                    Aggregate((resampler as TimeSeriesResampler<TimeSeries<int>, int>)!, dataToResample.Cast<ITimeSeries<int>>(), Aggregator.Average, x => x, x => (int)x);
-                else if (typeof(Tseries) == typeof(TimeSeriesStream<int>))
-                    Aggregate((resampler as TimeSeriesResampler<TimeSeriesStream<int>, int>)!, dataToResample.Cast<ITimeSeries<int>>(), Aggregator.Average, x => x, x => (int)x);
-            }
-            else if (typeof(Tval) == typeof(double))
-            {
-                if (typeof(Tseries) == typeof(TimeSeries<double>))
-                    Aggregate((resampler as TimeSeriesResampler<TimeSeries<double>, double>)!, dataToResample.Cast<ITimeSeries<double>>(), Aggregator.Average, x => (decimal)x, x => (double)x);
-                else if (typeof(Tseries) == typeof(TimeSeriesStream<double>))
-                    Aggregate((resampler as TimeSeriesResampler<TimeSeriesStream<double>, double>)!, dataToResample.Cast<ITimeSeries<double>>(), Aggregator.Average, x => (decimal)x, x => (double)x);
-            }
+            var aggregator = AggregatorFunction == Aggregator.Default ? Aggregator.Average : AggregatorFunction;
+            if (resampler is TimeSeriesResampler<TimeSeries<int>, int> resamplerInt)
+                resamplerInt.Aggregate(dataToResample.Cast<ITimeSeries<int>>(), aggregator, x => x, x => (int)x, CorrectionFactor, CorrectionOffset);
+            else if (resampler is TimeSeriesResampler<TimeSeriesStream<int>, int> resamplerIntStream)
+                resamplerIntStream.Aggregate(dataToResample.Cast<ITimeSeries<int>>(), aggregator, x => x, x => (int)x, CorrectionFactor, CorrectionOffset);
+            else if (resampler is TimeSeriesResampler<TimeSeries<double>, double> resamplerDouble)
+                resamplerDouble.Aggregate(dataToResample.Cast<ITimeSeries<double>>(), aggregator, CorrectionFactor, CorrectionOffset);
+            else if (resampler is TimeSeriesResampler<TimeSeriesStream<double>, double> resamplerDoubleStream)
+                resamplerDoubleStream.Aggregate(dataToResample.Cast<ITimeSeries<double>>(), aggregator, CorrectionFactor, CorrectionOffset);
             else if (typeof(Tval) == typeof(bool))
                 (resampler as TimeSeriesResampler<TimeSeries<bool>, bool>)?.SampleAggregate(dataToResample.Cast<ITimeSeries<bool>>(), x => x.Any(b => b));
 
