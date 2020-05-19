@@ -19,7 +19,10 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         {
             get
             {
-                var series = ToTimeSeries(Points, Begin, Spacing);
+                var series = ToTimeSeries(_operand.Points, Begin, Spacing);
+                if (series is null)
+                    return _operand.Points;
+
                 var newSpan = new TimeSeriesSpan(series.Begin, series.End, Spacing);
                 var resampler = new TimeSeriesResampler<TimeSeries<double>, double>(newSpan, SamplingConstraint.NoOversampling);
                 resampler.Aggregate(series, _func);
@@ -30,9 +33,11 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         public ResampledGraph(IGraphiteGraph operand, TimeSpan spacing, Aggregator func)
             => (_operand, Spacing, _func) = (operand, spacing, func);
 
-        private static TimeSeries<double> ToTimeSeries(IEnumerable<double?> points, DateTime begin, TimeSpan spacing)
+        private static TimeSeries<double>? ToTimeSeries(IEnumerable<double?> points, DateTime begin, TimeSpan spacing)
         {
             var values = points.ToList();
+            if (values.Count <= 0)
+                return null;
             var series = new TimeSeries<double>(new TimeSeriesSpan(begin, begin + spacing * values.Count, values.Count));
             var i = 0;
             foreach (var value in values)
