@@ -141,11 +141,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
         private string ReadStringParam()
         {
             ReadToken(TokenType.Comma);
-            var stringToken = ReadToken(TokenType.StringValue);
-            var rawString = stringToken.Value;
-            if (rawString.Length < 2 || rawString[0] != '\'' || rawString[^1] != '\'')
-                throw new ParserException($"Expected a valid string but found: '{stringToken.Value}' at pos {stringToken.StartIndex}");
-            return rawString[1..^1];
+            return ReadToken(TokenType.StringValue).Unescaped();
         }
 
         private TimeSpan ReadTimeParam()
