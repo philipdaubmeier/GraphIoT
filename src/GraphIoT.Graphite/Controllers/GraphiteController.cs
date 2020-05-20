@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Primitives;
 using PhilipDaubmeier.CompactTimeSeries;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Model;
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
 {
@@ -21,18 +19,18 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
     [Route("api/graphite")]
     public class GraphiteController : Controller
     {
-        private readonly GraphDataSource dataSource;
-        private readonly Dictionary<string, IEventCollectionViewModel> eventViewModels;
+        private readonly GraphDataSource _dataSource;
+        private readonly IList<IEventCollectionViewModel> _eventViewModels;
 
         public GraphiteController(IEnumerable<IGraphCollectionViewModel> graphViewModels, IEnumerable<IEventCollectionViewModel> eventViewModels)
         {
-            dataSource = new GraphDataSource(graphViewModels);
-            this.eventViewModels = eventViewModels.ToDictionary(x => x.Key, x => x);
+            _dataSource = new GraphDataSource(graphViewModels);
+            _eventViewModels = eventViewModels.ToList();
         }
 
         // POST: api/graphite/render
         [HttpPost("render")]
-        public ActionResult Render([FromForm] string target, [FromForm] string from, [FromForm] string until, [FromForm] string format, [FromForm] string maxDataPoints)
+        public ActionResult Render([FromForm] IEnumerable<string> target, [FromForm] string from, [FromForm] string until, [FromForm] string format, [FromForm] string maxDataPoints)
         {
             if (!from.TryParseGraphiteTime(out DateTime fromDate)
                 || !until.TryParseGraphiteTime(out DateTime toDate)
@@ -42,9 +40,9 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
             if (!format.Equals("json", StringComparison.InvariantCultureIgnoreCase))
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
-            dataSource.Span = new TimeSeriesSpan(fromDate, toDate, count);
-            var parser = new Parser() { DataSource = dataSource };
-            return Json(parser.Parse(target).Graphs.Select(g => new
+            _dataSource.Span = new TimeSeriesSpan(fromDate, toDate, count);
+            var parser = new Parser() { DataSource = _dataSource };
+            return Json(target.SelectMany(t => parser.Parse(t).Graphs).Select(g => new
             {
                 target = g.Name,
                 datapoints = g.TimestampedPoints()
@@ -57,10 +55,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [SuppressMessage("Style", "IDE0060", Justification = "'from' and 'until' are passed in by grafana but not used to exclude graphs.")]
         public ActionResult FindMetrics(int from, int until, string query)
         {
-            var q = new TargetQuery(query);
-
-            return Json(dataSource.GraphKeys.Where(g => q.IsMatch(g)).Select(g => q.NextSegment(g))
-                .Select(g => new { g.expandable, text = g.segment }).Distinct());
+            return Json(_dataSource.AutocompletePath(query).Select(g => new { g.expandable, text = g.segment }));
         }
 
         // GET: api/graphite/tags/autoComplete/tags
@@ -79,7 +74,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 || !until.TryParseGraphiteTime(out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
-            var eventViewModel = eventViewModels.FirstOrDefault().Value;
+            var eventViewModel = _eventViewModels.FirstOrDefault();
             eventViewModel.Span = new TimeSeriesSpan(fromDate, toDate, 1);
             eventViewModel.Query = tags;
 

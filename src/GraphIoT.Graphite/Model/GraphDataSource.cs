@@ -66,5 +66,39 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             }
             yield break;
         }
+
+        /// <summary>
+        /// Traverses the tree of available keys by the given query string with wildcards
+        /// and outputs the list of distinct next path segments, including a hint if this
+        /// is a tree leaf or is further expandable.
+        ///
+        /// Example GraphKeys list:
+        /// [
+        ///     "root.subitem1.leaf11",
+        ///     "root.subitem2.leaf21",
+        ///     "root.subitem2.leaf22",
+        ///     "root.subitem2.subsubitem21.leaf211",
+        ///     "other.subitem2.otherleaf21"
+        /// ]
+        ///
+        /// then AutocompletePath("root.*") would return
+        /// [
+        ///     (true, "subitem1"),
+        ///     (true, "subitem2")
+        /// ]
+        ///
+        /// and AutocompletePath("*.subitem2.*") would return
+        /// [
+        ///     (false, "leaf21"),
+        ///     (false, "leaf22"),
+        ///     (true, "subsubitem21"),
+        ///     (false, "otherleaf21")
+        /// ]
+        /// </summary>
+        public IEnumerable<(bool expandable, string segment)> AutocompletePath(string query)
+        {
+            var q = new TargetQuery(query);
+            return GraphKeys.Where(g => q.IsMatch(g)).Select(g => q.NextSegment(g)).Distinct();
+        }
     }
 }
