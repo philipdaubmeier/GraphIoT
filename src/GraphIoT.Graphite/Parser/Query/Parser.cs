@@ -59,6 +59,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                         var innerExpr = ReadExpression();
                         var expr = identifier.Value switch
                         {
+                            "alias" => ReadAliasFunction(innerExpr),
                             "movingAverage" => ReadMovingWindowFunction(innerExpr, Aggregator.Average),
                             "movingSum" => ReadMovingWindowFunction(innerExpr, Aggregator.Sum),
                             "movingMax" => ReadMovingWindowFunction(innerExpr, Aggregator.Maximum),
@@ -79,6 +80,12 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 default:
                     throw new ParserException($"Unexpected {_lookahead.TokenType.ToString().ToUpper()}");
             }
+        }
+
+        private IGraphiteExpression ReadAliasFunction(IGraphiteExpression seriesParam)
+        {
+            var alias = ReadStringParam();
+            return new AliasFunctionExpression(seriesParam, alias);
         }
 
         private IGraphiteExpression ReadOffsetFunction(IGraphiteExpression seriesParam)

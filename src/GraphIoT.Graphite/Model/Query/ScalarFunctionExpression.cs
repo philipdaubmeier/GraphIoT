@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         private readonly Func<double?, double?> _operation;
 
         public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
-            .Select(g => new DerivedGraphUnary(g, _operation));
+            .Select(g => new DerivedGraphUnary(g, _operation, n => n));
 
         public ScalarFunctionExpression(IGraphiteExpression innerExpression, Func<double?, double?> operation)
             => (_innerExpression, _operation) = (innerExpression, operation);

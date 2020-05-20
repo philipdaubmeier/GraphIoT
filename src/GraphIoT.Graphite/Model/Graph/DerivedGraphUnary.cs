@@ -8,14 +8,15 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     {
         private readonly IGraphiteGraph _operand;
         private readonly Func<double?, double?> _operation;
+        private readonly Func<string, string> _nameTransform;
 
-        public override string Name => _operand.Name;
+        public override string Name => _nameTransform(_operand.Name);
         public override DateTime Begin => _operand.Begin;
         public override TimeSpan Spacing => _operand.Spacing;
 
         public override IEnumerable<double?> Points => _operand.Points.Select(_operation);
 
-        public DerivedGraphUnary(IGraphiteGraph operand, Func<double?, double?> operation)
-            => (_operand, _operation) = (operand, operation);
+        public DerivedGraphUnary(IGraphiteGraph operand, Func<double?, double?> operation, Func<string, string> nameTransform)
+            => (_operand, _operation, _nameTransform) = (operand, operation, nameTransform);
     }
 }
