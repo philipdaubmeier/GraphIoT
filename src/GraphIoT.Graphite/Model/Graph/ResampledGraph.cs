@@ -10,10 +10,11 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     {
         private readonly IGraphiteGraph _operand;
         private readonly Aggregator _func;
+        private readonly TimeSpan _spacing;
 
         public override string Name => _operand.Name;
         public override DateTime Begin => _operand.Begin;
-        public override TimeSpan Spacing { get; }
+        public override TimeSpan Spacing => new TimeSpan(Math.Max(_operand.Spacing.Ticks, _spacing.Ticks));
 
         public override IEnumerable<double?> Points
         {
@@ -31,7 +32,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         }
 
         public ResampledGraph(IGraphiteGraph operand, TimeSpan spacing, Aggregator func)
-            => (_operand, Spacing, _func) = (operand, spacing, func);
+            => (_operand, _spacing, _func) = (operand, spacing, func);
 
         private static TimeSeries<double>? ToTimeSeries(IEnumerable<double?> points, DateTime begin, TimeSpan spacing)
         {
