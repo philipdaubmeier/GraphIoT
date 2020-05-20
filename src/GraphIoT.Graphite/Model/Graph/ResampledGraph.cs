@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         {
             get
             {
-                var series = ToTimeSeries(_operand.Points, Begin, Spacing);
+                var series = ToTimeSeries(_operand.Points, _operand.Begin, _operand.Spacing);
                 if (series is null)
                     return _operand.Points;
 
