@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 {
+    [GraphiteFunction("alias", "Alias")]
+    [GraphiteParam("seriesList", "seriesList", true)]
+    [GraphiteParam("alias", "string", true)]
     public class AliasFunctionExpression : IGraphiteExpression
     {
         private readonly IGraphiteExpression _innerExpression;
