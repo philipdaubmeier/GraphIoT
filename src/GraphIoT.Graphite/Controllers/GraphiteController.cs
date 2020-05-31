@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
 
 namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
 {
@@ -63,6 +64,15 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         public ActionResult GetTags()
         {
             return Json(new string[] { });
+        }
+
+        // GET: api/graphite/functions
+        [HttpGet("functions")]
+        public ActionResult GetFunctions()
+        {
+            var options = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            return Content('{' + string.Join(',', GraphiteFunctionMap.GetFunctions()
+                .Select(f => $"\"{f.Name}\":" + JsonSerializer.Serialize(f, options))) + '}', "application/json");
         }
 
         // GET: api/graphite/events/get_data
