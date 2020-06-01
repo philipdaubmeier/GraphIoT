@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             public IList<ParamDef> Params { get; set; } = new List<ParamDef>();
             public Type FunctionExpressionType = typeof(IGraphiteExpression);
 
-            public IGraphiteExpression? Instantiate(params object[] parameters)
+            public IGraphiteExpression? Instantiate(object[] parameters)
             {
                 var constructor = FunctionExpressionType.GetConstructors().FirstOrDefault();
                 if (constructor is null)
@@ -50,7 +50,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             FillCache();
 
             def = new FunctionDef();
-            if (_functionMap is null || _functionMap.TryGetValue(functionName, out FunctionDef? found) || found is null)
+            if (_functionMap is null || !_functionMap.TryGetValue(functionName, out FunctionDef? found) || found is null)
                 return false;
 
             def = found;
@@ -80,7 +80,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
                     var parameters = type.GetCustomAttributes<GraphiteParamAttribute>(false)
                         .Select(p => new ParamDef() { Name = p.Name, Type = p.Type, Required = p.Required, Suggestions = p.Suggestions }).ToList();
 
-                    _functionMap.Add(function.Name, new FunctionDef() { Name = function.Name, Group = function.Group, Params = parameters });
+                    _functionMap.Add(function.Name, new FunctionDef() { Name = function.Name, Group = function.Group, Params = parameters, FunctionExpressionType = type });
                 }
             }
             finally
