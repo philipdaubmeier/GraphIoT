@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
             new TokenDefinition(TokenType.OpenParanthesis, @"\(", 1),
             new TokenDefinition(TokenType.CloseParanthesis, @"\)", 1),
             new TokenDefinition(TokenType.StringValue, @"'(\\.|[^\\'])*'", 2),
-            new TokenDefinition(TokenType.NumberValue, @"\d+(\.\d+)?", 1),
+            new TokenDefinition(TokenType.NumberValue, @"(-|\+)?\d+(\.\d+)?", 1),
             new TokenDefinition(TokenType.TrueLiteral, @"true", 1),
             new TokenDefinition(TokenType.FalseLiteral, @"false", 1)
         };

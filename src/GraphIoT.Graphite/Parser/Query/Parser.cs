@@ -109,9 +109,14 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 
         private double ReadNumberParam()
         {
-            var numberToken = ReadToken(TokenType.NumberValue);
-            if (!double.TryParse(numberToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
-                throw new ParserException($"Expected a valid floating point number but found: '{numberToken.Value}' at pos {numberToken.StartIndex}");
+            var numberRaw = _lookahead.TokenType switch
+            {
+                TokenType.StringValue => ReadToken(TokenType.StringValue).Unescaped(),
+                _ => ReadToken(TokenType.NumberValue).Value
+            };
+
+            if (!double.TryParse(numberRaw, NumberStyles.Float, CultureInfo.InvariantCulture, out double result))
+                throw new ParserException($"Expected a valid floating point number but found: '{numberRaw}'");
             return result;
         }
 
