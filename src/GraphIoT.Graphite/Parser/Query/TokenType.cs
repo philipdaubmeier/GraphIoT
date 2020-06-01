@@ -8,6 +8,8 @@
         CloseParanthesis,
         StringValue,
         NumberValue,
+        TrueLiteral,
+        FalseLiteral,
         SequenceTerminator
     }
 }
