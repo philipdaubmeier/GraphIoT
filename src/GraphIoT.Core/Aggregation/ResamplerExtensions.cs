@@ -42,7 +42,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Aggregation
                 var a when
                     a == Aggregator.Average ||
                     a == Aggregator.Default => x => x.Average(),
-                Aggregator.AverageZero => x => x.Sum() - x.Count(),
+                Aggregator.AverageZero => x => x.Sum() / x.Count(),
                 Aggregator.Median => x => x.Median(),
                 Aggregator.Sum => x => x.Sum(),
                 Aggregator.Minimum => x => x.Min(),
