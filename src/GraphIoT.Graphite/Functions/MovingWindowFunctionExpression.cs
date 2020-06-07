@@ -17,10 +17,32 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
         private readonly Aggregator _func;
 
         public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
-            .Select(g => new ResampledGraph(g, _spacing, _func));
+            .Select(g => new DerivedGraphTransform(g, TransformMovingWindow));
 
         public MovingWindowFunctionExpression(IGraphiteExpression innerExpression, TimeSpan spacing, string func)
             => (_innerExpression, _spacing, _func) = (innerExpression, spacing, func.ToAggregator());
+
+        private IEnumerable<double?> TransformMovingWindow(IEnumerable<double?> source)
+        {
+            int steps = (int)Math.Max(1d, Math.Round(_spacing / (_innerExpression.Graphs.FirstOrDefault() ?? new NullGraph()).Spacing, 0));
+
+            foreach (var _ in Enumerable.Range(0, steps))
+                yield return null;
+
+            Queue<double?> input = new Queue<double?>(source.Take(steps - 1).Append(0d));
+
+            foreach (var value in source.Skip(steps))
+            {
+                input.Dequeue();
+                input.Enqueue(value);
+
+                var elements = input.Where(x => x != null).Select(x => x.Value);
+                if (elements.Any())
+                    yield return elements.Aggregate(_func);
+                else
+                    yield return null;
+            }
+        }
     }
 
     [GraphiteFunction("movingAverage", "Transform")]
