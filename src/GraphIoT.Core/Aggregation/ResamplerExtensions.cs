@@ -19,26 +19,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.Aggregation
 
         public static void Aggregate<Tseries, Tval>(this TimeSeriesResampler<Tseries, Tval> resampler, IEnumerable<ITimeSeries<Tval>> series, Aggregator aggregator, Func<Tval, double> selector, Func<double, Tval> resultCast, double correctionFactor = 1d, double correctionOffset = 0d) where Tval : struct where Tseries : TimeSeriesBase<Tval>
         {
-            Func<IEnumerable<Tval>, double> aggregationFunc = aggregator switch
-            {
-                var a when
-                    a == Aggregator.Average ||
-                    a == Aggregator.AverageZero ||
-                    a == Aggregator.Default => x => x.Average(selector),
-                Aggregator.Median => x => x.Median(selector),
-                Aggregator.Sum => x => x.Sum(selector),
-                Aggregator.Minimum => x => x.Min(selector),
-                Aggregator.Maximum => x => x.Max(selector),
-                Aggregator.Diff => x => x.Diff(selector),
-                Aggregator.Stddev => x => x.Stddev(selector),
-                Aggregator.Count => x => x.Count(),
-                Aggregator.Range => x => x.Max(selector) - x.Min(selector),
-                Aggregator.Multiply => x => x.Multiply(selector),
-                Aggregator.Last => x => x.Select(selector).Last(),
-                _ => throw new NotImplementedException($"Aggregation method {aggregator} not yet implemented")
-            };
+            Func<IEnumerable<double>, double> aggregationFunc = GetAggregationFunction(aggregator);
 
-            resampler.SampleAggregate(series, x => resultCast(aggregationFunc(x) * correctionFactor + correctionOffset));
+            resampler.SampleAggregate(series, x => resultCast(aggregationFunc(x.Select(selector)) * correctionFactor + correctionOffset));
 
             if (aggregator == Aggregator.AverageZero)
             {
@@ -47,33 +30,60 @@ namespace PhilipDaubmeier.GraphIoT.Core.Aggregation
             }
         }
 
-        private static double Median<TSource>(this IEnumerable<TSource> values, Func<TSource, double> selector)
+        public static double Aggregate(this IEnumerable<double> values, Aggregator aggregator)
         {
-            var vals = values.Select(selector).ToList();
+            return GetAggregationFunction(aggregator)(values);
+        }
+
+        private static Func<IEnumerable<double>, double> GetAggregationFunction(Aggregator aggregator)
+        {
+            return aggregator switch
+            {
+                var a when
+                    a == Aggregator.Average ||
+                    a == Aggregator.Default => x => x.Average(),
+                Aggregator.AverageZero => x => x.Sum() - x.Count(),
+                Aggregator.Median => x => x.Median(),
+                Aggregator.Sum => x => x.Sum(),
+                Aggregator.Minimum => x => x.Min(),
+                Aggregator.Maximum => x => x.Max(),
+                Aggregator.Diff => x => x.Diff(),
+                Aggregator.Stddev => x => x.Stddev(),
+                Aggregator.Count => x => x.Count(),
+                Aggregator.Range => x => x.Max() - x.Min(),
+                Aggregator.Multiply => x => x.Multiply(),
+                Aggregator.Last => x => x.Last(),
+                _ => throw new NotImplementedException($"Aggregation method {aggregator} not yet implemented")
+            };
+        }
+
+        private static double Median(this IEnumerable<double> values)
+        {
+            var vals = values.ToList();
             return vals.OrderBy(x => x).Skip(Math.Max(0, Math.Min(vals.Count / 2, vals.Count - 1))).First();
         }
 
-        private static double Diff<TSource>(this IEnumerable<TSource> values, Func<TSource, double> selector)
+        private static double Diff(this IEnumerable<double> values)
         {
             bool first = true;
             double result = 0;
-            foreach (var val in values.Select(selector))
+            foreach (var val in values)
                 result = first ? val : result - val;
             return result;
         }
 
-        private static double Multiply<TSource>(this IEnumerable<TSource> values, Func<TSource, double> selector)
+        private static double Multiply(this IEnumerable<double> values)
         {
             bool first = true;
             double result = 0;
-            foreach (var val in values.Select(selector))
+            foreach (var val in values)
                 result = first ? val : result * val;
             return result;
         }
 
-        private static double Stddev<TSource>(this IEnumerable<TSource> values, Func<TSource, double> selector)
+        private static double Stddev(this IEnumerable<double> values)
         {
-            var vals = values.Select(selector).ToList();
+            var vals = values.ToList();
             var sum = vals.Sum();
             var len = vals.Count;
             var avg = sum / len;
