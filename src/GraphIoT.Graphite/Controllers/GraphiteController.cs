@@ -42,8 +42,8 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
             _dataSource.Span = new TimeSeriesSpan(fromDate, toDate, count);
-            var parser = new Parser() { DataSource = _dataSource };
-            return Json(target.SelectMany(t => parser.Parse(t).Graphs).Select(g => new
+            var optimizer = new QueryOptimizer(new Parser() { DataSource = _dataSource });
+            return Json(optimizer.ParseAndOptimize(target).Select(g => new
             {
                 target = g.Name,
                 datapoints = g.TimestampedPoints()
