@@ -7,30 +7,30 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteFunction("grep", "Filter Series")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("grep", "string", true)]
-    public class GrepFunctionExpression : IGraphiteExpression
+    public class GrepFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly Regex _grep;
 
         public IEnumerable<IGraphiteGraph> Graphs =>
-            _innerExpression.Graphs.Where(g => _grep.IsMatch(g.Name));
+            InnerExpression.Graphs.Where(g => _grep.IsMatch(g.Name));
 
         public GrepFunctionExpression(IGraphiteExpression innerExpression, string grep)
-            => (_innerExpression, _grep) = (innerExpression, new Regex(grep));
+            => (InnerExpression, _grep) = (innerExpression, new Regex(grep));
     }
 
     [GraphiteFunction("exclude", "Filter Series")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("exclude", "string", true)]
-    public class ExcludeFunctionExpression : IGraphiteExpression
+    public class ExcludeFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly Regex _exclude;
 
         public IEnumerable<IGraphiteGraph> Graphs =>
-            _innerExpression.Graphs.Where(g => !_exclude.IsMatch(g.Name));
+            InnerExpression.Graphs.Where(g => !_exclude.IsMatch(g.Name));
 
         public ExcludeFunctionExpression(IGraphiteExpression innerExpression, string exclude)
-            => (_innerExpression, _exclude) = (innerExpression, new Regex(exclude));
+            => (InnerExpression, _exclude) = (innerExpression, new Regex(exclude));
     }
 }

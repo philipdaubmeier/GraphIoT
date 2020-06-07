@@ -7,32 +7,32 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteFunction("alias", "Alias")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("alias", "string", true)]
-    public class AliasFunctionExpression : IGraphiteExpression
+    public class AliasFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly string _alias;
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
             .Select(g => new DerivedGraphUnary(g, x => x, n => _alias));
 
         public AliasFunctionExpression(IGraphiteExpression innerExpression, string alias)
-            => (_innerExpression, _alias) = (innerExpression, alias);
+            => (InnerExpression, _alias) = (innerExpression, alias);
     }
 
     [GraphiteFunction("aliasSub", "Alias")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("search", "string", true)]
     [GraphiteParam("replace", "string", true)]
-    public class AliasSubFunctionExpression : IGraphiteExpression
+    public class AliasSubFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly Regex _search;
         private readonly string _replace;
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
             .Select(g => new DerivedGraphUnary(g, x => x, n => _search.Replace(n, _replace)));
 
         public AliasSubFunctionExpression(IGraphiteExpression innerExpression, string search, string replace)
-            => (_innerExpression, _search, _replace) = (innerExpression, new Regex(search), replace);
+            => (InnerExpression, _search, _replace) = (innerExpression, new Regex(search), replace);
     }
 }

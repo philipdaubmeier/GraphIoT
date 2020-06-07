@@ -6,30 +6,30 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteFunction("currentAbove", "Filter Series")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("n", "int", true)]
-    public class CurrentAboveFunctionExpression : IGraphiteExpression
+    public class CurrentAboveFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly double _n;
 
         public IEnumerable<IGraphiteGraph> Graphs =>
-            _innerExpression.Graphs.Where(g => (g.Points.LastOrDefault() ?? double.MinValue) >= _n);
+            InnerExpression.Graphs.Where(g => (g.Points.LastOrDefault() ?? double.MinValue) >= _n);
 
         public CurrentAboveFunctionExpression(IGraphiteExpression innerExpression, double n)
-            => (_innerExpression, _n) = (innerExpression, n);
+            => (InnerExpression, _n) = (innerExpression, n);
     }
 
     [GraphiteFunction("currentBelow", "Filter Series")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("n", "int", true)]
-    public class CurrentBelowFunctionExpression : IGraphiteExpression
+    public class CurrentBelowFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly double _n;
 
         public IEnumerable<IGraphiteGraph> Graphs =>
-            _innerExpression.Graphs.Where(g => (g.Points.LastOrDefault() ?? double.MinValue) <= _n);
+            InnerExpression.Graphs.Where(g => (g.Points.LastOrDefault() ?? double.MinValue) <= _n);
 
         public CurrentBelowFunctionExpression(IGraphiteExpression innerExpression, double n)
-            => (_innerExpression, _n) = (innerExpression, n);
+            => (InnerExpression, _n) = (innerExpression, n);
     }
 }

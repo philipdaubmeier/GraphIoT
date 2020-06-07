@@ -6,16 +6,16 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteFunction("delay", "Transform")]
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("steps", "int", true)]
-    public class DelayFunctionExpression : IGraphiteExpression
+    public class DelayFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly int _steps;
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
             .Select(g => new DerivedGraphTransform(g, TransformDelay));
 
         public DelayFunctionExpression(IGraphiteExpression innerExpression, double steps)
-            => (_innerExpression, _steps) = (innerExpression, (int)steps);
+            => (InnerExpression, _steps) = (innerExpression, (int)steps);
 
         private IEnumerable<double?> TransformDelay(IEnumerable<double?> source)
         {

@@ -5,15 +5,15 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 {
     [GraphiteFunction("derivative", "Transform")]
     [GraphiteParam("seriesList", "seriesList", true)]
-    public class DerivativeSeriesFunctionExpression : IGraphiteExpression
+    public class DerivativeSeriesFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
             .Select(g => new DerivedGraphTransform(g, TransformDerivative));
 
         public DerivativeSeriesFunctionExpression(IGraphiteExpression innerExpression)
-            => (_innerExpression) = (innerExpression);
+            => (InnerExpression) = (innerExpression);
 
         private IEnumerable<double?> TransformDerivative(IEnumerable<double?> source)
         {

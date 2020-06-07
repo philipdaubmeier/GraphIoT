@@ -10,17 +10,17 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("time", "int_or_interval", true, "1min,5min,10min,30min,1hour,1day")]
     [GraphiteParam("aggregator", "string", true, "avg,avg_zero,median,sum,min,max,diff,stddev,count,range,last")]
-    public class ResampleFunctionExpression : IGraphiteExpression
+    public class ResampleFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
-        private readonly TimeSpan _spacing;
-        private readonly Aggregator _func;
+        public IGraphiteExpression InnerExpression { get; }
+        public TimeSpan Spacing { get; }
+        public Aggregator Func { get; }
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
-            .Select(g => new ResampledGraph(g, _spacing, _func));
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
+            .Select(g => new ResampledGraph(g, Spacing, Func));
 
         public ResampleFunctionExpression(IGraphiteExpression innerExpression, TimeSpan spacing, string func)
-            => (_innerExpression, _spacing, _func) = (innerExpression, spacing, func.ToAggregator());
+            => (InnerExpression, Spacing, Func) = (innerExpression, spacing, func.ToAggregator());
     }
 
     [GraphiteFunction("resampleAverage", "Resample")]

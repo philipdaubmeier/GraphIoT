@@ -10,21 +10,21 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
     [GraphiteParam("seriesList", "seriesList", true)]
     [GraphiteParam("time", "int_or_interval", true, "1min,5min,10min,30min,1hour,1day")]
     [GraphiteParam("aggregator", "string", true, "avg,avg_zero,median,sum,min,max,diff,stddev,count,range,last")]
-    public class MovingWindowFunctionExpression : IGraphiteExpression
+    public class MovingWindowFunctionExpression : IFunctionExpression
     {
-        private readonly IGraphiteExpression _innerExpression;
+        public IGraphiteExpression InnerExpression { get; }
         private readonly TimeSpan _spacing;
         private readonly Aggregator _func;
 
-        public IEnumerable<IGraphiteGraph> Graphs => _innerExpression.Graphs
+        public IEnumerable<IGraphiteGraph> Graphs => InnerExpression.Graphs
             .Select(g => new DerivedGraphTransform(g, TransformMovingWindow));
 
         public MovingWindowFunctionExpression(IGraphiteExpression innerExpression, TimeSpan spacing, string func)
-            => (_innerExpression, _spacing, _func) = (innerExpression, spacing, func.ToAggregator());
+            => (InnerExpression, _spacing, _func) = (innerExpression, spacing, func.ToAggregator());
 
         private IEnumerable<double?> TransformMovingWindow(IEnumerable<double?> source)
         {
-            int steps = (int)Math.Max(1d, Math.Round(_spacing / (_innerExpression.Graphs.FirstOrDefault() ?? new NullGraph()).Spacing, 0));
+            int steps = (int)Math.Max(1d, Math.Round(_spacing / (InnerExpression.Graphs.FirstOrDefault() ?? new NullGraph()).Spacing, 0));
 
             foreach (var _ in Enumerable.Range(0, steps))
                 yield return null;
