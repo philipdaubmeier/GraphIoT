@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.GraphIoT.Core.Aggregation;
+using PhilipDaubmeier.GraphIoT.Graphite.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,35 +20,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             .Select(g => new ResampledGraph(g, _spacing, _func));
 
         public MovingWindowFunctionExpression(IGraphiteExpression innerExpression, TimeSpan spacing, string func)
-            => (_innerExpression, _spacing, _func) = (innerExpression, spacing, ToAggregator(func));
-
-        private static Aggregator ToAggregator(string aggregator)
-        {
-            return aggregator switch
-            {
-                var x when
-                    x == "avg" ||
-                    x == "average" => Aggregator.Average,
-                "avg_zero" => Aggregator.AverageZero,
-                "median" => Aggregator.Median,
-                var x when
-                    x == "sum" ||
-                    x == "total" => Aggregator.Sum,
-                "min" => Aggregator.Minimum,
-                "max" => Aggregator.Maximum,
-                "diff" => Aggregator.Diff,
-                "stddev" => Aggregator.Stddev,
-                "count" => Aggregator.Count,
-                var x when
-                    x == "range" ||
-                    x == "rangeOf" => Aggregator.Range,
-                "multiply" => Aggregator.Multiply,
-                var x when
-                    x == "last" ||
-                    x == "current" => Aggregator.Last,
-                _ => throw new Exception($"Unrecognized aggregator function '{aggregator}'")
-            };
-        }
+            => (_innerExpression, _spacing, _func) = (innerExpression, spacing, func.ToAggregator());
     }
 
     [GraphiteFunction("movingAverage", "Transform")]
