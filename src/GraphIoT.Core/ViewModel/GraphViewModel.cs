@@ -49,19 +49,9 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
             Name = name ?? string.Empty;
             Key = key ?? string.Empty;
             Format = format ?? string.Empty;
-            Begin = Max(FindBegin(timeseries), DateTimeOffset.FromUnixTimeMilliseconds(0).UtcDateTime);
+            Begin = timeseries.Span.Begin;
             Spacing = timeseries.Span.Duration;
-            Points = timeseries.Trimmed().Cast<dynamic>().ToList();
-        }
-
-        private DateTime FindBegin(ITimeSeries<T> timeseries)
-        {
-            return timeseries.SkipWhile(t => !t.Value.HasValue).FirstOrDefault().Key.ToUniversalTime();
-        }
-
-        private DateTime Max(DateTime val1, DateTime val2)
-        {
-            return DateTime.FromBinary(Math.Max(val1.ToBinary(), val2.ToBinary()));
+            Points = timeseries.Select(x => x.Value).Cast<dynamic>();
         }
     }
 }
