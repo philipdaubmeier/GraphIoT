@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
                 input.Dequeue();
                 input.Enqueue(value);
 
-                var elements = input.Where(x => x != null).Select(x => x.Value);
+                var elements = input.Where(x => x.HasValue).Select(x => x!.Value);
                 if (elements.Any())
                     yield return elements.Aggregate(_func);
                 else

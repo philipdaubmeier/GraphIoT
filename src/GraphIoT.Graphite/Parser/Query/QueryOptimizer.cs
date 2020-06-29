@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 
             // no optimization potential if desired resolution is not lower than the original
             var originalResolution = DataSource.Span;
-            var minReamplingRate = _resampleFuncs.Where(x => x != null).Min(x => x.Spacing);
+            var minReamplingRate = _resampleFuncs.Where(x => x != null).Min(x => x!.Spacing);
             if (minReamplingRate <= originalResolution.Duration)
                 return;
 
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 
         private bool AddSource(IEnumerable<IGraphiteExpression> parents)
         {
-            _resampleFuncs.Add(parents.Select(x => x as ResampleFunctionExpression).SkipWhile(x => x is null).FirstOrDefault());
+            _resampleFuncs.Add(parents.Select(x => x as ResampleFunctionExpression).FirstOrDefault());
             return true;
         }
     }
