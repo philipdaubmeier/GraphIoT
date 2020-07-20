@@ -10,7 +10,7 @@
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
     <Version>1.8.1</Version>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <TargetFramework>net5.0</TargetFramework>
     <NuspecFile>ViessmannClient.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>

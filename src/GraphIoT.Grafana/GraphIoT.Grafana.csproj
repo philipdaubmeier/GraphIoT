@@ -6,7 +6,7 @@
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
     <Version>1.0.0</Version>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
