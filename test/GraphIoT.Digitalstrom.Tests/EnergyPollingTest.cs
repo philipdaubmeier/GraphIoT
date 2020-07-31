@@ -39,6 +39,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             // We should have at least one polled dataset of 600 values (i.e. 10 min in a 1 sec interval)
             // for both metering circuits that we are mocking (see DigitalstromDssMockExtensions.AddEnergyMeteringMocks)
             var storedValues = db.DsEnergyHighresDataSet.FirstOrDefault()?.EnergySeriesEveryMeter;
+            Assert.NotNull(storedValues);
+            if (storedValues is null)
+                return;
             Assert.Equal(2, storedValues.Count());
             Assert.True(600 <= storedValues.First().Value.Trimmed().Count);
             Assert.True(600 <= storedValues.Last().Value.Trimmed().Count);

@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         public static void FormUrlEncoded(this HttpRequestMessage request, IEnumerable<(string, string)> values)
         {
-            request.Content = new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
+            request.Content = new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string?, string?>(x.Item1, x.Item2)));
         }
 
         public static bool TryGetValue(this GroupCollection groupCollection, string key, out Group? value)

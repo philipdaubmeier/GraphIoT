@@ -1,6 +1,8 @@
 ﻿using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Auth;
+using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -41,7 +43,8 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             {
                 Console.WriteLine($"Certificate fingerprint: {cert.GetCertHashString()}");
                 Console.WriteLine("Trust this certificate? (y/n)");
-                return Console.ReadLine().ToLowerInvariant().Trim().StartsWith('y');
+                var read = Console.ReadLine();
+                return (read ?? string.Empty).ToLowerInvariant().Trim().StartsWith('y');
             }
 
             using var conn = new DigitalstromConnectionProvider(uri, loginUser, validateCert);
@@ -52,7 +55,7 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             var reachableScenes = await client.GetReachableScenes(zone, group);
 
             Console.WriteLine($"Reachable scenes in zone '{zone}', group '{group}':");
-            Console.WriteLine(string.Join("\n", reachableScenes.ReachableScenes.Select(s => "\t" + s.ToString("d", CultureInfo.CurrentUICulture))));
+            Console.WriteLine(string.Join("\n", (reachableScenes.ReachableScenes ?? new List<Scene>()).Select(s => "\t" + s.ToString("d", CultureInfo.CurrentUICulture))));
         }
     }
 }

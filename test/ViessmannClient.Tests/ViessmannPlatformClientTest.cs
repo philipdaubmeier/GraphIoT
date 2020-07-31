@@ -586,10 +586,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.True(feature8?.Active?.Value);
 
             Assert.Equal("array", feature9?.Day?.Type);
-            Assert.Equal(new[] { 9.914d, 11.543d }.ToList(), feature9?.Day?.Value.ToList());
-            Assert.Equal(new List<double>(), feature9?.Week?.Value.ToList());
-            Assert.Equal(new List<double>(), feature9?.Month?.Value.ToList());
-            Assert.Equal(new List<double>(), feature9?.Year?.Value.ToList());
+            Assert.Equal(new[] { 9.914d, 11.543d }.ToList(), feature9?.Day?.Value?.ToList());
+            Assert.Equal(new List<double>(), feature9?.Week?.Value?.ToList());
+            Assert.Equal(new List<double>(), feature9?.Month?.Value?.ToList());
+            Assert.Equal(new List<double>(), feature9?.Year?.Value?.ToList());
             Assert.Equal("string", feature9?.Unit?.Type);
             Assert.Equal("kilowattHour", feature9?.Unit?.Value);
         }

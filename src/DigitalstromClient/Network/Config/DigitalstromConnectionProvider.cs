@@ -143,11 +143,13 @@ namespace PhilipDaubmeier.DigitalstromClient
             return clientHandler;
         }
 
-        private bool ValidateCertificate(X509Certificate2 cert)
+        private bool ValidateCertificate(X509Certificate2? cert)
         {
+            if (cert is null)
+                return false;
             if (!QueryCertificateTrusted(cert))
                 return false;
-            if (cert is null || ServerCertificate is null)
+            if (ServerCertificate is null)
                 return false;
             if (cert.Issuer != ServerCertificate.Issuer)
                 return false;

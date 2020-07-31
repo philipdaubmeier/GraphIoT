@@ -198,6 +198,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             try
             {
                 var persisted = JsonSerializer.Deserialize<PersistedSession>(_connectionProvider.AuthData.AccessToken);
+                if (persisted is null)
+                    throw new NullReferenceException();
                 state.BaseJsonUri = persisted.BaseJsonUri;
                 state.Csrf = persisted.Csrf;
                 persisted.AddToCookieContainer(_connectionProvider.CookieContainer);
@@ -327,7 +329,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to get authorization page.");
 
             var loginFormUrl = loginUrlResponse.Headers.Location;
-            if (!loginFormUrl.TryExtractUriParameter("relayState", out string loginRelayStateToken))
+            if (loginFormUrl is null || !loginFormUrl.TryExtractUriParameter("relayState", out string loginRelayStateToken))
                 throw new IOException("Failed to get relay state.");
 
             state.RelayStateToken = loginRelayStateToken;

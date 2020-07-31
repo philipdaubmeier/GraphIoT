@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.DigitalstromDssMock
 
             protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
             {
-                lastCalledUri = request.RequestUri.ToString();
+                lastCalledUri = request.RequestUri?.ToString();
 
                 return base.SendAsync(request, cancellationToken);
             }

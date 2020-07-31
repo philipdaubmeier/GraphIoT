@@ -99,33 +99,33 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return ((SensorType[])Enum.GetValues(typeof(SensorType))).Select(x =>                            (Sensor)(int)x);
         }
 
-        public static bool operator !=(Sensor type1, Sensor type2)
+        public static bool operator !=(Sensor? type1, Sensor? type2)
         {
             return !(type1 == type2);
         }
 
-        public static bool operator ==(Sensor type1, Sensor type2)
+        public static bool operator ==(Sensor? type1, Sensor? type2)
         {
             if (type1 is null || type2 is null)
                 return ReferenceEquals(type1, type2);
             return type1._type == type2._type;
         }
 
-        public static bool operator !=(Sensor type1, SensorType type2)
+        public static bool operator !=(Sensor? type1, SensorType type2)
         {
             return !(type1 == type2);
         }
 
-        public static bool operator ==(Sensor type1, SensorType type2)
+        public static bool operator ==(Sensor? type1, SensorType type2)
         {
             if (type1 is null)
                 return false;
             return type1._type == type2;
         }
 
-        public int CompareTo(Sensor value)
+        public int CompareTo(Sensor? value)
         {
-            return _type.CompareTo(value._type);
+            return _type.CompareTo(value?._type);
         }
 
         public int CompareTo(object? value)
@@ -133,7 +133,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _type.CompareTo((value as Sensor)?._type ?? value);
         }
 
-        public bool Equals(Sensor sensor)
+        public bool Equals(Sensor? sensor)
         {
             return this == sensor;
         }
@@ -145,7 +145,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _type.GetHashCode();
+            return HashCode.Combine(_type);
         }
 
         public override string ToString()

@@ -44,7 +44,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.VehicleList
         public bool? MobileKeyActivated { get; set; }
         public string EnrollmentType { get; set; } = string.Empty;
         public bool Ocu3Low { get; set; }
-        public List<PackageService> PackageServices { get; set; }
+        public List<PackageService> PackageServices { get; set; } = new List<PackageService>();
         public bool DefaultCar { get; set; }
         public bool VwConnectPowerLayerAvailable { get; set; }
         public string XprofileId { get; set; } = string.Empty;

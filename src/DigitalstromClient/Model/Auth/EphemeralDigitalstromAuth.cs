@@ -75,9 +75,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
             };
         }
 
-        public bool Equals(EphemeralDigitalstromAuth other)
+        public bool Equals(EphemeralDigitalstromAuth? other)
         {
-            return ApplicationToken == other.ApplicationToken && SessionToken == other.SessionToken
+            return other != null && ApplicationToken == other.ApplicationToken && SessionToken == other.SessionToken
                 && SessionExpiration == other.SessionExpiration && AppId == other.AppId
                 && Username == other.Username && UserPassword == other.UserPassword;
         }

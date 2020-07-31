@@ -39,9 +39,9 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
             return vin._vin;
         }
 
-        public int CompareTo(Vin value)
+        public int CompareTo(Vin? value)
         {
-            return ((string)this).CompareTo(value);
+            return ((string)this).CompareTo(value ?? string.Empty);
         }
 
         public int CompareTo(object? value)
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
             return this == value;
         }
 
-        public bool Equals(Vin g)
+        public bool Equals(Vin? g)
         {
             return this == g;
         }
@@ -66,12 +66,12 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
             return ((string)this).GetHashCode();
         }
 
-        public static bool operator ==(Vin a, Vin b)
+        public static bool operator ==(Vin? a, Vin? b)
         {
-            return a._vin == b._vin;
+            return a?._vin == b?._vin;
         }
 
-        public static bool operator !=(Vin a, Vin b)
+        public static bool operator !=(Vin? a, Vin? b)
         {
             return !(a == b);
         }

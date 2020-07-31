@@ -244,21 +244,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return scene._scene;
         }
 
-        public static bool operator !=(Scene scene1, Scene scene2)
+        public static bool operator !=(Scene? scene1, Scene? scene2)
         {
             return !(scene1 == scene2);
         }
 
-        public static bool operator ==(Scene scene1, Scene scene2)
+        public static bool operator ==(Scene? scene1, Scene? scene2)
         {
             if (scene1 is null || scene2 is null)
                 return ReferenceEquals(scene1, scene2);
             return scene1._scene == scene2._scene;
         }
 
-        public int CompareTo(Scene value)
+        public int CompareTo(Scene? value)
         {
-            return _scene.CompareTo(value._scene);
+            return _scene.CompareTo(value?._scene);
         }
 
         public int CompareTo(object? value)
@@ -266,7 +266,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _scene.CompareTo((value as Scene)?._scene ?? value);
         }
 
-        public bool Equals(Scene scene)
+        public bool Equals(Scene? scene)
         {
             return this == scene;
         }

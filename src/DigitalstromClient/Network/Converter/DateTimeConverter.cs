@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            var str = reader.GetString();
+            var str = reader.GetString() ?? string.Empty;
 
             if (DateTime.TryParseExact(str, "yyyy'-'MM'-'dd HH':'mm':'ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dt))
                 return dt;

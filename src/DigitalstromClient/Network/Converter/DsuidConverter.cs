@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public override Dsuid Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new Dsuid(reader.GetString());
+            return new Dsuid(reader.GetString() ?? string.Empty);
         }
     }
 }

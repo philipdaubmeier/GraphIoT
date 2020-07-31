@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         public override GroupName Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return reader.GetString();
+            return reader.GetString() ?? string.Empty;
         }
     }
 }

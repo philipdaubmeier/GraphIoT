@@ -48,7 +48,9 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             // The header values are always a string[]
             var valuesArray = (string[])values;
 
-            Uri requestUri = response.RequestMessage.RequestUri;
+            var requestUri = response.RequestMessage?.RequestUri;
+            if (requestUri is null)
+                return;
 
             for (int i = 0; i < valuesArray.Length; i++)
                 try { cookieContainer.SetCookies(requestUri, valuesArray[i]); } catch { }

@@ -11,6 +11,8 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
             {
                 Console.WriteLine(caption);
                 var uriStr = Console.ReadLine();
+                if (uriStr is null)
+                    continue;
                 try
                 {
                     return new Uri(uriStr, UriKind.Absolute);
@@ -58,7 +60,7 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
 
                 if (key.Key == ConsoleKey.Backspace && password.Length > 0)
                 {
-                    password = password.Substring(0, (password.Length - 1));
+                    password = password[0..^1];
                     Console.Write("\b \b");
                 }
             }

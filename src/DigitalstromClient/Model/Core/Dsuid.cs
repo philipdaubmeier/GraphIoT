@@ -49,9 +49,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return dsuid._hex;
         }
 
-        public int CompareTo(Dsuid value)
+        public int CompareTo(Dsuid? value)
         {
-            return _hex.CompareTo(value._hex);
+            return _hex.CompareTo(value?._hex);
         }
 
         public int CompareTo(object? value)
@@ -64,22 +64,22 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return o is Dsuid dsuid && this == dsuid;
         }
 
-        public bool Equals(Dsuid g)
+        public bool Equals(Dsuid? g)
         {
             return this == g;
         }
 
         public override int GetHashCode()
         {
-            return _hex.GetHashCode();
+            return HashCode.Combine(_hex);
         }
 
-        public static bool operator ==(Dsuid a, Dsuid b)
+        public static bool operator ==(Dsuid? a, Dsuid? b)
         {
-            return a._hex == b._hex;
+            return a?._hex == b?._hex;
         }
 
-        public static bool operator !=(Dsuid a, Dsuid b)
+        public static bool operator !=(Dsuid? a, Dsuid? b)
         {
             return !(a == b);
         }
