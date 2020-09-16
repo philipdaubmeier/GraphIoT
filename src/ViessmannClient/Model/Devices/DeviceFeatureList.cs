@@ -281,6 +281,11 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             return GetProperties(FeatureName.Name.HeatingControllerSerial)?.Value?.Value?.ToString() ?? string.Empty;
         }
 
+        public List<Message> GetHeatingCoolingCircuitMessages(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            return GetProperties(FeatureName.Name.HeatingCoolingCircuitsMessages, circuit)?.Messages?.Value ?? new List<Message>();
+        }
+
         public int GetHeatingDeviceTimeOffset()
         {
             return GetProperties(FeatureName.Name.HeatingDeviceTimeOffset)?.ValueAsInt ?? 0;
