@@ -472,6 +472,27 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
                                   }
                               },
                               {
+                                  ""properties"":{
+                                      ""entries"":{
+                                          ""value"":[
+                                              {
+                                                  ""timestamp"": ""2020-09-15T06:38:01.000Z"",
+                                                  ""errorCode"": ""49"",
+                                                  ""status"": ""inactive"",
+                                                  ""count"": 39,
+                                                  ""priority"": ""info""
+                                              }
+                                          ],
+                                          ""type"": ""array""
+                                      }
+                                  },
+                                  ""feature"": ""heating.coolingCircuits.0.messages"",
+                                  ""timestamp"": ""2020-09-16T06:15:50.236Z"",
+                                  ""isEnabled"": true,
+                                  ""isReady"": true,
+                                  ""deviceId"": ""0""
+                              },
+                              {
                                   ""feature"": ""heating.circuits.2.heating.schedule""
                               },
                               {
