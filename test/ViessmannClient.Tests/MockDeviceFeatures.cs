@@ -18,6 +18,24 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
                                   ""feature"": ""heating""
                               },
                               {
+                                  ""feature"":""device.messages.logbook"",
+                                  ""properties"": {
+                                      ""entries"": {
+                                          ""value"": [
+                                              {
+                                                  ""timestamp"": ""2020-01-01T00:00:00.000Z"",
+                                                  ""actor"": ""SECONDARY_PUMP1"",
+                                                  ""status"": 0,
+                                                  ""event"": ""Inverter_CPU_error"",
+                                                  ""stateMachine"": ""TPM_SC1"",
+                                                  ""additionalInfo"": 120
+                                              }
+                                          ],
+                                          ""type"": ""array""
+                                      }
+                                  }
+                              },
+                              {
                                   ""feature"": ""heating.boiler""
                               },
                               {
