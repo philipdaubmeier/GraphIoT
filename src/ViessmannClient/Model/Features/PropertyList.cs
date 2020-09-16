@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
@@ -27,7 +29,10 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<string?>? Name { get; set; }
         public TypedValue<decimal>? Shift { get; set; }
         public TypedValue<decimal>? Slope { get; set; }
-        public TypedValue<Schedule?>? Entries { get; set; }
+        
+        [JsonPropertyName("entries")]
+        internal TypedValue<JsonElement>? EntriesRaw { get; set; }
+
         public TypedValue<bool>? OverlapAllowed { get; set; }
         public TypedValue<decimal>? Temperature { get; set; }
         public TypedValue<string?>? Start { get; set; }
@@ -60,6 +65,22 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             Resolution.Year => Year,
             _ => Day
         };
+
+        public TypedValue<Schedule>? Entries =>
+            new TypedValue<Schedule>()
+            {
+                Type = EntriesRaw?.Type,
+                Value = EntriesRaw?.Type?.Equals("schedule", StringComparison.InvariantCultureIgnoreCase) ?? false
+                    ? JsonSerializer.Deserialize<Schedule>(EntriesRaw.Value.GetRawText()) : new Schedule()
+            };
+
+        public TypedValue<List<Message>?>? Messages =>
+            new TypedValue<List<Message>?>()
+            {
+                Type = EntriesRaw?.Type,
+                Value = EntriesRaw?.Type?.Equals("array", StringComparison.InvariantCultureIgnoreCase) ?? false
+                    ? JsonSerializer.Deserialize<List<Message>?>(EntriesRaw.Value.GetRawText()) : new List<Message>()
+            };
 
         public override string ToString()
         {
