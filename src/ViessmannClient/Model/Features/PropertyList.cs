@@ -67,17 +67,19 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         };
 
         [JsonIgnore]
-        public TypedValue<Schedule> Entries => new TypedValue<Schedule>()
+        public TypedValue<Schedule>? Entries => ScheduleOrMessage?.Value.Schedule == null ? null :
+            new TypedValue<Schedule>()
             {
                 Type = ScheduleOrMessage?.Type,
-                Value = ScheduleOrMessage?.Value.Schedule ?? new Schedule()
+                Value = ScheduleOrMessage?.Value.Schedule!
             };
 
         [JsonIgnore]
-        public TypedValue<List<Message>?> Messages => new TypedValue<List<Message>?>()
+        public TypedValue<List<Message>?>? Messages => ScheduleOrMessage?.Value.Messages == null ? null : 
+            new TypedValue<List<Message>?>()
             {
                 Type = ScheduleOrMessage?.Type,
-                Value = ScheduleOrMessage?.Value.Messages ?? new List<Message>()
+                Value = ScheduleOrMessage?.Value.Messages
             };
 
         public override string ToString()
