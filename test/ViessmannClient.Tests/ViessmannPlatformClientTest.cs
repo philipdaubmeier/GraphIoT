@@ -606,8 +606,14 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 
             var result = await viessmannClient.GetDeviceFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
 
-            Assert.Equal(156, result.Count());
+            Assert.Equal(157, result.Count());
 
+            Assert.Equal("2020-01-01T00:00:00.000Z", result.GetDeviceMessagesLogbook().First().Timestamp);
+            Assert.Equal("SECONDARY_PUMP1", result.GetDeviceMessagesLogbook().First().Actor);
+            Assert.Equal(0L, result.GetDeviceMessagesLogbook().First().Status);
+            Assert.Equal("Inverter_CPU_error", result.GetDeviceMessagesLogbook().First().Event);
+            Assert.Equal("TPM_SC1", result.GetDeviceMessagesLogbook().First().StateMachine);
+            Assert.Equal(120, result.GetDeviceMessagesLogbook().First().AdditionalInfo);
             Assert.Equal("3344556677", result.GetHeatingBoilerSerial());
             Assert.False(result.IsHeatingBoilerSensorsTemperatureCommonSupplyConnected());
             Assert.Equal(double.NaN, result.GetHeatingBoilerSensorsTemperatureCommonSupply());
@@ -733,11 +739,11 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.False(result.IsHeatingCircuitsGeofencingActive(FeatureName.Circuit.Circuit2));
             Assert.Equal("home", result.GetHeatingCircuitsGeofencingStatus(FeatureName.Circuit.Circuit2));
             Assert.False(result.IsHeatingConfigurationMultiFamilyHouseActive());
-            Assert.Equal("2020-09-15T06:38:01.000Z", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0)[0].Timestamp);
-            Assert.Equal("49", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0)[0].ErrorCode);
-            Assert.Equal("inactive", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0)[0].Status);
-            Assert.Equal(39, result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0)[0].Count);
-            Assert.Equal("info", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0)[0].Priority);
+            Assert.Equal("2020-09-15T06:38:01.000Z", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0).First().Timestamp);
+            Assert.Equal("49", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0).First().ErrorCode);
+            Assert.Equal("inactive", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0).First().Status);
+            Assert.Equal(39, result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0).First().Count);
+            Assert.Equal("info", result.GetHeatingCoolingCircuitMessages(FeatureName.Circuit.Circuit0).First().Priority);
             Assert.Equal("777555888999", result.GetHeatingControllerSerial());
             Assert.Equal(52, result.GetHeatingDeviceTimeOffset());
             Assert.True(result.IsHeatingDhwActive());

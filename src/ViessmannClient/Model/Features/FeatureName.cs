@@ -15,8 +15,8 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public enum Name
         {
             Device,
-            Devicemessages,
-            Devicemessageslogbook,
+            DeviceMessages,
+            DeviceMessagesLogbook,
             DeviceSerial,
             Gateway,
             GatewayBmuconnection,
@@ -216,8 +216,8 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         private static readonly Dictionary<string, Name> _mapping = new Dictionary<string, Name>()
         {
             {"device", Name.Device},
-            {"device.messages", Name.Devicemessages},
-            {"device.messages.logbook", Name.Devicemessageslogbook},
+            {"device.messages", Name.DeviceMessages},
+            {"device.messages.logbook", Name.DeviceMessagesLogbook},
             {"device.serial", Name.DeviceSerial},
             {"gateway", Name.Gateway},
             {"gateway.bmuconnection", Name.GatewayBmuconnection},
