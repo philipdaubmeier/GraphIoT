@@ -6,6 +6,11 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
     public class DeviceFeatureList : FeatureList
     {
+        public IEnumerable<Message> GetDeviceMessagesLogbook()
+        {
+            return GetProperties(FeatureName.Name.DeviceMessagesLogbook)?.Messages?.Value ?? new List<Message>();
+        }
+
         public string GetHeatingBoilerSerial()
         {
             return GetProperties(FeatureName.Name.HeatingBoilerSerial)?.Value?.Value as string ?? string.Empty;
@@ -279,6 +284,11 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public string GetHeatingControllerSerial()
         {
             return GetProperties(FeatureName.Name.HeatingControllerSerial)?.Value?.Value?.ToString() ?? string.Empty;
+        }
+
+        public IEnumerable<Message> GetHeatingCoolingCircuitMessages(FeatureName.Circuit? circuit = FeatureName.Circuit.Circuit0)
+        {
+            return GetProperties(FeatureName.Name.HeatingCoolingCircuitsMessages, circuit)?.Messages?.Value ?? new List<Message>();
         }
 
         public int GetHeatingDeviceTimeOffset()

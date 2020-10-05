@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.SonnenClient.Model
 {
@@ -19,6 +20,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
 
     public class DataWiremessage<T> where T : class
     {
+        [JsonConverter(typeof(IntToStringConverter))]
         public string? Id { get; set; }
         public string? Type { get; set; }
         public T? Attributes { get; set; }

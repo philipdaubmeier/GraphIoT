@@ -38,6 +38,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             _authClient = connectionProvider.AuthClient;
 
             _jsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
+            _jsonSerializerOptions.Converters.Add(new ScheduleMessageConverter());
         }
 
         /// <summary>

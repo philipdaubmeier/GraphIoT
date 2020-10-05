@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/SonnenClient</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.6.1</Version>
+    <Version>1.6.2</Version>
     <TargetFrameworks>netcoreapp3.1;netstandard2.1</TargetFrameworks>
     <NuspecFile>SonnenClient.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
