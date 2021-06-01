@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var node = htmlDoc.DocumentNode.SelectSingleNode($"//meta[@name=\"_csrf\"]");
 
-            string? value = node.GetAttributeValue("content", null);
+            string? value = node?.GetAttributeValue("content", null);
             csrf = value ?? string.Empty;
             return value != null;
         }
@@ -50,7 +50,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var node = htmlDoc.DocumentNode.SelectSingleNode($"//input[@type=\"hidden\"][@id=\"hmac\"]");
 
-            string? value = node.GetAttributeValue("value", null);
+            string? value = node?.GetAttributeValue("value", null);
             hmac = value ?? string.Empty;
             return value != null;
         }
@@ -62,7 +62,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var node = htmlDoc.DocumentNode.SelectSingleNode($"//input[@type=\"hidden\"][@id=\"csrf\"]");
 
-            string? value = node.GetAttributeValue("value", null);
+            string? value = node?.GetAttributeValue("value", null);
             csrf = value ?? string.Empty;
             return value != null;
         }
