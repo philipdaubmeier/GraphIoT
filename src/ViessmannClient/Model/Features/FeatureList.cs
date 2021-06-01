@@ -8,7 +8,8 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
     {
         public DateTime GetTimestamp()
         {
-            return this.FirstOrDefault()?.Timestamp ?? DateTime.UtcNow;
+            var latestTime = this.Max(x => x.Timestamp ?? DateTime.MinValue);
+            return latestTime == DateTime.MinValue ? DateTime.UtcNow : latestTime;
         }
 
         public Feature? GetRawFeatureByName(string featureName)
