@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         private async Task PollSolarValues()
         {
             var data = await _vitotrolClient.GetData(new List<int>() { 5272, 5273, 5274, 5276, 7895 });
-            var time = data.First().timestamp.ToUniversalTime();
+            var time = DateTime.UtcNow;
 
             var solarWhTotal = int.Parse(data.First(d => d.id == 7895.ToString()).value);
             var solarCollectorTemp = double.Parse(data.First(d => d.id == 5272.ToString()).value, CultureInfo.InvariantCulture);
@@ -57,8 +57,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             var dbSolarSeries = TimeSeriesDbEntityBase.LoadOrCreateDay(dbContext.ViessmannSolarTimeseries, time.Date);
 
             var oldSolarWhTotal = dbSolarSeries.SolarWhTotal;
+            var solarWhDiff = oldSolarWhTotal.HasValue ? solarWhTotal - oldSolarWhTotal.Value : 0;
             var series1 = dbSolarSeries.SolarWhSeries;
-            series1.Accumulate(time, oldSolarWhTotal.HasValue ? solarWhTotal - oldSolarWhTotal.Value : 0);
+            series1.Accumulate(time - series1.Span.Duration, solarWhDiff / 2);
+            series1.Accumulate(time, solarWhDiff / 2);
             dbSolarSeries.SetSeries(0, series1);
             dbSolarSeries.SolarWhTotal = solarWhTotal;
 
