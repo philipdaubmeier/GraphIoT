@@ -46,7 +46,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         {
             var features = await _platformClient.GetDeviceFeatures(_config.InstallationId, _config.GatewayId);
 
-            var time = features.GetTimestamp();
+            var time = DateTime.UtcNow;
 
             var burnerHoursTotal = (double)features.GetHeatingBurnerStatisticsHours();
             var burnerStartsTotal = (int)features.GetHeatingBurnerStatisticsStarts();
