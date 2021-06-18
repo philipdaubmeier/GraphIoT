@@ -16,6 +16,13 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
             _viessmannClient = platformClient;
         }
 
+        // GET: api/viessmann/login
+        [HttpGet("login")]
+        public RedirectResult Login()
+        {
+            return Redirect(_viessmannClient.GetLoginUri().AbsoluteUri);
+        }
+
         // GET: api/viessmann/installations
         [HttpGet("installations")]
         public async Task<JsonResult> GetInstallations()
