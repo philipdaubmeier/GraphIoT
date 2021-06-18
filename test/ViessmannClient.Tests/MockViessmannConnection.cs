@@ -30,12 +30,12 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             {
                 Client = mockClient;
                 AuthClient = mockAuthClient;
-                PlattformApiClientId = _clientId;
-                PlattformApiClientSecret = _clientSecret;
+                ClientId = _clientId;
+                RedirectUri = _clientSecret;
             }
         }
 
-        private static readonly IViessmannAuth auth = new ViessmannAuth("john@doe.com", "secretpassword");
+        private static readonly IViessmannAuth auth = new ViessmannAuth();
 
         public static ViessmannConnectionProvider<ViessmannPlatformClient> ToMockProvider(this MockHttpMessageHandler mockHandler)
         {

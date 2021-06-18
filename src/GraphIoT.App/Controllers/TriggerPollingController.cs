@@ -18,8 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
     {
         private readonly DigitalstromEnergyPollingService _energyPollingService;
         private readonly DigitalstromSensorPollingService _sensorPollingService;
-        private readonly ViessmannHeatingPollingService _heatingPollingService;
-        private readonly ViessmannSolarPollingService _solarPollingService;
+        private readonly ViessmannPollingService _heatingPollingService;
         private readonly SonnenEnergyPollingService _sonnenPollingService;
         private readonly INetatmoPollingService _netatmoPollingService;
 
@@ -27,8 +26,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         {
             _energyPollingService = dsPollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).First()!;
             _sensorPollingService = dsPollingServices.Select(x => x as DigitalstromSensorPollingService).Where(x => x != null).First()!;
-            _heatingPollingService = viessPollingServices.Select(x => x as ViessmannHeatingPollingService).Where(x => x != null).First()!;
-            _solarPollingService = viessPollingServices.Select(x => x as ViessmannSolarPollingService).Where(x => x != null).First()!;
+            _heatingPollingService = viessPollingServices.Select(x => x as ViessmannPollingService).Where(x => x != null).First()!;
             _sonnenPollingService = sonnenPollingService.Select(x => x as SonnenEnergyPollingService).Where(x => x != null).First()!;
             _netatmoPollingService = netatmoPollingService;
         }
@@ -67,13 +65,13 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         [HttpPost("viessmann/solar/lowres/compute")]
         public ActionResult ComputeSolarLowResFromMidRes([FromQuery] string begin, [FromQuery] string end)
         {
-            if (_solarPollingService == null)
+            if (_heatingPollingService == null)
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
             if (!TimeSeriesSpanParser.TryParse(begin, end, 1.ToString(), out TimeSeriesSpan span))
                 return StatusCode((int)HttpStatusCode.NotFound);
 
-            _solarPollingService.GenerateLowResSolarSeries(span.Begin, span.End);
+            _heatingPollingService.GenerateLowResSolarSeries(span.Begin, span.End);
 
             return StatusCode((int)HttpStatusCode.OK);
         }

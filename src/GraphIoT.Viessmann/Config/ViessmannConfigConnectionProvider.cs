@@ -20,10 +20,10 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
     public class ViessmannConfigConnectionProvider<T> : ViessmannConnectionProvider<T>
     {
         public ViessmannConfigConnectionProvider(TokenStore<T> tokenStore, IOptions<ViessmannConfig> config, ViessmannHttpClient<T> client, ViessmannAuthHttpClient authClient)
-            : base(new ViessmannAuth<T>(tokenStore, config.Value.Username, config.Value.Password))
+            : base(new ViessmannAuth<T>(tokenStore))
         {
-            PlattformApiClientId = config.Value.PlattformApiClientId;
-            PlattformApiClientSecret = config.Value.PlattformApiClientSecret;
+            ClientId = config.Value.ClientId;
+            RedirectUri = config.Value.RedirectUri;
 
             Client = client.Client;
             AuthClient = authClient.AuthClient;

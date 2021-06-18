@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 {
-    public class ViessmannHeatingPollingService : IViessmannPollingService
+    public class ViessmannPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
         private readonly IViessmannDbContext _dbContext;
         private readonly ViessmannConfig _config;
         private readonly ViessmannPlatformClient _platformClient;
 
-        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, IViessmannDbContext dbContext, IOptions<ViessmannConfig> config, ViessmannPlatformClient platformClient)
+        public ViessmannPollingService(ILogger<ViessmannPollingService> logger, IViessmannDbContext dbContext, IOptions<ViessmannConfig> config, ViessmannPlatformClient platformClient)
         {
             _logger = logger;
             _dbContext = dbContext;
@@ -44,7 +44,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
         private async Task PollHeatingValues()
         {
-            var features = await _platformClient.GetDeviceFeatures(_config.InstallationId, _config.GatewayId);
+            var features = await _platformClient.GetDeviceFeatures(_config.ParsedInstallationId, _config.ParsedGatewayId);
 
             var time = DateTime.UtcNow;
 
@@ -73,7 +73,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 
             SaveHeatingValues(time, burnerHoursTotal, burnerStartsTotal, burnerModulation, outsideTemp, boilerTemp, boilerTempMain, circuit0Temp, circuit1Temp, dhwTemp, burnerActive, circuit0Pump, circuit1Pump, dhwPrimPump, dhwCircPump);
 
-            ViessmannSolarPollingService.SaveSolarValues(_dbContext, time, solarWhTotal, solarCollectorTemp, solarHotwaterTemp, solarPumpState, solarSuppression);
+            SaveSolarValues(time, solarWhTotal, solarCollectorTemp, solarHotwaterTemp, solarPumpState, solarSuppression);
         }
 
         private void SaveHeatingValues(DateTime time, double burnerHoursTotal, int burnerStartsTotal, int burnerModulation, double outsideTemp, double boilerTemp, double boilerTempMain, double circuit0Temp, double circuit1Temp, double dhwTemp, bool burnerActive, bool circuit0Pump, bool circuit1Pump, bool dhwPrimPump, bool dhwCircPump)
@@ -128,6 +128,57 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
         private void SaveLowresHeatingValues(DateTime day, ViessmannHeatingMidresData midRes)
         {
             TimeSeriesDbEntityBase.LoadOrCreateMonth(_dbContext.ViessmannHeatingLowresTimeseries, day).ResampleFromAll(midRes);
+        }
+
+        private void SaveSolarValues(DateTime time, int solarWhTotal, double solarCollectorTemp, double solarHotwaterTemp, bool solarPumpState, bool solarSuppression)
+        {
+            var dbSolarSeries = TimeSeriesDbEntityBase.LoadOrCreateDay(_dbContext.ViessmannSolarTimeseries, time.Date);
+
+            var oldSolarWhTotal = dbSolarSeries.SolarWhTotal;
+            var solarWhDiff = oldSolarWhTotal.HasValue ? solarWhTotal - oldSolarWhTotal.Value : 0;
+            var series1 = dbSolarSeries.SolarWhSeries;
+            series1.Accumulate(time - series1.Span.Duration, solarWhDiff / 2);
+            series1.Accumulate(time, solarWhDiff / 2);
+            dbSolarSeries.SetSeries(0, series1);
+            dbSolarSeries.SolarWhTotal = solarWhTotal;
+
+            dbSolarSeries.SetSeriesValue(1, time, solarCollectorTemp);
+            dbSolarSeries.SetSeriesValue(2, time, solarHotwaterTemp);
+            dbSolarSeries.SetSeriesValue(3, time, solarPumpState);
+            dbSolarSeries.SetSeriesValue(4, time, solarSuppression);
+
+            SaveLowresSolarValues(_dbContext, time.Date, dbSolarSeries);
+
+            _dbContext.SaveChanges();
+        }
+
+        public void GenerateLowResSolarSeries(DateTime start, DateTime end)
+        {
+            foreach (var day in new TimeSeriesSpan(start, end, 1).IncludedDates())
+            {
+                var dbSolarSeries = _dbContext.ViessmannSolarTimeseries.Where(x => x.Key == day).FirstOrDefault();
+                if (dbSolarSeries == null)
+                    continue;
+
+                SaveLowresSolarValues(_dbContext, day, dbSolarSeries);
+                _dbContext.SaveChanges();
+            }
+        }
+
+        private static void SaveLowresSolarValues(IViessmannDbContext dbContext, DateTime day, ViessmannSolarMidresData midRes)
+        {
+            var dbSolarSeries = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.ViessmannSolarLowresTimeseries, day);
+
+            // Hack: remove first 5 elements due to bug in day-boundaries
+            static ITimeSeries<int> PreprocessSolarProduction(ITimeSeries<int> input)
+            {
+                for (int i = 0; i < 5; i++)
+                    input[i] = input[i].HasValue ? (int?)0 : null;
+                return input;
+            }
+
+            dbSolarSeries.ResampleFrom<int>(midRes, 0, x => (int)x.Average(), PreprocessSolarProduction);
+            dbSolarSeries.ResampleFromAll(midRes, 0);
         }
     }
 }

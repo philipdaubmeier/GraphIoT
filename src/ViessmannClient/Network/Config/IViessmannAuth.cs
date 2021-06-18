@@ -7,9 +7,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
     {
         string? AccessToken { get; }
         DateTime AccessTokenExpiry { get; }
-
-        string Username { get; }
-        string UserPassword { get; }
+        string? RefreshToken { get; }
 
         bool IsAccessTokenValid();
 

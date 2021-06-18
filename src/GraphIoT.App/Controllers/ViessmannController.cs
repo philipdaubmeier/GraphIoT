@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PhilipDaubmeier.ViessmannClient;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.App.Controllers
@@ -14,6 +15,26 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         public ViessmannController(ViessmannPlatformClient platformClient)
         {
             _viessmannClient = platformClient;
+        }
+
+        // GET: api/viessmann/login
+        [HttpGet("login")]
+        public RedirectResult Login()
+        {
+            return Redirect(_viessmannClient.GetLoginUri().AbsoluteUri);
+        }
+
+        // GET: api/viessmann/authcallback?code=owusQEHqhhosGHlod2oTuUXfxU9mMBtzurlyKK0IGjM
+        [HttpGet("authcallback")]
+        public async Task<ActionResult> AuthCallback(string code)
+        {
+            if (!await _viessmannClient.TryCompleteLogin(code))
+                return StatusCode((int)HttpStatusCode.Unauthorized);
+
+            return Json(new
+            {
+                login = "success"
+            });
         }
 
         // GET: api/viessmann/installations
