@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             }
         }
 
-        private static readonly IViessmannAuth auth = new ViessmannAuth("john@doe.com", "secretpassword");
+        private static readonly IViessmannAuth auth = new ViessmannAuth();
 
         public static ViessmannConnectionProvider<ViessmannPlatformClient> ToMockProvider(this MockHttpMessageHandler mockHandler)
         {
