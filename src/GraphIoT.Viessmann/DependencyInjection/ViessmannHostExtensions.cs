@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
             serviceCollection.AddScoped<ViessmannPlatformClient>();
 
-            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannHeatingPollingService>();
+            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannPollingService>();
             serviceCollection.AddTimedPollingHost<IViessmannPollingService>(viessmannConfig.GetSection("PollingService"));
 
             serviceCollection.AddGraphCollectionViewModel<ViessmannHeatingViewModel>();

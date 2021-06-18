@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
 {
-    public class ViessmannHeatingPollingService : IViessmannPollingService
+    public class ViessmannPollingService : IViessmannPollingService
     {
         private readonly ILogger _logger;
         private readonly IViessmannDbContext _dbContext;
         private readonly ViessmannConfig _config;
         private readonly ViessmannPlatformClient _platformClient;
 
-        public ViessmannHeatingPollingService(ILogger<ViessmannHeatingPollingService> logger, IViessmannDbContext dbContext, IOptions<ViessmannConfig> config, ViessmannPlatformClient platformClient)
+        public ViessmannPollingService(ILogger<ViessmannPollingService> logger, IViessmannDbContext dbContext, IOptions<ViessmannConfig> config, ViessmannPlatformClient platformClient)
         {
             _logger = logger;
             _dbContext = dbContext;

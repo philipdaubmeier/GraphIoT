@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
     {
         private readonly DigitalstromEnergyPollingService _energyPollingService;
         private readonly DigitalstromSensorPollingService _sensorPollingService;
-        private readonly ViessmannHeatingPollingService _heatingPollingService;
+        private readonly ViessmannPollingService _heatingPollingService;
         private readonly SonnenEnergyPollingService _sonnenPollingService;
         private readonly INetatmoPollingService _netatmoPollingService;
 
@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.GraphIoT.App.Controllers
         {
             _energyPollingService = dsPollingServices.Select(x => x as DigitalstromEnergyPollingService).Where(x => x != null).First()!;
             _sensorPollingService = dsPollingServices.Select(x => x as DigitalstromSensorPollingService).Where(x => x != null).First()!;
-            _heatingPollingService = viessPollingServices.Select(x => x as ViessmannHeatingPollingService).Where(x => x != null).First()!;
+            _heatingPollingService = viessPollingServices.Select(x => x as ViessmannPollingService).Where(x => x != null).First()!;
             _sonnenPollingService = sonnenPollingService.Select(x => x as SonnenEnergyPollingService).Where(x => x != null).First()!;
             _netatmoPollingService = netatmoPollingService;
         }
