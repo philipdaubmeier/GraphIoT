@@ -30,19 +30,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
-            serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
             serviceCollection.AddViessmannHttpClient<ViessmannAuthHttpClient>();
             serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannPlatformClient>>();
-            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannVitotrolClient>>();
 
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
-            serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
-
             serviceCollection.AddScoped<ViessmannPlatformClient>();
-            serviceCollection.AddScoped<ViessmannVitotrolClient>();
 
-            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannSolarPollingService>();
             serviceCollection.AddPollingService<IViessmannPollingService, ViessmannHeatingPollingService>();
             serviceCollection.AddTimedPollingHost<IViessmannPollingService>(viessmannConfig.GetSection("PollingService"));
 
