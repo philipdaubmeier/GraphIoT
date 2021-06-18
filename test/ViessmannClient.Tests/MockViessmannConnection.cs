@@ -25,11 +25,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 
         public class ViessmannMockConnectionProvider<T> : ViessmannConnectionProvider<T>
         {
-            public ViessmannMockConnectionProvider(IViessmannAuth authData, HttpClient mockClient, HttpClient mockAuthClient)
+            public ViessmannMockConnectionProvider(IViessmannAuth authData, HttpClient mockClient)
                 : base(authData)
             {
                 Client = mockClient;
-                AuthClient = mockAuthClient;
                 ClientId = _clientId;
                 RedirectUri = _clientSecret;
             }
@@ -39,7 +38,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 
         public static ViessmannConnectionProvider<ViessmannPlatformClient> ToMockProvider(this MockHttpMessageHandler mockHandler)
         {
-            return new ViessmannMockConnectionProvider<ViessmannPlatformClient>(auth, new HttpClient(mockHandler), new HttpClient(mockHandler));
+            return new ViessmannMockConnectionProvider<ViessmannPlatformClient>(auth, new HttpClient(mockHandler));
         }
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)

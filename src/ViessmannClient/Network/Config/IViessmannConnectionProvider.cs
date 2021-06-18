@@ -15,11 +15,6 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         HttpClient Client { get; }
 
-        /// <summary>
-        /// A HttpClient to inject for authentication that does not follow redirects.
-        /// </summary>
-        HttpClient AuthClient { get; }
-
         string ClientId { get; }
         string CodeVerifier { get; }
         string CodeChallenge { get; }
