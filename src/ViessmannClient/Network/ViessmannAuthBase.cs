@@ -101,7 +101,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         protected async Task Authenticate()
         {
-            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
+            if (string.IsNullOrWhiteSpace(_connectionProvider.ClientId) || string.IsNullOrWhiteSpace(_connectionProvider.RedirectUri))
                 throw new Exception("ViessmannPlatformClient is missing one or more of the mandatory connection provider configuration values.");
 
             try
@@ -129,7 +129,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
+                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.ClientId}&redirect_uri={_redirectUri}&response_type=code"),
                 Method = HttpMethod.Get,
             };
 
@@ -152,8 +152,8 @@ namespace PhilipDaubmeier.ViessmannClient.Network
                             new Uri(_tokenUri), new FormUrlEncodedContent(new[]
                             {
                                 new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                                new KeyValuePair<string, string>("client_id", _connectionProvider.PlattformApiClientId),
-                                new KeyValuePair<string, string>("client_secret", _connectionProvider.PlattformApiClientSecret),
+                                new KeyValuePair<string, string>("client_id", _connectionProvider.ClientId),
+                                new KeyValuePair<string, string>("client_secret", _connectionProvider.RedirectUri),
                                 new KeyValuePair<string, string>("code", authorizationCode),
                                 new KeyValuePair<string, string>("redirect_uri", _redirectUri)
                             })));

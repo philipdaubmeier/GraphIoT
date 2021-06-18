@@ -30,8 +30,8 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             {
                 Client = mockClient;
                 AuthClient = mockAuthClient;
-                PlattformApiClientId = _clientId;
-                PlattformApiClientSecret = _clientSecret;
+                ClientId = _clientId;
+                RedirectUri = _clientSecret;
             }
         }
 

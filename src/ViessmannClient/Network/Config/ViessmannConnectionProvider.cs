@@ -48,8 +48,8 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
 
-        public string PlattformApiClientId { get; set; } = string.Empty;
-        public string PlattformApiClientSecret { get; set; } = string.Empty;
+        public string ClientId { get; set; } = string.Empty;
+        public string RedirectUri { get; set; } = string.Empty;
 
         public ViessmannConnectionProvider(IViessmannAuth authData)
             => AuthData = authData;

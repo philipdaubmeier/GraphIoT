@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         HttpClient AuthClient { get; }
 
-        string PlattformApiClientId { get; }
-        string PlattformApiClientSecret { get; }
+        string ClientId { get; }
+        string RedirectUri { get; }
     }
 }
