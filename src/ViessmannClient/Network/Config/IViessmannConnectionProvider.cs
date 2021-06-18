@@ -21,6 +21,9 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         HttpClient AuthClient { get; }
 
         string ClientId { get; }
+        string CodeVerifier { get; }
+        string CodeChallenge { get; }
+        string CodeChallengeMethod { get; }
         string RedirectUri { get; }
     }
 }

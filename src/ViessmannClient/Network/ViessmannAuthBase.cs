@@ -4,6 +4,7 @@ using PhilipDaubmeier.ViessmannClient.Model.Error;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -20,9 +21,9 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
 
-        private const string _authUri = "https://iam.viessmann.com/idp/v1/authorize";
+        private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
         private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
-        private const string _redirectUri = "vicare://oauth-callback/everest";
+        private static List<string> _scopes = new List<string>() { "IoT", "User", "offline_access" };
 
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
@@ -39,6 +40,24 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
             _jsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
             _jsonSerializerOptions.Converters.Add(new ScheduleMessageConverter());
+        }
+
+        /// <summary>
+        /// Returns the uri of the login form that has to be sent back to the users
+        /// browser or has to be displayed in an embedded browser view respectively.
+        /// </summary>
+        public Uri GetLoginUri()
+        {
+            var queryStringData = new List<(string, string)>()
+            {
+                ("client_id", _connectionProvider.ClientId),
+                ("redirect_uri", _connectionProvider.RedirectUri),
+                ("response_type", "code"),
+                ("code_challenge", _connectionProvider.CodeChallenge),
+                ("code_challenge_method", _connectionProvider.CodeChallengeMethod),
+                ("scope", Uri.EscapeUriString(string.Join(' ', _scopes)))
+            };
+            return new Uri($"{_authUri}?{string.Join('&', queryStringData.Select(x => x.Item1 + "=" + x.Item2))}");
         }
 
         /// <summary>
@@ -129,7 +148,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             var request = new HttpRequestMessage()
             {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.ClientId}&redirect_uri={_redirectUri}&response_type=code"),
+                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.ClientId}&redirect_uri={_connectionProvider.RedirectUri}&response_type=code"),
                 Method = HttpMethod.Get,
             };
 
@@ -139,7 +158,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             var response = await _authClient.SendAsync(request);
             var location = response.Headers.Location.AbsoluteUri;
 
-            var prefix = $"{_redirectUri}?code=";
+            var prefix = $"{_connectionProvider.RedirectUri}?code=";
             if (!location.StartsWith(prefix) || location.Length <= prefix.Length)
                 throw new Exception("could not retrieve auth code");
 
@@ -155,7 +174,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
                                 new KeyValuePair<string, string>("client_id", _connectionProvider.ClientId),
                                 new KeyValuePair<string, string>("client_secret", _connectionProvider.RedirectUri),
                                 new KeyValuePair<string, string>("code", authorizationCode),
-                                new KeyValuePair<string, string>("redirect_uri", _redirectUri)
+                                new KeyValuePair<string, string>("redirect_uri", _connectionProvider.RedirectUri)
                             })));
 
             await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, string.Empty);
