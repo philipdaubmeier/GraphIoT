@@ -11,22 +11,18 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Config
 
         public string? AccessToken => _tokenStore.AccessToken;
         public DateTime AccessTokenExpiry => _tokenStore.AccessTokenExpiry;
+        public string? RefreshToken => _tokenStore.RefreshToken;
 
-        public string Username { get; }
-        public string UserPassword { get; }
-
-        public ViessmannAuth(TokenStore<T> tokenStore, string username, string password)
+        public ViessmannAuth(TokenStore<T> tokenStore)
         {
             _tokenStore = tokenStore;
-            Username = username;
-            UserPassword = password;
         }
 
         public bool IsAccessTokenValid() => _tokenStore.IsAccessTokenValid();
 
-        public async Task UpdateTokenAsync(string? sessionToken, DateTime sessionExpiration, string? applicationToken)
+        public async Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken)
         {
-            await _tokenStore.UpdateToken(sessionToken ?? string.Empty, sessionExpiration, applicationToken ?? string.Empty);
+            await _tokenStore.UpdateToken(accessToken ?? string.Empty, accessTokenExpiry, refreshToken ?? string.Empty);
         }
     }
 }

@@ -2,9 +2,6 @@
 {
     public class ViessmannConfig
     {
-        public string Username { get; set; } = null!;
-        public string Password { get; set; } = null!;
-
         public string InstallationId { get; set; } = null!;
         public string GatewayId { get; set; } = null!;
         public string ClientId { get; set; } = null!;
