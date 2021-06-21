@@ -3,7 +3,7 @@
   <metadata>
     <id>$id$</id>
     <version>$version$</version>
-    <title>Client library for communicating to the Viessmann Platform API</title>
+    <title>Client library for communicating to the Viessmann Developer Portal API</title>
     <authors>$authors$</authors>
     <owners>$authors$</owners>
     <license type="file">LICENSE</license>
@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.0.0 - upgraded library to be used with official API keys of the Viessmann Developer Portal which went live in May 2021.
 1.8.2 - fixed parsing issue of message lists
 1.8.1 - fixed multi TFM issues
 1.8.0 - widened range of supported platforms by targeting netstandard2.1
