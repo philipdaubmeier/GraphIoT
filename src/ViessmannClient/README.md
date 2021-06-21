@@ -3,7 +3,7 @@
 
 # ViessmannClient
 
-This class library provides a way to call the Viessmann Platform API. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface for reading all details of an installation as well as all setting and sensor values of devices.
+This class library provides a way to call the Viessmann Developer Portal API. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface for reading all details of an installation as well as all setting and sensor values of devices.
 
 ## NuGet
 
@@ -13,26 +13,44 @@ PM> Install-Package PhilipDaubmeier.ViessmannClient
 
 ## Usage
 
-You have to implement the interfaces `IViessmannAuth` and `IViessmannConnectionProvider<T>` to provide the Viessmann webservice clients with all information necessary to authenticate and establish a connection.
+For getting access to Viessmann APIs, first register on the [Viessmann Developer Portal](https://developer.viessmann.com/) and create a client via ["API Keys"](https://developer.viessmann.com/de/clients), which will generate a client id for you and lets you set one or more redirect URIs.
 
-The minimal viable example for playing around (do not hardcode credentials in real use!) with the client would be to create a connection provider as shown here:
+To then use this library, you have to implement the interfaces `IViessmannAuth` and `IViessmannConnectionProvider<T>` to provide the Viessmann webservice clients with all information necessary to authenticate and establish a connection.
+
+The minimal viable example for playing around with the client would be to create a connection provider and generate the login form uri as shown here:
 
 ```csharp
-var viessmannConnProvider = new ViessmannConnectionProvider<ViessmannPlatformClient>()
+var auth = new ViessmannAuth();
+var viessmannConnProvider = new ViessmannConnectionProvider<ViessmannPlatformClient>(auth)
 {
-    AuthData = new ViessmannAuth("<username>", "<password>"),
-    PlattformApiClientId = "<clientId>",
-    PlattformApiClientSecret = "<clientSecret>"
+    ClientId = "<clientId>",
+    RedirectUri = "http://localhost:4000"
 };
+
+var client = new ViessmannPlatformClient(viessmannConnProvider);
+var uri = client.GetLoginUri();
+
+Console.WriteLine($"Login here: {uri.AbsoluteUri}");
 ```
 
-> **Caution:** in a productive use you may want to implement your own `IViessmannConnectionProvider<T>` and load your app id, secret and user credentials from a suitable vault. You can have a look at the respective classes in [`GraphIoT.Viessmann`](../GraphIoT.Viessmann/Config) as an example for `IViessmannAuth` and `IViessmannConnectionProvider<T>` implemenations with secrets injection and storing/loading of access tokens.
-
-If you have the connection providers in place, you can create and use the Viessmann client like this:
+For playing around you can now copy the uri that was written to the console into a browser and log in there. The browser will then redirect to a page that does not exist and will show a _"page not found"_ message. Just use the part after `?code=` in the browser address bar and input it into the program, which is shown in the following.
 
 ```csharp
-var client = new ViessmannPlatformClient(viessmannConnProvider);
+Console.WriteLine("After logging in you should be redirected to a non-existent page.");
+Console.WriteLine("Enter the code you see in the browsers address bar behind '?code=':");
+var code = Console.ReadLine();
+await client.TryCompleteLogin(code);
+```
 
+After this step, the `auth` object will contain a valid access token and also a refresh token. The refresh token can be permanently persisted and loaded after each startup and will automatically be used for refreshing the access token if expired.
+
+> **Note:** in a productive use you will want to launch the login uri in an embedded browser view or redirect to this uri in case of a web application. After sucessful login either capture the resulting uri from the embedded browser or use a productive callback API on your server side.
+> 
+> **Note:** also, you may want to implement your own `IViessmannConnectionProvider<T>` and load your client id and redirect uri from a configuration file and store and load refresh tokens across program restarts. You can have a look at the respective classes in [`GraphIoT.Viessmann`](../GraphIoT.Viessmann/Config) as an example for `IViessmannAuth` and `IViessmannConnectionProvider<T>` implemenations with storing/loading of configuration, access tokens and refresh tokens.
+
+With being logged in sucessfully and having a valid refresh token in the `auth` object, you can now go ahead and use the library to actually traverse through installations, gateways and devices and finally query for data on the Viessmann API:
+
+```csharp
 // Get the first installation, gateway and device id of the logged in user
 var installationId = (await client.GetInstallations()).First().LongId;
 var gatewayId = (await client.GetGateways(installationId)).First().LongId;
@@ -43,15 +61,11 @@ var features = await client.GetDeviceFeatures(installationId, gatewayId, deviceI
 var outsideTemp = features.GetHeatingSensorsTemperatureOutside();
 var boilerTemp = features.GetHeatingBoilerTemperature();
 Console.WriteLine($"Outside temp: {outsideTemp} °C, boiler temp: {boilerTemp} °C");
-
-// Query for properties of individual circuits
-foreach (var circuit in features.GetHeatingCircuits())
-    Console.WriteLine($"Name of {circuit}: {features.GetHeatingCircuitsCircuitName(circuit)}");
 ```
 
 For more usage examples you can also have a look at the [unit tests](../../test/ViessmannClient.Tests).
 
-A full list of status and sensor values of devices can be found in the [`DeviceFeatureList`](Model/Devices/DeviceFeatureList.cs) class.
+A full list of status and sensor values of devices can be found in the [`DeviceFeatureList`](Model/Devices/DeviceFeatureList.cs) class and in the Viessmann Developer Portal, _"IoT Features"_, chapter [_"List of features"_](https://developer.viessmann.com/en/doc/iot).
 
 ## Platform Support
 
@@ -61,7 +75,7 @@ ViessmannClient is targeted for .NET Standard 2.1 or higher.
 
 The MIT License (MIT)
 
-Copyright (c) 2019-2020 Philip Daubmeier
+Copyright (c) 2019-2021 Philip Daubmeier
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

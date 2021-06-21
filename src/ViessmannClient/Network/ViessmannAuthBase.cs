@@ -18,7 +18,6 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         protected readonly IViessmannConnectionProvider<ViessmannPlatformClient> _connectionProvider;
 
         private readonly HttpClient _client;
-        private readonly HttpClient _authClient;
 
         private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
         private const string _tokenUri = "https://iam.viessmann.com/idp/v2/token";
@@ -35,7 +34,6 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             _connectionProvider = connectionProvider;
             _client = connectionProvider.Client;
-            _authClient = connectionProvider.AuthClient;
 
             _jsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
             _jsonSerializerOptions.Converters.Add(new ScheduleMessageConverter());

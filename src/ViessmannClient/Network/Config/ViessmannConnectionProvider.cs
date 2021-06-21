@@ -9,9 +9,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
     public class ViessmannConnectionProvider<T> : IViessmannConnectionProvider<T>, IDisposable
     {
         private bool skipDisposingClient = false;
-        private bool skipDisposingAuthClient = false;
         private HttpClient? client = null;
-        private HttpClient? authClient = null;
 
         /// <summary>
         /// See <see cref="IViessmannConnectionProvider{T}.AuthData"/>
@@ -23,7 +21,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient(CreateAuthHandler()));
+            get => client ?? (client = new HttpClient(CreateHttpClientHandler()));
             protected set
             {
                 client = value;
@@ -31,25 +29,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             }
         }
 
-        /// <summary>
-        /// See <see cref="IViessmannConnectionProvider{T}.AuthClient"/>
-        /// </summary>
-        public HttpClient AuthClient
-        {
-            get => authClient ?? (authClient = new HttpClient(CreateAuthHandler()));
-            protected set
-            {
-                authClient = value;
-                skipDisposingAuthClient = true;
-            }
-        }
-
-        /// <summary>
-        /// For authentication on Viessmann Plattform we need a separate
-        /// client that does not follow redirects. Use this handler for that
-        /// purpose.
-        /// </summary>
-        public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler() { AllowAutoRedirect = false };
+        public static HttpClientHandler CreateHttpClientHandler() => new HttpClientHandler();
 
         public string ClientId { get; set; } = string.Empty;
         public string RedirectUri { get; set; } = string.Empty;
@@ -96,9 +76,6 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
             if (!skipDisposingClient)
                 client?.Dispose();
-
-            if (!skipDisposingAuthClient)
-                authClient?.Dispose();
 
             disposed = true;
         }
