@@ -13,7 +13,7 @@
     <releaseNotes>
 1.0.0 - Initial version
     </releaseNotes>
-    <copyright>Copyright 2019-2020 Philip Daubmeier</copyright>
+    <copyright>Copyright 2019-2021 Philip Daubmeier</copyright>
     <tags>$tags$</tags>
     <dependencies>
       <group targetFramework="netcoreapp3.1">
