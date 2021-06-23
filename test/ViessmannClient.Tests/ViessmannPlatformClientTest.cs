@@ -158,10 +158,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
         {
             var mockHttp = new MockHttpMessageHandler();
 
-            mockHttp.When($"{MockViessmannConnection.BaseUri}operational-data/v2/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/features?reduceHypermedia=true")
+            mockHttp.When($"{MockViessmannConnection.BaseUri}iot/v1/equipment/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/features")
                     .Respond("application/json",
                     @"{
-                        ""features"": [
+                        ""data"": [
                             {
                                 ""isEnabled"": true,
                                 ""isReady"": true,
@@ -302,10 +302,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
         {
             var mockHttp = new MockHttpMessageHandler();
 
-            mockHttp.When($"{MockViessmannConnection.BaseUri}operational-data/v2/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features?reduceHypermedia=true")
+            mockHttp.When($"{MockViessmannConnection.BaseUri}iot/v1/equipment/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features")
                     .Respond("application/json",
                     @"{
-                          ""features"": [
+                          ""data"": [
                               {
                                   ""isEnabled"": true,
                                   ""isReady"": true,
