@@ -10,10 +10,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
     {
         public static MockHttpMessageHandler AddAllDeviceFeatures(this MockHttpMessageHandler mockHttp)
         {
-            mockHttp.When($"{MockViessmannConnection.BaseUri}operational-data/v2/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features?reduceHypermedia=true")
+            mockHttp.When($"{MockViessmannConnection.BaseUri}iot/v1/equipment/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features")
                     .Respond("application/json",
                     @"{
-                          ""features"": [
+                          ""data"": [
                               {
                                   ""feature"": ""heating""
                               },

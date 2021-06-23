@@ -11,7 +11,8 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
-2.0.0 - upgraded library to be used with official API keys of the Viessmann Developer Portal which went live in May 2021.
+2.1.0 - changed to new iot/v1 API and new base uri
+2.0.0 - upgraded library to be used with official API keys of the Viessmann Developer Portal which went live in May 2021
 1.8.2 - fixed parsing issue of message lists
 1.8.1 - fixed multi TFM issues
 1.8.0 - widened range of supported platforms by targeting netstandard2.1
