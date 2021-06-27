@@ -19,11 +19,11 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
-    <PackageReference Include="System.Text.Json" Version="4.7.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlAgilityPack" Version="1.11.23" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.34" />
   </ItemGroup>
 
   <Target Name="PopulateNuspec">

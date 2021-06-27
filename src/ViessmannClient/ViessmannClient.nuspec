@@ -35,7 +35,7 @@
       <group targetFramework="netcoreapp3.1">
       </group>
       <group targetFramework="netstandard2.1">
-        <dependency id="System.Text.Json" version="4.7.1" />
+        <dependency id="System.Text.Json" version="5.0.2" />
       </group>
     </dependencies>
   </metadata>
