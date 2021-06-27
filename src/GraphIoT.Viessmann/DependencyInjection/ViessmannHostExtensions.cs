@@ -30,20 +30,13 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
             serviceCollection.ConfigureTokenStore(tokenStoreConfig);
             serviceCollection.AddTokenStore<ViessmannPlatformClient>();
-            serviceCollection.AddTokenStore<ViessmannVitotrolClient>();
 
-            serviceCollection.AddViessmannHttpClient<ViessmannAuthHttpClient>();
             serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannPlatformClient>>();
-            serviceCollection.AddViessmannHttpClient<ViessmannHttpClient<ViessmannVitotrolClient>>();
 
             serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannPlatformClient>, ViessmannConfigConnectionProvider<ViessmannPlatformClient>>();
-            serviceCollection.AddScoped<IViessmannConnectionProvider<ViessmannVitotrolClient>, ViessmannConfigConnectionProvider<ViessmannVitotrolClient>>();
-
             serviceCollection.AddScoped<ViessmannPlatformClient>();
-            serviceCollection.AddScoped<ViessmannVitotrolClient>();
 
-            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannSolarPollingService>();
-            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannHeatingPollingService>();
+            serviceCollection.AddPollingService<IViessmannPollingService, ViessmannPollingService>();
             serviceCollection.AddTimedPollingHost<IViessmannPollingService>(viessmannConfig.GetSection("PollingService"));
 
             serviceCollection.AddGraphCollectionViewModel<ViessmannHeatingViewModel>();
@@ -62,8 +55,6 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
 
         public static IServiceCollection AddViessmannHttpClient<TClient>(this IServiceCollection serviceCollection) where TClient : class
         {
-            var useAuthHandler = typeof(TClient) == typeof(ViessmannAuthHttpClient);
-
             var retryPolicy = HttpPolicyExtensions
                 .HandleTransientHttpError()
                 .Or<TimeoutRejectedException>()
@@ -89,7 +80,7 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection
                 client.Timeout = TimeSpan.FromMinutes(1); // Overall timeout across all tries
             })
                 .ConfigurePrimaryHttpMessageHandler(services =>
-                    (useAuthHandler ? ViessmannConnectionProvider<TClient>.CreateAuthHandler() : new HttpClientHandler())
+                    new HttpClientHandler()
                     .SetProxy(services.GetService<IOptions<NetworkConfig>>())
                 )
                 .AddPolicyHandler(retryPolicy)

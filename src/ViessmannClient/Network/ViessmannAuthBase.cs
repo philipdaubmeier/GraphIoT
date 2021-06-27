@@ -4,9 +4,9 @@ using PhilipDaubmeier.ViessmannClient.Model.Error;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,11 +18,10 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         protected readonly IViessmannConnectionProvider<ViessmannPlatformClient> _connectionProvider;
 
         private readonly HttpClient _client;
-        private readonly HttpClient _authClient;
 
-        private const string _authUri = "https://iam.viessmann.com/idp/v1/authorize";
-        private const string _tokenUri = "https://iam.viessmann.com/idp/v1/token";
-        private const string _redirectUri = "vicare://oauth-callback/everest";
+        private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
+        private const string _tokenUri = "https://iam.viessmann.com/idp/v2/token";
+        private static List<string> _scopes = new List<string>() { "IoT", "User", "offline_access" };
 
         private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
 
@@ -35,9 +34,48 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         {
             _connectionProvider = connectionProvider;
             _client = connectionProvider.Client;
-            _authClient = connectionProvider.AuthClient;
 
             _jsonSerializerOptions.Converters.Add(new ObjectToInferredTypesConverter());
+            _jsonSerializerOptions.Converters.Add(new ScheduleMessageConverter());
+        }
+
+        /// <summary>
+        /// Returns the uri of the login form that has to be sent back to the users
+        /// browser or has to be displayed in an embedded browser view respectively.
+        /// </summary>
+        public Uri GetLoginUri()
+        {
+            var queryStringData = new List<(string, string)>()
+            {
+                ("client_id", _connectionProvider.ClientId),
+                ("redirect_uri", _connectionProvider.RedirectUri),
+                ("response_type", "code"),
+                ("code_challenge", _connectionProvider.CodeChallenge),
+                ("code_challenge_method", _connectionProvider.CodeChallengeMethod),
+                ("scope", Uri.EscapeUriString(string.Join(' ', _scopes)))
+            };
+            return new Uri($"{_authUri}?{string.Join('&', queryStringData.Select(x => x.Item1 + "=" + x.Item2))}");
+        }
+
+        /// <summary>
+        /// After the user filled out the Viessmann login form and was redirected to
+        /// the configured callback, this method can be called to complete the login
+        /// flow. If this method returns false, an error occured and the user could not
+        /// be logged in. If true is returned, the resulting access and refresh tokens
+        /// are stored in the connection provider and automatically used in all subsequent
+        /// requests. Access tokens are also automatically renewed if expired.
+        /// </summary>
+        public async Task<bool> TryCompleteLogin(string code)
+        {
+            try
+            {
+                await LoadInitialAccessToken(code);
+                return _connectionProvider.AuthData.IsAccessTokenValid();
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -100,7 +138,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         protected async Task Authenticate()
         {
-            if (string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientId) || string.IsNullOrWhiteSpace(_connectionProvider.PlattformApiClientSecret))
+            if (string.IsNullOrWhiteSpace(_connectionProvider.ClientId) || string.IsNullOrWhiteSpace(_connectionProvider.RedirectUri))
                 throw new Exception("ViessmannPlatformClient is missing one or more of the mandatory connection provider configuration values.");
 
             try
@@ -110,7 +148,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
                 if (_connectionProvider.AuthData.IsAccessTokenValid())
                     return;
 
-                await RetrieveAccessToken(await GetAuthorizationCode());
+                await RefreshAccessToken();
 
                 // check if we have a valid access token now
                 if (_connectionProvider.AuthData.IsAccessTokenValid())
@@ -124,43 +162,40 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             }
         }
 
-        private async Task<string> GetAuthorizationCode()
+        public async Task LoadInitialAccessToken(string code)
         {
-            var request = new HttpRequestMessage()
+            var formData = new List<(string, string)>()
             {
-                RequestUri = new Uri($"{_authUri}?type=web_server&client_id={_connectionProvider.PlattformApiClientId}&redirect_uri={_redirectUri}&response_type=code"),
-                Method = HttpMethod.Get,
+                ("client_id", _connectionProvider.ClientId),
+                ("redirect_uri", _connectionProvider.RedirectUri),
+                ("grant_type", "authorization_code"),
+                ("code_verifier", _connectionProvider.CodeVerifier),
+                ("code", code)
             };
+            var loadedToken = await ParseTokenResponse(await _client.PostAsync(new Uri(_tokenUri),
+                new FormUrlEncodedContent(formData.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)))));
 
-            var basicAuth = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{_connectionProvider.AuthData.Username}:{_connectionProvider.AuthData.UserPassword}"));
-            request.Headers.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
-
-            var response = await _authClient.SendAsync(request);
-            var location = response.Headers.Location.AbsoluteUri;
-
-            var prefix = $"{_redirectUri}?code=";
-            if (!location.StartsWith(prefix) || location.Length <= prefix.Length)
-                throw new Exception("could not retrieve auth code");
-
-            return location.Substring(prefix.Length);
+            await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, loadedToken.Item3);
         }
 
-        private async Task RetrieveAccessToken(string authorizationCode)
+        private async Task RefreshAccessToken()
         {
-            Tuple<string, DateTime> loadedToken = await ParseTokenResponse(await _client.PostAsync(
-                            new Uri(_tokenUri), new FormUrlEncodedContent(new[]
-                            {
-                                new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                                new KeyValuePair<string, string>("client_id", _connectionProvider.PlattformApiClientId),
-                                new KeyValuePair<string, string>("client_secret", _connectionProvider.PlattformApiClientSecret),
-                                new KeyValuePair<string, string>("code", authorizationCode),
-                                new KeyValuePair<string, string>("redirect_uri", _redirectUri)
-                            })));
+            if (_connectionProvider.AuthData.RefreshToken is null)
+                throw new IOException("No refresh token present");
 
-            await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, string.Empty);
+            var formData = new List<(string, string)>()
+            {
+                ("client_id", _connectionProvider.ClientId),
+                ("grant_type", "refresh_token"),
+                ("refresh_token", _connectionProvider.AuthData.RefreshToken)
+            };
+            var loadedToken = await ParseTokenResponse(await _client.PostAsync(new Uri(_tokenUri),
+                new FormUrlEncodedContent(formData.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)))));
+
+            await _connectionProvider.AuthData.UpdateTokenAsync(loadedToken.Item1, loadedToken.Item2, loadedToken.Item3);
         }
 
-        private async Task<Tuple<string, DateTime>> ParseTokenResponse(HttpResponseMessage response)
+        private async Task<(string, DateTime, string)> ParseTokenResponse(HttpResponseMessage response)
         {
             var responseStream = await response.Content.ReadAsStreamAsync();
 
@@ -168,7 +203,10 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             if (authRaw?.AccessToken == null || authRaw?.ExpiresIn == null)
                 throw new Exception("Could not parse token.");
 
-            return new Tuple<string, DateTime>(authRaw.AccessToken, DateTime.Now.AddSeconds(authRaw.ExpiresIn));
+            if (authRaw?.RefreshToken == null)
+                throw new Exception("Did not get refresh token.");
+
+            return (authRaw.AccessToken, DateTime.Now.AddSeconds(authRaw.ExpiresIn), authRaw.RefreshToken);
         }
 
         public void Dispose()

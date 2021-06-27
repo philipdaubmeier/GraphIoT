@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.ViessmannClient.Model.Features
 {
@@ -27,7 +29,10 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
         public TypedValue<string?>? Name { get; set; }
         public TypedValue<decimal>? Shift { get; set; }
         public TypedValue<decimal>? Slope { get; set; }
-        public TypedValue<Schedule?>? Entries { get; set; }
+        
+        [JsonPropertyName("entries")]
+        public TypedValue<ScheduleOrMessage>? ScheduleOrMessage { get; set; }
+
         public TypedValue<bool>? OverlapAllowed { get; set; }
         public TypedValue<decimal>? Temperature { get; set; }
         public TypedValue<string?>? Start { get; set; }
@@ -60,6 +65,22 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             Resolution.Year => Year,
             _ => Day
         };
+
+        [JsonIgnore]
+        public TypedValue<Schedule>? Entries => ScheduleOrMessage?.Value.Schedule == null ? null :
+            new TypedValue<Schedule>()
+            {
+                Type = ScheduleOrMessage?.Type,
+                Value = ScheduleOrMessage?.Value.Schedule!
+            };
+
+        [JsonIgnore]
+        public TypedValue<List<Message>?>? Messages => ScheduleOrMessage?.Value.Messages == null ? null : 
+            new TypedValue<List<Message>?>()
+            {
+                Type = ScheduleOrMessage?.Type,
+                Value = ScheduleOrMessage?.Value.Messages
+            };
 
         public override string ToString()
         {

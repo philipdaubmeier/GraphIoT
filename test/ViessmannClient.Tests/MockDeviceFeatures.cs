@@ -10,12 +10,30 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
     {
         public static MockHttpMessageHandler AddAllDeviceFeatures(this MockHttpMessageHandler mockHttp)
         {
-            mockHttp.When($"{MockViessmannConnection.BaseUri}operational-data/v2/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features?reduceHypermedia=true")
+            mockHttp.When($"{MockViessmannConnection.BaseUri}iot/v1/equipment/installations/{MockViessmannConnection.InstallationId}/gateways/{MockViessmannConnection.GatewayId}/devices/{MockViessmannConnection.DeviceId}/features")
                     .Respond("application/json",
                     @"{
-                          ""features"": [
+                          ""data"": [
                               {
                                   ""feature"": ""heating""
+                              },
+                              {
+                                  ""feature"":""device.messages.logbook"",
+                                  ""properties"": {
+                                      ""entries"": {
+                                          ""value"": [
+                                              {
+                                                  ""timestamp"": ""2020-01-01T00:00:00.000Z"",
+                                                  ""actor"": ""SECONDARY_PUMP1"",
+                                                  ""status"": 0,
+                                                  ""event"": ""Inverter_CPU_error"",
+                                                  ""stateMachine"": ""TPM_SC1"",
+                                                  ""additionalInfo"": 120
+                                              }
+                                          ],
+                                          ""type"": ""array""
+                                      }
+                                  }
                               },
                               {
                                   ""feature"": ""heating.boiler""
@@ -470,6 +488,27 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
                                           }
                                       }
                                   }
+                              },
+                              {
+                                  ""properties"":{
+                                      ""entries"":{
+                                          ""value"":[
+                                              {
+                                                  ""timestamp"": ""2020-09-15T06:38:01.000Z"",
+                                                  ""errorCode"": ""49"",
+                                                  ""status"": ""inactive"",
+                                                  ""count"": 39,
+                                                  ""priority"": ""info""
+                                              }
+                                          ],
+                                          ""type"": ""array""
+                                      }
+                                  },
+                                  ""feature"": ""heating.coolingCircuits.0.messages"",
+                                  ""timestamp"": ""2020-09-16T06:15:50.236Z"",
+                                  ""isEnabled"": true,
+                                  ""isReady"": true,
+                                  ""deviceId"": ""0""
                               },
                               {
                                   ""feature"": ""heating.circuits.2.heating.schedule""

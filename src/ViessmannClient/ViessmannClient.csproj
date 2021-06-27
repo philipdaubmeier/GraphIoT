@@ -4,12 +4,12 @@
     <AssemblyName>PhilipDaubmeier.ViessmannClient</AssemblyName>
     <RootNamespace>PhilipDaubmeier.ViessmannClient</RootNamespace>
     <PackageId>PhilipDaubmeier.ViessmannClient</PackageId>
-    <Description>This class library provides a way to call the Viessmann Server interfaces. It supports RESTful Viessmann Plattform services, the Estrella server as well as the legacy Vitotrol SOAP service. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
+    <Description>This class library provides a way to call the Viessmann Developer Portal interfaces. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
     <PackageTags>viessmann;heating;smarthome;httpclient</PackageTags>
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/ViessmannClient</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.9.0</Version>
+    <Version>2.2.0</Version>
     <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
     <NuspecFile>ViessmannClient.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

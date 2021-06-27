@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.ViessmannClient
 {
     public class ViessmannPlatformClient : ViessmannAuthBase
     {
-        private const string _baseUri = "https://api.viessmann-platform.io/";
+        private const string _baseUri = "https://api.viessmann.com/";
 
         public ViessmannPlatformClient(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
             : base(connectionProvider) { }
@@ -36,13 +36,13 @@ namespace PhilipDaubmeier.ViessmannClient
 
         public async Task<GatewayFeatureList> GetGatewayFeatures(long installationId, long gatewayId)
         {
-            var uri = $"{_baseUri}operational-data/v2/installations/{installationId}/gateways/{gatewayId}/features?reduceHypermedia=true";
+            var uri = $"{_baseUri}iot/v1/equipment/installations/{installationId}/gateways/{gatewayId}/features";
             return await CallViessmannApi<FeatureResponse<GatewayFeatureList>, GatewayFeatureList>(new Uri(uri));
         }
 
         public async Task<DeviceFeatureList> GetDeviceFeatures(long installationId, long gatewayId, long deviceId = 0)
         {
-            var uri = $"{_baseUri}operational-data/v2/installations/{installationId}/gateways/{gatewayId}/devices/{deviceId}/features?reduceHypermedia=true";
+            var uri = $"{_baseUri}iot/v1/equipment/installations/{installationId}/gateways/{gatewayId}/devices/{deviceId}/features";
             return await CallViessmannApi<FeatureResponse<DeviceFeatureList>, DeviceFeatureList>(new Uri(uri));
         }
     }

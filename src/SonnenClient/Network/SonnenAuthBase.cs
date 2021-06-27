@@ -63,6 +63,8 @@ namespace PhilipDaubmeier.SonnenClient.Network
             _provider = connectionProvider;
             _authData = _provider.AuthData;
             _client = _provider.Client;
+
+            _jsonSerializerOptions.Converters.Add(new DoubleToIntConverter());
         }
 
         /// <summary>

@@ -12,6 +12,7 @@
     <description>$description$</description>
     <releaseNotes>
 1.7.0 - upgraded to target framework net5.0
+1.6.2 - adjusted parsing according to Sonnen API changes
 1.6.1 - fixed multi TFM issues
 1.6.0 - widened range of supported platforms by targeting netstandard2.1
 1.5.0 - moved to System.Text.Json and removed dependency to Json.NET
@@ -21,7 +22,7 @@
 1.1.0 - migrated to netcoreapp3.0
 1.0.0 - Initial version with publishing version 1.0 of GraphIoT
     </releaseNotes>
-    <copyright>Copyright 2019-2020 Philip Daubmeier</copyright>
+    <copyright>Copyright 2019-2021 Philip Daubmeier</copyright>
     <tags>$tags$</tags>
     <dependencies>
       <group targetFramework="net5.0">
