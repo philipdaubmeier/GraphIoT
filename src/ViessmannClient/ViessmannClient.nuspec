@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.2.0 - upgraded to target framework net5.0
 2.1.0 - changed to new iot/v1 API and new base uri
 2.0.0 - upgraded library to be used with official API keys of the Viessmann Developer Portal which went live in May 2021
 1.8.2 - fixed parsing issue of message lists
@@ -29,14 +30,17 @@
     <copyright>Copyright 2019-2021 Philip Daubmeier</copyright>
     <tags>$tags$</tags>
     <dependencies>
+      <group targetFramework="net5.0">
+      </group>
       <group targetFramework="netcoreapp3.1">
       </group>
       <group targetFramework="netstandard2.1">
-        <dependency id="System.Text.Json" version="4.7.1" />
+        <dependency id="System.Text.Json" version="5.0.2" />
       </group>
     </dependencies>
   </metadata>
   <files>
+    <file src="bin\$configuration$\net5.0\$id$.dll" target="lib\net5.0" />
     <file src="bin\$configuration$\netcoreapp3.1\$id$.dll" target="lib\netcoreapp3.1" />
     <file src="bin\$configuration$\netstandard2.1\$id$.dll" target="lib\netstandard2.1" />
     <file src="..\..\LICENSE" />

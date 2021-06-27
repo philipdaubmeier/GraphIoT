@@ -57,9 +57,9 @@ namespace PhilipDaubmeier.DigitalstromTwin
             }
         }
 
-        private void ApartmentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ApartmentCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
+            if (e.NewItems is null || e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
                 return;
 
             var roomState = (e.NewItems[0] as KeyValuePair<Zone, RoomState>?)?.Value;
@@ -70,9 +70,9 @@ namespace PhilipDaubmeier.DigitalstromTwin
             SubscribeChangesRoom(roomState);
         }
 
-        private void RoomStateCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void RoomStateCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
+            if (e.NewItems is null || e.Action != NotifyCollectionChangedAction.Add || e.NewItems.Count < 1)
                 return;
 
             var sensorState = (e.NewItems[0] as KeyValuePair<Sensor, SensorState>?)?.Value;
@@ -90,7 +90,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             }
         }
 
-        private void StatePropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void StatePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // ignore sensor state changes, as sensors can not be changed/written
             if (!(sender is SceneState sceneState))
@@ -110,7 +110,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             });
         }
 
-        private void StatePropertyChangedInternal(object sender, PropertyChangedEventArgs e)
+        private void StatePropertyChangedInternal(object? sender, PropertyChangedEventArgs e)
         {
             if (!(sender is SceneState sceneState))
                 return;

@@ -31,7 +31,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection
         public static IApplicationBuilder ConfigureGrafanaHost(this IApplicationBuilder app, string appBasePath)
         {
             // configure reverse proxy for 'grafana' path
-            var grafanaRegex = string.IsNullOrWhiteSpace(appBasePath) ? @"^/grafana($|/.*)" : @"^(" + appBasePath + ")?/grafana($|/.*)";
+            string grafanaRegex = string.IsNullOrWhiteSpace(appBasePath) ? @"^/grafana($|/.*)" : @"^(" + appBasePath + ")?/grafana($|/.*)";
             string rewriteFunc(string s) => new PathString(((IEnumerable<Group>?)Regex.Matches(s, grafanaRegex).FirstOrDefault()?.Groups)?.Skip(2)?.FirstOrDefault()?.Value ?? string.Empty);
             app.UseWhen(context => Regex.IsMatch(context.Request.Path, grafanaRegex), appInner => appInner
                 .UseRewriter(new RewriteOptions().Add(context => context.HttpContext.Request.Path = rewriteFunc(context.HttpContext.Request.Path)))

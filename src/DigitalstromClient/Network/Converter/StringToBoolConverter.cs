@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             if (reader.TokenType == JsonTokenType.False)
                 return false;
 
-            if (reader.GetString().Trim().Equals("true", StringComparison.InvariantCultureIgnoreCase))
+            if (reader.GetString()?.Trim().Equals("true", StringComparison.InvariantCultureIgnoreCase) ?? false)
                 return true;
 
             return false;

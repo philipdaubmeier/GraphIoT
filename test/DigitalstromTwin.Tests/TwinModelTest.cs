@@ -283,7 +283,7 @@ namespace PhilipDaubmeier.DigitalstromTwin.Tests
 
             var changedCountValue = 0;
             var changedCountTimestamp = 0;
-            void onChanged(object s, PropertyChangedEventArgs e)
+            void onChanged(object? s, PropertyChangedEventArgs e)
             {
                 if (e.PropertyName == "Value")
                     changedCountValue++;

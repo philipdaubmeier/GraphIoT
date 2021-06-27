@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
     public abstract class AbstractState<T> : INotifyPropertyChanged
     {
         private PropertyChangedEventHandler? _propertyChanged;
-        public event PropertyChangedEventHandler PropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged
         {
             add
             {
@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         }
 
         private PropertyChangedEventHandler? _propertyChangedInternal;
-        internal event PropertyChangedEventHandler PropertyChangedInternal
+        internal event PropertyChangedEventHandler? PropertyChangedInternal
         {
             add
             {

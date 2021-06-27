@@ -71,7 +71,7 @@ Follow these steps to set up the development environment, publish the applicatio
 
 ## Platform Support
 
-GraphIoT is compiled for .NET Core 3.1.
+GraphIoT is compiled for .NET 5.0.
 
 ## License
 

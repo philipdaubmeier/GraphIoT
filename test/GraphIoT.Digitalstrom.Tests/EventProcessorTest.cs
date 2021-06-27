@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                     await Task.Delay(100);
                     if (db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStreamEncoded != null &&
                         db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStream.Count() > 1 &&
-                        db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault().EventStream.Last().Properties.SceneID == expected)
+                        db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStream.Last().Properties.SceneID == expected)
                         break;
                 }
             }
@@ -52,10 +52,10 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
             Assert.NotNull(db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStreamEncoded);
 
             var storedEvents = db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStream;
-            Assert.True(storedEvents.Count() > 1);
-            Assert.Equal(32027, (int)storedEvents.Last().Properties.ZoneID);
-            Assert.Equal((int)SceneCommand.Preset0, (int)storedEvents.First().Properties.SceneID);
-            Assert.Equal((int)SystemEvent.CallScene, (int)storedEvents.First().SystemEvent.Type);
+            Assert.True(!(storedEvents is null) && storedEvents.Count() > 1);
+            Assert.Equal(32027, storedEvents is null ? -1 : (int)storedEvents.Last().Properties.ZoneID);
+            Assert.Equal((int)SceneCommand.Preset0, storedEvents is null ? -1 : (int)storedEvents.First().Properties.SceneID);
+            Assert.Equal((int)SystemEvent.CallScene, storedEvents is null ? -1 : (int)storedEvents.First().SystemEvent.Type);
 
             // Turn off event sending
             mockHttp.AutoFlush = false;
@@ -73,7 +73,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
             storedEvents = db.DsSceneEventDataSet.AsNoTracking().FirstOrDefault()?.EventStream;
             Assert.NotNull(storedEvents);
-            Assert.Equal((int)SceneCommand.Alarm1, (int)storedEvents.Last().Properties.SceneID);
+            Assert.Equal((int)SceneCommand.Alarm1, storedEvents is null ? -1 : (int)storedEvents.Last().Properties.SceneID);
         }
     }
 }

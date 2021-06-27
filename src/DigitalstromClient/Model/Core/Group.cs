@@ -138,21 +138,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return ((Color[])Enum.GetValues(typeof(Color))).Select(x => (Group)x);
         }
 
-        public static bool operator !=(Group group1, Group group2)
+        public static bool operator !=(Group? group1, Group? group2)
         {
             return !(group1 == group2);
         }
 
-        public static bool operator ==(Group group1, Group group2)
+        public static bool operator ==(Group? group1, Group? group2)
         {
             if (group1 is null || group2 is null)
                 return ReferenceEquals(group1, group2);
             return group1._group == group2._group;
         }
 
-        public int CompareTo(Group value)
+        public int CompareTo(Group? value)
         {
-            return _group.CompareTo(value._group);
+            return _group.CompareTo(value?._group);
         }
 
         public int CompareTo(object? value)
@@ -160,7 +160,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _group.CompareTo((value as Group)?._group ?? value);
         }
 
-        public bool Equals(Group group)
+        public bool Equals(Group? group)
         {
             return this == group;
         }

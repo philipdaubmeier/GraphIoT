@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model
 
         public override Vin Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new Vin(reader.GetString());
+            return new Vin(reader.GetString() ?? string.Empty);
         }
     }
 }

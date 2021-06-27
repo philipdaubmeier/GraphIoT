@@ -34,21 +34,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return new Zone(zone);
         }
 
-        public static bool operator !=(Zone zone1, Zone zone2)
+        public static bool operator !=(Zone? zone1, Zone? zone2)
         {
             return !(zone1 == zone2);
         }
 
-        public static bool operator ==(Zone zone1, Zone zone2)
+        public static bool operator ==(Zone? zone1, Zone? zone2)
         {
             if (zone1 is null || zone2 is null)
                 return ReferenceEquals(zone1, zone2);
             return zone1._zone == zone2._zone;
         }
 
-        public int CompareTo(Zone value)
+        public int CompareTo(Zone? value)
         {
-            return _zone.CompareTo(value._zone);
+            return _zone.CompareTo(value?._zone);
         }
 
         public int CompareTo(object? value)
@@ -56,7 +56,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return _zone.CompareTo((value as Zone)?._zone ?? value);
         }
 
-        public bool Equals(Zone zone)
+        public bool Equals(Zone? zone)
         {
             return this == zone;
         }
@@ -68,7 +68,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public override int GetHashCode()
         {
-            return _zone.GetHashCode();
+            return HashCode.Combine(_zone);
         }
 
         public override string ToString()
