@@ -81,8 +81,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             {
                 yield return new EventViewModel(
                     time: dssEvent.TimestampUtc,
-                    title: _localizer["event: {0}", dssEvent.SystemEvent.Name],
-                    text: _localizer["{0}, zone {1}, group {2}, scene {3}", dssEvent.SystemEvent.Name, (int)dssEvent.Properties.ZoneID, (int)dssEvent.Properties.GroupID, (int)dssEvent.Properties.SceneID],
+                    title: (string?)_localizer["event: {0}", dssEvent.SystemEvent.Name] ?? string.Empty,
+                    text: (string?)_localizer["{0}, zone {1}, group {2}, scene {3}", dssEvent.SystemEvent.Name, (int)dssEvent.Properties.ZoneID, (int)dssEvent.Properties.GroupID, (int)dssEvent.Properties.SceneID] ?? string.Empty,
                     tags: new[] { dssEvent.SystemEvent.Name, _dsStructure.GetZoneName(dssEvent.Properties.ZoneID), dssEvent.Properties.GroupID.ToString("d", CultureInfo.CurrentUICulture), dssEvent.Properties.SceneID.ToString("d", CultureInfo.CurrentUICulture) }
                 );
             }

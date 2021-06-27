@@ -29,12 +29,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 stream.WriteByte((byte)((GetHexVal(_hex[i << 1]) << 4) + GetHexVal(_hex[(i << 1) + 1])));
         }
 
-        private int GetHexVal(char hex)
+        private static int GetHexVal(char hex)
         {
             return hex - (hex < 58 ? 48 : 87);
         }
 
-        private bool IsHexChar(char c)
+        private static bool IsHexChar(char c)
         {
             return (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
         }

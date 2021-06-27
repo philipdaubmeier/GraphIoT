@@ -24,12 +24,12 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.ViewModel
         {
             return index switch
             {
-                0 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Charged energy"], null, "# Wh"),
-                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Active power"], null, "# w"),
-                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Current"], null, "#"),
-                3 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Connected"], null, _localizer["# (connected/disconnected)"]),
-                4 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Charging"], null, _localizer["# (charging/not charging)"]),
-                5 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Smart mode"], null, _localizer["# (smart mode/power mode)"]),
+                0 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Charged energy"), null, "# Wh"),
+                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Active power"), null, "# w"),
+                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Current"), null, "#"),
+                3 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Connected"), null, Localized("# (connected/disconnected)")),
+                4 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Charging"), null, Localized("# (charging/not charging)")),
+                5 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Smart mode"), null, Localized("# (smart mode/power mode)")),
                 _ => new GraphViewModel(),
             };
         }

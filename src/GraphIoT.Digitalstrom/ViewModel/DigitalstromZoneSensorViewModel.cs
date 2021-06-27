@@ -35,8 +35,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             int column = index % _columns.Count;
             return column switch
             {
-                0 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => _localizer["Temperature {0}", _dsStructure?.GetZoneName(k) ?? k.ToString()], k => _localizer["temperature_zone_{0}", (int)k], "#.# °C"),
-                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => _localizer["Humidity {0}", _dsStructure?.GetZoneName(k) ?? k.ToString()], k => _localizer["humidity_zone_{0}", (int)k], "#.0 '%'"),
+                0 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => Localized("Temperature {0}", _dsStructure?.GetZoneName(k) ?? k.ToString()), k => Localized("temperature_zone_{0}", (int)k), "#.# °C"),
+                1 => DeferredLoadGraph<TimeSeries<double>, double>(index, k => Localized("Humidity {0}", _dsStructure?.GetZoneName(k) ?? k.ToString()), k => Localized("humidity_zone_{0}", (int)k), "#.0 '%'"),
                 _ => new GraphViewModel(),
             };
         }

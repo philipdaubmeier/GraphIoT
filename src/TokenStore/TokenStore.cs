@@ -75,7 +75,7 @@ namespace PhilipDaubmeier.TokenStore
             return AccessTokenExpiry > DateTime.Now && !string.IsNullOrEmpty(AccessToken);
         }
 
-        private DateTime FromBinaryString(string? str)
+        private static DateTime FromBinaryString(string? str)
         {
             if (str is null)
                 return DateTime.MinValue;

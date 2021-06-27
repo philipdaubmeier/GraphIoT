@@ -93,8 +93,11 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             var responseStream = await response.Content.ReadAsStreamAsync();
             var responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
 
-            if (responseJson.HasError)
+            if (responseJson != null && responseJson.HasError)
                 throw new IOException($"The API response returned the error code: {responseJson.ErrorCode}");
+
+            if (responseJson?.Body == null)
+                throw new IOException($"No valid response payload received");
 
             return responseJson.Body;
         }
@@ -229,7 +232,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             await GetFinalCsrf(state);
         }
 
-        private void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
+        private static void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
         {
             headers.Add("Accept-Language", "en-US,en;q=0.5");
             headers.Add("Accept", "text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8");
@@ -301,9 +304,9 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
             var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
-            if (getLoginBody.HasError)
+            if (getLoginBody != null && getLoginBody.HasError)
                 throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
-            if (string.IsNullOrEmpty(getLoginBody.Body.Path))
+            if (string.IsNullOrEmpty(getLoginBody?.Body.Path))
                 throw new IOException("Failed to deserialize body to get login url.");
 
             state.LoginUri = getLoginBody.Body.Path;

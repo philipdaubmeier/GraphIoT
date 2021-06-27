@@ -91,7 +91,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         {
             var query = await JsonSerializer.DeserializeAsync<GrafanaQuery>(Request.Body, _jsonSerializerOptions);
 
-            if (!DateTime.TryParse(query.Range.From, out DateTime fromDate) || !DateTime.TryParse(query.Range.To, out DateTime toDate))
+            if (query is null || !DateTime.TryParse(query.Range.From, out DateTime fromDate) || !DateTime.TryParse(query.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
 
             var span = new TimeSeriesSpan(fromDate.ToUniversalTime(), toDate.ToUniversalTime(), query.MaxDataPoints);
@@ -125,7 +125,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 viewModel.Span = targetSpan;
 
                 // if a custom 'aggregate.func' was given, take that as aggregation method
-                Aggregator ToAggregator(string? aggregateRaw)
+                static Aggregator ToAggregator(string? aggregateRaw)
                 {
                     return (aggregateRaw?.Substring(0, Math.Min(3, aggregateRaw.Length))?.ToLowerInvariant()) switch
                     {
@@ -155,7 +155,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         {
             var annotationInfo = await JsonSerializer.DeserializeAsync<AnnotationQuery>(Request.Body, _jsonSerializerOptions);
 
-            if (!DateTime.TryParse(annotationInfo.Range.From, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.Range.To, out DateTime toDate))
+            if (annotationInfo is null || !DateTime.TryParse(annotationInfo.Range.From, out DateTime fromDate) || !DateTime.TryParse(annotationInfo.Range.To, out DateTime toDate))
                 return StatusCode((int)HttpStatusCode.NotFound);
 
             var eventViewModel = eventViewModels.FirstOrDefault().Value;

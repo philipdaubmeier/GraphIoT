@@ -70,21 +70,21 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             };
         }
 
-        public static bool operator !=(Scale scale1, Scale scale2)
+        public static bool operator !=(Scale? scale1, Scale? scale2)
         {
             return !(scale1 == scale2);
         }
 
-        public static bool operator ==(Scale scale1, Scale scale2)
+        public static bool operator ==(Scale? scale1, Scale? scale2)
         {
             if (scale1 is null || scale2 is null)
                 return ReferenceEquals(scale1, scale2);
             return scale1._scale == scale2._scale;
         }
 
-        public int CompareTo(Scale value)
+        public int CompareTo(Scale? value)
         {
-            return _scale.CompareTo(value._scale);
+            return _scale.CompareTo(value?._scale);
         }
 
         public int CompareTo(object? value)
@@ -92,7 +92,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return _scale.CompareTo((value as Scale)?._scale ?? value);
         }
 
-        public bool Equals(Scale scale)
+        public bool Equals(Scale? scale)
         {
             return this == scale;
         }

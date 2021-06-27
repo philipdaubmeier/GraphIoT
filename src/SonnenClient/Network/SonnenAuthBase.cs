@@ -147,7 +147,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
             }
         }
 
-        private void AddCommonAuthHeaders(HttpRequestHeaders headers, string referrer)
+        private static void AddCommonAuthHeaders(HttpRequestHeaders headers, string referrer)
         {
             headers.Add("Accept-Language", "en-US,en;q=0.5");
             headers.Add("Connection", "keep-alive");
@@ -159,9 +159,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
             headers.TryAddWithoutValidation("User-Agent", _userAgent);
         }
 
-        private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
+        private static FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
         {
-            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
+            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string?, string?>(x.Item1, x.Item2)));
         }
 
         private async Task<AuthState> RequestAuthenticityToken()
@@ -184,7 +184,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
             return await ParseAuthenticityToken(await _client.GetAsync(requestUri), state);
         }
 
-        private async Task<AuthState> ParseAuthenticityToken(HttpResponseMessage response, AuthState state)
+        private static async Task<AuthState> ParseAuthenticityToken(HttpResponseMessage response, AuthState state)
         {
             try
             {
@@ -224,7 +224,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
             return ParseAuthorizationCode(await _client.SendAsync(request), state);
         }
 
-        private AuthState ParseAuthorizationCode(HttpResponseMessage response, AuthState state)
+        private static AuthState ParseAuthorizationCode(HttpResponseMessage response, AuthState state)
         {
             try
             {
@@ -235,9 +235,9 @@ namespace PhilipDaubmeier.SonnenClient.Network
                 throw new IOException("Sign in call did not return with a success HTTP status code, see inner exception.", ex);
             }
 
-            var responseUri = response.RequestMessage.RequestUri;
-            var querystring = responseUri.ParseQueryString();
-            if (!querystring.ContainsKey("code"))
+            var responseUri = response?.RequestMessage?.RequestUri;
+            var querystring = responseUri?.ParseQueryString();
+            if (querystring == null || !querystring.ContainsKey("code"))
                 throw new IOException("Response redirect uri does not contain the authorization code in its querystring.");
 
             var code = querystring["code"];
@@ -294,7 +294,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
             {
                 var tokenResponse = await JsonSerializer.DeserializeAsync<AccessTokenResponse>(await response.Content.ReadAsStreamAsync(), _jsonSerializerOptions);
 
-                if (tokenResponse.AccessToken == null)
+                if (tokenResponse?.AccessToken == null)
                     throw new IOException("No access token present in response");
 
                 if (tokenResponse.RefreshToken == null)
@@ -312,6 +312,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         public void Dispose()
         {
             _client.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

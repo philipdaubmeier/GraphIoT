@@ -50,7 +50,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
             int column = index % _columns.Count;
             return column switch
             {
-                0 => DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => _localizer["Power consumption {0}", _dsStructure?.GetCircuitName(k) ?? k.ToString()], k => _localizer["powerconsumption_{0}", k], "# Ws"),
+                0 => DeferredLoadGraph<TimeSeriesStream<int>, int>(index, k => Localized("Power consumption {0}", _dsStructure?.GetCircuitName(k) ?? k.ToString()), k => Localized("powerconsumption_{0}", k), "# Ws"),
                 _ => new GraphViewModel(),
             };
         }

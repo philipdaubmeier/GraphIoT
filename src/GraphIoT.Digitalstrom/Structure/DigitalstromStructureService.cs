@@ -105,6 +105,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
 
                 using var scope = _serviceScopeFactory.CreateScope();
                 var dsClient = scope.ServiceProvider.GetService<DigitalstromDssClient>();
+                if (dsClient is null)
+                    throw new Exception("No DigitalstromDssClient configured via dependency injection");
 
                 var circuitZoneRes = dsClient.GetCircuitZones().Result;
                 circuitZones = circuitZoneRes.DSMeters.ToDictionary(x => x.DSUID, x => x?.Zones?.Select(y => y.ZoneID)?.ToList() ?? new List<Zone>());

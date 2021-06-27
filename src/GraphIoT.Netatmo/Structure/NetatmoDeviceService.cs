@@ -143,6 +143,11 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
                 var netatmoClient = scope.ServiceProvider.GetService<NetatmoWebClient>();
                 var dbContext = scope.ServiceProvider.GetService<INetatmoDbContext>();
 
+                if (netatmoClient is null)
+                    throw new Exception("No NetatmoWebClient configured via dependency injection");
+                if (dbContext is null)
+                    throw new Exception("No INetatmoDbContext configured via dependency injection");
+
                 if (_modules == null)
                     LoadStructureFromDb(dbContext);
 
