@@ -89,7 +89,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Sensor sensorType = inputVal;
 
-            Assert.Equal(HashCode.Combine(expected), sensorType.GetHashCode());
+            Assert.Equal(((Sensor)expected).GetHashCode(), sensorType.GetHashCode());
         }
 
         [Theory]
