@@ -196,24 +196,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Unknown = 92
     }
 
-    public class Scene : IComparable, IComparable<Scene>, IEquatable<Scene>, IFormattable
+    public record Scene(SceneCommand Command) : IComparable, IComparable<Scene>, IFormattable
     {
-        private readonly SceneCommand _scene;
+        public static implicit operator Scene(SceneCommand scene) => new(scene);
 
-        public Scene(SceneCommand scene)
-        {
-            _scene = scene;
-        }
-
-        public static implicit operator Scene(SceneCommand scene)
-        {
-            return new Scene(scene);
-        }
-
-        public static implicit operator Scene(long sceneNumber)
-        {
-            return (int)sceneNumber;
-        }
+        public static implicit operator Scene(long sceneNumber) => (int)sceneNumber;
 
         public static implicit operator Scene(int sceneNumber)
         {
@@ -228,63 +215,18 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             if (!int.TryParse(sceneID, out int sceneNumber))
                 return new Scene(SceneCommand.Unknown);
 
-            if (sceneNumber < 0 || sceneNumber >= (int)SceneCommand.Unknown || sceneNumber == (int)SceneCommand.Reserved)
-                return new Scene(SceneCommand.Unknown);
-
-            return new Scene((SceneCommand)sceneNumber);
+            return sceneNumber;
         }
 
-        public static implicit operator int(Scene scene)
-        {
-            return (int)scene._scene;
-        }
+        public static implicit operator int(Scene scene) => (int)scene.Command;
 
-        public static implicit operator SceneCommand(Scene scene)
-        {
-            return scene._scene;
-        }
+        public static implicit operator SceneCommand(Scene scene) => scene.Command;
 
-        public static bool operator !=(Scene? scene1, Scene? scene2)
-        {
-            return !(scene1 == scene2);
-        }
+        public int CompareTo(Scene? value) => Command.CompareTo(value?.Command);
 
-        public static bool operator ==(Scene? scene1, Scene? scene2)
-        {
-            if (scene1 is null || scene2 is null)
-                return ReferenceEquals(scene1, scene2);
-            return scene1._scene == scene2._scene;
-        }
+        public int CompareTo(object? value) => Command.CompareTo((value as Scene)?.Command ?? value);
 
-        public int CompareTo(Scene? value)
-        {
-            return _scene.CompareTo(value?._scene);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _scene.CompareTo((value as Scene)?._scene ?? value);
-        }
-
-        public bool Equals(Scene? scene)
-        {
-            return this == scene;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Scene scene && this == scene;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_scene);
-        }
-
-        public override string ToString()
-        {
-            return ToString(null, null);
-        }
+        public override string ToString() => ToString(null, null);
 
         /// <summary>
         /// Converts the numeric value of this instance to its equivalent string representation
@@ -302,7 +244,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         public string ToString(string? format = null, IFormatProvider? formatProvider = null)
         {
             if (format is null)
-                return $"ID {(int)_scene}: {Enum.GetName(typeof(SceneCommand), _scene) ?? string.Empty}";
+                return $"ID {(int)Command}: {Enum.GetName(typeof(SceneCommand), Command) ?? string.Empty}";
 
             if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException($"Did not recognize format '{format}'");
@@ -310,7 +252,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             if (formatProvider is CultureInfo culture)
                 Locale.Scene.Culture = culture;
 
-            return _scene switch
+            return Command switch
             {
                 SceneCommand.Preset0 => Locale.Scene.Off,
                 SceneCommand.Preset1 => Locale.Scene.Scene1,
@@ -375,7 +317,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 SceneCommand.NoRain => Locale.Scene.NoRain,
                 SceneCommand.Hail => Locale.Scene.Hail,
                 SceneCommand.NoHail => Locale.Scene.Nohail,
-                _ => $"{Locale.Scene.Unknown} ({(int)_scene})"
+                _ => $"{Locale.Scene.Unknown} ({(int)Command})"
             };
         }
     }
