@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
@@ -55,7 +56,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Zone zone = inputVal;
 
-            Assert.Equal(expected, zone.GetHashCode());
+            Assert.Equal(HashCode.Combine(expected), zone.GetHashCode());
         }
 
         [Theory]
