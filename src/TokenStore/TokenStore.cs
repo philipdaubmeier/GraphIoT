@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.TokenStore
     {
         private readonly string _serviceName;
         private readonly ITokenStoreDbContext _dbContext;
-        private readonly Semaphore _dbSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _dbSemaphore = new(1, 1);
 
         public TokenStore(ITokenStoreDbContext databaseContext, IOptions<TokenStoreConfig> config)
         {
