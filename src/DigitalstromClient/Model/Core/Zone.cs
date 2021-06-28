@@ -2,29 +2,15 @@
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
-    public class Zone : IComparable, IComparable<Zone>, IEquatable<Zone>
+    public record Zone(int Id) : IComparable, IComparable<Zone>, IEquatable<Zone>
     {
-        private readonly int _zone = 0;
+        public int Id { get; init; } = Math.Min(Math.Max(Id, 0), ushort.MaxValue);
 
-        private Zone(int zone)
-        {
-            _zone = Math.Min(Math.Max(zone, 0), ushort.MaxValue);
-        }
+        public static implicit operator int(Zone zone) => zone.Id;
 
-        public static implicit operator int(Zone zone)
-        {
-            return zone._zone;
-        }
+        public static implicit operator Zone(long zone) => (int)zone;
 
-        public static implicit operator Zone(long zone)
-        {
-            return (int)zone;
-        }
-
-        public static implicit operator Zone(int zone)
-        {
-            return new Zone(zone);
-        }
+        public static implicit operator Zone(int zone) => new(zone);
 
         public static implicit operator Zone(string zoneID)
         {
@@ -34,46 +20,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return new Zone(zone);
         }
 
-        public static bool operator !=(Zone? zone1, Zone? zone2)
-        {
-            return !(zone1 == zone2);
-        }
+        public int CompareTo(Zone? value) => Id.CompareTo(value?.Id);
 
-        public static bool operator ==(Zone? zone1, Zone? zone2)
-        {
-            if (zone1 is null || zone2 is null)
-                return ReferenceEquals(zone1, zone2);
-            return zone1._zone == zone2._zone;
-        }
-
-        public int CompareTo(Zone? value)
-        {
-            return _zone.CompareTo(value?._zone);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _zone.CompareTo((value as Zone)?._zone ?? value);
-        }
-
-        public bool Equals(Zone? zone)
-        {
-            return this == zone;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Zone zone && this == zone;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_zone);
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Zone ID {0}", _zone);
-        }
+        public int CompareTo(object? value) => Id.CompareTo((value as Zone)?.Id ?? value);
     }
 }
