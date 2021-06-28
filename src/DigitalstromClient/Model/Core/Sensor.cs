@@ -47,44 +47,29 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         UnknownType = 255,
     };
 
-    public class Sensor : IComparable, IComparable<Sensor>, IEquatable<Sensor>, IFormattable
+    public record Sensor(SensorType Type) : IComparable, IComparable<Sensor>, IEquatable<Sensor>, IFormattable
     {
-        private readonly SensorType _type = SensorType.UnknownType;
+        public SensorType Type { get; init; } = NormalizeSensorType((int)Type);
 
-        private Sensor(int typeCode)
+        private static SensorType NormalizeSensorType(int type)
         {
-            int i = Math.Min(Math.Max(typeCode, 0), 255);
+            int i = Math.Min(Math.Max(type, 0), 255);
             if (i < 4 || i == 7 || i == 8 || i == 23 || i == 24 || (i > 22 && i < 25)
                 || (i > 25 && i < 50) || (i > 51 && i < 60) || i == 63 || (i > 68 && i < 71)
                 || (i > 72 && i < 76) || (i > 77 && i < 253) || i == 254)
                 i = 255;
-            _type = (SensorType)i;
+            return (SensorType)i;
         }
 
-        public static implicit operator Sensor(SensorType type)
-        {
-            return new Sensor((int)type);
-        }
+        public static implicit operator Sensor(SensorType type) => new((int)type);
 
-        public static implicit operator SensorType(Sensor type)
-        {
-            return type._type;
-        }
+        public static implicit operator SensorType(Sensor type) => type.Type;
 
-        public static implicit operator Sensor(long type)
-        {
-            return (int)type;
-        }
+        public static implicit operator Sensor(long type) => (int)type;
 
-        public static implicit operator Sensor(int type)
-        {
-            return new Sensor(type);
-        }
+        public static implicit operator Sensor(int type) => new(NormalizeSensorType(type));
 
-        public static implicit operator int(Sensor type)
-        {
-            return (int)type._type;
-        }
+        public static implicit operator int(Sensor type) => (int)type.Type;
 
         public static implicit operator Sensor(string type)
         {
@@ -94,63 +79,15 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return new Sensor(t);
         }
 
+        public int CompareTo(Sensor? value) => Type.CompareTo(value?.Type);
+
+        public int CompareTo(object? value) => Type.CompareTo((value as Sensor)?.Type ?? value);
+
+        public override string ToString() => ToString(null, null);
+
         public static IEnumerable<Sensor> GetTypes()
         {
-            return ((SensorType[])Enum.GetValues(typeof(SensorType))).Select(x =>                            (Sensor)(int)x);
-        }
-
-        public static bool operator !=(Sensor? type1, Sensor? type2)
-        {
-            return !(type1 == type2);
-        }
-
-        public static bool operator ==(Sensor? type1, Sensor? type2)
-        {
-            if (type1 is null || type2 is null)
-                return ReferenceEquals(type1, type2);
-            return type1._type == type2._type;
-        }
-
-        public static bool operator !=(Sensor? type1, SensorType type2)
-        {
-            return !(type1 == type2);
-        }
-
-        public static bool operator ==(Sensor? type1, SensorType type2)
-        {
-            if (type1 is null)
-                return false;
-            return type1._type == type2;
-        }
-
-        public int CompareTo(Sensor? value)
-        {
-            return _type.CompareTo(value?._type);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _type.CompareTo((value as Sensor)?._type ?? value);
-        }
-
-        public bool Equals(Sensor? sensor)
-        {
-            return this == sensor;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Sensor sensor && this == sensor;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_type);
-        }
-
-        public override string ToString()
-        {
-            return ToString(null, null);
+            return ((SensorType[])Enum.GetValues(typeof(SensorType))).Select(x => (Sensor)(int)x);
         }
 
         /// <summary>
@@ -169,7 +106,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         public string ToString(string? format = null, IFormatProvider? formatProvider = null)
         {
             if (format is null)
-                return $"Sensor {(int)_type}: {Enum.GetName(typeof(SensorType), _type) ?? string.Empty}";
+                return $"Sensor {(int)Type}: {Enum.GetName(typeof(SensorType), Type) ?? string.Empty}";
 
             if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException($"Did not recognize format '{format}'");
@@ -177,7 +114,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             if (formatProvider is CultureInfo culture)
                 Locale.Sensor.Culture = culture;
 
-            return _type switch
+            return Type switch
             {
                 SensorType.ActivePower => Locale.Sensor.ActivePower,
                 SensorType.OutputCurrent => Locale.Sensor.OutputCurrent,

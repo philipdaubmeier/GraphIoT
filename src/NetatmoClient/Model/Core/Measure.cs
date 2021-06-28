@@ -37,8 +37,8 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
         DateMaxGust
     }
 
-    [DebuggerDisplay("{_measure,nq}")]
-    public class Measure : IComparable, IComparable<Measure>, IEquatable<Measure>
+    [DebuggerDisplay("{Type,nq}")]
+    public record Measure(MeasureType Type) : IComparable, IComparable<Measure>, IEquatable<Measure>
     {
         private static Dictionary<string, MeasureType>? _mappingDict = null;
         private static Dictionary<string, MeasureType> Mapping
@@ -53,17 +53,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             }
         }
 
-        private readonly MeasureType _measure;
-
-        public Measure(MeasureType measure)
-        {
-            _measure = measure;
-        }
-
-        public static implicit operator Measure(MeasureType measure)
-        {
-            return new Measure(measure);
-        }
+        public static implicit operator Measure(MeasureType measure) => new(measure);
 
         public static implicit operator Measure(string measure)
         {
@@ -75,53 +65,15 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return new Measure(MeasureType.Temperature);
         }
 
-        public static implicit operator MeasureType(Measure measure)
-        {
-            return measure._measure;
-        }
+        public static implicit operator MeasureType(Measure measure) => measure.Type;
 
-        public static bool operator !=(Measure? measure1, Measure? measure2)
-        {
-            return !(measure1 == measure2);
-        }
+        public int CompareTo(Measure? value) => Type.CompareTo(value?.Type);
 
-        public static bool operator ==(Measure? measure1, Measure? measure2)
-        {
-            if (measure1 is null || measure2 is null)
-                return ReferenceEquals(measure1, measure2);
-            return measure1._measure == measure2._measure;
-        }
-
-        public int CompareTo(Measure? value)
-        {
-            return _measure.CompareTo(value?._measure);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _measure.CompareTo((value as Measure)?._measure ?? value);
-        }
-
-        public bool Equals(Measure? measure)
-        {
-            return this == measure;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is not Measure measure)
-                return false;
-            return this == measure;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_measure);
-        }
+        public int CompareTo(object? value) => Type.CompareTo((value as Measure)?.Type ?? value);
 
         public override string ToString()
         {
-            return _measure switch
+            return Type switch
             {
                 MeasureType.Temperature => "temperature",
                 MeasureType.CO2 => "co2",

@@ -87,7 +87,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Scene scene = new(inputVal);
 
-            Assert.Equal(HashCode.Combine(expected), scene.GetHashCode());
+            Assert.Equal(new Scene((SceneCommand)expected).GetHashCode(), scene.GetHashCode());
         }
 
         [Theory]

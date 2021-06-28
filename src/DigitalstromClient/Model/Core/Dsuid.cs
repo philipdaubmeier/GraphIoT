@@ -5,17 +5,11 @@ using System.Text;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
-    public class Dsuid : IComparable, IComparable<Dsuid>, IEquatable<Dsuid>
+    public record Dsuid(string Hex) : IComparable, IComparable<Dsuid>
     {
+        public string Hex { get; init; } = NormalizeDsuid(Hex);
+
         public static int Size => 17;
-
-        private readonly string _hex;
-
-        public Dsuid(string hex)
-        {
-            _hex = new string(hex.ToLowerInvariant().ToCharArray().Where(c => IsHexChar(c)).ToArray());
-            _hex = _hex.Substring(0, Math.Min(_hex.Length, Size * 2)).PadLeft(Size * 2, '0');
-        }
 
         public static Dsuid ReadFrom(Stream stream)
         {
@@ -25,68 +19,28 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 
         public void WriteTo(Stream stream)
         {
-            for (int i = 0; i < _hex.Length >> 1; ++i)
-                stream.WriteByte((byte)((GetHexVal(_hex[i << 1]) << 4) + GetHexVal(_hex[(i << 1) + 1])));
+            for (int i = 0; i < Hex.Length >> 1; ++i)
+                stream.WriteByte((byte)((GetHexVal(Hex[i << 1]) << 4) + GetHexVal(Hex[(i << 1) + 1])));
         }
 
-        private static int GetHexVal(char hex)
+        private static string NormalizeDsuid(string input)
         {
-            return hex - (hex < 58 ? 48 : 87);
+            input = new string(input.ToLowerInvariant().ToCharArray().Where(c => IsHexChar(c)).ToArray());
+            return input.Substring(0, Math.Min(input.Length, Size * 2)).PadLeft(Size * 2, '0');
         }
 
-        private static bool IsHexChar(char c)
-        {
-            return (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
-        }
+        private static int GetHexVal(char hex) => hex - (hex < 58 ? 48 : 87);
 
-        public static implicit operator Dsuid(string hex)
-        {
-            return new Dsuid(hex);
-        }
+        private static bool IsHexChar(char c) => (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
 
-        public static implicit operator string(Dsuid dsuid)
-        {
-            return dsuid._hex;
-        }
+        public static implicit operator Dsuid(string hex) => new(hex);
 
-        public int CompareTo(Dsuid? value)
-        {
-            return _hex.CompareTo(value?._hex);
-        }
+        public static implicit operator string(Dsuid dsuid) => dsuid.Hex;
 
-        public int CompareTo(object? value)
-        {
-            return _hex.CompareTo((value as Dsuid)?._hex ?? value);
-        }
+        public int CompareTo(Dsuid? value) => Hex.CompareTo(value?.Hex);
 
-        public override bool Equals(object? o)
-        {
-            return o is Dsuid dsuid && this == dsuid;
-        }
+        public int CompareTo(object? value) => Hex.CompareTo((value as Dsuid)?.Hex ?? value);
 
-        public bool Equals(Dsuid? g)
-        {
-            return this == g;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_hex);
-        }
-
-        public static bool operator ==(Dsuid? a, Dsuid? b)
-        {
-            return a?._hex == b?._hex;
-        }
-
-        public static bool operator !=(Dsuid? a, Dsuid? b)
-        {
-            return !(a == b);
-        }
-
-        public override string ToString()
-        {
-            return this;
-        }
+        public override string ToString() => this;
     }
 }

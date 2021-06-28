@@ -94,7 +94,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Group group = inputVal;
 
-            Assert.Equal(HashCode.Combine(expected), group.GetHashCode());
+            Assert.Equal(new Group(expected).GetHashCode(), group.GetHashCode());
         }
 
         [Theory]

@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
@@ -55,13 +56,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         {
             Zone zone = inputVal;
 
-            Assert.Equal(expected, zone.GetHashCode());
+            Assert.Equal(((Zone)expected).GetHashCode(), zone.GetHashCode());
         }
 
         [Theory]
-        [InlineData("Zone ID 7", 7)]
-        [InlineData("Zone ID 68", 68)]
-        [InlineData("Zone ID 32031", 32031)]
+        [InlineData("Zone { Id = 7 }", 7)]
+        [InlineData("Zone { Id = 68 }", 68)]
+        [InlineData("Zone { Id = 32031 }", 32031)]
         public void TestToString(string expected, int inputVal)
         {
             Zone zone = inputVal;

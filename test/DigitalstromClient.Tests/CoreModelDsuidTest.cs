@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
 
             Dsuid dsuidAgain = new(dsuid.ToString());
 
-            Assert.Equal(expected, dsuidAgain.ToString());
+            Assert.Equal(expected, dsuidAgain);
         }
 
         [Theory]
@@ -79,11 +79,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestGetHashCode()
         {
-            Dsuid dsuid1 = new("0000000000001234568790abcdefabcdef");
-            Dsuid dsuid2 = new("0000000000000000000000000000000001");
+            Dsuid dsuid11 = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuid12 = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuid21 = new("0000000000000000000000000000000001");
+            Dsuid dsuid22 = new("0000000000000000000000000000000001");
 
-            Assert.Equal("0000000000001234568790abcdefabcdef".GetHashCode(), dsuid1.GetHashCode());
-            Assert.Equal("0000000000000000000000000000000001".GetHashCode(), dsuid2.GetHashCode());
+            Assert.Equal(dsuid11.GetHashCode(), dsuid12.GetHashCode());
+            Assert.Equal(dsuid21.GetHashCode(), dsuid22.GetHashCode());
         }
 
         [Fact]

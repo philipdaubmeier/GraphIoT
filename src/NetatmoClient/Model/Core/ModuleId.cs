@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -11,19 +13,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
     /// and formatted in single byte hex blocks separated by ':', e.g. "70:ee:50:09:f0:xx"
     /// </summary>
     [DebuggerDisplay("{ToString(),nq}")]
-    public class ModuleId : IComparable, IComparable<ModuleId>, IEquatable<ModuleId>
+    public sealed record ModuleId(byte[] Bytes) : IComparable, IComparable<ModuleId>, IEquatable<ModuleId>
     {
         public static int Size => 6;
 
-        private readonly byte[] _bytes = new byte[Size];
-
-        public ModuleId(string hex)
-        {
-            hex = new string(hex.ToLowerInvariant().ToCharArray().Where(c => IsHexChar(c)).ToArray());
-            hex = hex.Substring(0, Math.Min(hex.Length, Size * 2)).PadLeft(Size * 2, '0');
-            for (int i = 0; i < Math.Min(_bytes.Length, hex.Length >> 1); ++i)
-                _bytes[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + GetHexVal(hex[(i << 1) + 1]));
-        }
+        public byte[] Bytes { get; private init; } = Bytes;
 
         public static ModuleId ReadFrom(Stream stream)
         {
@@ -34,78 +28,43 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public void WriteTo(Stream stream)
         {
-            for (int i = 0; i < _bytes.Length; ++i)
-                stream.WriteByte(_bytes[i]);
+            for (int i = 0; i < Bytes.Length; ++i)
+                stream.WriteByte(Bytes[i]);
         }
 
-        private static int GetHexVal(char hex)
-        {
-            return hex - (hex < 58 ? 48 : 87);
-        }
+        private static int GetHexVal(char hex) => hex - (hex < 58 ? 48 : 87);
 
-        private static bool IsHexChar(char c)
-        {
-            return (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
-        }
+        private static bool IsHexChar(char c) => (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
 
         public static implicit operator ModuleId(string hex)
         {
-            return new ModuleId(hex);
+            var bytes = new byte[Size];
+            hex = new string(hex.ToLowerInvariant().ToCharArray().Where(c => IsHexChar(c)).ToArray());
+            hex = hex.Substring(0, Math.Min(hex.Length, Size * 2)).PadLeft(Size * 2, '0');
+            for (int i = 0; i < Math.Min(bytes.Length, hex.Length >> 1); ++i)
+                bytes[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + GetHexVal(hex[(i << 1) + 1]));
+            return new ModuleId(bytes);
         }
 
         public static implicit operator string(ModuleId dsuid)
         {
-            return BitConverter.ToString(dsuid._bytes).ToLowerInvariant().Replace('-', ':');
+            return BitConverter.ToString(dsuid.Bytes).ToLowerInvariant().Replace('-', ':');
         }
 
-        public int CompareTo(ModuleId? value)
+        public bool Equals(ModuleId? other)
         {
-            return ((string)this).CompareTo(value ?? string.Empty);
+            if (other is null)
+                return ReferenceEquals(this, other);
+
+            return ((IStructuralEquatable)Bytes).Equals(other.Bytes, EqualityComparer<byte>.Default);
         }
 
-        public int CompareTo(object? value)
-        {
-            return ((string)this).CompareTo((value as ModuleId) ?? value);
-        }
+        public override int GetHashCode() => ((string)this).GetHashCode();
 
-        public override bool Equals(object? obj)
-        {
-            return obj is ModuleId value && this == value;
-        }
+        public int CompareTo(ModuleId? value) => ((string)this).CompareTo(value ?? string.Empty);
 
-        public bool Equals(ModuleId? g)
-        {
-            return this == g;
-        }
+        public int CompareTo(object? value) => ((string)this).CompareTo((value as ModuleId) ?? value);
 
-        public override int GetHashCode()
-        {
-            return ((string)this).GetHashCode();
-        }
-
-        public static bool operator ==(ModuleId? a, ModuleId? b)
-        {
-            if (a is null || b is null)
-                return ReferenceEquals(a, b);
-
-            if (a._bytes.Length != b._bytes.Length)
-                return false;
-
-            for (int i = 0; i < a._bytes.Length; i++)
-                if (a._bytes[i] != b._bytes[i])
-                    return false;
-
-            return true;
-        }
-
-        public static bool operator !=(ModuleId? a, ModuleId? b)
-        {
-            return !(a == b);
-        }
-
-        public override string ToString()
-        {
-            return this;
-        }
+        public override string ToString() => this;
     }
 }
