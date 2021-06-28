@@ -18,14 +18,14 @@ namespace PhilipDaubmeier.SonnenClient.Network
         private const string _authBaseUri = @"https://account.sonnen.de/";
         private const string _redirectUri = @"https://my.sonnen.de/";
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
         private readonly ISonnenConnectionProvider _provider;
         private readonly ISonnenAuth _authData;
 
         private readonly HttpClient _client;
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy()
         };

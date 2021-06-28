@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
     {
         public UserDataWiremessage? Data { get; set; }
 
-        public UserSites ContainedData => new UserSites()
+        public UserSites ContainedData => new()
         {
             User = Data?.Attributes ?? new UserProfile(),
             DefaultSiteId = Data?.Relationships?.DefaultSite?.Data?.Id ?? string.Empty,
