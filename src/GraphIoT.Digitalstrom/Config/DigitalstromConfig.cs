@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
         public bool UseCloudredir { get; set; }
 
         public Uri? UriLocal => string.IsNullOrWhiteSpace(DssUriLocal) ? null : new Uri(DssUriLocal);
-        public Uri UriDsNet => new Uri(DssUriDsNet.Replace("{CloudDssId}", CloudDssId));
-        public Uri UriCloudredir => new Uri(DssUriCloudredir.Replace("{CloudDssId}", CloudDssId).Replace("{CloudredirToken}", CloudredirToken));
+        public Uri UriDsNet => new(DssUriDsNet.Replace("{CloudDssId}", CloudDssId));
+        public Uri UriCloudredir => new(DssUriCloudredir.Replace("{CloudDssId}", CloudDssId).Replace("{CloudredirToken}", CloudredirToken));
     }
 }

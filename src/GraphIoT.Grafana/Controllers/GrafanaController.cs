@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
     [Route("api/grafana")]
     public class GrafanaController : Controller
     {
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };

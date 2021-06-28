@@ -12,7 +12,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
         protected IQueryable<Tentity> _dataTable;
         protected IQueryable<Tentity>? data = null;
 
-        protected readonly Dictionary<int, GraphViewModel> _graphs = new Dictionary<int, GraphViewModel>();
+        protected readonly Dictionary<int, GraphViewModel> _graphs = new();
         protected readonly Dictionary<string, int> _columns;
 
         private List<string>? _keys = null;

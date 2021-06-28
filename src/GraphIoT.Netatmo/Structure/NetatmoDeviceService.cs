@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 
         private readonly ILogger _logger;
 
-        private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _loadSemaphore = new(1, 1);
 
         public NetatmoDeviceService(IServiceScopeFactory serviceScopeFactory, ILogger<NetatmoDeviceService> logger)
         {
@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             _logger = logger;
         }
 
-        private static readonly List<ModuleId> EmptyDeviceList = new List<ModuleId>();
+        private static readonly List<ModuleId> EmptyDeviceList = new();
         public IEnumerable<ModuleId> Devices
         {
             get
@@ -43,7 +43,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             }
         }
 
-        private static readonly List<Tuple<ModuleId, ModuleId>> EmptyModuleList = new List<Tuple<ModuleId, ModuleId>>();
+        private static readonly List<Tuple<ModuleId, ModuleId>> EmptyModuleList = new();
         public IEnumerable<Tuple<ModuleId, ModuleId>> Modules
         {
             get

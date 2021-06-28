@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
 
         private readonly ILogger _logger;
 
-        private readonly Semaphore _loadSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _loadSemaphore = new(1, 1);
 
         public DigitalstromStructureService(IServiceScopeFactory serviceScopeFactory, ILogger<DigitalstromStructureService> logger)
         {
