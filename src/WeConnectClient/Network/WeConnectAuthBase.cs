@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0";
 
-        private protected readonly AuthState _state = new AuthState();
+        private protected readonly AuthState _state = new();
 
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
@@ -34,9 +34,9 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private const string _baseUri = "https://www.portal.volkswagen-we.com";
         private const string _authUri = "https://identity.vwgroup.io";
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
@@ -433,8 +433,13 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to read auth code and state from url.");
             if (!lastLocation.TryExtractUriParameter("code", out string authCode))
                 throw new IOException("Failed to get portlet code.");
+
+#pragma warning disable IDE0079
+#pragma warning disable CA1507 // "nameof" does not fit here, it is only named like the variable by chance
             if (!lastLocation.TryExtractUriParameter("state", out string authState))
                 throw new IOException("Failed to get state.");
+#pragma warning restore CA1507
+#pragma warning restore IDE0079
 
             state.PortletAuthCode = authCode;
             state.PortletAuthState = authState;

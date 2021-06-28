@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         public string PortletAuthCode { get; set; } = string.Empty;
         public string PortletAuthState { get; set; } = string.Empty;
 
-        public Uri BaseUri => new Uri(new Uri(BaseJsonUri), "/");
+        public Uri BaseUri => new(new Uri(BaseJsonUri), "/");
 
         public string BaseJsonUriForVin(Vin? vin)
         {

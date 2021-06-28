@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         public DateTime Expires { get; set; }
 
         public Cookie ToCookie(Uri baseUri)
-            => new Cookie(Name, Value, baseUri.AbsolutePath, baseUri.Host)
+            => new(Name, Value, baseUri.AbsolutePath, baseUri.Host)
             { HttpOnly = true, Secure = true, Expires = Expires };
     }
 }

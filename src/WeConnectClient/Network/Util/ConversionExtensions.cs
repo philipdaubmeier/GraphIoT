@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
     {
         public static Dictionary<string, string> ParseQueryString(this Uri uri)
         {
-            var querystring = uri.ToString().Substring(uri.ToString().IndexOf('?') + 1);
+            var querystring = uri.ToString()[(uri.ToString().IndexOf('?') + 1)..];
             var pairs = querystring.Split('&');
             var dict = pairs.Select(pair =>
             {
