@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
         private readonly IDigitalstromAuth _authData;
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
         /// <summary>
         /// Connects to the Digitalstrom DSS REST webservice at the given uri with the given

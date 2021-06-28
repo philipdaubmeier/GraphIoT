@@ -8,8 +8,8 @@ namespace PhilipDaubmeier.DigitalstromTwin
     public class RoomState : INotifyCollectionChanged
     {
         private readonly SceneCommand _defaultScene = (new SceneState()).Value;
-        private readonly ConcurrentDictionary<Group, SceneState> _sceneStates = new ConcurrentDictionary<Group, SceneState>();
-        private readonly ConcurrentDictionary<Sensor, SensorState> _sensorStates = new ConcurrentDictionary<Sensor, SensorState>();
+        private readonly ConcurrentDictionary<Group, SceneState> _sceneStates = new();
+        private readonly ConcurrentDictionary<Sensor, SensorState> _sensorStates = new();
 
         public IEnumerable<KeyValuePair<Group, SceneState>> Groups => _sceneStates;
 

@@ -11,11 +11,12 @@ namespace PhilipDaubmeier.DigitalstromClient
 {
     public class DigitalstromConnectionProvider : IDigitalstromConnectionProvider, IDisposable
     {
-        private static readonly Semaphore trustCertificateSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore trustCertificateSemaphore = new(1, 1);
 
         private bool skipDisposingHttpClient = false;
         protected HttpClient? httpClient = null;
 
+#pragma warning disable IDE0079
 #pragma warning disable IDE0069 // It is disposed by the one that injected it
         protected HttpClient? longPollingHttpClient = null;
 #pragma warning restore IDE0069
@@ -23,6 +24,7 @@ namespace PhilipDaubmeier.DigitalstromClient
 #pragma warning disable IDE0069 // IDisposable.Dispose() is never called on httpHandler because its parent HttpClient disposes it already.
         protected HttpMessageHandler? httpHandler = null;
 #pragma warning restore IDE0069
+#pragma warning restore IDE0079
 
         /// <summary>
         /// See <see cref="IDigitalstromConnectionProvider.Uris"/>
@@ -133,7 +135,7 @@ namespace PhilipDaubmeier.DigitalstromClient
         private HttpMessageHandler BuildHttpHandler()
         {
             var clientHandler = httpHandler ?? new HttpClientHandler();
-            if (!(clientHandler is HttpClientHandler httpClientHandler) ||
+            if (clientHandler is not HttpClientHandler httpClientHandler ||
                 (ServerCertificate is null && ServerCertificateValidationCallback is null))
                 return clientHandler;
 
@@ -194,6 +196,7 @@ namespace PhilipDaubmeier.DigitalstromClient
                 httpClient?.Dispose();
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

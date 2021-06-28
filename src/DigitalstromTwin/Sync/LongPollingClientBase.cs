@@ -27,7 +27,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private readonly Task? eventWorkerThread = null;
 
-        private readonly CancellationTokenSource cancellationSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource cancellationSource = new();
         private readonly CancellationToken cancellationToken;
 
         protected ExponentialBackoff Backoff { get; } = new ExponentialBackoff();
@@ -111,6 +111,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             cancellationSource.Dispose();
 
             isDisposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 {
     public class ApartmentState : IEnumerable<KeyValuePair<Zone, RoomState>>, INotifyCollectionChanged
     {
-        private readonly ConcurrentDictionary<Zone, RoomState> _dictionary = new ConcurrentDictionary<Zone, RoomState>();
+        private readonly ConcurrentDictionary<Zone, RoomState> _dictionary = new();
 
         /// <summary>
         /// Event raised when the collection changes.
