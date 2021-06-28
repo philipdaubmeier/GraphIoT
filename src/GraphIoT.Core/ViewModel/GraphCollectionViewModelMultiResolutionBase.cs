@@ -63,5 +63,15 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 
             return searchSpace.Where(x => _dataTables?.ContainsKey(x) ?? false).Select(x => _dataTables[x]).FirstOrDefault();
         }
+
+        protected string Localized(string input)
+        {
+            return (string?)_localizer[input] ?? string.Empty;
+        }
+
+        protected string Localized(string input, params object?[] arguments)
+        {
+            return (string?)_localizer[input, arguments.Where(x => x != null).Select(x => x!).ToArray()] ?? string.Empty;
+        }
     }
 }

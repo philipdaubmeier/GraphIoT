@@ -22,9 +22,11 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly IServiceScope _serviceScope;
 
+#pragma warning disable IDE0079
 #pragma warning disable IDE0069 // false warning - is properly disposed
         private DssEventSubscriber? _dssEventSubscriber = null;
 #pragma warning restore IDE0069
+#pragma warning restore IDE0079
 
         private Task? _executingThread;
         private CancellationTokenSource? _cancellationSource;

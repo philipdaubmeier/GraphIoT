@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
         [InlineData("/subpath/subsubpath/", UriKind.Relative)]
         public void TestImplicitConversions(string uriString, UriKind kind)
         {
-            Uri uriBefore = new Uri(uriString, kind);
+            Uri uriBefore = new(uriString, kind);
             UriQueryStringBuilder builder = uriBefore;
             Uri uriAfter = builder;
 
@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
         [Fact]
         public void TestChainedConversions()
         {
-            Uri baseUri = new Uri("/subpath/subsubpath/", UriKind.Relative);
+            Uri baseUri = new("/subpath/subsubpath/", UriKind.Relative);
 
             Uri newUri1 = baseUri.AddQuery("key1", "val1")
                 .AddQuery("key2", "val2")
@@ -47,10 +47,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
         [Fact]
         public void TestExtensionMethods()
         {
-            Uri uri1 = new Uri("https://www.domain.tld/", UriKind.Absolute);
-            Uri uri2 = new Uri("https://www.domain.tld/", UriKind.Absolute);
-            Uri uri3 = new Uri("/subpath/subsubpath/", UriKind.Relative);
-            Uri uri4 = new Uri("/subpath/subsubpath/", UriKind.Relative);
+            Uri uri1 = new("https://www.domain.tld/", UriKind.Absolute);
+            Uri uri2 = new("https://www.domain.tld/", UriKind.Absolute);
+            Uri uri3 = new("/subpath/subsubpath/", UriKind.Relative);
+            Uri uri4 = new("/subpath/subsubpath/", UriKind.Relative);
 
             int intvalue = 23;
             string strvalue = "foo";
@@ -168,7 +168,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
             UriQueryStringBuilder uribuilder1 = new Uri("https://www.domain.tld/", UriKind.Absolute);
             UriQueryStringBuilder uribuilder2 = new Uri("/subpath/subsubpath/", UriKind.Relative);
 
-            List<KeyValuePair<string, string>> keysvals = new List<KeyValuePair<string, string>>()
+            List<KeyValuePair<string, string>> keysvals = new()
             {
                 new KeyValuePair<string, string>("key1", "val1"),
                 new KeyValuePair<string, string>("key2", "val2")
@@ -186,8 +186,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Network.Tests
         [InlineData("/subpath/subsubpath/", UriKind.Relative)]
         public void TestMultipleAddQuery(string uriString, UriKind kind)
         {
-            Uri uri1 = new Uri(uriString, kind);
-            Uri uri2 = new Uri(uriString, kind);
+            Uri uri1 = new(uriString, kind);
+            Uri uri2 = new(uriString, kind);
             UriQueryStringBuilder uribuilder1 = new Uri(uriString, kind);
             UriQueryStringBuilder uribuilder2 = new Uri(uriString, kind);
 

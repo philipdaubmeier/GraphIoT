@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         public DateTime Timestamp { get; set; }
 
-        private readonly Semaphore _stateSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _stateSemaphore = new(1, 1);
 
         public AbstractState(T value)
         {

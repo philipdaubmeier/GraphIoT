@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         [NotMapped]
         public TimeSeriesStreamCollection<Dsuid, int> EnergySeriesEveryMeter
         {
-            get => new TimeSeriesStreamCollection<Dsuid, int>(EnergyCurvesEveryMeter ?? new byte[0], Dsuid.Size, stream => Dsuid.ReadFrom(stream), Span, DecimalPlaces);
+            get => new(EnergyCurvesEveryMeter ?? new byte[0], Dsuid.Size, stream => Dsuid.ReadFrom(stream), Span, DecimalPlaces);
             set { EnergyCurvesEveryMeter = value.ToCompressedByteArray(); }
         }
 

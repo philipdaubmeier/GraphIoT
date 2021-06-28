@@ -8,11 +8,11 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
     public class TimeSeriesResamplerTest
     {
         private const int count = 10;
-        private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
+        private static readonly DateTime begin = new(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
-        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
-        private static readonly TimeSeriesSpan spanDownsampling = new TimeSeriesSpan(begin, end, count / 2);
-        private static readonly TimeSeriesSpan spanUpsampling = new TimeSeriesSpan(begin, end, count * 2);
+        private static readonly TimeSeriesSpan span = new(begin, end, count);
+        private static readonly TimeSeriesSpan spanDownsampling = new(begin, end, count / 2);
+        private static readonly TimeSeriesSpan spanUpsampling = new(begin, end, count * 2);
 
         [Fact]
         public void TestConstructTimeSeriesResampler()

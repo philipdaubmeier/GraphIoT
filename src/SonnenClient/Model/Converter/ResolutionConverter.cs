@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.SonnenClient.Model
 
         public override Resolution Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new Resolution(reader.GetString());
+            return new Resolution(reader.GetString() ?? string.Empty);
         }
     }
 }

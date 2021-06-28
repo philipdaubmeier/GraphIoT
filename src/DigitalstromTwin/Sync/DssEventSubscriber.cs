@@ -28,7 +28,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private const int defaultSubscriptionId = 10;
 
-        private readonly SemaphoreSlim initializedSempahore = new SemaphoreSlim(0, 1);
+        private readonly SemaphoreSlim initializedSempahore = new(0, 1);
         private volatile bool subscribed;
         private readonly int subscriptionId;
 

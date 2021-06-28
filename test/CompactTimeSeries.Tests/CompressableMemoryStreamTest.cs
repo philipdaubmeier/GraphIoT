@@ -7,10 +7,8 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         [Fact]
         public void TestCapacity()
         {
-            using (var stream = new CompressableMemoryStream(100))
-            {
-                Assert.Equal(100, stream.Capacity);
-            }
+            using var stream = new CompressableMemoryStream(100);
+            Assert.Equal(100, stream.Capacity);
         }
 
         [Theory]

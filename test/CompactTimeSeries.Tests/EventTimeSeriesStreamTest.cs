@@ -7,9 +7,9 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
     public class EventTimeSeriesStreamTest
     {
         private const int count = 10;
-        private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
+        private static readonly DateTime begin = new(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
-        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
+        private static readonly TimeSeriesSpan span = new(begin, end, count);
 
         [Fact]
         public void TestEventTimeSeriesStreamIntSeries()

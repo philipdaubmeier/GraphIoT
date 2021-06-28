@@ -110,7 +110,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
         {
             var tableProperties = dbContext.GetType().GetProperties()
                     .Where(prop => prop.PropertyType.IsSubclassOfGeneric(typeof(DbSet<>)))
-                    .Where(prop => tableFilter.Count <= 0 ? true : tableFilter.Contains(prop.Name, StringComparer.InvariantCultureIgnoreCase));
+                    .Where(prop => tableFilter.Count <= 0 || tableFilter.Contains(prop.Name, StringComparer.InvariantCultureIgnoreCase));
 
             return tableProperties.Select(prop => (prop, prop.GetGetMethod()?.Invoke(dbContext, null) as IQueryable<object>))
                 .Where(x => x.Item2 != null).Select(x => (x.prop, x.Item2!));

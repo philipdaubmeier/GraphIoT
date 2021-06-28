@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         private readonly bool _isStreamManaged = false;
         private readonly int _startPosition = 0;
         private int _count = 0;
-        private readonly TSerializer _serializer = new TSerializer();
+        private readonly TSerializer _serializer = new();
 
         /// <summary>
         /// Creates a new EventTimeSeriesStream object with the start time and max number of events given in the span
@@ -58,6 +58,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             if (_isStreamManaged)
                 _stream.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public static EventTimeSeriesStream<TEvent, TSerializer> FromByteArray(TimeSeriesSpan span, byte[] array)

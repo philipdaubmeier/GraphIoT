@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
         }
 
-        private readonly TupleFactory<TValue> _tupleFactory = new TupleFactory<TValue>();
+        private readonly TupleFactory<TValue> _tupleFactory = new();
 
         /// <summary>
         /// See <see cref="IEventSerializer{TEvent}.SizeOf"/>
@@ -62,10 +62,10 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 throw new InvalidOperationException("EventValueSerializer only supports serializing int and double");
 
             if (writer == null)
-                throw new ArgumentNullException("writer");
+                throw new ArgumentNullException(nameof(writer));
 
             if (eventObj == null)
-                throw new ArgumentNullException("eventObj");
+                throw new ArgumentNullException(nameof(eventObj));
 
             var nullable = new TValue?(eventObj.Item2);
             if (typeof(TValue) == typeof(int))
@@ -83,7 +83,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 throw new InvalidOperationException("EventValueSerializer only supports deserializing int and double");
 
             if (reader == null)
-                throw new ArgumentNullException("reader");
+                throw new ArgumentNullException(nameof(reader));
 
             if (typeof(TValue) == typeof(int))
                 (_tupleFactory as TupleFactory<int>)!.Set(timestampUtc, reader.ReadInt32());

@@ -16,14 +16,14 @@ namespace PhilipDaubmeier.NetatmoClient
     {
         protected const string _baseUri = @"https://api.netatmo.net";
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
         private readonly INetatmoConnectionProvider _provider;
         private readonly INetatmoAuth _authData;
 
         private readonly HttpClient _client;
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy()
         };
@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.NetatmoClient
             var response = await RequestNetatmoApi(uri, parameters);
             var responseStream = await response.Content.ReadAsStreamAsync();
 
-            TWiremessage result;
+            TWiremessage? result;
             try
             {
                 result = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
@@ -82,21 +82,21 @@ namespace PhilipDaubmeier.NetatmoClient
                 throw new IOException($"The API response could not be deserialized. HTTP status code: {(int)response.StatusCode}");
             }
 
-            if (!response.IsSuccessStatusCode && result.Error?.Code == 26)
+            if (!response.IsSuccessStatusCode && result?.Error?.Code == 26)
                 throw new IOException("API rate limit reached, see https://dev.netatmo.com/en-US/resources/technical/guides/ratelimits");
 
             if (!response.IsSuccessStatusCode)
-                throw new IOException($"The API response was not succesful and returned with HTTP status code: {(int)response.StatusCode}, API error code: {result.Error?.Code} and error message: '{result.Error?.Message ?? string.Empty}'");
+                throw new IOException($"The API response was not succesful and returned with HTTP status code: {(int)response.StatusCode}, API error code: {result?.Error?.Code} and error message: '{result?.Error?.Message ?? string.Empty}'");
 
-            if (result.Body is null)
+            if (result?.Body is null)
                 throw new IOException($"The API response is missing a payload.");
 
             return result.Body;
         }
 
-        private FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
+        private static FormUrlEncodedContent FormContentFromList(IEnumerable<(string, string)> values)
         {
-            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string, string>(x.Item1, x.Item2)));
+            return new FormUrlEncodedContent(values.Select(x => new KeyValuePair<string?, string?>(x.Item1, x.Item2)));
         }
 
         /// <summary>
@@ -169,6 +169,7 @@ namespace PhilipDaubmeier.NetatmoClient
         public void Dispose()
         {
             _client.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

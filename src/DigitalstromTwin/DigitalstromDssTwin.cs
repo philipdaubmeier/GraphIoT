@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             await _dssClient.CallScene(zone, group, scene);
         }
 
-        private IEnumerable<IEventName> SubscribedEventNames
+        private static IEnumerable<IEventName> SubscribedEventNames
         {
             get
             {
@@ -108,6 +108,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
             _changeAggregator?.Dispose();
             _subscriber?.Dispose();
             _dssClient?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

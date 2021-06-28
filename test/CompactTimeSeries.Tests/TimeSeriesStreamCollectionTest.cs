@@ -10,21 +10,21 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
     public class TimeSeriesStreamCollectionTest
     {
         private const int count = 10;
-        private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
+        private static readonly DateTime begin = new(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
-        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
+        private static readonly TimeSeriesSpan span = new(begin, end, count);
 
-        private static List<Guid> guids = new List<Guid>() { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
-        private static int guidSize = 16;
-        private static Action<Guid, Stream> writeGuid = (g, s) =>
+        private static readonly List<Guid> guids = new() { Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid() };
+        private static readonly int guidSize = 16;
+        private static readonly Action<Guid, Stream> writeGuid = (g, s) =>
         {
-            using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
-                writer.Write(g.ToByteArray());
+            using var writer = new BinaryWriter(s, Encoding.UTF8, true);
+            writer.Write(g.ToByteArray());
         };
-        private static Func<Stream, Guid> readGuid = s =>
+        private static readonly Func<Stream, Guid> readGuid = s =>
         {
-            using (var reader = new BinaryReader(s, Encoding.UTF8, true))
-                return new Guid(reader.ReadBytes(guidSize));
+            using var reader = new BinaryReader(s, Encoding.UTF8, true);
+            return new Guid(reader.ReadBytes(guidSize));
         };
 
         [Fact]
@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         {
             var timeseriesCollection = new TimeSeriesStreamCollection<Guid, int>(guids, guidSize, writeGuid, span);
 
-            List<ITimeSeries<int>> timeseries = new List<ITimeSeries<int>>();
+            List<ITimeSeries<int>> timeseries = new();
             int i = 0;
             foreach (var item in timeseriesCollection)
             {
@@ -52,8 +52,8 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
         [Fact]
         public void TestIntTimeSeriesStreamCollectionCreateModifyWriteReadModify()
         {
-            List<int?> addValues1 = new List<int?>() { 1, 3, 5, 3, 1, null, null, null, null, null };
-            List<int?> addValues2 = new List<int?>() { null, null, null, null, null, 21, 23, 25, 23, 21 };
+            List<int?> addValues1 = new() { 1, 3, 5, 3, 1, null, null, null, null, null };
+            List<int?> addValues2 = new() { null, null, null, null, null, 21, 23, 25, 23, 21 };
             var allValues = addValues1.Zip(addValues2, (x, y) => x ?? y).ToList();
 
             // Create

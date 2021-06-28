@@ -87,7 +87,7 @@ namespace PhilipDaubmeier.TokenStore.Tests
             Assert.False(tokenStore.IsAccessTokenValid());
         }
 
-        private IOptions<TokenStoreConfig> GetOptions()
+        private static IOptions<TokenStoreConfig> GetOptions()
         {
             return Options.Create(new TokenStoreConfig()
             {
@@ -98,14 +98,14 @@ namespace PhilipDaubmeier.TokenStore.Tests
             });
         }
 
-        private ITokenStoreDbContext GetMockDbContext(List<AuthData>? authList = null)
+        private static ITokenStoreDbContext GetMockDbContext(List<AuthData>? authList = null)
         {
             var db = Mock.Of<ITokenStoreDbContext>(d => d.SaveChangesAsync(default) == Task.FromResult(1));
             db.AuthDataSet = GetQueryableMockDbSet(authList ?? new List<AuthData>());
             return db;
         }
 
-        private DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
+        private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
         {
             var queryable = sourceList.AsQueryable();
 

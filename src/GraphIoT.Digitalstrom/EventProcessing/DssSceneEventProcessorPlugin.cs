@@ -103,7 +103,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         /// See <see cref="IDssEventProcessorPlugin.Span"/>
         /// </summary>
         public TimeSeriesSpan Span => _eventStream?.Span ?? EmptySpan;
-        private static readonly TimeSeriesSpan EmptySpan = new TimeSeriesSpan(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1);
+        private static readonly TimeSeriesSpan EmptySpan = new(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1);
 
         /// <summary>
         /// See <see cref="IDssEventProcessorPlugin.WriteToEventStream(DssEvent)"/>
@@ -145,15 +145,13 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
             if (_eventStream != null && !Span.IsIncluded(date))
                 SaveEventStreamToDb();
 
-            using (var scope = _serviceScopeFactory.CreateScope())
-            using (var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>())
-            {
-                var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
-                if (dbSceneEvents != null)
-                    _eventStream = dbSceneEvents.EventStream;
-                else
-                    _eventStream = new EventTimeSeriesStream<DssEvent, DssSceneEventSerializer>(new TimeSeriesSpan(date, date.AddDays(1), DigitalstromSceneEventData.MaxEventsPerDay));
-            }
+            using var scope = _serviceScopeFactory.CreateScope();
+            using var dbContext = scope.ServiceProvider.GetRequiredService<IDigitalstromDbContext>();
+            var dbSceneEvents = dbContext.DsSceneEventDataSet.Where(x => x.Key == date).FirstOrDefault();
+            if (dbSceneEvents != null)
+                _eventStream = dbSceneEvents.EventStream;
+            else
+                _eventStream = new EventTimeSeriesStream<DssEvent, DssSceneEventSerializer>(new TimeSeriesSpan(date, date.AddDays(1), DigitalstromSceneEventData.MaxEventsPerDay));
         }
 
         /// <summary>

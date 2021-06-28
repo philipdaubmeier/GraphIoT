@@ -24,18 +24,18 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.ViewModel
         {
             return index switch
             {
-                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Driven kilometers"], null, _localizer["# km"]),
-                1 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Battery SoC"], null, _localizer["# %"]),
-                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Trip length km"], null, _localizer["# km"]),
-                3 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Trip duration min"], null, _localizer["# min"]),
-                4 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Trip average speed km/h"], null, _localizer["#.# km/h"]),
-                5 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Trip consumed kWh"], null, _localizer["#.# kWh"]),
-                6 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Trip average consumption kWh/100 km"], null, _localizer["#.# kWh/100 km"]),
-                7 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Charging state"], null, _localizer["# (charging/not charging)"]),
-                8 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Climate temperature"], null, _localizer["#.# °C"]),
-                9 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Climate state"], null, _localizer["# (on/off)"]),
-                10 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Window melt state"], null, _localizer["# (on/off)"]),
-                11 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, _localizer["Remote heating state"], null, _localizer["# (on/off)"]),
+                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Driven kilometers"), null, Localized("# km")),
+                1 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Battery SoC"), null, Localized("# %")),
+                2 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Trip length km"), null, Localized("# km")),
+                3 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Trip duration min"), null, Localized("# min")),
+                4 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Trip average speed km/h"), null, Localized("#.# km/h")),
+                5 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Trip consumed kWh"), null, Localized("#.# kWh")),
+                6 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Trip average consumption kWh/100 km"), null, Localized("#.# kWh/100 km")),
+                7 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Charging state"), null, Localized("# (charging/not charging)")),
+                8 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Climate temperature"), null, Localized("#.# °C")),
+                9 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Climate state"), null, Localized("# (on/off)")),
+                10 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Window melt state"), null, Localized("# (on/off)")),
+                11 => DeferredLoadGraph<TimeSeries<bool>, bool>(index, Localized("Remote heating state"), null, Localized("# (on/off)")),
                 _ => new GraphViewModel()
             };
         }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
 {
-    public class EphemeralDigitalstromAuth : IDigitalstromAuth, IEquatable<EphemeralDigitalstromAuth>
+    public class EphemeralDigitalstromAuth : IDigitalstromAuth, IEquatable<EphemeralDigitalstromAuth>, IDisposable
     {
         public virtual string? ApplicationToken { get; private set; }
         public virtual string? SessionToken { get; private set; }
@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
         private string? _appId = null;
         private string? _username = null;
         private string? _userPassword = null;
-        private readonly Semaphore _loginSemaphore = new Semaphore(1, 1);
+        private readonly Semaphore _loginSemaphore = new(1, 1);
         private readonly Func<IDigitalstromAuth>? _credentialsCallback;
 
         public string AppId { get { CheckCallback(); return _appId!; } }
@@ -75,11 +75,21 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
             };
         }
 
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as EphemeralDigitalstromAuth);
+        }
+
         public bool Equals(EphemeralDigitalstromAuth? other)
         {
             return other != null && ApplicationToken == other.ApplicationToken && SessionToken == other.SessionToken
                 && SessionExpiration == other.SessionExpiration && AppId == other.AppId
                 && Username == other.Username && UserPassword == other.UserPassword;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(ApplicationToken, SessionToken, SessionExpiration, AppId, Username, UserPassword);
         }
 
         /// <summary>
@@ -105,6 +115,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Auth
                     throw new Exception("Credentials could not be retrieved by callback.");
             }
             finally { _loginSemaphore.Release(); }
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

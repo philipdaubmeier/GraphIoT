@@ -18,9 +18,9 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
     {
         private readonly string _vin = string.Empty;
 
-        private static readonly Regex vinPattern = new Regex(@"^[A-HJ-NPR-Z\d]{9}[A-HJ-NPR-Z\d-]{2}[\d]{6}$", RegexOptions.Compiled);
+        private static readonly Regex vinPattern = new(@"^[A-HJ-NPR-Z\d]{9}[A-HJ-NPR-Z\d-]{2}[\d]{6}$", RegexOptions.Compiled);
 
-        public static Vin Empty => new Vin("S0000000000000000");
+        public static Vin Empty => new("S0000000000000000");
 
         public Vin(string vin)
         {
@@ -51,9 +51,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Core
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is Vin value))
-                return false;
-            return this == value;
+            return obj is Vin value && this == value;
         }
 
         public bool Equals(Vin? g)

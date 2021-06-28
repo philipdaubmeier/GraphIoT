@@ -24,14 +24,14 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.ViewModel
         {
             return index switch
             {
-                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Production"], null, "# W"),
-                1 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Consumption"], null, "# W"),
-                2 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Direct usage"], null, "# W"),
-                3 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Battery charging"], null, "# W"),
-                4 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Battery discharging"], null, "# W"),
-                5 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Grid feedin"], null, "# W"),
-                6 => DeferredLoadGraph<TimeSeries<int>, int>(index, _localizer["Grid purchase"], null, "# W"),
-                7 => DeferredLoadGraph<TimeSeries<double>, double>(index, _localizer["Battery SoC"], null, "#.# %"),
+                0 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Production"), null, "# W"),
+                1 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Consumption"), null, "# W"),
+                2 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Direct usage"), null, "# W"),
+                3 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Battery charging"), null, "# W"),
+                4 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Battery discharging"), null, "# W"),
+                5 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Grid feedin"), null, "# W"),
+                6 => DeferredLoadGraph<TimeSeries<int>, int>(index, Localized("Grid purchase"), null, "# W"),
+                7 => DeferredLoadGraph<TimeSeries<double>, double>(index, Localized("Battery SoC"), null, "#.# %"),
                 _ => new GraphViewModel(),
             };
         }

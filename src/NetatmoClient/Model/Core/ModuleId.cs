@@ -38,12 +38,12 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
                 stream.WriteByte(_bytes[i]);
         }
 
-        private int GetHexVal(char hex)
+        private static int GetHexVal(char hex)
         {
             return hex - (hex < 58 ? 48 : 87);
         }
 
-        private bool IsHexChar(char c)
+        private static bool IsHexChar(char c)
         {
             return (c >= 48 && c <= 57) || (c >= 97 && c <= 102);
         }
@@ -58,9 +58,9 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return BitConverter.ToString(dsuid._bytes).ToLowerInvariant().Replace('-', ':');
         }
 
-        public int CompareTo(ModuleId value)
+        public int CompareTo(ModuleId? value)
         {
-            return ((string)this).CompareTo(value);
+            return ((string)this).CompareTo(value ?? string.Empty);
         }
 
         public int CompareTo(object? value)
@@ -70,12 +70,10 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is ModuleId value))
-                return false;
-            return this == value;
+            return obj is ModuleId value && this == value;
         }
 
-        public bool Equals(ModuleId g)
+        public bool Equals(ModuleId? g)
         {
             return this == g;
         }
@@ -85,8 +83,11 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return ((string)this).GetHashCode();
         }
 
-        public static bool operator ==(ModuleId a, ModuleId b)
+        public static bool operator ==(ModuleId? a, ModuleId? b)
         {
+            if (a is null || b is null)
+                return ReferenceEquals(a, b);
+
             if (a._bytes.Length != b._bytes.Length)
                 return false;
 
@@ -97,7 +98,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return true;
         }
 
-        public static bool operator !=(ModuleId a, ModuleId b)
+        public static bool operator !=(ModuleId? a, ModuleId? b)
         {
             return !(a == b);
         }

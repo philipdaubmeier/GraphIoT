@@ -35,7 +35,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         public List<PersistedCookie> Cookies { get; set; }
 
         [JsonIgnore]
-        public Uri BaseUri => new Uri(new Uri(BaseJsonUri), "/");
+        public Uri BaseUri => new(new(BaseJsonUri), "/");
 
         public void AddToCookieContainer(CookieContainer cookieContainer)
         {

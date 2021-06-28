@@ -41,7 +41,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model
                 if (reader.TryGetDateTime(out DateTime datetime))
                     return datetime;
 
-                return reader.GetString();
+                return reader.GetString() ?? string.Empty;
             }
 
             using JsonDocument document = JsonDocument.ParseValue(ref reader);

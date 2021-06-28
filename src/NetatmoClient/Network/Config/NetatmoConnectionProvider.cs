@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient());
+            get => client ??= new HttpClient();
             protected set
             {
                 client = value;
@@ -47,6 +47,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
                 client?.Dispose();
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

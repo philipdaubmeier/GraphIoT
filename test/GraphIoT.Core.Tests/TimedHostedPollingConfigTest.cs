@@ -10,8 +10,10 @@ namespace PhilipDaubmeier.GraphIoT.Core.Tests
         [MemberData(nameof(GetTimeSpans))]
         public void TestTimerIntervalTimeSpan(string input, TimeSpan output)
         {
-            var config = new TimedHostedPollingConfig<IScopedPollingService>();
-            config.TimerInterval = input;
+            var config = new TimedHostedPollingConfig<IScopedPollingService>
+            {
+                TimerInterval = input
+            };
 
             Assert.Equal(output, config.TimerIntervalTimeSpan);
         }

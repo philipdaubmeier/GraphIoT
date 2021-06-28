@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
         public async Task<IntegrationTestDbContext> InitDb()
         {
-            if (!(Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() is IntegrationTestDbContext dbContext) || dbContext.Database is null)
+            if (Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() is not IntegrationTestDbContext dbContext || dbContext.Database is null)
                 throw new NullReferenceException("No database service available");
 
             await dbContext.Database.EnsureDeletedAsync();
@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
         protected override IWebHostBuilder CreateWebHostBuilder()
         {
-            return WebHost.CreateDefaultBuilder(null)
+            return WebHost.CreateDefaultBuilder()
                           .UseStartup<TStartup>();
         }
 
@@ -91,7 +91,9 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
                 );
 
                 // Replace the digitalstrom connection provider with a http mock for testing
-                services.Remove(services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IDigitalstromConnectionProvider)));
+                var existingProvider = services.FirstOrDefault(descriptor => descriptor.ServiceType == typeof(IDigitalstromConnectionProvider));
+                if (existingProvider != null)
+                    services.Remove(existingProvider);
                 services.AddTransient<IDigitalstromConnectionProvider, DigitalstromConnectionProvider>(fac =>
                     fac.GetRequiredService<MockHttpMessageHandler>().ToMockProvider());
             });

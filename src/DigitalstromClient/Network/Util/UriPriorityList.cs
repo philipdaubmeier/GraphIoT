@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
             _list = list.ToList();
 
             var authInclList = authIncluded.ToList();
-            _authIncluded = Enumerable.Range(0, _list.Count).Select(i => i < authInclList.Count ? authInclList[i] : false).ToList();
+            _authIncluded = Enumerable.Range(0, _list.Count).Select(i => i < authInclList.Count && authInclList[i]).ToList();
         }
 
         public Uri? GetCurrent()

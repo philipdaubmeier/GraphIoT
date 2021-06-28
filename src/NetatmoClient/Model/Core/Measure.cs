@@ -80,21 +80,21 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return measure._measure;
         }
 
-        public static bool operator !=(Measure measure1, Measure measure2)
+        public static bool operator !=(Measure? measure1, Measure? measure2)
         {
             return !(measure1 == measure2);
         }
 
-        public static bool operator ==(Measure measure1, Measure measure2)
+        public static bool operator ==(Measure? measure1, Measure? measure2)
         {
             if (measure1 is null || measure2 is null)
                 return ReferenceEquals(measure1, measure2);
             return measure1._measure == measure2._measure;
         }
 
-        public int CompareTo(Measure value)
+        public int CompareTo(Measure? value)
         {
-            return _measure.CompareTo(value._measure);
+            return _measure.CompareTo(value?._measure);
         }
 
         public int CompareTo(object? value)
@@ -102,14 +102,14 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return _measure.CompareTo((value as Measure)?._measure ?? value);
         }
 
-        public bool Equals(Measure measure)
+        public bool Equals(Measure? measure)
         {
             return this == measure;
         }
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is Measure measure))
+            if (obj is not Measure measure)
                 return false;
             return this == measure;
         }

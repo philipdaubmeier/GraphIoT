@@ -13,13 +13,13 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 {
     public abstract class DigitalstromClientBase : IDisposable
     {
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true
         };
 
-        private readonly List<JsonConverter> _jsonConverters = new List<JsonConverter>()
+        private readonly List<JsonConverter> _jsonConverters = new()
         {
             new DateTimeConverter(),
             new DsuidConverter(),
@@ -147,6 +147,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
         {
             // explicit no-op. IDisposable is kept for compatibility reasons.
             // HttpClient must be disposed by IDigitalstromConnectionProvider.
+            GC.SuppressFinalize(this);
         }
     }
 }

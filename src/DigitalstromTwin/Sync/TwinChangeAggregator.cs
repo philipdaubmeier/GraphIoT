@@ -93,7 +93,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
         private void StatePropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             // ignore sensor state changes, as sensors can not be changed/written
-            if (!(sender is SceneState sceneState))
+            if (sender is not SceneState sceneState)
                 return;
 
             if (e.PropertyName != nameof(SceneState.Value))
@@ -112,7 +112,7 @@ namespace PhilipDaubmeier.DigitalstromTwin
 
         private void StatePropertyChangedInternal(object? sender, PropertyChangedEventArgs e)
         {
-            if (!(sender is SceneState sceneState))
+            if (sender is not SceneState sceneState)
                 return;
 
             if (!TryFindZoneAndGroup(sceneState, out Zone zone, out Group group))

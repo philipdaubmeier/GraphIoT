@@ -30,8 +30,8 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
                     serializer.Serialize(writer, new Tuple<DateTime, int>(timestamp, value));
 
                 stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
-                    read = serializer.Deserialize(reader, timestamp);
+                using var reader = new BinaryReader(stream, Encoding.UTF8, true);
+                read = serializer.Deserialize(reader, timestamp);
             }
 
             Assert.Equal(timestamp, read.Item1);
@@ -65,8 +65,8 @@ namespace PhilipDaubmeier.CompactTimeSeries.Tests
                     serializer.Serialize(writer, new Tuple<DateTime, double>(timestamp, value));
 
                 stream.Seek(0, SeekOrigin.Begin);
-                using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
-                    read = serializer.Deserialize(reader, timestamp);
+                using var reader = new BinaryReader(stream, Encoding.UTF8, true);
+                read = serializer.Deserialize(reader, timestamp);
             }
 
             Assert.Equal(timestamp, read.Item1);

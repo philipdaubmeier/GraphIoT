@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         private bool skipDisposingClient = false;
         private HttpClient? client;
 
-        private static readonly CookieContainer cookieContainer = new CookieContainer();
+        private static readonly CookieContainer cookieContainer = new();
 
         /// <summary>
         /// See <see cref="ISonnenConnectionProvider.AuthData"/>
@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient(CreateHandler()));
+            get => client ??= new HttpClient(CreateHandler());
             protected set
             {
                 client = value;
@@ -33,7 +33,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
         /// For authentication on my.sonnen.de portal we need a handler that supports cookies.
         /// Always use this as inner handler if you create an own HttpClient to inject.
         /// </summary>
-        public static HttpClientHandler CreateHandler() => new HttpClientHandler()
+        public static HttpClientHandler CreateHandler() => new()
         {
             UseCookies = true,
             CookieContainer = cookieContainer
@@ -56,6 +56,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
                 client?.Dispose();
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

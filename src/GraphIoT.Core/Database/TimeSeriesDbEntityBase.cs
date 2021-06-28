@@ -19,12 +19,12 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         protected abstract int DecimalPlaces { get; }
 
-        protected TimeSeriesSpan SpanMonth30Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
-        protected TimeSeriesSpan SpanMonth160Min => new TimeSeriesSpan(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 9));
+        protected TimeSeriesSpan SpanMonth30Min => new(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 24 * 2));
+        protected TimeSeriesSpan SpanMonth160Min => new(Key, Key.AddMonths(1), (int)Math.Floor((Key.AddMonths(1) - Key).TotalDays * 9));
 
-        protected TimeSeriesSpan SpanDay1Sec => new TimeSeriesSpan(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
-        protected TimeSeriesSpan SpanDay1Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
-        protected TimeSeriesSpan SpanDay5Min => new TimeSeriesSpan(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
+        protected TimeSeriesSpan SpanDay1Sec => new(Key, TimeSeriesSpan.Spacing.Spacing1Sec, (int)TimeSeriesSpan.Spacing.Spacing1Day);
+        protected TimeSeriesSpan SpanDay1Min => new(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing1Min);
+        protected TimeSeriesSpan SpanDay5Min => new(Key, Key.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min);
 
         public static T LoadOrCreateDay<T>(DbSet<T> dbTable, DateTime day, Expression<Func<T, bool>>? additionalQuery = null) where T : TimeSeriesDbEntityBase, new()
         {
@@ -134,8 +134,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
             }
         }
 
-        private static readonly Semaphore _loadPropertiesSemaphore = new Semaphore(1, 1);
-        private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new Dictionary<Type, List<PropertyInfo>>();
+        private static readonly Semaphore _loadPropertiesSemaphore = new(1, 1);
+        private static readonly Dictionary<Type, List<PropertyInfo>> _curveProperties = new();
         private (PropertyInfo property, int count)? CurvePropertyAndCount(int index)
         {
             try

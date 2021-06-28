@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private HttpClient? client = null;
         private HttpClient? authClient = null;
 
-        public static readonly CookieContainer cookieContainer = new CookieContainer();
+        public static readonly CookieContainer cookieContainer = new();
 
         /// <summary>
         /// See <see cref="IWeConnectConnectionProvider.AuthData"/>
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient(CreateHandler()));
+            get => client ??= new HttpClient(CreateHandler());
             protected set
             {
                 client = value;
@@ -36,7 +36,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         public HttpClient AuthClient
         {
-            get => authClient ?? (authClient = new HttpClient(CreateAuthHandler()));
+            get => authClient ??= new HttpClient(CreateAuthHandler());
             protected set
             {
                 authClient = value;
@@ -49,7 +49,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         public CookieContainer CookieContainer => cookieContainer;
 
-        public static HttpClientHandler CreateHandler() => new HttpClientHandler()
+        public static HttpClientHandler CreateHandler() => new()
         {
             UseCookies = true,
             CookieContainer = cookieContainer
@@ -59,7 +59,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// During authentication we need a separate client that does not
         /// follow redirects. Use this handler for that purpose.
         /// </summary>
-        public static HttpClientHandler CreateAuthHandler() => new HttpClientHandler()
+        public static HttpClientHandler CreateAuthHandler() => new()
         {
             AllowAutoRedirect = false,
             UseCookies = true,
@@ -84,6 +84,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 authClient?.Dispose();
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

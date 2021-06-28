@@ -22,7 +22,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
         public string? EventStreamEncoded { get; set; }
 
         [NotMapped]
-        public TimeSeriesSpan Span => new TimeSeriesSpan(Key, Key.AddDays(1), MaxEventsPerDay);
+        public TimeSeriesSpan Span => new(Key, Key.AddDays(1), MaxEventsPerDay);
 
         [NotMapped]
         public SceneEventStream EventStream
@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Database
             }
         }
 
-        public TimeSeries<T> GetSeries<T>(int index) where T : struct => new TimeSeries<T>(new TimeSeriesSpan(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1));
+        public TimeSeries<T> GetSeries<T>(int index) where T : struct => new(new TimeSeriesSpan(DateTime.MinValue, TimeSeriesSpan.Spacing.Spacing1Sec, 1));
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct { }
     }
 }

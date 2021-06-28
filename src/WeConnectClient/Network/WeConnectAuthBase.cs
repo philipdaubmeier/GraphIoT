@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private const string _userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:75.0) Gecko/20100101 Firefox/75.0";
 
-        private protected readonly AuthState _state = new AuthState();
+        private protected readonly AuthState _state = new();
 
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
@@ -34,9 +34,9 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private const string _baseUri = "https://www.portal.volkswagen-we.com";
         private const string _authUri = "https://identity.vwgroup.io";
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };
@@ -93,8 +93,11 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             var responseStream = await response.Content.ReadAsStreamAsync();
             var responseJson = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);
 
-            if (responseJson.HasError)
+            if (responseJson != null && responseJson.HasError)
                 throw new IOException($"The API response returned the error code: {responseJson.ErrorCode}");
+
+            if (responseJson?.Body == null)
+                throw new IOException($"No valid response payload received");
 
             return responseJson.Body;
         }
@@ -229,7 +232,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             await GetFinalCsrf(state);
         }
 
-        private void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
+        private static void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
         {
             headers.Add("Accept-Language", "en-US,en;q=0.5");
             headers.Add("Accept", "text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8");
@@ -301,9 +304,9 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
             var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
-            if (getLoginBody.HasError)
+            if (getLoginBody != null && getLoginBody.HasError)
                 throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
-            if (string.IsNullOrEmpty(getLoginBody.Body.Path))
+            if (string.IsNullOrEmpty(getLoginBody?.Body.Path))
                 throw new IOException("Failed to deserialize body to get login url.");
 
             state.LoginUri = getLoginBody.Body.Path;
@@ -430,8 +433,13 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to read auth code and state from url.");
             if (!lastLocation.TryExtractUriParameter("code", out string authCode))
                 throw new IOException("Failed to get portlet code.");
+
+#pragma warning disable IDE0079
+#pragma warning disable CA1507 // "nameof" does not fit here, it is only named like the variable by chance
             if (!lastLocation.TryExtractUriParameter("state", out string authState))
                 throw new IOException("Failed to get state.");
+#pragma warning restore CA1507
+#pragma warning restore IDE0079
 
             state.PortletAuthCode = authCode;
             state.PortletAuthState = authState;

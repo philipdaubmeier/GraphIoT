@@ -63,8 +63,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel.Tests
             Assert.Equal(TimeSpan.FromMinutes(1), graphViewModel.Spacing);
             Assert.Equal("test", graphViewModel.Name);
             Assert.Equal("#.00 Unit", graphViewModel.Format);
-            Assert.Equal(new dynamic[] { }, graphViewModel.Points);
-            Assert.Equal(new dynamic[] { }, graphViewModel.TimestampedPoints());
+            Assert.Equal(Array.Empty<dynamic>(), graphViewModel.Points);
+            Assert.Equal(Array.Empty<dynamic>(), graphViewModel.TimestampedPoints());
 
             Assert.Equal(0, graphViewModel.BeginUnixTimestamp);
             Assert.Equal(60000, graphViewModel.SpacingMillis);

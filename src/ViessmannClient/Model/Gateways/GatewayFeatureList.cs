@@ -33,12 +33,12 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
 
         public string GetGatewayFirmwareVersion()
         {
-            return GetProperties(FeatureName.Name.GatewayFirmware)?.Version?.Value as string ?? string.Empty;
+            return GetProperties(FeatureName.Name.GatewayFirmware)?.Version?.Value ?? string.Empty;
         }
 
         public string GetGatewayFirmwareUpdateStatus()
         {
-            return GetProperties(FeatureName.Name.GatewayFirmware)?.UpdateStatus?.Value as string ?? string.Empty;
+            return GetProperties(FeatureName.Name.GatewayFirmware)?.UpdateStatus?.Value ?? string.Empty;
         }
     }
 }

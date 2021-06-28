@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.ViewModel
 {
     public abstract class GraphCollectionViewModelKeyedItemBase<Tentity, Tkey> : GraphCollectionViewModelMultiResolutionBase<Tentity> where Tentity : class, ITimeSeriesDbEntity where Tkey : notnull
     {
-        protected readonly Dictionary<int, GraphViewModel> _loadedGraphs = new Dictionary<int, GraphViewModel>();
+        protected readonly Dictionary<int, GraphViewModel> _loadedGraphs = new();
         protected readonly Dictionary<Tkey, int> _keys;
         protected readonly Func<Tentity, Tkey> _keySelector;
         protected readonly Func<Tkey, Func<Tentity, bool>> _predicateGenerator;
