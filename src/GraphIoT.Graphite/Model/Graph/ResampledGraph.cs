@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 
         public override string Name => _operand.Name;
         public override DateTime Begin => _operand.Begin;
-        public override TimeSpan Spacing => new TimeSpan(Math.Max(_operand.Spacing.Ticks, _spacing.Ticks));
+        public override TimeSpan Spacing => new(Math.Max(_operand.Spacing.Ticks, _spacing.Ticks));
 
         public override IEnumerable<double?> Points
         {

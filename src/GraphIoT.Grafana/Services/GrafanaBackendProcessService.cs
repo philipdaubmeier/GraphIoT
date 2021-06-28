@@ -89,6 +89,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Services
         public void Dispose()
         {
             _process?.Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 

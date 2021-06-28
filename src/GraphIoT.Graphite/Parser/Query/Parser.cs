@@ -9,8 +9,8 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 {
     public class Parser
     {
-        private Queue<TokenMatch> _tokenSequence = new Queue<TokenMatch>(0);
-        private TokenMatch _lookahead = new TokenMatch(TokenType.SequenceTerminator);
+        private Queue<TokenMatch> _tokenSequence = new(0);
+        private TokenMatch _lookahead = new(TokenType.SequenceTerminator);
 
         public GraphDataSource DataSource { get; set; } = new GraphDataSource(new List<IGraphCollectionViewModel>());
 

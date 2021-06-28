@@ -57,7 +57,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             return true;
         }
 
-        private static readonly Semaphore _loadCacheSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _loadCacheSemaphore = new(1, 1);
         private static void FillCache()
         {
             try

@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 {
     public class QueryOptimizer
     {
-        private readonly HashSet<ResampleFunctionExpression?> _resampleFuncs = new HashSet<ResampleFunctionExpression?>();
+        private readonly HashSet<ResampleFunctionExpression?> _resampleFuncs = new();
 
         public readonly Parser _parser;
         public GraphDataSource DataSource { get; set; } = new GraphDataSource(new List<IGraphCollectionViewModel>());

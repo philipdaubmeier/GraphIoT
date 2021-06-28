@@ -12,9 +12,9 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
     /// </summary>
     public static class TimeExtensions
     {
-        private static readonly List<string> Months = new List<string> { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
+        private static readonly List<string> Months = new() { "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec" };
 
-        private static readonly List<string> Weekdays = new List<string> { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
+        private static readonly List<string> Weekdays = new() { "sun", "mon", "tue", "wed", "thu", "fri", "sat" };
 
         private enum Unit
         {

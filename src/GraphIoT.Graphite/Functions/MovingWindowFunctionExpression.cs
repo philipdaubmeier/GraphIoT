@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             foreach (var _ in Enumerable.Range(0, steps))
                 yield return null;
 
-            Queue<double?> input = new Queue<double?>(source.Take(steps - 1).Append(0d));
+            Queue<double?> input = new(source.Take(steps - 1).Append(0d));
 
             foreach (var value in source.Skip(steps))
             {

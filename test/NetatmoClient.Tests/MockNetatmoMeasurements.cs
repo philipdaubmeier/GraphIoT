@@ -37,8 +37,8 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                         ""body"": [" + string.Join(',', Enumerable.Range(0, num).Select(i =>
                         {
                             var begTime = time;
-                            var stepTime = pseudoRandom5MinSteps[i % pseudoRandom5MinSteps.Count()];
-                            var clumps = Math.Min(num - valueCount, pseudoRandomClumpSizes[i % pseudoRandomClumpSizes.Count()]);
+                            var stepTime = pseudoRandom5MinSteps[i % pseudoRandom5MinSteps.Length];
+                            var clumps = Math.Min(num - valueCount, pseudoRandomClumpSizes[i % pseudoRandomClumpSizes.Length]);
                             valueCount += clumps;
                             time += stepTime * clumps;
 

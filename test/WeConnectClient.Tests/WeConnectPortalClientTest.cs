@@ -10,11 +10,12 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 {
     public class WeConnectPortalClientTest
     {
-        public static string expectedSessionToken = "{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
-                "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}," +
-                "{\"n\":\"COOKIE_SUPPORT\",\"v\":\"true\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
-                "{\"n\":\"GUEST_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
-                "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}]}";
+        private const string expectedSessionToken = "{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
+                        "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}," +
+                        "{\"n\":\"COOKIE_SUPPORT\",\"v\":\"true\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                        "{\"n\":\"GUEST_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2021-04-28T22:44:04+02:00\"}," +
+                        "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}]}";
+        public static readonly string ExpectedSessionToken = expectedSessionToken;
 
         [Fact]
         public async Task TestAuthSerialization()
@@ -28,7 +29,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             await client.GetEManager();
 
-            Assert.Equal(expectedSessionToken, auth.AccessToken);
+            Assert.Equal(ExpectedSessionToken, auth.AccessToken);
         }
 
         [Fact]
@@ -39,7 +40,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             // emulate that the session was persisted and is now restored.
             // this should give us access without a username and password
-            await auth.UpdateTokenAsync(expectedSessionToken, DateTime.MinValue, null);
+            await auth.UpdateTokenAsync(ExpectedSessionToken, DateTime.MinValue, null);
 
             var mockedHandler = new MockCookieHttpMessageHandler();
             var client = new WeConnectPortalClient(mockedHandler

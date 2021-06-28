@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
     /// </summary>
     public class Lexer
     {
-        private static readonly List<TokenDefinition> _tokenDefinitions = new List<TokenDefinition>()
+        private static readonly List<TokenDefinition> _tokenDefinitions = new()
         {
             new TokenDefinition(TokenType.Identifier, @"[\w\.\*:_]*[A-Za-z][\w\.\*:_]*( [\w\.\*:_]+)*", 3),
             new TokenDefinition(TokenType.Comma, @",", 1),
