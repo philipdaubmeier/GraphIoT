@@ -65,31 +65,19 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         Joker = 8
     }
 
-    public class Group : IComparable, IComparable<Group>, IEquatable<Group>, IFormattable
+    public record Group(int Type) : IComparable, IComparable<Group>, IFormattable
     {
-        private readonly int _group = (int)Color.Yellow;
+        public int Type { get; init; } = NormalizeGroupType(Type);
 
-        private Group(int colorCode)
+        private static int NormalizeGroupType(int groupType)
         {
-            _group = Math.Min(Math.Max(colorCode, 0), 64);
-            if (_group > 12 && !(_group == 48 || _group == 64))
-                _group = 0;
+            groupType = Math.Min(Math.Max(groupType, 0), 64);
+            if (groupType > 12 && !(groupType == 48 || groupType == 64))
+                return 0;
+            return groupType;
         }
 
-        public static implicit operator int(Group group)
-        {
-            return group._group;
-        }
-
-        public static implicit operator Group(long group)
-        {
-            return (int)group;
-        }
-
-        public static implicit operator Group(int group)
-        {
-            return new Group(group);
-        }
+        public static implicit operator int(Group group) => group.Type;
 
         public static implicit operator Group(string groupID)
         {
@@ -99,86 +87,47 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             return new Group(color);
         }
 
-        public static implicit operator Group(Color color)
-        {
-            return new Group((int)color);
-        }
+        public static implicit operator Group(long group) => (int)group;
 
-        public static implicit operator Group(GroupType type)
-        {
-            return new Group((int)type);
-        }
+        public static implicit operator Group(int group) => new(group);
+
+        public static implicit operator Group(Color color) => new((int)color);
+
+        public static implicit operator Group(GroupType type) => new((int)type);
 
         public static implicit operator Color(Group group)
         {
-            if (group._group <= 0)
-                return Color.White;
-
-            if ((group._group >= 9 && group._group <= 12) || group._group == 48 || group._group == 64)
-                return Color.Blue;
-
-            if (group._group > 8)
-                return Color.White;
-
-            return (Color)group._group;
+            return group.Type switch
+            {
+                0 => Color.White,
+                8 => Color.Black,
+                var x when x >= 9 && x <= 12 => Color.Blue,
+                48 => Color.Blue,
+                64 => Color.Blue,
+                _ => (Color)group.Type
+            };
         }
 
         public static implicit operator GroupType(Group group)
         {
-            if (group._group == 48 || group._group == 64)
-                return (GroupType)group._group;
-            if (group._group <= 0 || group._group > 12)
+            if (group.Type == 48 || group.Type == 64)
+                return (GroupType)group.Type;
+            if (group.Type <= 0 || group.Type > 12)
                 return GroupType.Various;
 
-            return (GroupType)group._group;
+            return (GroupType)group.Type;
         }
+
+        public int CompareTo(Group? value) => Type.CompareTo(value?.Type);
+
+        public int CompareTo(object? value) => Type.CompareTo((value as Group)?.Type ?? value);
 
         public static IEnumerable<Group> GetGroups()
         {
             return ((Color[])Enum.GetValues(typeof(Color))).Select(x => (Group)x);
         }
 
-        public static bool operator !=(Group? group1, Group? group2)
-        {
-            return !(group1 == group2);
-        }
-
-        public static bool operator ==(Group? group1, Group? group2)
-        {
-            if (group1 is null || group2 is null)
-                return ReferenceEquals(group1, group2);
-            return group1._group == group2._group;
-        }
-
-        public int CompareTo(Group? value)
-        {
-            return _group.CompareTo(value?._group);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _group.CompareTo((value as Group)?._group ?? value);
-        }
-
-        public bool Equals(Group? group)
-        {
-            return this == group;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Group group && this == group;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_group);
-        }
-
-        public override string ToString()
-        {
-            return ToString(null, null);
-        }
+        public override string ToString() => ToString(null, null);
 
         /// <summary>
         /// Converts the numeric value of this instance to its equivalent string representation
@@ -196,7 +145,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
         public string ToString(string? format = null, IFormatProvider? formatProvider = null)
         {
             if (format is null)
-                return $"ID {_group}: {(Color)this} - {(GroupType)this}";
+                return $"ID {Type}: {(Color)this} - {(GroupType)this}";
 
             if (!format.Equals("d", StringComparison.InvariantCultureIgnoreCase))
                 throw new FormatException($"Did not recognize format '{format}'");
@@ -204,7 +153,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             if (formatProvider is CultureInfo culture)
                 Locale.Group.Culture = culture;
 
-            return _group switch
+            return Type switch
             {
                 (int)GroupType.Various => Locale.Group.Device,
                 (int)GroupType.Light => Locale.Group.Light,
@@ -221,7 +170,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
                 (int)GroupType.Security => Locale.Group.Security,
                 (int)GroupType.Access => Locale.Group.Access,
                 (int)GroupType.Joker => Locale.Group.Joker,
-                _ => $"{Locale.Group.Unknown} ({_group})",
+                _ => $"{Locale.Group.Unknown} ({Type})",
             };
         }
     }
