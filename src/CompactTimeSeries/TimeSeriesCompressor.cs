@@ -25,7 +25,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
                 return null;
 
             foreach (var key in _timeseries.Select(x => x.Key))
-                WriteDiffTimeseries(_timeseries[key], clonedTimeSeries[key]);
+                TimeSeriesCompressor<TKey, T>.WriteDiffTimeseries(_timeseries[key], clonedTimeSeries[key]);
 
             return (clonedTimeSeries.UnderlyingStream as CompressableMemoryStream)?.ToCompressedByteArray();
         }
@@ -69,7 +69,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         ///  - output values (in dest TimeSeries object), note the first value remains untouched:
         ///     [120,   3,  -3,   1,   2,   0,  -3, null, null,   1,   3,   3,  903, -903]
         /// </summary>
-        private void WriteDiffTimeseries(ITimeSeries<T> source, ITimeSeries<T> dest)
+        private static void WriteDiffTimeseries(ITimeSeries<T> source, ITimeSeries<T> dest)
         {
             bool first = true;
             T previous = default;

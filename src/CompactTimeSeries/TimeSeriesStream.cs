@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             }
         }
 
-        private readonly KeyValuePairFactory<T> _keyValuePairFactory = new KeyValuePairFactory<T>();
+        private readonly KeyValuePairFactory<T> _keyValuePairFactory = new();
 
         private readonly Stream _stream;
         private readonly bool _isStreamManaged = false;
@@ -84,6 +84,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
         {
             if (_isStreamManaged)
                 _stream.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -107,7 +108,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             set
             {
                 if (index < 0 || index >= _span.Count)
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(index));
 
                 if (!SeekToTimeBucket(index))
                     return;
@@ -117,7 +118,7 @@ namespace PhilipDaubmeier.CompactTimeSeries
             get
             {
                 if (index < 0 || index >= _span.Count)
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(index));
 
                 if (!SeekToTimeBucket(index))
                     return default;
