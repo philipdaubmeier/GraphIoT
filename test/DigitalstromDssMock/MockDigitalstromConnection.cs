@@ -26,8 +26,8 @@ namespace PhilipDaubmeier.DigitalstromDssMock
         }
 
         private static readonly IDigitalstromAuth auth = new EphemeralDigitalstromAuth("DigitalstromClientUnittests", "dssadmin", "mocksecret");
-        private static readonly UriPriorityList testGenerationUris = new UriPriorityList(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
-        private static readonly UriPriorityList mockUris = new UriPriorityList(new List<Uri>() { new Uri(BaseUri) });
+        private static readonly UriPriorityList testGenerationUris = new(new List<Uri>() { new Uri("https://uri") }, new List<bool>() { true });
+        private static readonly UriPriorityList mockUris = new(new List<Uri>() { new Uri(BaseUri) });
 
         public static string BaseUri => "https://unittestdummy0000123456789abcdef.digitalstrom.net:8080";
         public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";

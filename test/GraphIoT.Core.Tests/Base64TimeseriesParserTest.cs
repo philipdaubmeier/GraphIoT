@@ -7,13 +7,13 @@ namespace PhilipDaubmeier.GraphIoT.Core.Parsers.Tests
     public class TimeSeriesTest
     {
         private const int count = 10;
-        private static readonly DateTime begin = new DateTime(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
+        private static readonly DateTime begin = new(2019, 01, 09, 13, 23, 00, DateTimeKind.Utc);
         private static readonly DateTime end = begin.AddMinutes(count);
-        private static readonly TimeSeriesSpan span = new TimeSeriesSpan(begin, end, count);
+        private static readonly TimeSeriesSpan span = new(begin, end, count);
 
-        private static readonly DateTime insideRangeExactSecond = new DateTime(2019, 01, 09, 13, 28, 00, DateTimeKind.Utc);
-        private static readonly DateTime insideRangeOddSecond1 = new DateTime(2019, 01, 09, 13, 26, 01, DateTimeKind.Utc);
-        private static readonly DateTime insideRangeOddSecond2 = new DateTime(2019, 01, 09, 13, 30, 59, DateTimeKind.Utc);
+        private static readonly DateTime insideRangeExactSecond = new(2019, 01, 09, 13, 28, 00, DateTimeKind.Utc);
+        private static readonly DateTime insideRangeOddSecond1 = new(2019, 01, 09, 13, 26, 01, DateTimeKind.Utc);
+        private static readonly DateTime insideRangeOddSecond2 = new(2019, 01, 09, 13, 30, 59, DateTimeKind.Utc);
 
         [Fact]
         public void TestIntTimeSeriesWriter()

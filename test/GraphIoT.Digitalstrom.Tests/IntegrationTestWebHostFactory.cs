@@ -26,7 +26,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Tests
 
         public async Task<IntegrationTestDbContext> InitDb()
         {
-            if (!(Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() is IntegrationTestDbContext dbContext) || dbContext.Database is null)
+            if (Server.Host.Services.GetRequiredService<IDigitalstromDbContext>() is not IntegrationTestDbContext dbContext || dbContext.Database is null)
                 throw new NullReferenceException("No database service available");
 
             await dbContext.Database.EnsureDeletedAsync();

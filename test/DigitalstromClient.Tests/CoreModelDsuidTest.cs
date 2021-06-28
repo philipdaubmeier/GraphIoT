@@ -15,11 +15,11 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [InlineData("1234568790abcdef1234568790abcdef12", "1234568790abcdef1234568790abcdef1234568790abcdef1234568790abcdef")]
         public void TestConstructor(string expected, string input)
         {
-            Dsuid dsuid = new Dsuid(input);
+            Dsuid dsuid = new(input);
 
             Assert.Equal(expected, dsuid.ToString());
 
-            Dsuid dsuidAgain = new Dsuid(dsuid.ToString());
+            Dsuid dsuidAgain = new(dsuid.ToString());
 
             Assert.Equal(expected, dsuidAgain.ToString());
         }
@@ -32,7 +32,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [InlineData("1234568790abcdef1234568790abcdef12")]
         public void TestSerialization(string input)
         {
-            Dsuid dsuidBeforeSerialization = new Dsuid(input);
+            Dsuid dsuidBeforeSerialization = new(input);
             Dsuid dsuidAfterSerialization;
 
             using (var stream = new MemoryStream())
@@ -50,8 +50,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestComparable()
         {
-            Dsuid dsuid = new Dsuid("0000000000001234568790abcdefabcdef");
-            Dsuid dsuidToCompare = new Dsuid("0000000000000000000000000000000001");
+            Dsuid dsuid = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuidToCompare = new("0000000000000000000000000000000001");
             IComparable dsuidComparable = dsuid;
             IComparable<Dsuid> dsuidGenericComparable = dsuid;
 
@@ -62,9 +62,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEquals()
         {
-            Dsuid dsuid1 = new Dsuid("0000000000001234568790abcdefabcdef");
-            Dsuid dsuid2 = new Dsuid("0000000000001234568790abcdefabcdef");
-            Dsuid dsuid3 = new Dsuid("0000000000000000000000000000000001");
+            Dsuid dsuid1 = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuid2 = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuid3 = new("0000000000000000000000000000000001");
 
             Assert.True(dsuid1.Equals(dsuid2));
             Assert.False(dsuid2.Equals(dsuid3));
@@ -79,8 +79,8 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestGetHashCode()
         {
-            Dsuid dsuid1 = new Dsuid("0000000000001234568790abcdefabcdef");
-            Dsuid dsuid2 = new Dsuid("0000000000000000000000000000000001");
+            Dsuid dsuid1 = new("0000000000001234568790abcdefabcdef");
+            Dsuid dsuid2 = new("0000000000000000000000000000000001");
 
             Assert.Equal("0000000000001234568790abcdefabcdef".GetHashCode(), dsuid1.GetHashCode());
             Assert.Equal("0000000000000000000000000000000001".GetHashCode(), dsuid2.GetHashCode());

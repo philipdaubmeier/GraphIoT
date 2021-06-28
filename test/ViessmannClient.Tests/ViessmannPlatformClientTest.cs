@@ -263,7 +263,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             var result = await viessmannClient.GetGatewayFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId);
 
             Assert.Equal(MockViessmannConnection.GatewayId.ToString(), result.First().GatewayId);
-            Assert.Equal(5, result.Count());
+            Assert.Equal(5, result.Count);
 
             var feature1 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayStatus))?.Properties;
             var feature2 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.GatewayWifi))?.Properties;
@@ -540,7 +540,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             var result = await viessmannClient.GetDeviceFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
 
             Assert.Equal(MockViessmannConnection.DeviceId.ToString(), result.First().DeviceId);
-            Assert.Equal(9, result.Count());
+            Assert.Equal(9, result.Count);
 
             var feature1 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingBoilerTemperature))?.Properties;
             var feature2 = result.GetRawFeatureByName(new FeatureName(FeatureName.Name.HeatingCircuits))?.Properties;
@@ -606,7 +606,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 
             var result = await viessmannClient.GetDeviceFeatures(MockViessmannConnection.InstallationId, MockViessmannConnection.GatewayId, MockViessmannConnection.DeviceId);
 
-            Assert.Equal(157, result.Count());
+            Assert.Equal(157, result.Count);
 
             Assert.Equal("2020-01-01T00:00:00.000Z", result.GetDeviceMessagesLogbook().First().Timestamp);
             Assert.Equal("SECONDARY_PUMP1", result.GetDeviceMessagesLogbook().First().Actor);

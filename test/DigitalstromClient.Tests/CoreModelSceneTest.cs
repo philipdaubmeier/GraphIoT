@@ -16,7 +16,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
             Scene sceneFromInt = intVal;
             Scene sceneFromStringImplicit = intVal.ToString();
             Scene sceneFromEnumImplicit = enumVal;
-            Scene sceneFromEnumExplicit = new Scene(enumVal);
+            Scene sceneFromEnumExplicit = new(enumVal);
 
             // implicit conversions back to int
             Assert.Equal(intVal, (int)sceneFromInt);
@@ -66,9 +66,9 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [Fact]
         public void TestEqualsOperators()
         {
-            Scene scene1 = new Scene(SceneCommand.DeepOff);
-            Scene scene2 = new Scene(SceneCommand.Preset4);
-            Scene scene3 = new Scene(SceneCommand.Preset4);
+            Scene scene1 = new(SceneCommand.DeepOff);
+            Scene scene2 = new(SceneCommand.Preset4);
+            Scene scene3 = new(SceneCommand.Preset4);
 
             Assert.False(scene1 == scene2);
             Assert.True(scene2 == scene3);
@@ -85,7 +85,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [InlineData(19, SceneCommand.Preset4)]
         public void TestGetHashCode(int expected, SceneCommand inputVal)
         {
-            Scene scene = new Scene(inputVal);
+            Scene scene = new(inputVal);
 
             Assert.Equal(HashCode.Combine(expected), scene.GetHashCode());
         }
@@ -96,7 +96,7 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core.Tests
         [InlineData("ID 19: Preset4", "Preset 4", "Stimmung 4", SceneCommand.Preset4)]
         public void TestToString(string expectedInvariant, string expectedEn, string expectedDe, SceneCommand inputVal)
         {
-            Scene scene = new Scene(inputVal);
+            Scene scene = new(inputVal);
 
             Assert.Equal(expectedInvariant, scene.ToString());
 
