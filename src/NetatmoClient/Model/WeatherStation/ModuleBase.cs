@@ -19,7 +19,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.WeatherStation
         public int Firmware { get; set; }
         public ModuleData DashboardData { get; set; } = new ModuleData();
 
-        private List<Measure> _dataType = new List<Measure>();
+        private List<Measure> _dataType = new();
         public List<Measure> DataType
         {
             get

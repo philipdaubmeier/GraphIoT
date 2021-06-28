@@ -109,7 +109,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is Measure measure))
+            if (obj is not Measure measure)
                 return false;
             return this == measure;
         }

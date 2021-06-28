@@ -70,9 +70,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is ModuleId value))
-                return false;
-            return this == value;
+            return obj is ModuleId value && this == value;
         }
 
         public bool Equals(ModuleId? g)

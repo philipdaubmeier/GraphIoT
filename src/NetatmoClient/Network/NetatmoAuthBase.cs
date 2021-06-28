@@ -16,14 +16,14 @@ namespace PhilipDaubmeier.NetatmoClient
     {
         protected const string _baseUri = @"https://api.netatmo.net";
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
         private readonly INetatmoConnectionProvider _provider;
         private readonly INetatmoAuth _authData;
 
         private readonly HttpClient _client;
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = new SnakeCaseNamingPolicy()
         };
@@ -72,7 +72,7 @@ namespace PhilipDaubmeier.NetatmoClient
             var response = await RequestNetatmoApi(uri, parameters);
             var responseStream = await response.Content.ReadAsStreamAsync();
 
-            TWiremessage result;
+            TWiremessage? result;
             try
             {
                 result = await JsonSerializer.DeserializeAsync<TWiremessage>(responseStream, _jsonSerializerOptions);

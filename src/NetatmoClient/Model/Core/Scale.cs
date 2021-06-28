@@ -99,9 +99,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
 
         public override bool Equals(object? obj)
         {
-            if (!(obj is Scale scale))
-                return false;
-            return this == scale;
+            return obj is Scale scale && this == scale;
         }
 
         public override int GetHashCode()
