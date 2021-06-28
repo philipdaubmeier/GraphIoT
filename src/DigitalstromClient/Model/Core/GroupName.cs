@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace PhilipDaubmeier.DigitalstromClient.Model.Core
 {
-    public class GroupName
+    public record GroupName(GroupName.Name NameValue)
     {
         public enum Name
         {
@@ -41,34 +41,16 @@ namespace PhilipDaubmeier.DigitalstromClient.Model.Core
             {"reserved2", Name.Reserved2 }
         };
 
-        private readonly Name _name = Name.Broadcast;
-
-        private GroupName(Name name)
-        {
-            _name = name;
-        }
+        public Name NameValue { get; init; } = NameValue;
 
         public static implicit operator string(GroupName name)
-        {
-            return _mapping.ToDictionary(x => x.Value, x => x.Key)[name];
-        }
+            => _mapping.ToDictionary(x => x.Value, x => x.Key)[name];
 
         public static implicit operator GroupName(string name)
-        {
-            if (!_mapping.TryGetValue(name, out Name enumName))
-                return new GroupName(Name.Broadcast);
+            => new(_mapping.TryGetValue(name, out Name enumName) ? enumName : Name.Broadcast);
 
-            return new GroupName(enumName);
-        }
+        public static implicit operator Name(GroupName name) => name.NameValue;
 
-        public static implicit operator Name(GroupName name)
-        {
-            return name._name;
-        }
-
-        public static implicit operator GroupName(Name name)
-        {
-            return new GroupName(name);
-        }
+        public static implicit operator GroupName(Name name) => new(name);
     }
 }
