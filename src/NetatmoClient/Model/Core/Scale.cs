@@ -16,8 +16,8 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
         Scale1Month
     }
 
-    [DebuggerDisplay("{_scale,nq}")]
-    public class Scale : IComparable, IComparable<Scale>, IEquatable<Scale>
+    [DebuggerDisplay("{Measure,nq}")]
+    public record Scale(MeasureScale Measure) : IComparable, IComparable<Scale>, IEquatable<Scale>
     {
         private static Dictionary<string, MeasureScale>? _mappingDict = null;
         private static Dictionary<string, MeasureScale> Mapping
@@ -32,17 +32,7 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             }
         }
 
-        private readonly MeasureScale _scale;
-
-        public Scale(MeasureScale scale)
-        {
-            _scale = scale;
-        }
-
-        public static implicit operator Scale(MeasureScale scale)
-        {
-            return new Scale(scale);
-        }
+        public static implicit operator Scale(MeasureScale scale) => new(scale);
 
         public static implicit operator Scale(string scale)
         {
@@ -51,14 +41,15 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             return new Scale(MeasureScale.ScaleMax);
         }
 
-        public static implicit operator MeasureScale(Scale scale)
-        {
-            return scale._scale;
-        }
+        public static implicit operator MeasureScale(Scale scale) => scale.Measure;
+
+        public int CompareTo(Scale? value) => Measure.CompareTo(value?.Measure);
+
+        public int CompareTo(object? value) => Measure.CompareTo((value as Scale)?.Measure ?? value);
 
         public static implicit operator TimeSpan(Scale scale)
         {
-            return scale._scale switch
+            return scale.Measure switch
             {
                 MeasureScale.Scale30Min => new TimeSpan(0, 30, 0),
                 MeasureScale.Scale1Hour => new TimeSpan(1, 0, 0),
@@ -70,46 +61,9 @@ namespace PhilipDaubmeier.NetatmoClient.Model.Core
             };
         }
 
-        public static bool operator !=(Scale? scale1, Scale? scale2)
-        {
-            return !(scale1 == scale2);
-        }
-
-        public static bool operator ==(Scale? scale1, Scale? scale2)
-        {
-            if (scale1 is null || scale2 is null)
-                return ReferenceEquals(scale1, scale2);
-            return scale1._scale == scale2._scale;
-        }
-
-        public int CompareTo(Scale? value)
-        {
-            return _scale.CompareTo(value?._scale);
-        }
-
-        public int CompareTo(object? value)
-        {
-            return _scale.CompareTo((value as Scale)?._scale ?? value);
-        }
-
-        public bool Equals(Scale? scale)
-        {
-            return this == scale;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            return obj is Scale scale && this == scale;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(_scale);
-        }
-
         public override string ToString()
         {
-            return _scale switch
+            return Measure switch
             {
                 MeasureScale.Scale30Min => "30min",
                 MeasureScale.Scale1Hour => "1hour",
