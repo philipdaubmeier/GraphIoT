@@ -21,11 +21,11 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
         private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
         private const string _tokenUri = "https://iam.viessmann.com/idp/v2/token";
-        private static readonly List<string> _scopes = new List<string>() { "IoT", "User", "offline_access" };
+        private static readonly List<string> _scopes = new() { "IoT", "User", "offline_access" };
 
-        private static readonly Semaphore _renewTokenSemaphore = new Semaphore(1, 1);
+        private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         };

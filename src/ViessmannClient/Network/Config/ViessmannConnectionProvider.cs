@@ -21,7 +21,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         /// </summary>
         public HttpClient Client
         {
-            get => client ?? (client = new HttpClient(CreateHttpClientHandler()));
+            get => client ??= new HttpClient(CreateHttpClientHandler());
             protected set
             {
                 client = value;
@@ -29,7 +29,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             }
         }
 
-        public static HttpClientHandler CreateHttpClientHandler() => new HttpClientHandler();
+        public static HttpClientHandler CreateHttpClientHandler() => new();
 
         public string ClientId { get; set; } = string.Empty;
         public string RedirectUri { get; set; } = string.Empty;
@@ -37,7 +37,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
         private static readonly string _verifierAllowedChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
         private static readonly int _verifierLength = 128;
         private static readonly char[] _base64Padding = { '=' };
-        private static string _codeVerifier = GenerateCodeVerifier();
+        private static readonly string _codeVerifier = GenerateCodeVerifier();
 
         public string CodeVerifier => _codeVerifier;
         public string CodeChallenge => ToCodeChallenge(CodeVerifier);
@@ -78,6 +78,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
                 client?.Dispose();
 
             disposed = true;
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

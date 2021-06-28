@@ -213,7 +213,7 @@ namespace PhilipDaubmeier.ViessmannClient.Model.Features
             VentilationSchedule
         }
 
-        private static readonly Dictionary<string, Name> _mapping = new Dictionary<string, Name>()
+        private static readonly Dictionary<string, Name> _mapping = new()
         {
             {"device", Name.Device},
             {"device.messages", Name.DeviceMessages},
