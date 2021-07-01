@@ -49,7 +49,8 @@ It is structured as follows:
   * [GraphIoT.Viessmann](src/GraphIoT.Viessmann)
   * [GraphIoT.WeConnect](src/GraphIoT.WeConnect)
 * **Visualization Library**:
-  * [GraphIoT.Grafana](src/GraphIoT.Grafana)
+  * [GraphIoT.Grafana](src/GraphIoT.Grafana) as Grafana reverse proxy
+  * [GraphIoT.Graphite](src/GraphIoT.Graphite) as Grafana datasource
 * **Main Host Application**:
   * [GraphIoT.App](src/GraphIoT.App)
 
