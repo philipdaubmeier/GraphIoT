@@ -4,6 +4,7 @@ using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Parser;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 {
@@ -28,8 +29,14 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             {
                 if (_graphKeys is null)
                 {
+                    Regex nonAlphaPunctuation = new("[^A-Za-z_.]+");
+                    string normalizeGraphKey(string key)
+                    {
+                        return nonAlphaPunctuation.Replace(key.Replace('_', '.').Replace(' ', '_'), string.Empty);
+                    };
+
                     _graphKeys = _viewModels.SelectMany(collection => collection.GraphKeys()
-                        .Select(graphKey => $"{collection.Key}.{graphKey}".Replace('_', '.'))).ToList();
+                        .Select(graphKey => normalizeGraphKey($"{collection.Key}.{graphKey}"))).ToList();
                 }
 
                 return _graphKeys;
@@ -49,7 +56,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
                         continue;
                     var viewModelKey = splitted[0];
 
-                    var viewModelIndex = GraphKeys.FindIndex(k => k.StartsWith(viewModelKey));
+                    var viewModelIndex = GraphKeys.FindIndex(k => k.StartsWith(viewModelKey + "."));
                     var graphIndex = GraphKeys.FindIndex(k => k == key);
                     var index = graphIndex - viewModelIndex;
 
