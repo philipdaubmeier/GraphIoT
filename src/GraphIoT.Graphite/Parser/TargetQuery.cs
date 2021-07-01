@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
         public (bool expandable, string segment) NextSegment(string target)
         {
             var segment = TargetRegex.Matches(target).First().Groups.Cast<Group>().Last().Value;
-            return (segment.Contains('.'), segment.Split('.').FirstOrDefault());
+            return (segment.Contains('.'), segment.Split('.').FirstOrDefault() ?? string.Empty);
         }
     }
 }

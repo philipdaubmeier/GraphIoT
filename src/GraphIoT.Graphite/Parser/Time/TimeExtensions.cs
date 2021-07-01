@@ -83,7 +83,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser
             void SplitOffset(char splitChar)
             {
                 var split = s.Split(splitChar, 2);
-                s = split.FirstOrDefault();
+                s = split.FirstOrDefault() ?? string.Empty;
                 offset = splitChar + split.LastOrDefault();
             }
 

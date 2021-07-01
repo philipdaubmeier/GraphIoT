@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 
         public GraphDataSource(IEnumerable<IGraphCollectionViewModel> viewModels) => _viewModels = viewModels.ToList();
 
-        public TimeSeriesSpan Span { set { foreach (var model in _viewModels) model.Span = value; } get { return _viewModels.FirstOrDefault().Span; } }
+        public TimeSeriesSpan Span { set { foreach (var model in _viewModels) model.Span = value; } get { return _viewModels.FirstOrDefault()?.Span ?? new(DateTime.MinValue, DateTime.MinValue.AddMinutes(1), 1); } }
 
         public Aggregator AggregatorFunction { set { foreach (var model in _viewModels) model.AggregatorFunction = value; } }
 

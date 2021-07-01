@@ -63,7 +63,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
         [HttpGet("tags/autoComplete/tags")]
         public ActionResult GetTags()
         {
-            return Json(new string[] { });
+            return Json(Array.Empty<string>());
         }
 
         // GET: api/graphite/functions
@@ -85,6 +85,8 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
                 return StatusCode((int)HttpStatusCode.BadRequest);
 
             var eventViewModel = _eventViewModels.FirstOrDefault();
+            if (eventViewModel is null)
+                return StatusCode((int)HttpStatusCode.NotFound);
             eventViewModel.Span = new TimeSeriesSpan(fromDate, toDate, 1);
             eventViewModel.Query = tags;
 
