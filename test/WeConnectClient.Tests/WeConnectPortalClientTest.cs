@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 {
     public class WeConnectPortalClientTest
     {
-        private const string expectedSessionToken = "{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
+        private const string ExpectedSessionToken = "{\"u\":\"https://www.portal.volkswagen-we.com/portal/delegate/dashboard/WVWZZZABCD1234567\"," +
                 "\"csrf\":\"agkWdVBw\",\"c\":[{\"n\":\"CARNET_LANGUAGE_ID\",\"v\":\"en_GB\",\"e\":\"2066-12-12T00:26:12+01:00\"}," +
                 "{\"n\":\"JSESSIONID\",\"v\":\"ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx\",\"e\":\"0001-01-01T00:00:00\"}]}";
 
