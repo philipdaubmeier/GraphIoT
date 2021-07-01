@@ -2,6 +2,7 @@
 using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Parser;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -35,8 +36,13 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
                         return nonAlphaPunctuation.Replace(key.Replace('_', '.').Replace(' ', '_'), string.Empty);
                     };
 
+                    TimeSeriesSpan prevSpanToRestore = Span;
+                    Span = new(DateTime.MinValue, DateTime.MinValue.AddMinutes(1), 1);
+
                     _graphKeys = _viewModels.SelectMany(collection => collection.GraphKeys()
                         .Select(graphKey => normalizeGraphKey($"{collection.Key}.{graphKey}"))).ToList();
+
+                    Span = prevSpanToRestore;
                 }
 
                 return _graphKeys;
