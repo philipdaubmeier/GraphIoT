@@ -30,7 +30,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             {
                 if (_graphKeys is null)
                 {
-                    Regex nonAlphaPunctuation = new("[^A-Za-z_.]+");
+                    Regex nonAlphaPunctuation = new("[^A-Za-z0-9_.]+");
                     string normalizeGraphKey(string key)
                     {
                         return nonAlphaPunctuation.Replace(key.Replace('_', '.').Replace(' ', '_'), string.Empty);
