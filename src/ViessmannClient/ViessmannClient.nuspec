@@ -11,6 +11,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.3.0 - changed data point naming of burners according to Viessmann Developer Portal changelog
 2.2.0 - upgraded to target framework net5.0
 2.1.0 - changed to new iot/v1 API and new base uri
 2.0.0 - upgraded library to be used with official API keys of the Viessmann Developer Portal which went live in May 2021
