@@ -50,9 +50,10 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
             }));
         }
 
-        // GET: api/graphite/metrics/find
+        // GET or POST: api/graphite/metrics/find
         // Grafana calls it like this: metrics/find?from=1589353272&query=*&until=1589526192
         [HttpGet("metrics/find")]
+        [HttpPost("metrics/find")]
         [SuppressMessage("Style", "IDE0060", Justification = "'from' and 'until' are passed in by grafana but not used to exclude graphs.")]
         public ActionResult FindMetrics(int from, int until, string query)
         {
