@@ -189,6 +189,7 @@ FakesAssemblies/
 /src/GraphIoT.Grafana/Grafana/conf/ldap.toml
 /src/GraphIoT.Grafana/Grafana/conf/defaults.ini
 /src/GraphIoT.Grafana/Grafana/data
+/src/GraphIoT.Grafana/Grafana/plugins-bundled
 /src/GraphIoT.Grafana/Grafana/public
 /src/GraphIoT.Grafana/Grafana/tools/phantomjs
 /src/GraphIoT.Grafana/Grafana/VERSION
