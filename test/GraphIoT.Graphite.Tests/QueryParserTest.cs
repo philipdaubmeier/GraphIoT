@@ -12,11 +12,11 @@ namespace GraphIoT.Graphite.Tests
     {
         private class MockGraphViewModel : GraphViewModel
         {
-            public MockGraphViewModel() : base()
+            public MockGraphViewModel(string name) : base()
             {
                 Begin = new DateTime(2020, 1, 1, 12, 0, 0, DateTimeKind.Utc);
                 Spacing = new TimeSpan(0, 1, 0);
-                Name = "unit.test";
+                Name = name;
                 Key = Name;
                 Points = new List<dynamic>() { 0.01d, 0.08d, 0.2d, 0.7d, 0.9d, 1.0d, 1.1d, 0.8d, 0.3d, -0.2d };
             }
@@ -26,10 +26,21 @@ namespace GraphIoT.Graphite.Tests
         {
             public override string Key => "mock";
             protected override void InvalidateData() { }
-            public override int GraphCount() => 1;
+            public override int GraphCount() => 9;
             public override IEnumerable<string> GraphKeys() => Graphs().Select(g => g.Key);
-            public override GraphViewModel Graph(int index) => new MockGraphViewModel();
-            public override IEnumerable<GraphViewModel> Graphs() => new[] { Graph(0) };
+            public override GraphViewModel Graph(int index) => index switch
+            {
+                0 => new MockGraphViewModel("unit1.test1"),
+                1 => new MockGraphViewModel("unit1.test2"),
+                2 => new MockGraphViewModel("unit1.test1.foo1"),
+                3 => new MockGraphViewModel("unit1.test1.foo2"),
+                4 => new MockGraphViewModel("unit1.test2.foo1"),
+                5 => new MockGraphViewModel("unit1.test2.foo2"),
+                6 => new MockGraphViewModel("unit2.test1.foo1"),
+                7 => new MockGraphViewModel("unit2.test1.foo2"),
+                _ => new MockGraphViewModel("unit.test")
+            };
+            public override IEnumerable<GraphViewModel> Graphs() => Enumerable.Range(0, GraphCount()).Select(i => Graph(i));
         }
 
         [Theory]
@@ -49,6 +60,26 @@ namespace GraphIoT.Graphite.Tests
             Assert.Equal(0.259999d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(3).First()!.Value, 3);
             Assert.Equal(0.533333d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(4).First()!.Value, 3);
             Assert.Equal(0.866666d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(5).First()!.Value, 3);
+        }
+
+        [Theory]
+        [InlineData("mock.unit1.{test1}", 1)]
+        [InlineData("mock.{unit1}.test1", 1)]
+        [InlineData("mock.{unit1}.{test1}", 1)]
+        [InlineData("mock.unit1.{test1,test2}", 2)]
+        [InlineData("mock.unit1.{test1,test2}.{foo1,foo2}", 4)]
+        [InlineData("mock.{unit1,unit2}.{test1,test2}.{foo1,foo2}", 6)]
+        [InlineData("mock.{unit1,unit2}.test1.{foo1,foo2}", 4)]
+        [InlineData("mock.{unit1,unit2}.test1.foo1", 2)]
+        [InlineData("{mock,bar}.{unit1,unit2}.test1.foo1", 2)]
+        public void ParserCurlyBracketsMultiIdentifierTest(string query, int num)
+        {
+            var dataSource = new GraphDataSource(new[] { new MockGraphCollectionViewModel() });
+            var parser = new Parser() { DataSource = dataSource };
+            var ast = parser.Parse(query);
+
+            Assert.IsType<SourceExpression>(ast);
+            Assert.Equal(num, ast.Graphs.Count());
         }
     }
 }
