@@ -14,7 +14,7 @@ namespace GraphIoT.Graphite.Tests
         public void LexerWhitepaceInvarianceTest(string query)
         {
             var lexer = new Lexer();
-            var tokens = lexer.Tokenize(query).ToList();
+            var tokens = Lexer.Tokenize(query).ToList();
 
             Assert.Equal("movingWindow", tokens[0].Value);
             Assert.Equal("(", tokens[1].Value);
@@ -44,7 +44,7 @@ namespace GraphIoT.Graphite.Tests
         public void LexerCaseSensitivityTest(string query, string expected)
         {
             var lexer = new Lexer();
-            var tokens = lexer.Tokenize(query).ToList();
+            var tokens = Lexer.Tokenize(query).ToList();
 
             Assert.True(expected.Equals(tokens[1].Value, System.StringComparison.InvariantCulture));
         }
@@ -53,7 +53,7 @@ namespace GraphIoT.Graphite.Tests
         public void LexerTokenPositionsTest()
         {
             var lexer = new Lexer();
-            var tokens = lexer.Tokenize("func(metric.param,'strparam',42,func2('1h24min'))").ToList();
+            var tokens = Lexer.Tokenize("func(metric.param,'strparam',42,func2('1h24min'))").ToList();
 
             Assert.Equal(new[] { 0, 4, 5, 17, 18, 28, 29, 31, 32, 37, 38, 47, 48, 0 }, tokens.Select(x => x.StartIndex));
             Assert.Equal(new[] { 3, 4, 16, 17, 27, 28, 30, 31, 36, 37, 46, 47, 48, 0 }, tokens.Select(x => x.EndIndex));
@@ -64,15 +64,15 @@ namespace GraphIoT.Graphite.Tests
         {
             var lexer = new Lexer();
 
-            Assert.Throws<LexerException>(() => lexer.Tokenize("func(met:;ric.param").ToList());
-            Assert.Throws<LexerException>(() => lexer.Tokenize("func   :;   (metric.param").ToList());
+            Assert.Throws<LexerException>(() => Lexer.Tokenize("func(met:;ric.param").ToList());
+            Assert.Throws<LexerException>(() => Lexer.Tokenize("func   :;   (metric.param").ToList());
         }
 
         [Fact]
         public void LexerPrecedenceTest()
         {
             var lexer = new Lexer();
-            var tokens = lexer.Tokenize("123,123metric,'comma,comma','123','123metric'").ToList();
+            var tokens = Lexer.Tokenize("123,123metric,'comma,comma','123','123metric'").ToList();
 
             Assert.Equal(TokenType.NumberValue, tokens[0].TokenType);
             Assert.Equal(TokenType.Comma, tokens[1].TokenType);
@@ -104,11 +104,11 @@ namespace GraphIoT.Graphite.Tests
             var lexer = new Lexer();
             if (expectedTokenizeFail)
             {
-                Assert.Throws<LexerException>(() => lexer.Tokenize(input).ToList());
+                Assert.Throws<LexerException>(() => Lexer.Tokenize(input).ToList());
                 return;
             }
 
-            var tokens = lexer.Tokenize(input).ToList();
+            var tokens = Lexer.Tokenize(input).ToList();
 
             Assert.Equal(expectedRaw, tokens[0].Value);
             if (expectedUnescapingFail)
