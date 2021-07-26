@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using PhilipDaubmeier.DigitalstromClient.Model.Events;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
@@ -36,12 +37,14 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
         private readonly IDigitalstromDbContext _db;
         private readonly IDigitalstromStructureService _dsStructure;
         private readonly IStringLocalizer<DigitalstromSceneEventViewModel> _localizer;
+        private readonly ILogger _logger;
 
-        public DigitalstromSceneEventViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromSceneEventViewModel> localizer) : base()
+        public DigitalstromSceneEventViewModel(IDigitalstromDbContext databaseContext, IDigitalstromStructureService dsStructure, IStringLocalizer<DigitalstromSceneEventViewModel> localizer, ILogger<DigitalstromSceneEventViewModel> logger) : base()
         {
             _db = databaseContext;
             _dsStructure = dsStructure;
             _localizer = localizer;
+            _logger = logger;
         }
 
         public override string Key => "sceneevents";
@@ -63,7 +66,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
 
                 var zonesFromMeters = query?.MeterIds?.Select(x => x.Contains('_') ? x.Split('_').LastOrDefault() : x)
                     ?.SelectMany(circuit => _dsStructure.GetCircuitZones(circuit)).ToList() ?? new List<Zone>();
-                var zones = (query?.ZoneIds.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
+                var zones = (query?.ZoneIds?.Select(x => (Zone)x)?.ToList() ?? new List<Zone>()).Union(zonesFromMeters).Distinct().ToList();
 
                 filtered = events
                     .Where(x => query?.EventNames?.Contains(x.SystemEvent.Name, StringComparer.InvariantCultureIgnoreCase) ?? true)
@@ -72,8 +75,10 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.ViewModel
                     .Where(x => query?.SceneIds?.Contains(x.Properties.SceneID) ?? true)
                     .ToList();
             }
-            catch
+            catch (Exception ex)
             {
+                _logger.LogWarning($"Annotation Query error, using unfiltered event list. Message: {ex.Message}");
+
                 filtered = events;
             }
 
