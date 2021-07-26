@@ -18,7 +18,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
 
         public IGraphiteExpression Parse(string input)
         {
-            var tokens = new Lexer().Tokenize(input);
+            var tokens = Lexer.Tokenize(input);
             _tokenSequence = new Queue<TokenMatch>(tokens);
 
             // initialize the lookahead field with dequeueing the first token
@@ -47,21 +47,56 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
             return current;
         }
 
+        private List<string> ReadIdentifiers()
+        {
+            List<string> identifiers = new();
+            while (_lookahead.TokenType == TokenType.OpenCurlyBrackets || _lookahead.TokenType == TokenType.Identifier)
+            {
+                List<string> identifierParts = new();
+
+                var isMultiple = _lookahead.TokenType != TokenType.Identifier;
+                if (isMultiple)
+                    ReadToken(TokenType.OpenCurlyBrackets);
+
+                identifierParts.Add(ReadToken(TokenType.Identifier).Value);
+
+                while (isMultiple && _lookahead.TokenType == TokenType.Comma)
+                {
+                    ReadToken(TokenType.Comma);
+                    identifierParts.Add(ReadToken(TokenType.Identifier).Value);
+                }
+
+                if (isMultiple)
+                    ReadToken(TokenType.CloseCurlyBrackets);
+
+                identifiers = (identifiers.Count > 0 ? identifiers : new() { string.Empty })
+                    .SelectMany(id => identifierParts.Select(part => id + part)).ToList();
+            }
+
+            if (identifiers.Count == 0)
+                throw new ParserException($"Unexpected {_lookahead.TokenType.ToString().ToUpper()}");
+
+            return identifiers;
+        }
+
         private IGraphiteExpression ReadExpression()
         {
-            var identifier = ReadToken(TokenType.Identifier);
+            List<string> identifiers = ReadIdentifiers();
 
             switch (_lookahead.TokenType)
             {
                 case TokenType.OpenParanthesis:
                     {
-                        return ReadFunction(identifier.Value);
+                        if (identifiers.Count > 1)
+                            throw new ParserException($"Found unexpected curly brackets in function name");
+
+                        return ReadFunction(identifiers.First());
                     }
                 case TokenType.Comma:
                 case TokenType.CloseParanthesis:
                 case TokenType.SequenceTerminator:
                     {
-                        return SourceExpression.CreateFromQueryExpression(DataSource, queryExpression: identifier.Value);
+                        return SourceExpression.CreateFromQueryExpression(DataSource, queryExpression: identifiers);
                     }
                 default:
                     throw new ParserException($"Unexpected {_lookahead.TokenType.ToString().ToUpper()}");
