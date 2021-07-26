@@ -49,33 +49,36 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
             }
         }
 
-        public IEnumerable<GraphViewModel> Query(string query)
+        public IEnumerable<GraphViewModel> Query(IEnumerable<string> queries)
         {
-            var q = new TargetQuery(query);
-            foreach (var key in GraphKeys.Where(g => q.IsMatch(g)))
+            foreach (var query in queries)
             {
-                GraphViewModel? graph = null;
-                try
+                var q = new TargetQuery(query);
+                foreach (var key in GraphKeys.Where(g => q.IsMatch(g)))
                 {
-                    var splitted = key.Split('.');
-                    if (splitted.Length < 1)
-                        continue;
-                    var viewModelKey = splitted[0];
+                    GraphViewModel? graph = null;
+                    try
+                    {
+                        var splitted = key.Split('.');
+                        if (splitted.Length < 1)
+                            continue;
+                        var viewModelKey = splitted[0];
 
-                    var viewModelIndex = GraphKeys.FindIndex(k => k.StartsWith(viewModelKey + "."));
-                    var graphIndex = GraphKeys.FindIndex(k => k == key);
-                    var index = graphIndex - viewModelIndex;
+                        var viewModelIndex = GraphKeys.FindIndex(k => k.StartsWith(viewModelKey + "."));
+                        var graphIndex = GraphKeys.FindIndex(k => k == key);
+                        var index = graphIndex - viewModelIndex;
 
-                    var viewModel = _viewModels.Find(x => x.Key == viewModelKey);
-                    if (viewModel is null || index < 0 || index >= viewModel.GraphCount())
-                        continue;
+                        var viewModel = _viewModels.Find(x => x.Key == viewModelKey);
+                        if (viewModel is null || index < 0 || index >= viewModel.GraphCount())
+                            continue;
 
-                    graph = viewModel.Graph(index);
+                        graph = viewModel.Graph(index);
+                    }
+                    catch { continue; }
+
+                    if (graph != null)
+                        yield return graph;
                 }
-                catch { continue; }
-
-                if (graph != null)
-                    yield return graph;
             }
             yield break;
         }

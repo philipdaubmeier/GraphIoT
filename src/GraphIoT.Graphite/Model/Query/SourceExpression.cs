@@ -9,7 +9,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Model
 
         public SourceExpression(List<IGraphiteGraph> graphs) => Graphs = graphs;
 
-        public static SourceExpression CreateFromQueryExpression(GraphDataSource dataSource, string queryExpression)
+        public static SourceExpression CreateFromQueryExpression(GraphDataSource dataSource, IEnumerable<string> queryExpression)
         {
             return new SourceExpression(dataSource.Query(queryExpression).Select(g => new SourceGraph(g)).Cast<IGraphiteGraph>().ToList());
         }
