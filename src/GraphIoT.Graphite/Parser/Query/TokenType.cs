@@ -6,6 +6,8 @@
         Comma,
         OpenParanthesis,
         CloseParanthesis,
+        OpenCurlyBrackets,
+        CloseCurlyBrackets,
         StringValue,
         NumberValue,
         TrueLiteral,

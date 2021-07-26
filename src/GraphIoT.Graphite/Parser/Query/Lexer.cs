@@ -13,17 +13,19 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
     {
         private static readonly List<TokenDefinition> _tokenDefinitions = new()
         {
-            new TokenDefinition(TokenType.Identifier, @"[\w\._]*[A-Za-z][^()\/'"",]*( [^()\/'"",]+)*", 3),
+            new TokenDefinition(TokenType.Identifier, @"(\.|[\w\._]*[A-Za-z][^(){}\/'"",\n ]*( [^(){}\/'"",\n ]+)*)", 3),
             new TokenDefinition(TokenType.Comma, @",", 1),
             new TokenDefinition(TokenType.OpenParanthesis, @"\(", 1),
             new TokenDefinition(TokenType.CloseParanthesis, @"\)", 1),
+            new TokenDefinition(TokenType.OpenCurlyBrackets, @"{", 1),
+            new TokenDefinition(TokenType.CloseCurlyBrackets, @"}", 1),
             new TokenDefinition(TokenType.StringValue, @"'(\\.|[^\\'])*'", 2),
             new TokenDefinition(TokenType.NumberValue, @"(-|\+)?\d+(\.\d+)?", 1),
             new TokenDefinition(TokenType.TrueLiteral, @"true", 1),
             new TokenDefinition(TokenType.FalseLiteral, @"false", 1)
         };
 
-        public IEnumerable<TokenMatch> Tokenize(string input)
+        public static IEnumerable<TokenMatch> Tokenize(string input)
         {
             var tokenMatches = _tokenDefinitions
                 .SelectMany(def => def.FindMatches(input).ToList())
@@ -51,7 +53,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
             yield return new TokenMatch(TokenType.SequenceTerminator);
         }
 
-        private void CheckWhitespace(string input, int start, int length)
+        private static void CheckWhitespace(string input, int start, int length)
         {
             var slice = input.Substring(start, Math.Min(input.Length - start, length));
 
