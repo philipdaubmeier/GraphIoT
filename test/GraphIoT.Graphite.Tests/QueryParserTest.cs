@@ -44,11 +44,11 @@ namespace GraphIoT.Graphite.Tests
             var ast = parser.Parse(query);
 
             Assert.IsType<MovingWindowFunctionExpression>(ast);
-            Assert.IsType<ResampledGraph>(ast.Graphs.First());
-            Assert.Equal("unit.test", ((ResampledGraph)ast.Graphs.First()).Name);
-            Assert.Equal(0.097d, ((ResampledGraph)ast.Graphs.First()).Points.First()!.Value, 3);
-            Assert.Equal(0.800d, ((ResampledGraph)ast.Graphs.First()).Points.Skip(1).First()!.Value, 3);
-            Assert.Equal(0.967d, ((ResampledGraph)ast.Graphs.First()).Points.Skip(2).First()!.Value, 3);
+            Assert.IsType<DerivedGraphTransform>(ast.Graphs.First());
+            Assert.Equal("unit.test", ((DerivedGraphTransform)ast.Graphs.First()).Name);
+            Assert.Equal(0.259999d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(3).First()!.Value, 3);
+            Assert.Equal(0.533333d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(4).First()!.Value, 3);
+            Assert.Equal(0.866666d, ((DerivedGraphTransform)ast.Graphs.First()).Points.Skip(5).First()!.Value, 3);
         }
     }
 }
