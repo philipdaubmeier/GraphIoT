@@ -96,7 +96,7 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.Controllers
             {
                 id = counter++,
                 what = item.Title,
-                when = new DateTimeOffset(item.Time.ToUniversalTime()).ToUnixTimeMilliseconds(),
+                when = new DateTimeOffset(item.Time.ToUniversalTime()).ToUnixTimeSeconds(),
                 tags = item.Tags,
                 data = item.Text
             }));
