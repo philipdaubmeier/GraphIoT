@@ -13,7 +13,6 @@ namespace GraphIoT.Graphite.Tests
         [InlineData("  \t \r\n  movingWindow \n\n  ( \n  root.subpath.subsubpath.leaf1    , \r\n '1d27min'   ,  \r\n  'avg'  )  \t \r\n  ")]
         public void LexerWhitepaceInvarianceTest(string query)
         {
-            var lexer = new Lexer();
             var tokens = Lexer.Tokenize(query).ToList();
 
             Assert.Equal("movingWindow", tokens[0].Value);
@@ -43,7 +42,6 @@ namespace GraphIoT.Graphite.Tests
         [InlineData("(ROOT.SUBPATH.SUBSUBPATH.LEAF1)", "ROOT.SUBPATH.SUBSUBPATH.LEAF1")]
         public void LexerCaseSensitivityTest(string query, string expected)
         {
-            var lexer = new Lexer();
             var tokens = Lexer.Tokenize(query).ToList();
 
             Assert.True(expected.Equals(tokens[1].Value, System.StringComparison.InvariantCulture));
@@ -71,7 +69,6 @@ namespace GraphIoT.Graphite.Tests
         [Fact]
         public void LexerPrecedenceTest()
         {
-            var lexer = new Lexer();
             var tokens = Lexer.Tokenize("123,123metric,'comma,comma','123','123metric'").ToList();
 
             Assert.Equal(TokenType.NumberValue, tokens[0].TokenType);
