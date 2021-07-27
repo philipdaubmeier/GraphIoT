@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.CompactTimeSeries;
+using PhilipDaubmeier.GraphIoT.Core.Aggregation;
 using PhilipDaubmeier.GraphIoT.Core.ViewModel;
 using PhilipDaubmeier.GraphIoT.Graphite.Model;
 using System;
@@ -10,6 +11,19 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
     public class QueryOptimizer
     {
         private readonly HashSet<ResampleFunctionExpression?> _resampleFuncs = new();
+
+        private readonly List<Aggregator> _nonOptimizableResampler = new()
+        {
+            Aggregator.Median,
+            Aggregator.Minimum,
+            Aggregator.Maximum,
+            Aggregator.Diff,
+            Aggregator.Stddev,
+            Aggregator.Count,
+            Aggregator.Range,
+            Aggregator.Multiply,
+            Aggregator.Last
+        };
 
         public readonly Parser _parser;
         public GraphDataSource DataSource { get; set; } = new GraphDataSource(new List<IGraphCollectionViewModel>());
@@ -38,6 +52,10 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
             var originalResolution = DataSource.Span;
             var minReamplingRate = _resampleFuncs.Where(x => x != null).Min(x => x!.Spacing);
             if (minReamplingRate <= originalResolution.Duration)
+                return;
+
+            // no optimization potential if all the resampling functions contain non-optimizable aggregator functions
+            if (_resampleFuncs.All(x => _nonOptimizableResampler.Contains(x.Func)))
                 return;
 
             // optimize by loading lower resolution source data
