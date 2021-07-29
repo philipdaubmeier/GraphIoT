@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.GraphIoT.Graphite.Parser.Query
                 return;
 
             // no optimization potential if all the resampling functions contain non-optimizable aggregator functions
-            if (_resampleFuncs.All(x => _nonOptimizableResampler.Contains(x.Func)))
+            if (_resampleFuncs.All(x => x is null || _nonOptimizableResampler.Contains(x.Func)))
                 return;
 
             // optimize by loading lower resolution source data
