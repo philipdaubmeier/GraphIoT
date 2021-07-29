@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using PhilipDaubmeier.GraphIoT.Grafana.Controllers;
 using PhilipDaubmeier.GraphIoT.Grafana.Services;
 using ProxyKit;
 using System.Collections.Generic;
@@ -16,9 +15,6 @@ namespace PhilipDaubmeier.GraphIoT.Grafana.DependencyInjection
     {
         public static IServiceCollection AddGrafanaHost(this IServiceCollection serviceCollection)
         {
-            // add grafana json api
-            serviceCollection.AddControllers().AddApplicationPart(typeof(GrafanaController).Assembly);
-
             // add grafana hosted service for starting/stopping/restarting the grafana server process
             serviceCollection.AddHostedService<GrafanaBackendProcessService>();
 
