@@ -6,11 +6,11 @@
 
 ## Create variables
 
-You can create variables for Metric Ids like Digitalstrom rooms, groups, color or for Netatmo modules. Those can be used in dashboard panel queries or in annotation queries. For more information on this topic, see the [Grafana variables documentation](https://grafana.com/docs/reference/templating/).
+You can create variables for Metric Ids like Digitalstrom rooms, groups, color or for Netatmo modules. Those can be used in dashboard panel queries or in annotation queries. For more information on this topic, see the [Grafana variables documentation](https://grafana.com/docs/grafana/latest/variables/).
 
 **Example:**
 
-![Grafana add variables screenshot](../img/grafana_json_variables.png)
+![Grafana add variables screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_variables.png)
 
 ## Create annotations
 
@@ -18,7 +18,7 @@ Annotations can be created for displaying non-equidistant data of the GraphIoT a
 
 **Example:**
 
-![Grafana add annotations screenshot](../img/grafana_annotations.png)
+![Grafana add annotations screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_annotations.png)
 
 Annotations can contain Grafana variables (see above).
 

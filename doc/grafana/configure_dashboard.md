@@ -8,55 +8,29 @@
 
 Create a new dashboard in grafana and add a panel by clicking `Add Query`
 
-![Grafana add query screenshot](../img/grafana_add_query.png)
+![Grafana add query screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_add_query.png)
 
-You should see the query configuration, where you can add a new query. Select `Time series` as format and select your desired metric from the dropdown.
+You should see the query configuration, where you can add a new query. Select `Graphite` as datasource.
 
-Each metric appears two times in the dropdown box: the first one will be a readable display name (e.g. *"Power Consumption Kitchen"**), the one just below each display name is the internal metric id (e.g. *"energy_0_power_consumption_a8fe..2d45"*).
+You can select one or more time series metrics by clicking next to `Series` where you get autocompletion based on the selected path:
 
-The internal metric id is build in this pattern:
+![Grafana dashboard query screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_dashboard_query1.png)
 
-    <graph-viewmodel-id>_<index>_<metric-display-name>
+You can also select `*` as wildcard for any parts of the metrics path.
 
-And optionally with a metric id as suffix, if it exists (e.g. Digitalstrom zone id, meter id, etc.)
+Additionally, a time series query can be refined with applying functions to the query, which get executed on server side by GraphIoT before sending the result values to grafana.
 
-    <graph-viewmodel-id>_<index>_<metric-display-name>_<metric-id>
+Just explore all available functions by clicking the `+` sign and the autocompletion drop down that will pop up.
 
-If you chose the display name from the dropdown box, you have to provide the internal metric id via `Additional JSON Data`:
+For example, you can filter the result set of time series via a regular expression via the `grep` function, rename the resulting metric with `alias`, change the resolution with `resample` functions and much more. Also, many of the function parameters also feature autocompletion suggestions for time spans or enum values.
 
-![Grafana dashboard query screenshot](../img/grafana_dashboard_query.png)
+Your query could look like this for instance:
 
-The full schema of `Additional JSON Data` follows this pattern (all elements are optional):
+![Grafana dashboard query screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_dashboard_query2.png)
 
-```json
-{
-  "rawMetricId": "energy_0",
-  "aggregate":
-  {
-    "interval": "1h",
-    "func": "sum"
-  },
-  "correction":
-  {
-    "factor": 0.1,
-    "offset": 12.5
-  },
-  "filterIfNoneOf": [ "filter1", "filter2" ],
-  "overrideMaxDataPoints": 100
-}
-```
+Also, if you already defined variables (see chapter [variables](configure_variables_annotations.md)) in your dashboard, you can also include them into your query. This even works with multiple valued variables:
 
-### Detailled description
-
-| Element | Description |
-| --- | --- |
-| `rawMetricId` | The internal metric id, at least the first two parts, i.e. `<graph-viewmodel-id>_<index>`. Values for `<graph-viewmodel-id>` are currently: `energy`, `sensors`, `heating`, `solar` and `solarenergy` |
-| `aggregate.interval` | Aggregate into the given time resolution, e.g. `1d`, `5m`, `2h30m`, `1h15m30s`. |
-| `aggregate.func` | Aggregate all values with the given function, allowed values are `min`, `max`, `avg` and `sum`. |
-| `correction.factor` | Multiply all values by `factor`. |
-| `correction.offset` | Add `offset` to all values. |
-| `filterIfNoneOf` | Only show the requested metric if the internal metric id shows up in this `filterIfNoneOf` array. |
-| `overrideMaxDataPoints` | Aggregate to a maximum resolution that results in no more than `overrideMaxDataPoints` number of data points. |
+![Grafana dashboard query screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_dashboard_query3.png)
 
 ## Next steps
 

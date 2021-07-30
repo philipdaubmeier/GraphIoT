@@ -12,17 +12,15 @@ If you want to configure grafana in your *production* environment:
 
 ## Setup admin user
 
-After you start the application and go to the grafana url in your browser, you should see the grafana login page.
+After you start the application and go to the grafana url (`http://localhost:53685/grafana` or `https://your.domain/path-to-graphiot-website/grafana`) in your browser, you should see the grafana login page.
 
 Enter the initial magic credentials with username `admin` and password: `admin`. You should be promted to create a real admin user with a username and password of your choice.
 
 ## Create datasource
 
-In the `Configuration` menu, go to `Data Sources`. Add a new datasource and select `JSON`.
+In the `Configuration` menu, go to `Data Sources`. Add a new datasource and select `Graphite`.
 
-If you do not have a `JSON` datasource, install the respective plugin from [here](https://grafana.com/grafana/plugins/simpod-json-datasource).
-
-In the `JSON` datasource configuration panel, set the URL for dev to:
+In the `Graphite` datasource configuration panel, set the URL for dev to:
 
     http://localhost:53685/api/grafana
 
@@ -30,11 +28,11 @@ or for production to (replace your domain and website base path and append `/api
 
     https://your.domain/path-to-graphiot-website/api/grafana
 
-and set the `Access` mode to `Browser`, as both grafana and the API run on the same website, to allow direct access.
+and set the `Version` to `1.1.x`.
 
 It should look like follows:
 
-![Grafana JSON datasource screenshot](../img/grafana_json_datasource.png)
+![Grafana JSON datasource screenshot](https://philip.daubmeier.de/github/graphiot/doc/grafana_graphite_datasource.png)
 
 Hit `Safe & Test` to make sure the datasource works.
 
