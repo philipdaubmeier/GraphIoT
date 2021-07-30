@@ -22,11 +22,11 @@ In the `Configuration` menu, go to `Data Sources`. Add a new datasource and sele
 
 In the `Graphite` datasource configuration panel, set the URL for dev to:
 
-    http://localhost:53685/api/grafana
+    http://localhost:53685/api/graphite
 
-or for production to (replace your domain and website base path and append `/api/grafana`):
+or for production to (replace your domain and website base path and append `/api/graphite`):
 
-    https://your.domain/path-to-graphiot-website/api/grafana
+    https://your.domain/path-to-graphiot-website/api/graphite
 
 and set the `Version` to `1.1.x`.
 
