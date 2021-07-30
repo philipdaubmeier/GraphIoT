@@ -6,7 +6,7 @@
 
 # GraphIoT
 
-GraphIoT is a .NET Core project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
+GraphIoT is a .NET 5 project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
 
 The main server application consists of these two major parts for this purpose:
 
@@ -23,6 +23,15 @@ The main server application consists of these two major parts for this purpose:
         * a grafana hosted service that starts and monitors the grafana server process
         * a reverse proxy middleware that redirects to the grafana server
         * a REST+json api that loads, aggregates and preprocesses the stored data and outputs it in a grafana JSON datasource compatible format
+
+## Screenshots
+
+[![Screenshot 1](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot1.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot1.png)
+[![Screenshot 2](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot2.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot2.png)
+[![Screenshot 3](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot3.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot3.png)
+[![Screenshot 4](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot4.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot4.png)
+[![Screenshot 5](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot5.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot5.png)
+[![Screenshot 6](https://philip.daubmeier.de/github/graphiot/screenshots/thumbs/screenshot6.png)](https://philip.daubmeier.de/github/graphiot/screenshots/screenshot6.png)
 
 ## Code Structure
 
