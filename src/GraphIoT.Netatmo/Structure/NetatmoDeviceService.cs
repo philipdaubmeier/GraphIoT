@@ -6,6 +6,7 @@ using PhilipDaubmeier.NetatmoClient.Model.Core;
 using PhilipDaubmeier.NetatmoClient.Model.WeatherStation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -159,7 +160,8 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo Device Service: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo Device Service: {ex}");
                 throw;
             }
             finally { _loadSemaphore.Release(); }

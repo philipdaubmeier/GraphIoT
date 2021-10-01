@@ -4,6 +4,7 @@ using PhilipDaubmeier.DigitalstromClient;
 using PhilipDaubmeier.DigitalstromClient.Model.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -126,6 +127,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Structure
             }
             catch (Exception ex)
             {
+                ex = ex.Demystify();
                 _logger.LogError($"{DateTime.Now} Exception occurred in Digitalstrom Structure Service", ex);
                 throw;
             }

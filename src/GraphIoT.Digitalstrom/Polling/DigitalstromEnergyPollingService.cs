@@ -7,6 +7,7 @@ using PhilipDaubmeier.GraphIoT.Digitalstrom.Database;
 using PhilipDaubmeier.GraphIoT.Digitalstrom.Structure;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,7 +40,8 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Polling
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom energy background worker: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in Digitalstrom energy background worker: {ex}");
             }
         }
 

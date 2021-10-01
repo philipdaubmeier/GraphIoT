@@ -5,6 +5,7 @@ using PhilipDaubmeier.GraphIoT.WeConnect.Database;
 using PhilipDaubmeier.WeConnectClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,7 +35,8 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in WeConnect background worker: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in WeConnect background worker: {ex}");
             }
         }
 

@@ -7,6 +7,7 @@ using PhilipDaubmeier.NetatmoClient;
 using PhilipDaubmeier.NetatmoClient.Model.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -37,7 +38,8 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Polling
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo weather background worker: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo weather background worker: {ex}");
             }
         }
 

@@ -4,6 +4,7 @@ using PhilipDaubmeier.GraphIoT.Sonnen.Database;
 using PhilipDaubmeier.SonnenClient;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -34,7 +35,8 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in MySonnen energy background worker: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in MySonnen energy background worker: {ex}");
             }
         }
 

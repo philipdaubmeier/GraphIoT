@@ -8,6 +8,7 @@ using PhilipDaubmeier.ViessmannClient;
 using PhilipDaubmeier.ViessmannClient.Model.Features;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -38,7 +39,8 @@ namespace PhilipDaubmeier.GraphIoT.Viessmann.Polling
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in viessmann heating background worker: {ex.Message}");
+                ex = ex.Demystify();
+                _logger.LogInformation($"{DateTime.Now} Exception occurred in viessmann heating background worker: {ex}");
             }
         }
 
