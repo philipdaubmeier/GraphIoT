@@ -3,6 +3,7 @@ using PhilipDaubmeier.DigitalstromClient.Model.Auth;
 using PhilipDaubmeier.DigitalstromClient.Model.Token;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -116,16 +117,20 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 if (!_authData.MustFetchSessionToken())
                     return;
 
-                // fetch an application token first, if not present already
-                if (_authData.MustFetchApplicationToken())
+                // try fetching a session token or retry to get a fresh application token
+                foreach (var _ in Enumerable.Range(0, 2))
                 {
-                    await FetchApplicationToken();
-                    await ActivateApplicationToken(await LoginCredentials());
-                }
+                    // fetch an application token first, if not present already
+                    if (_authData.MustFetchApplicationToken())
+                    {
+                        await FetchApplicationToken();
+                        await ActivateApplicationToken(await LoginCredentials());
+                    }
 
-                // try to refresh the session token if the application token is activated
-                if (await RefreshSessionToken() && !_authData.MustFetchSessionToken())
-                    return;
+                    // try to refresh the session token if the application token is activated
+                    if (await RefreshSessionToken() && !_authData.MustFetchSessionToken())
+                        return;
+                }
 
                 throw new IOException("Could not authenticate");
             }
@@ -208,9 +213,12 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
                 return true;
             }
 
-            // Must login first, try login of the application token
-            if (responseData.Message != null && responseData.Message.Equals("Application-Authentication failed", StringComparison.OrdinalIgnoreCase))
+            // Application token was invalidated, trigger complete fresh login
+            if (responseData.Message != null && responseData.Message.Equals("Application authentication failed", StringComparison.OrdinalIgnoreCase))
+            {
+                await _authData.UpdateTokenAsync(string.Empty, DateTime.MinValue, string.Empty);
                 return false;
+            }
 
             // In this case, a retry does not seem to be a solution
             throw new IOException("Could not get session token");
