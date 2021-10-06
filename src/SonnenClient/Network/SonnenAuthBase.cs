@@ -119,7 +119,15 @@ namespace PhilipDaubmeier.SonnenClient.Network
                 // if we have a refresh token, try to fetch a new access token with it
                 if (!string.IsNullOrWhiteSpace(_authData.RefreshToken))
                 {
-                    await RequestAccessTokenWithRefreshToken();
+                    try
+                    {
+                        await RequestAccessTokenWithRefreshToken();
+                    }
+                    catch
+                    {
+                        // if token renewal via refresh token failed, reset it completely to restart login flow
+                        await _authData.UpdateTokenAsync(string.Empty, DateTime.MinValue, string.Empty);
+                    }
 
                     // check if we have a valid access token now, if not proceed to new sign-in
                     if (_authData.IsAccessTokenValid())
@@ -215,8 +223,8 @@ namespace PhilipDaubmeier.SonnenClient.Network
             request.Content = FormContentFromList(new[]
                 {
                     ("authenticity_token", state.AuthenticityToken),
-                    ("user[email]", _provider.AuthData.Username),
-                    ("user[password]", _provider.AuthData.UserPassword),
+                    ("user[email]", _authData.Username),
+                    ("user[password]", _authData.UserPassword),
                     ("user[remember_me]", "0"),
                     ("commit", "Log+in")
                 });
@@ -301,7 +309,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
                     throw new IOException("No refesh token present in response");
 
                 var expiry = DateTimeOffset.FromUnixTimeSeconds(tokenResponse.CreatedAt).UtcDateTime.ToLocalTime().AddSeconds(tokenResponse.ExpiresIn);
-                await _provider.AuthData.UpdateTokenAsync(tokenResponse.AccessToken, expiry, tokenResponse.RefreshToken);
+                await _authData.UpdateTokenAsync(tokenResponse.AccessToken, expiry, tokenResponse.RefreshToken);
             }
             catch (Exception ex)
             {
