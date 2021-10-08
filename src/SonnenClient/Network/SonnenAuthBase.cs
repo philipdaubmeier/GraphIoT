@@ -161,7 +161,6 @@ namespace PhilipDaubmeier.SonnenClient.Network
             headers.Add("Connection", "keep-alive");
             headers.Add("Pragma", "no-cache");
             headers.Add("Cache-Control", "no-cache");
-            headers.Host = "account.sonnen.de";
             if (!string.IsNullOrWhiteSpace(referrer))
                 headers.Referrer = new Uri(referrer);
             headers.TryAddWithoutValidation("User-Agent", _userAgent);
