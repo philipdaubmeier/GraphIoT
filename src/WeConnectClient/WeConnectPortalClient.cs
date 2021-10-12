@@ -22,100 +22,95 @@ namespace PhilipDaubmeier.WeConnectClient
 
         public async Task<Location> GetLastKnownLocation(Vin? vin = null)
         {
-            return await CallApi<LocationResponse, Location>("/-/cf/get-location", vin);
+            return await CallApi<LocationResponse, Location>("/-/cf/get-location");
         }
 
         public async Task<IEnumerable<VehicleEntry>> GetVehicleList(Vin? vin = null)
         {
-            return await CallApi<VehicleListResponse, IEnumerable<VehicleEntry>>("/-/mainnavigation/get-fully-loaded-cars", vin);
+            return await CallApi<VehicleListResponse, IEnumerable<VehicleEntry>>("/-/mainnavigation/get-fully-loaded-cars");
         }
 
         public async Task<VehicleEntry> GetVehicle(Vin vin)
         {
-            return await CallApi<LoadCarDetailsResponse, VehicleEntry>($"/-/mainnavigation/load-car-details/{vin}", vin);
+            return await CallApi<LoadCarDetailsResponse, VehicleEntry>($"https://myvw-gvf-proxy.apps.emea.vwapps.io/vehicleData/de-DE/{vin}");
         }
 
         public async Task<VehicleDetails> GetVehicleDetails(Vin? vin = null)
         {
-            return await CallApi<VehicleDetailsResponse, VehicleDetails>("/-/vehicle-info/get-vehicle-details", vin);
+            return await CallApi<VehicleDetailsResponse, VehicleDetails>($"https://myvw-gvf-proxy.apps.emea.vwapps.io/vehicleDetails/de-DE/{vin}");
         }
 
         public async Task<VehicleStatus> GetVehicleStatus(Vin? vin = null)
         {
-            return await CallApi<VehicleStatusResponse, VehicleStatus>("/-/vsr/get-vsr", vin);
+            return await CallApi<VehicleStatusResponse, VehicleStatus>("/-/vsr/get-vsr");
         }
 
         public async Task<IEnumerable<HealthReport>> GetLatestHealthReports(Vin? vin = null)
         {
-            return await CallApi<HealthReportResponse, List<HealthReport>>("/-/vhr/get-latest-report", vin);
+            return await CallApi<HealthReportResponse, List<HealthReport>>("/-/vhr/get-latest-report");
         }
 
         public async Task<GeofenceCollection> GetGeofences(Vin? vin = null)
         {
-            return await CallApi<GeofenceResponse, GeofenceCollection>("/-/geofence/get-fences", vin);
+            return await CallApi<GeofenceResponse, GeofenceCollection>("/-/geofence/get-fences");
         }
 
         public async Task<Emanager> GetEManager(Vin? vin = null)
         {
-            return await CallApi<EmanagerResponse, Emanager>("/-/emanager/get-emanager", vin);
+            return await CallApi<EmanagerResponse, Emanager>("/-/emanager/get-emanager");
         }
 
         public async Task<Rts> GetLatestTripStatistics(Vin? vin = null)
         {
-            return await LoadTripStatistics("/-/rts/get-latest-trip-statistics", vin);
+            return await LoadTripStatistics($"https://cardata.apps.emea.vwapps.io/vehicles/{vin}/tripdata/longterm/last");
         }
 
         public async Task<Rts> GetLastRefuelTripStatistics(Vin? vin = null)
         {
-            return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics", vin);
+            return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics");
         }
 
         public async Task StartCharge(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/charge-battery", vin, new ChargeParams(true, 100));
+            await RequestApi("/-/emanager/charge-battery", new ChargeParams(true, 100));
         }
 
         public async Task StopCharge(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/charge-battery", vin, new ChargeParams(false, 99));
+            await RequestApi("/-/emanager/charge-battery", new ChargeParams(false, 99));
         }
 
         public async Task StartClimate(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-climatisation", vin, new ClimateParams(true, true));
+            await RequestApi("/-/emanager/trigger-climatisation", new ClimateParams(true, true));
         }
 
         public async Task StopClimate(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-climatisation", vin, new ClimateParams(false, true));
+            await RequestApi("/-/emanager/trigger-climatisation", new ClimateParams(false, true));
         }
 
         public async Task StartWindowMelt(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-windowheating", vin, new WindowsMeltParams(true));
+            await RequestApi("/-/emanager/trigger-windowheating", new WindowsMeltParams(true));
         }
 
         public async Task StopWindowMelt(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-windowheating", vin, new WindowsMeltParams(true));
+            await RequestApi("/-/emanager/trigger-windowheating", new WindowsMeltParams(true));
         }
 
         /// <summary>
-        /// Logs out the session on the portal server, clears all state data of this client
-        /// and removes the persisted state token in the IWeConnectAuth object.
+        /// Clears the persisted token in the IWeConnectAuth object.
         /// </summary>
         public async Task Logout()
         {
-            await RequestApi("/-/logout/revoke");
             await _connectionProvider.AuthData.UpdateTokenAsync(null, DateTime.MinValue, null);
-            _state.Reset();
         }
 
-        private async Task<Rts> LoadTripStatistics(string path, Vin? vin = null)
+        private async Task<Rts> LoadTripStatistics(string path)
         {
-            var res = await CallApi<TripStatisticsResponse, Rts>(path, vin);
-            res.DateTimeLocale = GetCarNetLocale();
-            return res;
+            return await CallApi<TripStatisticsResponse, Rts>(path);
         }
     }
 }
