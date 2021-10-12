@@ -1,8 +1,9 @@
 using PhilipDaubmeier.WeConnectClient.Model;
 using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using PhilipDaubmeier.WeConnectClient.Model.Core;
+using PhilipDaubmeier.WeConnectClient.Model.User;
 using System;
-using System.Globalization;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -16,8 +17,11 @@ using System.Threading.Tasks;
 namespace PhilipDaubmeier.WeConnectClient.Network
 {
     /// <remarks>
-    /// Built based on the excellent work of github users bgewehr, wez3 and reneboer and
-    /// the volkswagen carnet python client, see newest version here:
+    /// Was rebuilt from scratch in October 2021 after the WeConnect portal and its login flow
+    /// was changed completely a few months before.
+    ///
+    /// Was previously (now not anymore) built based on the excellent work of github users bgewehr,
+    /// wez3 and reneboer and the volkswagen carnet python client, see here:
     /// https://github.com/bgewehr/volkswagen-carnet-client
     /// </remarks>
     public abstract class WeConnectAuthBase
@@ -31,10 +35,36 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         private readonly HttpClient _client;
         private readonly HttpClient _authClient;
 
-        private const string _baseUri = "https://www.portal.volkswagen-we.com";
-        private const string _authUri = "https://identity.vwgroup.io";
+        private const string _landingPage = "https://www.volkswagen.de/";
+        private const string _authProxyUri = "https://www.volkswagen.de/app/authproxy";
+        private const string _tokenExchangeUri = "https://myvw-idk-token-exchanger.apps.emea.vwapps.io/token-exchange";
+        private const string _idpUri = "https://identity.vwgroup.io";
+
+        private const string _fagVw = "vw-de";
+        private const string _fagWeConnect = "vwag-weconnect";
+
+        private readonly List<FeatureAppGroup> _featureAppGroups = new()
+        {
+            new() { Name = _fagVw, Scopes = new(){ "profile", "carConfigurations", "cars", "vin" }, Prompt = "login" },
+            new() { Name = _fagWeConnect, Scopes = new(){ "openid", "mbb" }, Prompt = "none" }
+        };
 
         private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
+
+        private class FeatureAppGroup
+        {
+            public string Name { get; set; } = null!;
+            public List<string> Scopes { get; set; } = null!;
+            public string Prompt { get; set; } = null!;
+
+            public static string ToQuerystring(IEnumerable<FeatureAppGroup> fagList)
+            {
+                var fag = new[]{ $"fag={string.Join(',', fagList.Select(x => x.Name))}" };
+                var scopes = fagList.Select(x => $"scope-{x.Name}={string.Join(',', x.Scopes)}");
+                var prompts = fagList.Select(x => $"prompt-{x.Name}={x.Prompt}");
+                return string.Join('&', fag.Concat(scopes).Concat(prompts));
+            }
+        }
 
         private readonly JsonSerializerOptions _jsonSerializerOptions = new()
         {
@@ -49,26 +79,26 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated
+        /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated
         /// and parses the result afterwards, including unpacking of the wiremessage. If the first request
         /// fails, it tries to reauthenticate and tries it again before throwing the exception to the caller.
         /// </summary>
-        private protected async Task<TData> CallApi<TWiremessage, TData>(string path, Vin? vin = null)
+        private protected async Task<TData> CallApi<TWiremessage, TData>(string path)
             where TWiremessage : class, IWiremessage<TData> where TData : class
         {
             TData? result;
             try
             {
-                result = await CallApiNoRetry<TWiremessage, TData>(path, vin);
+                result = await CallApiNoRetry<TWiremessage, TData>(path);
             }
             catch
             {
                 // retry login
-                _state.ForceRelogin();
+                await _connectionProvider.AuthData.UpdateTokenAsync(null, DateTime.MinValue, null);
 
                 try
                 {
-                    result = await CallApiNoRetry<TWiremessage, TData>(path, vin);
+                    result = await CallApiNoRetry<TWiremessage, TData>(path);
                 }
                 catch (Exception ex)
                 {
@@ -80,7 +110,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated
+        /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated
         /// and parses the result afterwards, including unpacking of the wiremessage.
         /// </summary>
         private protected async Task<TData> CallApiNoRetry<TWiremessage, TData>(string path, Vin? vin = null)
@@ -103,53 +133,32 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         }
 
         /// <summary>
-        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated.
+        /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi(string path, Vin? vin = null)
+        protected async Task<HttpResponseMessage> RequestApi(string path)
         {
-            return await RequestApi<object>(path, vin, null);
+            return await RequestApi<object>(path, null);
         }
 
         /// <summary>
-        /// Calls the given endpoint at the WeConnect Portal api and ensures the request is authenticated.
+        /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated.
         /// It sends the given action params object as json serialized request body.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(string path, Vin? vin = null, TActionParams? actionParams = null)
+        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(string path, TActionParams? actionParams = null)
             where TActionParams : class
         {
             await Authenticate(_state);
 
-            var uri = new Uri($"{_state.BaseJsonUriForVin(vin)}{path}");
-            var request = new HttpRequestMessage(HttpMethod.Post, uri);
-            AddCommonAuthHeaders(request.Headers, _state.Csrf, _state.Referrer);
+            var uri = new Uri(path);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
+            request.Headers.Add("User-ID", _state.UserId);
 
             var requestJson = actionParams != null ? JsonSerializer.Serialize(actionParams, _jsonSerializerOptions) : null;
             if (requestJson != null)
                 request.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
 
             return await _client.SendAsync(request);
-        }
-
-        /// <summary>
-        /// Gets the CultureInfo that the portal responded via the 'CARNET_LANGUAGE_ID' cookie,
-        /// which is the locale that the server side uses for formatting date and time strings.
-        /// </summary>
-        private protected CultureInfo GetCarNetLocale()
-        {
-            var cookies = _connectionProvider.CookieContainer?.GetCookies(_state.BaseUri).Cast<Cookie>()
-                .GroupBy(c => c.Name.ToUpperInvariant()).ToDictionary(c => c.Key, c => c.First().Value);
-
-            if (cookies is null || !cookies.TryGetValue("CARNET_LANGUAGE_ID", out string? locale) || locale is null)
-                return CultureInfo.InvariantCulture;
-
-            try
-            {
-                return CultureInfo.CreateSpecificCulture(locale.Replace('_', '-').Trim());
-            }
-            catch (CultureNotFoundException)
-            {
-                return CultureInfo.InvariantCulture;
-            }
         }
 
         /// <summary>
@@ -162,20 +171,18 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             {
                 _renewTokenSemaphore.WaitOne();
 
-                if (state.MustForceRelogin())
-                    ClearCookies(state);
-                else
-                    TryRestoreSession(state);
-
-                if (state.HasValidLogin())
+                if (_connectionProvider.AuthData.IsAccessTokenValid())
                     return;
 
-                await LoginSession(state);
+                await GetLoginHmacToken(state);
+                await LoginIdentifier(state);
+                await LoginAuthenticate(state);
+                await GetAuthProxyAccessToken(state);
+                await GetUserId(state);
+                await ExchangeAccessToken(state);
 
-                if (!state.HasValidLogin())
-                    throw new IOException("Invalid login state after completed login.");
-
-                await StoreSession(state);
+                if (!_connectionProvider.AuthData.IsAccessTokenValid())
+                    throw new IOException("Login flow completed, still no access token present.");
             }
             catch (Exception innerEx)
             {
@@ -187,173 +194,58 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             }
         }
 
-        private void ClearCookies(AuthState state)
-        {
-            foreach (var cookie in _connectionProvider.CookieContainer.GetCookies(state.BaseUri).Cast<Cookie>())
-                cookie.Expired = true;
-        }
-
-        private void TryRestoreSession(AuthState state)
-        {
-            if (_connectionProvider.AuthData.AccessToken is null)
-                return;
-
-            try
-            {
-                var persisted = JsonSerializer.Deserialize<PersistedSession>(_connectionProvider.AuthData.AccessToken);
-                if (persisted is null)
-                    throw new NullReferenceException();
-                state.BaseJsonUri = persisted.BaseJsonUri;
-                state.Csrf = persisted.Csrf;
-                persisted.AddToCookieContainer(_connectionProvider.CookieContainer);
-            }
-            catch
-            {
-                state.Reset();
-            }
-        }
-
-        private async Task StoreSession(AuthState state)
-        {
-            var serializableSession = new PersistedSession(state.BaseJsonUri, state.Csrf, _connectionProvider.CookieContainer);
-            await _connectionProvider.AuthData.UpdateTokenAsync(JsonSerializer.Serialize(serializableSession), DateTime.MinValue, string.Empty);
-        }
-
-        private async Task LoginSession(AuthState state)
-        {
-            await GetInitialCsrf(state);
-            await SetInvariantLanguage(state);
-            await GetLoginPageUri(state);
-            await GetLoginRelayState(state);
-            await GetLoginHmacToken(state);
-            await LoginIdentifier(state);
-            await LoginAuthenticate(state);
-            await CompleteLogin(state);
-            await GetFinalCsrf(state);
-        }
-
-        private static void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf, string? referrer)
+        private static void AddCommonAuthHeaders(HttpRequestHeaders headers, string? csrf = null)
         {
             headers.Add("Accept-Language", "en-US,en;q=0.5");
             headers.Add("Accept", "text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8");
             headers.Add("Connection", "keep-alive");
             headers.Add("Pragma", "no-cache");
             headers.Add("Cache-Control", "no-cache");
-            if (!string.IsNullOrWhiteSpace(csrf))
-                headers.Add("X-CSRF-Token", csrf);
-            if (!string.IsNullOrWhiteSpace(referrer))
-                headers.Referrer = new Uri(referrer);
+            if (csrf is not null)
+                headers.Add("X-CSRF-TOKEN", csrf);
             headers.TryAddWithoutValidation("User-Agent", _userAgent);
         }
 
         /// <summary>
         /// Step 1
-        /// Get initial CSRF from landing page to get login process started. HttpClient
-        /// stores JSESSIONID cookie.
-        /// </summary>
-        private async Task GetInitialCsrf(AuthState state)
-        {
-            var landingPageUri = new Uri(new Uri(_baseUri), "/portal/en_GB/web/guest/home");
-            var landingPageResponse = await _client.GetAsync(landingPageUri);
-            if (!landingPageResponse.IsSuccessStatusCode)
-                throw new IOException("Failed getting to portal landing page.");
-
-            var landingPageBody = await landingPageResponse.Content.ReadAsStringAsync();
-            if (!landingPageBody.TryExtractCsrf(out string csrf))
-                throw new IOException("Failed to get CSRF from landing page.");
-
-            state.Csrf = csrf;
-            state.Referrer = landingPageUri.ToString();
-        }
-
-        /// <summary>
-        /// Step 1b
-        /// Note: Portal performs a get-supported-browsers and get-countries at this point.
-        /// Those steps are skipped - but we trigger the market switch to en_GB
-        /// </summary>
-        private async Task SetInvariantLanguage(AuthState state)
-        {
-            var changeLanguageUrl = new Uri(new Uri(_baseUri), $"/portal/en_GB/web/guest/home?p_auth={state.Csrf}&p_p_id=10_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=2&_10_WAR_cored5portlet_javax.portlet.action=changeMarket");
-            var changeLanguageUrlRequest = new HttpRequestMessage(HttpMethod.Post, changeLanguageUrl);
-            AddCommonAuthHeaders(changeLanguageUrlRequest.Headers, null, state.Referrer);
-            changeLanguageUrlRequest.FormUrlEncoded(new[]
-            {
-                ("_10_WAR_cored5portlet_country", "gb"),
-                ("_10_WAR_cored5portlet_language", "en")
-            });
-            var finalLoginUrlResponse = await _client.SendAsync(changeLanguageUrlRequest);
-
-            if (!finalLoginUrlResponse.IsSuccessStatusCode)
-                throw new IOException("Failed to set language before logging in.");
-        }
-
-        /// <summary>
-        /// Step 2
-        /// Get login page url. POST returns JSON with loginURL for next step. Returned
-        /// loginURL includes client_id for step 4.
-        /// </summary>
-        private async Task GetLoginPageUri(AuthState state)
-        {
-            var getLoginUri = new Uri(new Uri(_baseUri), "/portal/en_GB/web/guest/home/-/csrftokenhandling/get-login-url");
-            var getLoginRequest = new HttpRequestMessage(HttpMethod.Post, getLoginUri);
-            AddCommonAuthHeaders(getLoginRequest.Headers, state.Csrf, state.Referrer);
-            var getLoginResponse = await _client.SendAsync(getLoginRequest);
-
-            if (!getLoginResponse.IsSuccessStatusCode)
-                throw new IOException("Failed to get login url.");
-
-            var getLoginStream = await getLoginResponse.Content.ReadAsStreamAsync();
-            var getLoginBody = await JsonSerializer.DeserializeAsync<LoginPageInfoResponse>(getLoginStream, _jsonSerializerOptions);
-            if (getLoginBody != null && getLoginBody.HasError)
-                throw new IOException($"Error while getting login url, code {getLoginBody.ErrorCode}");
-            if (string.IsNullOrEmpty(getLoginBody?.Body.Path))
-                throw new IOException("Failed to deserialize body to get login url.");
-
-            state.LoginUri = getLoginBody.Body.Path;
-            if (!new Uri(state.LoginUri).TryExtractUriParameter("client_id", out string clientId))
-                throw new IOException("Failed to get client_id.");
-
-            state.ClientId = clientId;
-        }
-
-        /// <summary>
-        /// Step 3
-        /// Get login form url we are told to use, it will give us a new location.
-        /// response header location (redirect URL) includes relayState for step 5
-        /// https://identity.vwgroup.io/oidc/v1/authorize...
-        /// </summary>
-        private async Task GetLoginRelayState(AuthState state)
-        {
-            var loginUrlRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginUri);
-            AddCommonAuthHeaders(loginUrlRequest.Headers, state.Csrf, state.Referrer);
-            var loginUrlResponse = await _authClient.SendAsync(loginUrlRequest);
-
-            if (loginUrlResponse.StatusCode != HttpStatusCode.Found)
-                throw new IOException("Failed to get authorization page.");
-
-            var loginFormUrl = loginUrlResponse.Headers.Location;
-            if (loginFormUrl is null || !loginFormUrl.TryExtractUriParameter("relayState", out string loginRelayStateToken))
-                throw new IOException("Failed to get relay state.");
-
-            state.RelayStateToken = loginRelayStateToken;
-            state.LoginFormUrl = loginFormUrl.ToString();
-        }
-
-        /// <summary>
-        /// Step 4
-        /// Get login action url, relay state. hmac token 1 and login CSRF from form contents
-        /// https://identity.vwgroup.io/signin-service/v1/signin/<client_id>@relayState=<relay_state>
+        /// Load login page, and store client id, relay state, hmac token 1 and login CSRF
+        /// https://www.volkswagen.de/app/authproxy/login?fag=<featureappgroups>&scope-<fag>=<scopes>&prompt-<fag>=login&redirectUrl=<uri>
         /// </summary>
         private async Task GetLoginHmacToken(AuthState state)
         {
-            var loginFormLocationRequest = new HttpRequestMessage(HttpMethod.Get, state.LoginFormUrl);
-            AddCommonAuthHeaders(loginFormLocationRequest.Headers, state.Csrf, state.Referrer);
-            var loginFormLocationResponse = await _client.SendAsync(loginFormLocationRequest);
-
-            if (!loginFormLocationResponse.IsSuccessStatusCode)
-                throw new IOException("Failed to get sign-in page.");
+            var loginUri = $"{_authProxyUri}/login?{FeatureAppGroup.ToQuerystring(_featureAppGroups)}&redirectUrl={_landingPage}";
+            var loginFormLocationRequest = new HttpRequestMessage(HttpMethod.Get, loginUri);
+            AddCommonAuthHeaders(loginFormLocationRequest.Headers);
+            var loginFormLocationResponse = await _authClient.SendAsync(loginFormLocationRequest);
 
             // We get a SESSION set-cookie here!
+            // performs a 302 redirect to https://identity.vwgroup.io/oidc/v1/authorize?response_type=code&client_id=<client-id>&scope=<scopes>&state=<state>&redirect_uri=<uri>&prompt=login
+            // then another 302 redirect to https://identity.vwgroup.io/signin-service/v1/signin/<client-id>?relayState=<relay-state>
+            // read the client id and relay state from these redirect urls
+            while (loginFormLocationResponse.StatusCode == HttpStatusCode.Found)
+            {
+                Uri? redirectLocation = loginFormLocationResponse.Headers.Location;
+                if (redirectLocation is null)
+                    throw new IOException("Failed to get sign-in page, no redirect url given.");
+
+                if (redirectLocation.TryExtractUriParameter("client_id", out string clientId))
+                    state.ClientId = clientId;
+
+                if (redirectLocation.TryExtractUriParameter("relayState", out string loginRelayStateToken))
+                    state.RelayStateToken = loginRelayStateToken;
+
+                loginFormLocationResponse = await _authClient.GetAsync(redirectLocation);
+            }
+
+            if (!loginFormLocationResponse.IsSuccessStatusCode)
+                throw new IOException($"Failed to get sign-in page, status code {(int)loginFormLocationResponse.StatusCode}.");
+
+            if (string.IsNullOrWhiteSpace(state.ClientId))
+                throw new IOException("Failed to get relay state.");
+
+            if (string.IsNullOrWhiteSpace(state.RelayStateToken))
+                throw new IOException("Failed to get client_id.");
+
             // Get hmac and csrf tokens from form content.
             var loginFormPageBody = (await loginFormLocationResponse.Content.ReadAsStringAsync()).Replace("\n", "").Replace("\r", "");
             if (!loginFormPageBody.TryExtractLoginHmac(out string hmac))
@@ -363,19 +255,18 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             state.HmacToken1 = hmac;
             state.LoginCsrf = csrf;
-            state.Referrer = state.LoginFormUrl;
         }
 
         /// <summary>
-        /// Step 5
-        /// Post initial login data
+        /// Step 2
+        /// Submit username (i.e. email) to first login page
         /// https://identity.vwgroup.io/signin-service/v1/<client_id>/login/identifier
         /// </summary>
         private async Task LoginIdentifier(AuthState state)
         {
-            var loginActionUri = new Uri(new Uri(_authUri), $"/signin-service/v1/{state.ClientId}/login/identifier");
+            var loginActionUri = new Uri($"{_idpUri}/signin-service/v1/{state.ClientId}/login/identifier");
             var loginActionUrlRequest = new HttpRequestMessage(HttpMethod.Post, loginActionUri);
-            AddCommonAuthHeaders(loginActionUrlRequest.Headers, null, state.Referrer);
+            AddCommonAuthHeaders(loginActionUrlRequest.Headers);
             loginActionUrlRequest.FormUrlEncoded(new[]
             {
                 ("email", _connectionProvider.AuthData.Username),
@@ -395,19 +286,18 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 throw new IOException("Failed to get 2nd HMAC token.");
 
             state.HmacToken2 = hmac;
-            state.Referrer = loginActionUri.ToString();
         }
 
         /// <summary>
-        /// Step 6
-        /// Post login data to "login action 2" url
+        /// Step 3
+        /// Submit password to second login page
         /// https://identity.vwgroup.io/signin-service/v1/<client_id>/login/authenticate
         /// </summary>
         private async Task LoginAuthenticate(AuthState state)
         {
-            var loginAction2Uri = new Uri(new Uri(_authUri), $"/signin-service/v1/{state.ClientId}/login/authenticate");
+            var loginAction2Uri = new Uri($"{_idpUri}/signin-service/v1/{state.ClientId}/login/authenticate");
             var loginAction2UrlRequest = new HttpRequestMessage(HttpMethod.Post, loginAction2Uri);
-            AddCommonAuthHeaders(loginAction2UrlRequest.Headers, null, state.Referrer);
+            AddCommonAuthHeaders(loginAction2UrlRequest.Headers);
             loginAction2UrlRequest.FormUrlEncoded(new[]
             {
                 ("email", _connectionProvider.AuthData.Username),
@@ -417,76 +307,100 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 ("_csrf", state.LoginCsrf),
                 ("login", "true")
             });
-            var loginAction2UrlResponse = await _authClient.SendAsync(loginAction2UrlRequest);
+            var loginAction2UrlResponse = await _client.SendAsync(loginAction2UrlRequest);
 
-            // performs a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/oauth/sso?clientId=<client_id>&relayState=<relay_state>&userId=<userID>&HMAC=<...>"
-            // then a 302 redirect to GET https://identity.vwgroup.io/consent/v1/users/<userID>/<client_id>?scopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&relay_state=1bc582f3ff177afde55b590af92e17a006f9c532&callback=https://identity.vwgroup.io/oidc/v1/oauth/client/callback&hmac=<.....>
-            // then a 302 redirect to https://identity.vwgroup.io/oidc/v1/oauth/client/callback/success?user_id=<userID>&client_id=<client_id>&scopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&consentedScopes=openid%20profile%20birthdate%20nickname%20address%20email%20phone%20cars%20dealers%20mbb&relay_state=<relayState>&hmac=<...>
-            // then a 302 redirect to https://www.portal.volkswagen-we.com/portal/web/guest/complete-login?state=<csrf>&code=<....>
-            Uri? lastLocation = null;
-            while (loginAction2UrlResponse.StatusCode == HttpStatusCode.Found)
-                loginAction2UrlResponse = await _authClient.GetAsync(lastLocation = loginAction2UrlResponse.Headers.Location);
+            // (1) the login form flow to retrieve the authorization code for feature app group "vw-de":
+            // performs a 302 redirect to https://identity.vwgroup.io/oidc/v1/oauth/sso?clientId=<client_id>&relayState=<relay_state>&userId=<userID>&HMAC=<hmac>
+            // then a 302 redirect to GET https://identity.vwgroup.io/signin-service/v1/consent/users/<userID>/<client_id>?scopes=<scopes>&relayState=<relay_state>&callback=https://identity.vwgroup.io/oidc/v1/oauth/client/callback&hmac=<hmac>
+            // then a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/oauth/client/callback/success?user_id=<userID>&client_id=<client_id>&scopes=<scopes>&consentedScopes=<scopes>&relayState=<relay_state>&hmac=<hmac>
+            // then a 302 redirect to GET https://www.volkswagen.de/app/authproxy/login/oauth2/code/vw-de?state=<state>&code=<authorization_code>
+            // (2) followed by a non-prompting flow to retrieve the authorization code for feature app group "vwag-weconnect":
+            // then a 302 redirect to GET https://www.volkswagen.de/app/authproxy/login/vwag-weconnect?scope=openid,mbb&prompt=none
+            // then a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/authorize?response_type=code&client_id=<client_id>&scope=openid%20mbb&state=<state>&redirect_uri=https://www.volkswagen.de/app/authproxy/login/oauth2/code/vwag-weconnect&nonce=<nonce>&prompt=none
+            // then a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/oauth/sso?clientId=<client_id>&userId=<userID>&relayState=<relay_state>&prompt=none&HMAC=<hmac>
+            // then a 302 redirect to GET https://identity.vwgroup.io/oidc/v1/oauth/client/callback?clientId=<client_id>&relayState=<relay_state>&userId=<userID>&HMAC=<hmac>
+            // then a 302 redirect to GET https://www.volkswagen.de/app/authproxy/login/oauth2/code/vwag-weconnect?state=<state>&code=<authorization_code>
 
             if (!loginAction2UrlResponse.IsSuccessStatusCode)
                 throw new IOException("Failed to process login sequence.");
-            if (lastLocation is null)
-                throw new IOException("Failed to read auth code and state from url.");
-            if (!lastLocation.TryExtractUriParameter("code", out string authCode))
-                throw new IOException("Failed to get portlet code.");
 
-#pragma warning disable IDE0079
-#pragma warning disable CA1507 // "nameof" does not fit here, it is only named like the variable by chance
-            if (!lastLocation.TryExtractUriParameter("state", out string authState))
-                throw new IOException("Failed to get state.");
-#pragma warning restore CA1507
-#pragma warning restore IDE0079
+            // finally read csrf token from cookie
+            var cookies = _connectionProvider.CookieContainer?.GetCookies(new Uri(_landingPage)).Cast<Cookie>()
+                .GroupBy(c => c.Name.ToUpperInvariant()).ToDictionary(c => c.Key, c => c.First().Value);
 
-            state.PortletAuthCode = authCode;
-            state.PortletAuthState = authState;
-            state.Referrer = lastLocation.ToString();
-        }
-
-        /// <summary>
-        /// Step 7
-        /// Site first does a POST https://www.portal.volkswagen-we.com/portal/web/guest/complete-login/-/mainnavigation/get-countries
-        /// Post login data to complete login url
-        /// https://www.portal.volkswagen-we.com/portal/web/guest/complete-login?p_auth=<state>&p_p_id=33_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_33_WAR_cored5portlet_javax.portlet.action=getLoginStatus
-        /// </summary>
-        private async Task CompleteLogin(AuthState state)
-        {
-            var finalLoginUrl = new Uri(new Uri(_baseUri), $"/portal/web/guest/complete-login?p_auth={state.PortletAuthState}&p_p_id=33_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_33_WAR_cored5portlet_javax.portlet.action=getLoginStatus");
-            var finalLoginUrlRequest = new HttpRequestMessage(HttpMethod.Post, finalLoginUrl);
-            AddCommonAuthHeaders(finalLoginUrlRequest.Headers, null, state.Referrer);
-            finalLoginUrlRequest.FormUrlEncoded(new[]
-            {
-                ("_33_WAR_cored5portlet_code", state.PortletAuthCode)
-            });
-            var finalLoginUrlResponse = await _authClient.SendAsync(finalLoginUrlRequest);
-
-            if (finalLoginUrlResponse.StatusCode != HttpStatusCode.Found)
-                throw new IOException("Failed to post portlet page.");
-            if (finalLoginUrlResponse.Headers.Location is null)
-                throw new IOException("Failed to get base json url.");
-
-            state.BaseJsonUri = finalLoginUrlResponse.Headers.Location.ToString();
-        }
-
-        /// <summary>
-        /// Step 8
-        /// Get base JSON url for commands
-        /// </summary>
-        private async Task GetFinalCsrf(AuthState state)
-        {
-            var baseJsonResponse = await _client.GetAsync(state.BaseJsonUri);
-            if (!baseJsonResponse.IsSuccessStatusCode)
-                throw new IOException("Failed to load base json page.");
-
-            var landingPageBody = await baseJsonResponse.Content.ReadAsStringAsync();
-            if (!landingPageBody.TryExtractCsrf(out string csrf))
-                throw new IOException("Failed to get final CSRF.");
+            if (cookies is null || !cookies.TryGetValue("CSRF_TOKEN", out string? csrf))
+                throw new IOException("Failed to read CSRF token from cookies.");
 
             state.Csrf = csrf;
-            state.Referrer = state.BaseJsonUri;
+        }
+
+        /// <summary>
+        /// Step 4
+        /// Get access token from auth proxy
+        /// </summary>
+        private async Task GetAuthProxyAccessToken(AuthState state)
+        {
+            var tokenUri = new Uri($"{_authProxyUri}/{_fagWeConnect}/tokens");
+            var tokenRequest = new HttpRequestMessage(HttpMethod.Get, tokenUri);
+            AddCommonAuthHeaders(tokenRequest.Headers, state.Csrf);
+            var tokenResponse = await _client.SendAsync(tokenRequest);
+
+            if (!tokenResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to fetch tokens.");
+
+            var tokens = await JsonSerializer.DeserializeAsync<AuthProxyTokenResponse>(await tokenResponse.Content.ReadAsStreamAsync(), _jsonSerializerOptions);
+
+            if (tokens?.AccessToken == null)
+                throw new IOException("No access token present in response");
+
+            state.AuthProxyAccessToken = tokens.AccessToken;
+        }
+
+        /// <summary>
+        /// Step 5
+        /// Get access token from auth proxy
+        /// </summary>
+        private async Task GetUserId(AuthState state)
+        {
+            var userIdUri = new Uri($"{_authProxyUri}/{_fagVw}/user");
+            var userIdRequest = new HttpRequestMessage(HttpMethod.Get, userIdUri);
+            AddCommonAuthHeaders(userIdRequest.Headers, state.Csrf);
+            var userIdResponse = await _client.SendAsync(userIdRequest);
+
+            if (!userIdResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to fetch user id.");
+
+            var user = await JsonSerializer.DeserializeAsync<UserProfileResponse>(await userIdResponse.Content.ReadAsStreamAsync(), _jsonSerializerOptions);
+
+            if (string.IsNullOrEmpty(user?.Id))
+                throw new IOException("No user id returned.");
+
+            state.UserId = user.Id;
+        }
+
+        /// <summary>
+        /// Step 6
+        /// Exchange auth proxy access token to get an access token for WeConnect access
+        /// </summary>
+        private async Task ExchangeAccessToken(AuthState state)
+        {
+            var tokenExchangeUri = new Uri($"{_tokenExchangeUri}?isWcar=false");
+            var tokenExchangeRequest = new HttpRequestMessage(HttpMethod.Get, tokenExchangeUri);
+            tokenExchangeRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", state.AuthProxyAccessToken);
+            tokenExchangeRequest.Headers.Add("Accept", "application/json, text/plain, */*");
+            var tokenExchangeResponse = await _client.SendAsync(tokenExchangeRequest);
+
+            if (!tokenExchangeResponse.IsSuccessStatusCode)
+                throw new IOException("Failed to exchange token.");
+
+            var token = await tokenExchangeResponse.Content.ReadAsStringAsync();
+
+            if (token is null)
+                throw new IOException("Token could not be exchanged.");
+
+            state.AccessToken = token;
+
+            await _connectionProvider.AuthData.UpdateTokenAsync(token, DateTime.UtcNow.AddHours(1), null);
         }
     }
 }
