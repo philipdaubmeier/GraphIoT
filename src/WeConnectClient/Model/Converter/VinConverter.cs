@@ -5,16 +5,24 @@ using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.WeConnectClient.Model
 {
-    internal class VinConverter : JsonConverter<Vin>
+    internal class VinConverter : JsonConverter<Vin?>
     {
         public override void Write(Utf8JsonWriter writer, Vin value, JsonSerializerOptions options)
         {
-            writer.WriteStringValue(value);
+            writer.WriteStringValue(value ?? string.Empty);
         }
 
-        public override Vin Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override Vin? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            return new Vin(reader.GetString() ?? string.Empty);
+            try
+            {
+                var str = reader.GetString();
+                return str is null ? null : new Vin(str);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

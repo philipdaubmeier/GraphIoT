@@ -83,13 +83,13 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// and parses the result afterwards, including unpacking of the wiremessage. If the first request
         /// fails, it tries to reauthenticate and tries it again before throwing the exception to the caller.
         /// </summary>
-        private protected async Task<TData> CallApi<TWiremessage, TData>(string path)
+        private protected async Task<TData> CallApi<TWiremessage, TData>(Uri uri, bool proxyToken = false)
             where TWiremessage : class, IWiremessage<TData> where TData : class
         {
             TData? result;
             try
             {
-                result = await CallApiNoRetry<TWiremessage, TData>(path);
+                result = await CallApiNoRetry<TWiremessage, TData>(uri, proxyToken);
             }
             catch
             {
@@ -98,7 +98,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
                 try
                 {
-                    result = await CallApiNoRetry<TWiremessage, TData>(path);
+                    result = await CallApiNoRetry<TWiremessage, TData>(uri, proxyToken);
                 }
                 catch (Exception ex)
                 {
@@ -113,10 +113,10 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated
         /// and parses the result afterwards, including unpacking of the wiremessage.
         /// </summary>
-        private protected async Task<TData> CallApiNoRetry<TWiremessage, TData>(string path, Vin? vin = null)
+        private protected async Task<TData> CallApiNoRetry<TWiremessage, TData>(Uri uri, bool proxyToken = false)
             where TWiremessage : class, IWiremessage<TData> where TData : class
         {
-            var response = await RequestApi(path, vin);
+            var response = await RequestApi(uri, proxyToken);
             if (!response.IsSuccessStatusCode)
                 throw new IOException($"The API responded with HTTP status code: {(int)response.StatusCode} {response.StatusCode}");
 
@@ -135,23 +135,23 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// <summary>
         /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi(string path)
+        protected async Task<HttpResponseMessage> RequestApi(Uri uri, bool proxyToken = false)
         {
-            return await RequestApi<object>(path, null);
+            return await RequestApi<object>(uri, proxyToken, null);
         }
 
         /// <summary>
         /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated.
         /// It sends the given action params object as json serialized request body.
         /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(string path, TActionParams? actionParams = null)
+        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(Uri uri, bool proxyToken = false, TActionParams? actionParams = null)
             where TActionParams : class
         {
             await Authenticate(_state);
 
-            var uri = new Uri(path);
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _connectionProvider.AuthData.AccessToken);
+            var token = proxyToken ? _state.AuthProxyVwAccessToken : _connectionProvider.AuthData.AccessToken;
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Add("User-ID", _state.UserId);
 
             var requestJson = actionParams != null ? JsonSerializer.Serialize(actionParams, _jsonSerializerOptions) : null;
@@ -177,7 +177,8 @@ namespace PhilipDaubmeier.WeConnectClient.Network
                 await GetLoginHmacToken(state);
                 await LoginIdentifier(state);
                 await LoginAuthenticate(state);
-                await GetAuthProxyAccessToken(state);
+                _state.AuthProxyVwAccessToken = await GetAuthProxyAccessToken(state, _fagVw);
+                _state.AuthProxyWeConnectAccessToken = await GetAuthProxyAccessToken(state, _fagWeConnect);
                 await GetUserId(state);
                 await ExchangeAccessToken(state);
 
@@ -338,22 +339,22 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// Step 4
         /// Get access token from auth proxy
         /// </summary>
-        private async Task GetAuthProxyAccessToken(AuthState state)
+        private async Task<string> GetAuthProxyAccessToken(AuthState state, string fag)
         {
-            var tokenUri = new Uri($"{_authProxyUri}/{_fagWeConnect}/tokens");
+            var tokenUri = new Uri($"{_authProxyUri}/{fag}/tokens");
             var tokenRequest = new HttpRequestMessage(HttpMethod.Get, tokenUri);
             AddCommonAuthHeaders(tokenRequest.Headers, state.Csrf);
             var tokenResponse = await _client.SendAsync(tokenRequest);
 
             if (!tokenResponse.IsSuccessStatusCode)
-                throw new IOException("Failed to fetch tokens.");
+                throw new IOException($"Failed to fetch tokens of feature app group '{fag}'.");
 
             var tokens = await JsonSerializer.DeserializeAsync<AuthProxyTokenResponse>(await tokenResponse.Content.ReadAsStreamAsync(), _jsonSerializerOptions);
 
             if (tokens?.AccessToken == null)
-                throw new IOException("No access token present in response");
+                throw new IOException($"No access token present in response for feature app group '{fag}'");
 
-            state.AuthProxyAccessToken = tokens.AccessToken;
+            return tokens.AccessToken;
         }
 
         /// <summary>
@@ -386,7 +387,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         {
             var tokenExchangeUri = new Uri($"{_tokenExchangeUri}?isWcar=false");
             var tokenExchangeRequest = new HttpRequestMessage(HttpMethod.Get, tokenExchangeUri);
-            tokenExchangeRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", state.AuthProxyAccessToken);
+            tokenExchangeRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", state.AuthProxyWeConnectAccessToken);
             tokenExchangeRequest.Headers.Add("Accept", "application/json, text/plain, */*");
             var tokenExchangeResponse = await _client.SendAsync(tokenExchangeRequest);
 

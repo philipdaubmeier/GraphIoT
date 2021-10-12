@@ -17,87 +17,96 @@ namespace PhilipDaubmeier.WeConnectClient
 {
     public class WeConnectPortalClient : WeConnectAuthBase
     {
+        private const string _gvfUri = "https://myvw-gvf-proxy.apps.emea.vwapps.io/";
+        private const string _vumUri = "https://vum.apps.emea.vwapps.io/v2/users";
+        private const string _carUri = "https://cardata.apps.emea.vwapps.io/vehicles";
+
         public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
 
         public async Task<Location> GetLastKnownLocation(Vin? vin = null)
         {
-            return await CallApi<LocationResponse, Location>("/-/cf/get-location");
+            return await CallApi<LocationResponse, Location>(new Uri($"{_carUri}/{vin}/parkingposition"));
         }
 
-        public async Task<IEnumerable<VehicleEntry>> GetVehicleList(Vin? vin = null)
+        public async Task<IEnumerable<VehicleEntry>> GetVehicleList()
         {
-            return await CallApi<VehicleListResponse, IEnumerable<VehicleEntry>>("/-/mainnavigation/get-fully-loaded-cars");
+            return await CallApi<VehicleListResponse, List<VehicleEntry>>(new Uri($"{_vumUri}/me/relations"), true);
         }
 
         public async Task<VehicleEntry> GetVehicle(Vin vin)
         {
-            return await CallApi<LoadCarDetailsResponse, VehicleEntry>($"https://myvw-gvf-proxy.apps.emea.vwapps.io/vehicleData/de-DE/{vin}");
+            return await CallApi<LoadCarDetailsResponse, VehicleEntry>(new Uri($"{_gvfUri}vehicleData/de-DE/{vin}"), true);
         }
 
         public async Task<VehicleDetails> GetVehicleDetails(Vin? vin = null)
         {
-            return await CallApi<VehicleDetailsResponse, VehicleDetails>($"https://myvw-gvf-proxy.apps.emea.vwapps.io/vehicleDetails/de-DE/{vin}");
+            return await CallApi<VehicleDetailsResponse, VehicleDetails>(new Uri($"{_gvfUri}vehicleDetails/de-DE/{vin}"), true);
         }
 
         public async Task<VehicleStatus> GetVehicleStatus(Vin? vin = null)
         {
-            return await CallApi<VehicleStatusResponse, VehicleStatus>("/-/vsr/get-vsr");
+            return await CallApi<VehicleStatusResponse, VehicleStatus>(new Uri($"{_carUri}/{vin}/"));
         }
 
         public async Task<IEnumerable<HealthReport>> GetLatestHealthReports(Vin? vin = null)
         {
-            return await CallApi<HealthReportResponse, List<HealthReport>>("/-/vhr/get-latest-report");
+            return await CallApi<HealthReportResponse, List<HealthReport>>(new Uri($"{_carUri}/{vin}/"));
         }
 
         public async Task<GeofenceCollection> GetGeofences(Vin? vin = null)
         {
-            return await CallApi<GeofenceResponse, GeofenceCollection>("/-/geofence/get-fences");
+            return await CallApi<GeofenceResponse, GeofenceCollection>(new Uri($"{_carUri}/{vin}/"));
         }
 
         public async Task<Emanager> GetEManager(Vin? vin = null)
         {
-            return await CallApi<EmanagerResponse, Emanager>("/-/emanager/get-emanager");
+            return await CallApi<EmanagerResponse, Emanager>(new Uri($"{_carUri}/{vin}/"));
+        }
+
+        public async Task<Rts> GetLongtermTripStatistics(Vin? vin = null)
+        {
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/longterm/last"));
         }
 
         public async Task<Rts> GetLatestTripStatistics(Vin? vin = null)
         {
-            return await LoadTripStatistics($"https://cardata.apps.emea.vwapps.io/vehicles/{vin}/tripdata/longterm/last");
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/shortterm/last"));
         }
 
         public async Task<Rts> GetLastRefuelTripStatistics(Vin? vin = null)
         {
-            return await LoadTripStatistics("/-/rts/get-last-refuel-trip-statistics");
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/cyclic/last"));
         }
 
         public async Task StartCharge(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/charge-battery", new ChargeParams(true, 100));
+            await RequestApi(new Uri("/-/emanager/charge-battery"), false, new ChargeParams(true, 100));
         }
 
         public async Task StopCharge(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/charge-battery", new ChargeParams(false, 99));
+            await RequestApi(new Uri("/-/emanager/charge-battery"), false, new ChargeParams(false, 99));
         }
 
         public async Task StartClimate(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-climatisation", new ClimateParams(true, true));
+            await RequestApi(new Uri("/-/emanager/trigger-climatisation"), false, new ClimateParams(true, true));
         }
 
         public async Task StopClimate(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-climatisation", new ClimateParams(false, true));
+            await RequestApi(new Uri("/-/emanager/trigger-climatisation"), false, new ClimateParams(false, true));
         }
 
         public async Task StartWindowMelt(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-windowheating", new WindowsMeltParams(true));
+            await RequestApi(new Uri("/-/emanager/trigger-windowheating"), false, new WindowsMeltParams(true));
         }
 
         public async Task StopWindowMelt(Vin? vin = null)
         {
-            await RequestApi("/-/emanager/trigger-windowheating", new WindowsMeltParams(true));
+            await RequestApi(new Uri("/-/emanager/trigger-windowheating"), false, new WindowsMeltParams(true));
         }
 
         /// <summary>
@@ -108,9 +117,9 @@ namespace PhilipDaubmeier.WeConnectClient
             await _connectionProvider.AuthData.UpdateTokenAsync(null, DateTime.MinValue, null);
         }
 
-        private async Task<Rts> LoadTripStatistics(string path)
+        private async Task<Rts> LoadTripStatistics(Uri uri)
         {
-            return await CallApi<TripStatisticsResponse, Rts>(path);
+            return await CallApi<TripStatisticsResponse, Rts>(uri);
         }
     }
 }
