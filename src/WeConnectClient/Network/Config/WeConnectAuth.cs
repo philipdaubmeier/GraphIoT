@@ -20,7 +20,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             AccessTokenExpiry = DateTime.MinValue;
         }
 
-        public bool IsAccessTokenValid() => !string.IsNullOrEmpty(AccessToken) && AccessTokenExpiry > DateTime.Now;
+        public bool IsAccessTokenValid() => !string.IsNullOrEmpty(AccessToken) && AccessTokenExpiry > DateTime.UtcNow;
 
         public Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken)
         {
