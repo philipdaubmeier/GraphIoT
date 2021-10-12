@@ -150,7 +150,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             await Authenticate(_state);
 
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            var token = proxyToken ? _state.AuthProxyVwAccessToken : _connectionProvider.AuthData.AccessToken;
+            var token = proxyToken ? (string)_state.AuthProxyVwAccessToken : _connectionProvider.AuthData.AccessToken;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Add("User-ID", _state.UserId);
 

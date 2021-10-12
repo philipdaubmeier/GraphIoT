@@ -12,8 +12,8 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
         public string HmacToken2 { get; set; } = string.Empty;
         public string LoginCsrf { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
-        public string AuthProxyVwAccessToken { get; set; } = string.Empty;
-        public string AuthProxyWeConnectAccessToken { get; set; } = string.Empty;
-        public string AccessToken { get; set; } = string.Empty;
+        public ReadableJwt AuthProxyVwAccessToken { get; set; } = string.Empty;
+        public ReadableJwt AuthProxyWeConnectAccessToken { get; set; } = string.Empty;
+        public ReadableJwt AccessToken { get; set; } = string.Empty;
     }
 }
