@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 
 namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 {
+    [DebuggerDisplay("scp: {string.Join(' ', Scopes),nq}; sub: {Subject,nq}; iss: {Issuer,nq}")]
     public record ReadableJwt
     {
         private readonly JwtHeader _header;
@@ -13,8 +15,8 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 
         public string JwtToken { get; init; }
 
-        public string HeaderKid => _header.Kid;
-        public string HeaderAlg => _header.Alg;
+        public string JwtKeyId => _header.Kid;
+        public string JwtAlgorithm => _header.Alg;
 
         public string Subject => _payload.Sub;
         public string Audience => _payload.Aud;

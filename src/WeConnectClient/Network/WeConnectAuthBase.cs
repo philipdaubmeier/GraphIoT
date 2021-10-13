@@ -401,7 +401,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
             state.AccessToken = token;
 
-            await _connectionProvider.AuthData.UpdateTokenAsync(token, DateTime.UtcNow.AddHours(1), null);
+            await _connectionProvider.AuthData.UpdateTokenAsync(state.AccessToken, state.AccessToken.Expiration, null);
         }
     }
 }
