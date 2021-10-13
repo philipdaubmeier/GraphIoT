@@ -45,7 +45,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
 
         private readonly List<FeatureAppGroup> _featureAppGroups = new()
         {
-            new() { Name = _fagVw, Scopes = new(){ "profile", "carConfigurations", "cars", "vin" }, Prompt = "login" },
+            new() { Name = _fagVw, Scopes = new(){ "profile", "address", "phone", "dealers", "carConfigurations", "cars", "vin", "profession" }, Prompt = "login" },
             new() { Name = _fagWeConnect, Scopes = new(){ "openid", "mbb" }, Prompt = "none" }
         };
 
@@ -153,6 +153,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             var token = proxyToken ? (string)_state.AuthProxyVwAccessToken : _connectionProvider.AuthData.AccessToken;
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Add("User-ID", _state.UserId);
+            request.Headers.Add("traceId", Guid.NewGuid().ToString("D"));
 
             var requestJson = actionParams != null ? JsonSerializer.Serialize(actionParams, _jsonSerializerOptions) : null;
             if (requestJson != null)
