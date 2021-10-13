@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.WeConnectClient
         public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
 
-        public async Task<Location> GetLastKnownLocation(Vin? vin = null)
+        public async Task<Location> GetLastKnownLocation(Vin vin)
         {
             return await CallApi<LocationResponse, Location>(new Uri($"{_carUri}/{vin}/parkingposition"));
         }
@@ -34,12 +34,12 @@ namespace PhilipDaubmeier.WeConnectClient
             return await CallApi<VehicleListResponse, List<VehicleEntry>>(new Uri($"{_vumUri}/me/relations"), true);
         }
 
-        public async Task<VehicleEntry> GetVehicle(Vin vin)
+        public async Task<VehicleData> GetVehicleData(Vin vin)
         {
-            return await CallApi<LoadCarDetailsResponse, VehicleEntry>(new Uri($"{_gvfUri}vehicleData/de-DE/{vin}"), true);
+            return await CallApi<VehicleDataResponse, VehicleData>(new Uri($"{_gvfUri}vehicleData/de-DE/{vin}"), true);
         }
 
-        public async Task<VehicleDetails> GetVehicleDetails(Vin? vin = null)
+        public async Task<VehicleDetails> GetVehicleDetails(Vin vin)
         {
             return await CallApi<VehicleDetailsResponse, VehicleDetails>(new Uri($"{_gvfUri}vehicleDetails/de-DE/{vin}"), true);
         }
