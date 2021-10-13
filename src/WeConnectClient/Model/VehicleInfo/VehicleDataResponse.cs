@@ -1,11 +1,11 @@
 ﻿namespace PhilipDaubmeier.WeConnectClient.Model.VehicleInfo
 {
-    internal class VehicleDetailsResponse : VehicleDetails, IWiremessage<VehicleDetails>
+    internal class VehicleDataResponse : VehicleData, IWiremessage<VehicleData>
     {
         public string ErrorCode => string.Empty;
 
         public bool HasError => false;
 
-        public virtual VehicleDetails Body => this;
+        public virtual VehicleData Body => this;
     }
 }
