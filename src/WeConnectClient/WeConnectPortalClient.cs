@@ -64,19 +64,19 @@ namespace PhilipDaubmeier.WeConnectClient
             return await CallApi<EmanagerResponse, Emanager>(new Uri($"{_carUri}/{vin}/"));
         }
 
-        public async Task<Rts> GetLongtermTripStatistics(Vin? vin = null)
+        public async Task<IEnumerable<TripStatisticEntry>> GetLongtermTripStatistics(Vin vin, bool onlyLast = true)
         {
-            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/longterm/last"));
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/longterm" + (onlyLast ? "/last" : "")));
         }
 
-        public async Task<Rts> GetLatestTripStatistics(Vin? vin = null)
+        public async Task<IEnumerable<TripStatisticEntry>> GetLatestTripStatistics(Vin vin, bool onlyLast = true)
         {
-            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/shortterm/last"));
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/shortterm" + (onlyLast ? "/last" : "")));
         }
 
-        public async Task<Rts> GetLastRefuelTripStatistics(Vin? vin = null)
+        public async Task<IEnumerable<TripStatisticEntry>> GetLastRefuelTripStatistics(Vin vin, bool onlyLast = true)
         {
-            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/cyclic/last"));
+            return await LoadTripStatistics(new Uri($"{_carUri}/{vin}/tripdata/cyclic" + (onlyLast ? "/last" : "")));
         }
 
         public async Task StartCharge(Vin? vin = null)
@@ -117,9 +117,9 @@ namespace PhilipDaubmeier.WeConnectClient
             await _connectionProvider.AuthData.UpdateTokenAsync(null, DateTime.MinValue, null);
         }
 
-        private async Task<Rts> LoadTripStatistics(Uri uri)
+        private async Task<List<TripStatisticEntry>> LoadTripStatistics(Uri uri)
         {
-            return await CallApi<TripStatisticsResponse, Rts>(uri);
+            return await CallApi<TripStatisticsResponse, List<TripStatisticEntry>>(uri);
         }
     }
 }

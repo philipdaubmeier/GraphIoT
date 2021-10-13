@@ -1,10 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
 {
-    internal class TripStatisticsResponse : Wiremessage<Rts>
+    internal class TripStatisticsResponse : IWiremessage<List<TripStatisticEntry>>
     {
-        [JsonPropertyName("rtsViewModel")]
-        public override Rts Body { get; set; } = new Rts();
+        public string ErrorCode => string.Empty;
+
+        public bool HasError => false;
+
+        [JsonPropertyName("data")]
+        public virtual List<TripStatisticEntry> Body { get; set; } = new();
     }
 }

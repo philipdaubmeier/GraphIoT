@@ -1,19 +1,31 @@
-﻿namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
+﻿using System.Text.Json.Serialization;
+
+namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
 {
     public class TripStatisticEntry
     {
-        public int TripId { get; set; }
-        public double? AverageElectricConsumption { get; set; }
+        public string Id { get; set; } = string.Empty;
+        public string TripEndTimestamp { get; set; } = string.Empty;
+        public string TripType { get; set; } = string.Empty;
+        public string VehicleType { get; set; } = string.Empty;
+
+        [JsonPropertyName("mileage_km")]
+        public double MileageKm { get; set; } = 0;
+
+        [JsonPropertyName("startMileage_km")]
+        public double StartMileageKm { get; set; } = 0;
+
+        [JsonPropertyName("overallMileage_km")]
+        public double OverallMileageKm { get; set; } = 0;
+        public double TravelTime { get; set; } = 0;
+
         public double? AverageFuelConsumption { get; set; }
-        public double? AverageCngConsumption { get; set; }
-        public double AverageSpeed { get; set; }
-        public double TripDuration { get; set; }
-        public double TripLength { get; set; }
-        public string Timestamp { get; set; } = string.Empty;
-        public string TripDurationFormatted { get; set; } = string.Empty;
-        public double? Recuperation { get; set; }
-        public double? AverageAuxiliaryConsumption { get; set; }
-        public double? TotalElectricConsumption { get; set; }
-        public string LongFormattedTimestamp { get; set; } = string.Empty;
+        public double? AverageElectricConsumption { get; set; }
+        public double? AverageGasConsumption { get; set; }
+        public double? AverageAuxConsumption { get; set; }
+        public double? AverageRecuperation { get; set; }
+
+        [JsonPropertyName("averageSpeed_kmph")]
+        public double AverageSpeedKmph { get; set; } = 0d;
     }
 }
