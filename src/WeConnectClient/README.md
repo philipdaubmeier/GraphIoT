@@ -3,7 +3,7 @@
 
 # WeConnectClient
 
-This class library provides a way to call the Volkswagen WeConnect Portal interfaces. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.
+This class library provides a way to call the Volkswagen WeConnect interfaces. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.
 
 ## NuGet
 
@@ -27,19 +27,16 @@ using var connectionProvider = new WeConnectConnectionProvider(auth);
 If you have the connection providers in place, you can create and use the WeConnect client like this:
 
 ```csharp
-var client = new WeConnectPortalClient(connectionProvider);
+var weclient = new WeConnectPortalClient(connectionProvider);
 
-// Get all vehicles of the logged in user
-foreach (var vehicle in await weclient.GetVehicleList())
-    Console.WriteLine($"VIN: {vehicle.Vin} name: {vehicle.Name}");
+// Get the first vehicle of the logged in user
+var vehicle = (await weclient.GetVehicleList()).FirstOrDefault() ?? new();
+Console.WriteLine($"VIN: {vehicle.Vin} license plate: {vehicle.LicensePlate}");
 
 // Get statistics about latest trips
-var trips = await client.GetTripStatistics();
-foreach (var trip in trips.TripStatistics.SelectMany(t => t.TripStatistics))
-    Console.WriteLine($"Trip {trip.Timestamp}: avg. speed: {trip.AverageSpeed}");
-
-// Trigger actions on a specific vehicle
-await client.StartWindowMelt("WVWZZZAAAAA111111");
+var trips = await weclient.GetLatestTripStatistics(vehicle.Vin);
+foreach (var trip in trips)
+    Console.WriteLine($"Trip {trip.TripEndTimestamp}: avg. speed: {trip.AverageSpeedKmph}");
 ```
 
 For more usage examples you can also have a look at the [unit tests](../../test/WeConnectClient.Tests).
@@ -47,10 +44,6 @@ For more usage examples you can also have a look at the [unit tests](../../test/
 ## Platform Support
 
 WeConnectClient is targeted for .NET Standard 2.1 or higher.
-
-## Credits
-
-The core of this client, the authentication mechanism, is based on the excellent work of bgewehr, reneboer and wez3 and ported from their python client to c#. See details in this repository [here](https://github.com/bgewehr/volkswagen-carnet-client/)
 
 ## License
 
