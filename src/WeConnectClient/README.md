@@ -33,8 +33,8 @@ var weclient = new WeConnectPortalClient(connectionProvider);
 var vehicle = (await weclient.GetVehicleList()).FirstOrDefault() ?? new();
 Console.WriteLine($"VIN: {vehicle.Vin} license plate: {vehicle.LicensePlate}");
 
-// Get statistics about latest trips
-var trips = await weclient.GetLatestTripStatistics(vehicle.Vin);
+// Get statistics about trips
+var trips = await weclient.GetLongtermTripStatistics(vehicle.Vin);
 foreach (var trip in trips)
     Console.WriteLine($"Trip {trip.TripEndTimestamp}: avg. speed: {trip.AverageSpeedKmph}");
 ```
