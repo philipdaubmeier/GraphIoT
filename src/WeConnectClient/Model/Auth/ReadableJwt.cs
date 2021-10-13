@@ -58,7 +58,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model.Auth
 
         private static string ExtractDecode(string[]? array, int index)
         {
-            var extractedBase64UrlSafe = array is not null && array.Count() > index ? array[index] ?? string.Empty : string.Empty;
+            var extractedBase64UrlSafe = array is not null && array.Length > index ? array[index] ?? string.Empty : string.Empty;
             try
             {
                 var base64 = extractedBase64UrlSafe.Replace('-', '+').Replace('_', '/');

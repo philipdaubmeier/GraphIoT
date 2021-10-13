@@ -7,7 +7,7 @@ namespace PhilipDaubmeier.WeConnectClient.Model
 {
     internal class VinConverter : JsonConverter<Vin?>
     {
-        public override void Write(Utf8JsonWriter writer, Vin value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, Vin? value, JsonSerializerOptions options)
         {
             writer.WriteStringValue(value ?? string.Empty);
         }
