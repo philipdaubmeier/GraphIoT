@@ -137,16 +137,6 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// </summary>
         protected async Task<HttpResponseMessage> RequestApi(Uri uri, bool proxyToken = false)
         {
-            return await RequestApi<object>(uri, proxyToken, null);
-        }
-
-        /// <summary>
-        /// Calls the given endpoint at the WeConnect api and ensures the request is authenticated.
-        /// It sends the given action params object as json serialized request body.
-        /// </summary>
-        protected async Task<HttpResponseMessage> RequestApi<TActionParams>(Uri uri, bool proxyToken = false, TActionParams? actionParams = null)
-            where TActionParams : class
-        {
             await Authenticate(_state);
 
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
@@ -154,10 +144,6 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             request.Headers.Add("User-ID", _state.UserId);
             request.Headers.Add("traceId", Guid.NewGuid().ToString("D"));
-
-            var requestJson = actionParams != null ? JsonSerializer.Serialize(actionParams, _jsonSerializerOptions) : null;
-            if (requestJson != null)
-                request.Content = new StringContent(requestJson, Encoding.UTF8, "application/json");
 
             return await _client.SendAsync(request);
         }
