@@ -1,15 +1,11 @@
 ﻿using PhilipDaubmeier.WeConnectClient.Model;
-using PhilipDaubmeier.WeConnectClient.Model.ActionParams;
 using PhilipDaubmeier.WeConnectClient.Model.Capabilities;
-using PhilipDaubmeier.WeConnectClient.Model.Carfinder;
 using PhilipDaubmeier.WeConnectClient.Model.Core;
-using PhilipDaubmeier.WeConnectClient.Model.Emanager;
-using PhilipDaubmeier.WeConnectClient.Model.Geofence;
-using PhilipDaubmeier.WeConnectClient.Model.HealthReport;
+using PhilipDaubmeier.WeConnectClient.Model.Fuel;
 using PhilipDaubmeier.WeConnectClient.Model.TripStatistics;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleInfo;
 using PhilipDaubmeier.WeConnectClient.Model.VehicleList;
-using PhilipDaubmeier.WeConnectClient.Model.VehicleStatus;
+using PhilipDaubmeier.WeConnectClient.Model.WarningLights;
 using PhilipDaubmeier.WeConnectClient.Network;
 using System;
 using System.Collections.Generic;
@@ -26,11 +22,6 @@ namespace PhilipDaubmeier.WeConnectClient
 
         public WeConnectPortalClient(IWeConnectConnectionProvider connectionProvider)
             : base(connectionProvider) { }
-
-        public async Task<Location> GetLastKnownLocation(Vin vin)
-        {
-            return await CallApi<LocationResponse, Location>(new Uri($"{_carUri}/{vin}/parkingposition"));
-        }
 
         public async Task<IEnumerable<VehicleEntry>> GetVehicleList()
         {
@@ -52,29 +43,19 @@ namespace PhilipDaubmeier.WeConnectClient
             return await CallApi<VehicleDetailsResponse, VehicleDetails>(new Uri($"{_gvfUri}vehicleDetails/de-DE/{vin}"), true);
         }
 
-        public async Task<VehicleStatus> GetAccessStatus(Vin vin)
+        public async Task<IEnumerable<FuelStatus>> GetFuelStatus(Vin vin)
         {
-            return await CallApi<VehicleStatusResponse, VehicleStatus>(new Uri($"{_carUri}/{vin}/charging/settings"));
+            return await CallApi<FuelStatusResponse, List<FuelStatus>>(new Uri($"{_carUri}/{vin}/fuel/status"));
         }
 
-        public async Task<VehicleStatus> GetVehicleStatus(Vin? vin = null)
+        public async Task<IEnumerable<WarningLightsEntry>> GetWarningLights(Vin vin)
         {
-            return await CallApi<VehicleStatusResponse, VehicleStatus>(new Uri($"{_carUri}/{vin}/states"));
+            return await CallApi<WarningLightsListResponse, List<WarningLightsEntry>>(new Uri($"{_carUri}/{vin}/warninglights"));
         }
 
-        public async Task<IEnumerable<HealthReport>> GetLatestHealthReports(Vin? vin = null)
+        public async Task<WarningLightsEntry> GetLastWarningLights(Vin vin)
         {
-            return await CallApi<HealthReportResponse, List<HealthReport>>(new Uri($"{_carUri}/{vin}/"));
-        }
-
-        public async Task<GeofenceCollection> GetGeofences(Vin? vin = null)
-        {
-            return await CallApi<GeofenceResponse, GeofenceCollection>(new Uri($"{_carUri}/{vin}/"));
-        }
-
-        public async Task<Emanager> GetEManager(Vin? vin = null)
-        {
-            return await CallApi<EmanagerResponse, Emanager>(new Uri($"{_carUri}/{vin}/"));
+            return await CallApi<WarningLightsSingleResponse, WarningLightsEntry>(new Uri($"{_carUri}/{vin}/warninglights/last"));
         }
 
         public async Task<IEnumerable<TripStatisticEntry>> GetLongtermTripStatistics(Vin vin)
@@ -105,36 +86,6 @@ namespace PhilipDaubmeier.WeConnectClient
         public async Task<TripStatisticEntry> GetLastCyclicTrip(Vin vin)
         {
             return await LoadTripStatistics<TripStatisticsSingleResponse, TripStatisticEntry>(vin, "cyclic", true);
-        }
-
-        public async Task StartCharge(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/charge-battery"), false, new ChargeParams(true, 100));
-        }
-
-        public async Task StopCharge(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/charge-battery"), false, new ChargeParams(false, 99));
-        }
-
-        public async Task StartClimate(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/trigger-climatisation"), false, new ClimateParams(true, true));
-        }
-
-        public async Task StopClimate(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/trigger-climatisation"), false, new ClimateParams(false, true));
-        }
-
-        public async Task StartWindowMelt(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/trigger-windowheating"), false, new WindowsMeltParams(true));
-        }
-
-        public async Task StopWindowMelt(Vin? vin = null)
-        {
-            await RequestApi(new Uri("/-/emanager/trigger-windowheating"), false, new WindowsMeltParams(true));
         }
 
         /// <summary>
