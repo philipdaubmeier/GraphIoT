@@ -6,125 +6,72 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
     {
         public static MockHttpMessageHandler AddTripStatistics(this MockHttpMessageHandler mockHttp)
         {
-            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/rts/get-latest-trip-statistics")
-                    .Respond("application/json",
-                    @"{
-                        ""errorCode"": ""0"",
-                        ""rtsViewModel"":
-                        {
-                            ""daysInMonth"": 30,
-                            ""firstWeekday"": 2,
-                            ""month"": 4,
-                            ""year"": 2020,
-                            ""firstTripYear"": 2020,
-                            ""tripStatistics"":
-                            [
-                                null, null, null, null, null, null, null, null, null, null, null, null, null, null, 
-			                    null, null, null, null, null, null, null, null, null, null, null, null, null,
-                                {
-                                    ""aggregatedStatistics"":
-                                    {
-                                        ""tripId"": 123412344,
-                                        ""averageElectricConsumption"": 12.8,
-                                        ""averageFuelConsumption"": null,
-                                        ""averageCngConsumption"": null,
-                                        ""averageSpeed"": 50,
-                                        ""tripDuration"": 70,
-                                        ""tripLength"": 58,
-                                        ""timestamp"": ""28.04.2020"",
-                                        ""tripDurationFormatted"": ""1:10"",
-                                        ""recuperation"": null,
-                                        ""averageAuxiliaryConsumption"": null,
-                                        ""totalElectricConsumption"": 12.8,
-                                        ""longFormattedTimestamp"": null
-                                    },
-                                    ""tripStatistics"":
-                                    [
-                                        {
-                                            ""tripId"": 123412344,
-                                            ""averageElectricConsumption"": 12.8,
-                                            ""averageFuelConsumption"": null,
-                                            ""averageCngConsumption"": null,
-                                            ""averageSpeed"": 50,
-                                            ""tripDuration"": 70,
-                                            ""tripLength"": 58,
-                                            ""timestamp"": ""Today, 14:34"",
-                                            ""tripDurationFormatted"": ""1:10"",
-                                            ""recuperation"": null,
-                                            ""averageAuxiliaryConsumption"": null,
-                                            ""totalElectricConsumption"": null,
-                                            ""longFormattedTimestamp"": ""Trip ended: Tue, 28.04.2020, 14:34""
-                                        }
-                                    ]
-                                },
-                                null, null
-                            ],
-                            ""longTermData"":
-                            {
-                                ""tripId"": 123412344,
-                                ""averageElectricConsumption"": 13.1,
-                                ""averageFuelConsumption"": null,
-                                ""averageCngConsumption"": null,
-                                ""averageSpeed"": 26,
-                                ""tripDuration"": 642,
-                                ""tripLength"": 275,
-                                ""timestamp"": ""Heute, 14:34"",
-                                ""tripDurationFormatted"": ""10:42"",
-                                ""recuperation"": null,
-                                ""averageAuxiliaryConsumption"": null,
-                                ""totalElectricConsumption"": null,
-                                ""longFormattedTimestamp"": ""Trip ended: Tue, 28.04.2020, 14:34""
-                            },
-                            ""cyclicData"": null,
-                            ""serviceConfiguration"":
-                            {
-                                ""electric_consumption"": false,
-                                ""triptype_short"": true,
-                                ""auxiliary_consumption"": false,
-                                ""fuel_overall_consumption"": false,
-                                ""triptype_cyclic"": true,
-                                ""electric_overall_consumption"": true,
-                                ""triptype_long"": true,
-                                ""cng_overall_consumption"": false,
-                                ""recuperation"": false
-                            },
-                            ""tripFromLastRefuelAvailable"": false
-                        }
-                    }");
+            var statisticsTypes = new[] { "shortTerm", "longTerm", "cyclic" };
 
-            mockHttp.When($"{MockWeConnectConnection.BaseUri}/-/rts/get-last-refuel-trip-statistics")
-                    .Respond("application/json",
-                    @"{
-                        ""errorCode"": ""0"",
-                        ""rtsViewModel"":
-                        {
-                            ""daysInMonth"": 30,
-                            ""firstWeekday"": 2,
-                            ""month"": 4,
-                            ""year"": 2020,
-                            ""firstTripYear"": 2020,
-                            ""tripStatistics"": null,
-                            ""longTermData"": null,
-                            ""cyclicData"":
+            foreach (var statisticsType in statisticsTypes)
+            {
+                mockHttp.When($"{MockWeConnectConnection.VcfBaseUri}/tripdata/{statisticsType}/last")
+                        .Respond("application/json",
+                        @"{
+                            ""data"":
                             {
-                                ""tripId"": 123412344,
-                                ""averageElectricConsumption"": 12.8,
+                                ""tripEndTimestamp"": ""2021-01-01T12:00:00Z"",
+                                ""id"": ""34563456"",
+                                ""tripType"": """ + statisticsType + @""",
+                                ""vehicleType"": ""electric"",
+                                ""mileage_km"": 34,
+                                ""startMileage_km"": 1200,
+                                ""overallMileage_km"": 1234,
+                                ""travelTime"": 60,
                                 ""averageFuelConsumption"": null,
-                                ""averageCngConsumption"": null,
-                                ""averageSpeed"": 50,
-                                ""tripDuration"": 70,
-                                ""tripLength"": 58,
-                                ""timestamp"": ""Today, 14:34"",
-                                ""tripDurationFormatted"": ""1:10"",
-                                ""recuperation"": null,
-                                ""averageAuxiliaryConsumption"": null,
-                                ""totalElectricConsumption"": null,
-                                ""longFormattedTimestamp"": ""Trip ended: Tue, 28.04.2020, 14:34""
-                            },
-                            ""serviceConfiguration"": null,
-                            ""tripFromLastRefuelAvailable"": true
-                        }
-                    }");
+                                ""averageElectricConsumption"": 15,
+                                ""averageGasConsumption"": null,
+                                ""averageAuxConsumption"": null,
+                                ""averageRecuperation"": null,
+                                ""averageSpeed_kmph"": 50
+                            }
+                        }");
+
+                mockHttp.When($"{MockWeConnectConnection.VcfBaseUri}/tripdata/{statisticsType}")
+                        .Respond("application/json",
+                        @"{
+                            ""data"":
+                            [
+                                {
+                                    ""tripEndTimestamp"": ""2021-01-01T12:00:00Z"",
+                                    ""id"": ""34563456"",
+                                    ""tripType"": """ + statisticsType + @""",
+                                    ""vehicleType"": ""electric"",
+                                    ""mileage_km"": 34,
+                                    ""startMileage_km"": 1200,
+                                    ""overallMileage_km"": 1234,
+                                    ""travelTime"": 60,
+                                    ""averageFuelConsumption"": null,
+                                    ""averageElectricConsumption"": 15,
+                                    ""averageGasConsumption"": null,
+                                    ""averageAuxConsumption"": null,
+                                    ""averageRecuperation"": null,
+                                    ""averageSpeed_kmph"": 50
+                                },
+                                {
+                                    ""tripEndTimestamp"": ""2021-01-01T06:00:00Z"",
+                                    ""id"": ""12341234"",
+                                    ""tripType"": """ + statisticsType + @""",
+                                    ""vehicleType"": ""electric"",
+                                    ""mileage_km"": 100,
+                                    ""startMileage_km"": 1100,
+                                    ""overallMileage_km"": 1200,
+                                    ""travelTime"": 60,
+                                    ""averageFuelConsumption"": null,
+                                    ""averageElectricConsumption"": 18,
+                                    ""averageGasConsumption"": null,
+                                    ""averageAuxConsumption"": null,
+                                    ""averageRecuperation"": null,
+                                    ""averageSpeed_kmph"": 50
+                                }
+                            ]
+                        }");
+            }
 
             return mockHttp;
         }
