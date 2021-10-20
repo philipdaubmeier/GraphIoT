@@ -4,29 +4,62 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text;
 
 namespace PhilipDaubmeier.WeConnectClient.Tests
 {
     public static class MockWeConnectConnection
     {
-        private const string _baseUri = "https://identity.vwgroup.io";
-        private const string _portalUri = "https://www.portal.volkswagen-we.com";
-        private const string _redirectUri = "https%3A%2F%2Fwww.portal.volkswagen-we.com%2Fportal%2Fweb%2Fguest%2Fcomplete-login";
+        private const string _dummyJwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdWJpZCIsImF1ZCI6ImF1ZCIsInNjcCI6InNjb3BlcyIsImFhdCI6ImlkZW50aXR5a2l0In0.gVNJi3N8lbJe23s5hcbe4LCpaw0C1-sTpDVUoOPGtpA";
 
-        private const string _clientId = "b2345678-d123-4abc-9cde-89abcdef1234@apps_vw-dilab_com";
-        private const string _userId = "b12341c9-d123-4abc-9cde-89abcdef1234";
-        private const string _nonce = "c6677889-346b-5678-5432-b1234a3465bc";
-        private const string _scopes = "openid%20profile%20birthdate%20nickname%20address%20phone%20cars%20mbb";
-        private const string _csrf1 = "UrWEaLPN";
-        private const string _csrf2 = "ce777776-csrf-csrf-csrf-67555555f55a";
-        private const string _finalCsrf = "agkWdVBw";
-        private const string _relaystate = "0f9d7eaae_unittest_relaystate_1980e977e5";
-        private const string _hmac2 = "8e208cd992bd_unittest_hmac2_f9f218793ed78945be3f232b4180129cf9bf";
-        private const string _jwtToken = "eyJraWQiOiI2YTE1NzUyMTY3OGY3N2JhIiwiYWxnIjoiUlMyNTYifQ.ewogICJzdWIiOiAiYjEyMzQxYzktZDEyMy00YWJjLTljZGUtODlhYmNkZWYxMjM0IiwKICAiYXVkIjogImIyMzQ1Njc4LWQxMjMtNGFiYy05Y2RlLTg5YWJjZGVmMTIzNEBhcHBzX3Z3LWRpbGFiX2NvbSIsCiAgImFjciI6ICJodHRwczovL2lkZW50aXR5LnZ3Z3JvdXAuaW8vYXNzdXJhbmNlL2xvYS0yIiwKICAic2NwIjogIm9wZW5pZCBwcm9maWxlIGJpcnRoZGF0ZSBuaWNrbmFtZSBhZGRyZXNzIHBob25lIGNhcnMgbWJiIiwKICAiYWF0IjogImlkZW50aXR5a2l0IiwKICAiaXNzIjogImh0dHBzOi8vaWRlbnRpdHkudndncm91cC5pbyIsCiAgImp0dCI6ICJhdXRob3JpemF0aW9uX2NvZGUiLAogICJleHAiOiAxNTg4MDIwOTk4LAogICJpYXQiOiAxNTg4MDIwNjk4LAogICJub25jZSI6ICJjNjU0ODg5Yi0wZjliLTRiYTgtYTkzNi1iZDc0ODFkMjY4NmIiLAogICJqdGkiOiAiN2M4ZTBjNmYtMDc1MC00OGQ1LWIzNzAtNDVjYzQ1YTI5MWY4Igp9.PtzseyO4M3Qnsgj9WaQopUikn4yfDktkhAQ2tvVenkeqXtwPuFi8JA0-xDTPd2tU1DhVmuMTAeXRSS0Y8uaWfxfh8DBe19vPvY5I5zsFwQ6GRFYJ_UZ6MLwPvJniSa2ov1nRo4fO7fVZD2nHXsmM7bHa73f394YT_WhDQ7hGbPMBUsCK77H2KtwCeHtROWQV4rdlbRZ21TIL4A5YROw8bvWmpclwSC8UNUqweiDpZDfxSMiiwjpuOiwWRHPap4pTrsPOyUXRYj7yNg9sEnu88wMOVoaO7L6upV0oBLi_Iz2gZFhvGJnV38wmhB1gf2XEHQNPzl68uTs_J15MQGKRhwWYqtrwT9Gj46PefbQnhfWfBLPBsrxT5nAG74W-0-I0T_CNP87oq3CNV-emxMMR_qE5hH_FVjH0fgjlkXl_sgFmcRNpoGGejoP73Digv73VnRVHba50oaU-pGtxBkXCyiAZkTQFg6vA8g1RmBFG0Jplt2OxshQrC1IGkbxNuQPwLZaTwsxUciNkMcYWdzy3j-4urYeXBLPDmF46ju5rzWHfBhifxg43l8fZ8KOpDPTdkkrIyNeGOLoF-Rw4KPh5fdTjJlO4zpOxHJC-fXK9wCc0riPpYJrLjfjEyh9tNHlbrXwdnuZm4Q-HusB_trb7oE9ys3jLBlbRNFQ0ZmyLnKU";
-        private const string _sessionId = "ZTVmMz_unittest_session_id_2NTktY2MyYjAzN2I1NzAx";
+        private const string _requestedScopesVw = "profile,address,phone,dealers,carConfigurations,cars,vin,profession";
+        private const string _requestedScopesWeConnect = "openid,mbb";
+        private const string _scopesVw = "profession%20cars%20address%20phone%20openid%20profile%20dealers%20vin%20carConfigurations";
+        private const string _scopesWeConnect = "openid%20mbb";
+        private const string _authFagsPartVw = "\"vw-de\":[\"profession\",\"cars\",\"address\",\"phone\",\"openid\",\"profile\",\"dealers\",\"vin\",\"carConfigurations\"]";
+        private const string _authFagsPartWeConnect = "\"vwag-weconnect\":[\"openid\",\"mbb\"]";
+        private static readonly string _authFagsVW = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{{{_authFagsPartVw}}}"));
+        private static readonly string _authFagsVWAndWeConnect = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{{{_authFagsPartVw},{_authFagsPartWeConnect}}}"));
+
+        private const string _csrfToken1 = "unittest--111-csrf-aa8a-d37eeb633f6c";
+        private const string _csrfToken2 = "unittest--222-csrf-bb91-f0bd1921b97e";
+        private const string _csrfToken3 = "unittest--333-csrf-ccd2-bf5779e10440";
+        private const string _csrfToken4 = "unittest--444-csrf-ddd7-e899108ec304";
+        private const string _session1 = "random-unittest-sessionid-1-AWItZjZmNDdiYzA4ZjVm";
+        private const string _session2 = "random-unittest-sessionid-2-BTAtNDgyNGVkZDhkMzdh";
+        private const string _session3 = "random-unittest-sessionid-3-CjMtNzQxYWRlNGExZjBm";
+        private const string _session4 = "random-unittest-sessionid-4-DWQtMGUxNWZjNmY5ZGYw";
+        private const string _jsessionId = "random-unittest-jsessionid-735A3";
+        private const string _salt = "random-unittest-salt-value-wAfj";
+
+        private const string _state1 = "unittest-state-random-11gLKotJiB0_Sj6zTKH2o%3D";
+        private const string _state2 = "unittest-state-random-22Cz2fWje9FH_Iq5XYxOU%3D";
+        private const string _relayState1 = "random-unittest-relayState-111187a5d5b80";
+        private const string _relayState2 = "random-unittest-relayState-2222f02229d91";
+        private const string _nonce1 = "unittest-nonce-random-118AN_GcgvJSGdYI9lKvk";
+        private const string _nonce2 = "unittest-nonce-random-22q4XWxSmOKFVKYIcWMHQ";
+
+        private const string _hmac1 = "unittest-hmac-111111-random-4a7b55321-hmac-d067580f287c98fe0e1b6";
+        private const string _hmac2 = "unittest-hmac-222222-random-33d009c16-hmac-ce776c8b6334acc18f3c2";
+        private const string _hmac3 = "unittest-hmac-333333-random-a96bc8d15-hmac-a3b66e396c1104a153d34";
+        private const string _hmac4 = "unittest-hmac-444444-random-614a42be7-hmac-36a07b9a02398a965f3d7";
+        private const string _hmac5 = "unittest-hmac-555555-random-8b253bd9c-hmac-69f038e5dff4e499fe617";
+        private const string _hmac6 = "unittest-hmac-666666-random-8a07d6c57-hmac-8e7117a16755aa8f48c75";
+
+        private const string _clientId1 = "11111111-d113-4abc-9abc-ffabcdef1234@apps_vw-dilab_com";
+        private const string _clientId2 = "22222222-d223-4abc-9abc-ffabcdef1234@apps_vw-dilab_com";
+
+        private const string _userId = "123451c9-d123-4abc-9cde-89abcdef1234";
 
         public static string Vin => "WVWZZZABCD1234567";
-        public static string BaseUri => $"{_portalUri}/portal/delegate/dashboard/{Vin}";
+        public static string VwBaseUri => "https://www.volkswagen.de/";
+        public static string IdkBaseUri => "https://identity.vwgroup.io/";
+        public static string GvfBaseUri => "https://myvw-gvf-proxy.apps.emea.vwapps.io";
+        public static string VdbsBaseUri => "https://vdbs.apps.emea.vwapps.io/v1/vehicles";
+        public static string VcfBaseUriPattern => "https://cardata.apps.emea.vwapps.io/vehicles/{Vin}";
+        public static string VcfBaseUri => $"https://cardata.apps.emea.vwapps.io/vehicles/{Vin}";
+        public static string UserId => _userId;
+        public static string AccessToken => _dummyJwtToken;
 
         public class WeConnectMockConnectionProvider : WeConnectConnectionProvider
         {
@@ -40,13 +73,15 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
         private static readonly IWeConnectAuth mockAuth = new WeConnectAuth("john@doe.com", "secretpassword");
 
-        public static WeConnectConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler, IWeConnectAuth? auth = null)
+        public static WeConnectConnectionProvider ToMockProvider(this MockHttpMessageHandler mockHandler, MockHttpMessageHandler? mockAuthHandler = null, IWeConnectAuth? auth = null)
         {
-            var connProvider = new WeConnectMockConnectionProvider(auth ?? mockAuth, new HttpClient(mockHandler), new HttpClient(mockHandler));
+            var connProvider = new WeConnectMockConnectionProvider(auth ?? mockAuth, new HttpClient(mockHandler), new HttpClient(mockAuthHandler is null ? mockHandler : mockAuthHandler));
 
             // Hook up cookie container, so that the mock handler fills the cookie container of the connection provider
             if (mockHandler is MockCookieHttpMessageHandler cookieHandler)
                 cookieHandler.CookieContainer = connProvider.CookieContainer;
+            if (mockAuthHandler is MockCookieHttpMessageHandler cookieAuthHandler)
+                cookieAuthHandler.CookieContainer = connProvider.CookieContainer;
 
             return connProvider;
         }
@@ -58,119 +93,331 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
         public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp, out MockedRequest mocketRequest)
         {
-            // Step 1
-            mocketRequest = mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
-                    .WithExactQueryString(string.Empty)
-                    .Respond(new[]{
-                        new KeyValuePair<string, string>("Set-Cookie", "COOKIE_SUPPORT=true; Expires=Wed, 28-Apr-2021 20:44:04 GMT; Path=/; Secure; HttpOnly"),
-                        new KeyValuePair<string, string>("Set-Cookie", $"JSESSIONID={_sessionId}; Path=/; Secure; HttpOnly"),
-                        new KeyValuePair<string, string>("Set-Cookie", "GUEST_LANGUAGE_ID=en_GB; Expires=Wed, 28-Apr-2021 20:44:04 GMT; Path=/; Secure; HttpOnly"),
-                        new KeyValuePair<string, string>("Set-Cookie", "CARNET_LANGUAGE_ID=en_GB; Expires=Sat, 11-Dec-2066 23:26:12 GMT; Path=/; Secure; HttpOnly")
+            mocketRequest = mockHttp.When($"{VwBaseUri}app/authproxy/login")
+                    .WithExactQueryString($"fag=vw-de,vwag-weconnect&scope-vw-de={_requestedScopesVw}&scope-vwag-weconnect={_requestedScopesWeConnect}&prompt-vw-de=login&prompt-vwag-weconnect=none&redirectUrl={VwBaseUri}")
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}app/authproxy/login/vw-de?scope={_requestedScopesVw}&prompt=login"),
+                        new("Set-Cookie", $"csrf_token={_csrfToken1}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"SESSION={_session1}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly; SameSite=Lax")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/login/vw-de")
+                    .WithExactQueryString($"scope={_requestedScopesVw}&prompt=login")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session1),
+                        new("csrf_token", _csrfToken1)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/authorize?response_type=code&client_id={_clientId1}&scope={_scopesVw}&state={_state1}&redirect_uri={VwBaseUri}app/authproxy/login/oauth2/code/vw-de&nonce={_nonce1}&prompt=login")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/authorize")
+                    .WithExactQueryString($"response_type=code&client_id={_clientId1}&scope={_scopesVw}&state={_state1}&redirect_uri={VwBaseUri}app/authproxy/login/oauth2/code/vw-de&nonce={_nonce1}&prompt=login")
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}signin-service/v1/signin/{_clientId1}?relayState={_relayState1}"),
+                        new("Set-Cookie", $"JSESSIONID={_jsessionId}; Path=/oidc; Secure; HttpOnly")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}signin-service/v1/signin/{_clientId1}?relayState={_relayState1}")
+                    .Respond(new List<KeyValuePair<string, string>>() {
+                        new("Set-Cookie", $"SESSION={_session2}; Path=/signin-service/v1/; Secure; HttpOnly; SameSite=Lax")
                     }, "text/html",
-                    @"<html>
-                    <head>
-                        <title>We Connect</title>
-                        <meta name=""_csrf"" content=""" + _csrf1 + @"""/>
-                    </head>
-                    <body></body>
+                    @"<!DOCTYPE html>
+                    <html>
+                        <head />
+                        <body>
+                            <form method=""POST"" action=""/signin-service/v1/" + _clientId1 + @"/login/identifier"">
+                                <input type=""hidden"" id=""csrf"" name=""_csrf"" value=""" + _csrfToken2 + @""" />
+                                <input type=""hidden"" id=""input_relayState"" name=""relayState"" value=""" + _relayState1 + @""" />
+                                <input type=""hidden"" id=""hmac"" name=""hmac"" value=""" + _hmac1 + @""" />
+                                <input id=""input_email"" name=""email"" type=""email"" />
+                                <button type=""submit"">Next</button>
+                            </form>
+                        </body>
                     </html>");
 
-            // Step 1b
-            mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home")
-                    .WithExactQueryString($"p_auth={_csrf1}&p_p_id=10_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=2&_10_WAR_cored5portlet_javax.portlet.action=changeMarket")
-                    .Respond("text/plain", "");
+            mockHttp.When(HttpMethod.Post, $"{IdkBaseUri}signin-service/v1/{_clientId1}/login/identifier")
+                    .WithExactFormData(new List<KeyValuePair<string, string>>()
+                    {
+                        new("email", mockAuth.Username),
+                        new("relayState", _relayState1),
+                        new("hmac", _hmac1),
+                        new("_csrf", _csrfToken2)
+                    })
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session2)
+                    })
+                    .Respond(HttpStatusCode.SeeOther, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"/signin-service/v1/{_clientId1}/login/authenticate?relayState={_relayState1}&email={mockAuth.Username}")
+                    }, "text/plain", "");
 
-            // Step 2
-            mockHttp.When($"{_portalUri}/portal/en_GB/web/guest/home/-/csrftokenhandling/get-login-url")
+            mockHttp.When($"{IdkBaseUri}signin-service/v1/{_clientId1}/login/authenticate?relayState={_relayState1}&email={mockAuth.Username}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session2)
+                    })
+                    .Respond("text/html",
+                    @"<!DOCTYPE html>
+                    <html>
+                        <head />
+                        <body>
+                            <form method=""POST"" action=""/signin-service/v1/" + _clientId1 + @"/login/authenticate"">
+                                <input type=""hidden"" id=""csrf"" name=""_csrf"" value=""" + _csrfToken2 + @"""/>
+                                <input type=""hidden"" id=""input_relayState"" name=""relayState"" value=""" + _relayState1 + @"""/>
+                                <input type=""hidden"" id=""email"" name=""email"" value=""" + mockAuth.Username + @"""/>
+                                <input type=""hidden"" id=""hmac"" name=""hmac"" value=""" + _hmac2 + @"""/>
+                                <input id=""password"" name=""password"" type=""password"" />
+                                <button type=""submit"">Next</button>
+                            </form>
+						</body>
+                    </html>");
+
+            mockHttp.When(HttpMethod.Post, $"{IdkBaseUri}signin-service/v1/{_clientId1}/login/authenticate")
+                    .WithExactFormData(new List<KeyValuePair<string, string>>()
+                    {
+                        new("email", mockAuth.Username),
+                        new("password", mockAuth.UserPassword),
+                        new("relayState", _relayState1),
+                        new("hmac", _hmac2),
+                        new("_csrf", _csrfToken2),
+                        new("login", "true")
+                    })
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session2)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/oauth/sso?clientId={_clientId1}&relayState={_relayState1}&userId={_userId}&HMAC={_hmac3}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/oauth/sso")
+                    .WithExactQueryString($"clientId={_clientId1}&relayState={_relayState1}&userId={_userId}&HMAC={_hmac3}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("JSESSIONID", _jsessionId)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}signin-service/v1/consent/users/{_userId}/{_clientId1}?scopes={_scopesVw}&relayState={_relayState1}&callback={IdkBaseUri}oidc/v1/oauth/client/callback&hmac={_hmac4}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}signin-service/v1/consent/users/{_userId}/{_clientId1}")
+                    .WithExactQueryString($"scopes={_scopesVw}&relayState={_relayState1}&callback={IdkBaseUri}oidc/v1/oauth/client/callback&hmac={_hmac4}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session2)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/oauth/client/callback/success?user_id={_userId}&client_id={_clientId1}&scopes={_scopesVw}&consentedScopes={_scopesVw}&relayState={_relayState1}&hmac={_hmac5}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/oauth/client/callback/success")
+                    .WithExactQueryString($"user_id={_userId}&client_id={_clientId1}&scopes={_scopesVw}&consentedScopes={_scopesVw}&relayState={_relayState1}&hmac={_hmac5}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("JSESSIONID", _jsessionId)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}app/authproxy/login/oauth2/code/vw-de?state={_state1}&code={_dummyJwtToken}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/login/oauth2/code/vw-de")
+                    .WithExactQueryString($"state={_state1}&code={_dummyJwtToken}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session1),
+                        new("csrf_token", _csrfToken1)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}app/authproxy/login/vwag-weconnect?scope={_requestedScopesWeConnect}&prompt=none"),
+                        new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
+                        new("Set-Cookie", $"auth_fags={_authFagsVW}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"csrf_token=; Max-Age=0; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"csrf_token={_csrfToken3}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"SESSION={_session3}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly; SameSite=Lax")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/login/vwag-weconnect")
+                    .WithExactQueryString($"scope={_requestedScopesWeConnect}&prompt=none")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session3),
+                        new("salt", _salt),
+                        new("auth_fags", _authFagsVW),
+                        new("csrf_token", _csrfToken3)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/authorize?response_type=code&client_id={_clientId2}&scope={_scopesWeConnect}&state={_state2}&redirect_uri={VwBaseUri}app/authproxy/login/oauth2/code/vwag-weconnect&nonce={_nonce2}&prompt=none")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/authorize")
+                    .WithExactQueryString($"response_type=code&client_id={_clientId2}&scope={_scopesWeConnect}&state={_state2}&redirect_uri={VwBaseUri}app/authproxy/login/oauth2/code/vwag-weconnect&nonce={_nonce2}&prompt=none")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("JSESSIONID", _jsessionId)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/oauth/sso?clientId={_clientId2}&userId={_userId}&relayState={_relayState2}&prompt=none&HMAC={_hmac6}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/oauth/sso")
+                    .WithExactQueryString($"clientId={_clientId2}&userId={_userId}&relayState={_relayState2}&prompt=none&HMAC={_hmac6}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("JSESSIONID", _jsessionId)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{IdkBaseUri}oidc/v1/oauth/client/callback?clientId={_clientId2}&relayState={_relayState2}&userId={_userId}&HMAC={_hmac6}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{IdkBaseUri}oidc/v1/oauth/client/callback")
+                    .WithExactQueryString($"clientId={_clientId2}&relayState={_relayState2}&userId={_userId}&HMAC={_hmac6}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("JSESSIONID", _jsessionId)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}app/authproxy/login/oauth2/code/vwag-weconnect?state={_state2}&code={_dummyJwtToken}")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/login/oauth2/code/vwag-weconnect")
+                    .WithExactQueryString($"state={_state2}&code={_dummyJwtToken}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session3),
+                        new("salt", _salt),
+                        new("auth_fags", _authFagsVW),
+                        new("csrf_token", _csrfToken3)
+                    })
+                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}"),
+                        new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
+                        new("Set-Cookie", $"auth_fags={_authFagsVWAndWeConnect}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"csrf_token=; Max-Age=0; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"csrf_token={_csrfToken4}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
+                        new("Set-Cookie", $"SESSION={_session4}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly; SameSite=Lax")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("auth_fags", _authFagsVWAndWeConnect),
+                        new("csrf_token", _csrfToken4)
+                    })
+                    .Respond(HttpStatusCode.MovedPermanently, new List<KeyValuePair<string, string>>()
+                    {
+                        new("Location", $"{VwBaseUri}de.html")
+                    }, "text/plain", "");
+
+            mockHttp.When($"{VwBaseUri}de.html")
+                    .WithCookies(new List<KeyValuePair<string, string>>()
+                    {
+                        new("auth_fags", _authFagsVWAndWeConnect),
+                        new("csrf_token", _csrfToken4)
+                    })
+                    .Respond("text/html",
+                    @"<!DOCTYPE html>
+                    <html><head /><body /></html>");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/vw-de/tokens")
+                    .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
+                    {
+                        new("X-CSRF-TOKEN", _csrfToken1)
+                    },
+                    new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session1),
+                        new("salt", _salt),
+                        new("auth_fags", _authFagsVWAndWeConnect),
+                        new("csrf_token", _csrfToken1)
+                    })
+                    .Respond(new List<KeyValuePair<string, string>>() {
+                        new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
+                        new("Set-Cookie", $"auth_fags={_authFagsVWAndWeConnect}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure")
+                    }, "text/html",
+                    @"{
+                        ""access_token"": """ + _dummyJwtToken + @""",
+                        ""id_token"": """ + _dummyJwtToken + @"""
+                    }");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/vwag-weconnect/tokens")
+                    .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
+                    {
+                        new("X-CSRF-TOKEN", _csrfToken1)
+                    },
+                    new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session1),
+                        new("salt", _salt),
+                        new("auth_fags", _authFagsVWAndWeConnect),
+                        new("csrf_token", _csrfToken1)
+                    })
+                    .Respond(new List<KeyValuePair<string, string>>() {
+                        new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
+                        new("Set-Cookie", $"auth_fags={_authFagsVWAndWeConnect}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure")
+                    }, "text/html",
+                    @"{
+                        ""access_token"": """ + _dummyJwtToken + @""",
+                        ""id_token"": """ + _dummyJwtToken + @"""
+                    }");
+
+            mockHttp.When($"{VwBaseUri}app/authproxy/vw-de/user")
+                    .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
+                    {
+                        new("X-CSRF-TOKEN", _csrfToken1)
+                    },
+                    new List<KeyValuePair<string, string>>()
+                    {
+                        new("SESSION", _session1),
+                        new("salt", _salt),
+                        new("auth_fags", _authFagsVWAndWeConnect),
+                        new("csrf_token", _csrfToken1)
+                    })
                     .Respond("application/json",
-                    $"{{\"errorCode\":\"0\",\"loginURL\":{{\"path\":\"{_baseUri}/oidc/v1/authorize?ui_locales=en&scope={_scopes}&response_type=code&state={_csrf1}&redirect_uri={_redirectUri}&nonce={_nonce}&prompt=login&client_id={_clientId}\"}}}}");
+                    @"{
+                        ""sub"": """ + _userId + @""",
+                        ""name"": ""John Doe"",
+                        ""given_name"": ""John"",
+                        ""family_name"": ""Doe"",
+                        ""email"": """ + mockAuth.Username + @""",
+                        ""email_verified"": true,
+                        ""phone_number"": ""55512345687"",
+                        ""phone_number_verified"": true,
+                        ""address"":
+                        {
+                            ""street_address"": ""Mockstreet 1"",
+                            ""locality"": ""Mocktropolis"",
+                            ""postal_code"": ""12345"",
+                            ""country"": ""US"",
+                            ""formatted"": ""Mockstreet 1\n12345 Mocktropolis\nUS""
+                        },
+                        ""updated_at"": 1234567890,
+                        ""picture"": ""https://customer-pictures.apps.emea.vwapps.io/v1/" + _userId + @"/profile-picture""
+                    }");
 
-            // Step 3
-            mockHttp.When($"{_baseUri}/oidc/v1/authorize")
-                    .WithExactQueryString($"ui_locales=en&scope={_scopes}&response_type=code&state={_csrf1}&redirect_uri={_redirectUri}&nonce={_nonce}&prompt=login&client_id={_clientId}")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
+            mockHttp.When($"https://myvw-idk-token-exchanger.apps.emea.vwapps.io/token-exchange")
+                    .WithExactQueryString($"isWcar=false")
+                    .WithHeaders(new List<KeyValuePair<string, string>>()
                     {
-                        new KeyValuePair<string, string>("Location", $"{_baseUri}/signin-service/v1/signin/{_clientId}?relayState={_relaystate}")
-                    }, "text/plain", "");
-
-            // Step 4
-            mockHttp.When($"{_baseUri}/signin-service/v1/signin/{_clientId}?relayState={_relaystate}")
-                    .Respond(new []{
-                        new KeyValuePair<string, string>("Set-Cookie", $"SESSION={_sessionId}; Path=/signin-service/v1/; Secure; HttpOnly; SameSite=Lax")
-                    }, "text/html",
-                    @"<!DOCTYPE html>
-                    <html>
-                    <body>
-                        <form method=""POST"" action=""/signin-service/v1/{_clientId}/login/identifier"">
-                            <input type=""hidden"" id=""hmac"" name=""hmac"" value=""" + _hmac2 + @"""/>
-                            <input type=""hidden"" id=""csrf"" name=""_csrf"" value=""" + _csrf2 + @"""/>
-	                    </form>
-                    </body>
-                    </html>");
-
-            // Step 5
-            mockHttp.When($"{_baseUri}/signin-service/v1/{_clientId}/login/identifier")
-                    .Respond("text/html",
-                    @"<!DOCTYPE html>
-                    <html>
-                    <body>
-                        <form method=""POST"" action=""/signin-service/v1/" + _clientId + @"/login/authenticate"">
-                            <input type=""hidden"" id=""hmac"" name=""hmac"" value=""" + _hmac2 + @""" />
-	                    </form>
-                    </body>
-                    </html>");
-
-            // Step 6
-            mockHttp.When($"{_baseUri}/signin-service/v1/{_clientId}/login/authenticate")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
-                    {
-                        new KeyValuePair<string, string>("Location", $"{_baseUri}/oidc/v1/oauth/sso?clientId={_clientId}&relayState={_relaystate}&userId={_userId}&HMAC={_hmac2}")
-                    }, "text/plain", "");
-
-            mockHttp.When($"{_baseUri}/oidc/v1/oauth/sso")
-                    .WithExactQueryString($"clientId={_clientId}&relayState={_relaystate}&userId={_userId}&HMAC={_hmac2}")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
-                    {
-                        new KeyValuePair<string, string>("Location", $"{_baseUri}/signin-service/v1/consent/users/{_userId}/{_clientId}?scopes={_scopes}&relayState={_relaystate}&callback={_baseUri}/oidc/v1/oauth/client/callback&hmac={_hmac2}")
-                    }, "text/plain", "");
-
-            mockHttp.When($"{_baseUri}/signin-service/v1/consent/users/{_userId}/{_clientId}")
-                    .WithExactQueryString($"scopes={_scopes}&relayState={_relaystate}&callback={_baseUri}/oidc/v1/oauth/client/callback&hmac={_hmac2}")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
-                    {
-                        new KeyValuePair<string, string>("Location", $"{_baseUri}/oidc/v1/oauth/client/callback/success?user_id={_userId}&client_id={_clientId}&scopes={_scopes}&consentedScopes={_scopes}&relayState={_relaystate}&hmac={_hmac2}")
-                    }, "text/plain", "");
-
-            mockHttp.When($"{_baseUri}/oidc/v1/oauth/client/callback/success")
-                    .WithExactQueryString($"user_id={_userId}&client_id={_clientId}&scopes={_scopes}&consentedScopes={_scopes}&relayState={_relaystate}&hmac={_hmac2}")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
-                    {
-                        new KeyValuePair<string, string>("Location", $"{_portalUri}/portal/web/guest/complete-login?state={_finalCsrf}&code={_jwtToken}")
-                    }, "text/plain", "");
-
-            mockHttp.When($"{_portalUri}/portal/web/guest/complete-login")
-                    .WithExactQueryString($"state={_finalCsrf}&code={_jwtToken}")
-                    .Respond("text/plain", "");
-
-            // Step 7
-            mockHttp.When($"{_portalUri}/portal/web/guest/complete-login")
-                    .WithExactQueryString($"p_auth={_finalCsrf}&p_p_id=33_WAR_cored5portlet&p_p_lifecycle=1&p_p_state=normal&p_p_mode=view&p_p_col_id=column-1&p_p_col_count=1&_33_WAR_cored5portlet_javax.portlet.action=getLoginStatus")
-                    .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
-                    {
-                        new KeyValuePair<string, string>("Location", $"{_portalUri}/portal/delegate/dashboard/{Vin}")
-                    }, "text/plain", "");
-
-            // Step 8
-            mockHttp.When($"{_portalUri}/portal/delegate/dashboard/{Vin}")
-                    .Respond("text/html",
-                    @"<!DOCTYPE html>
-                    <html>
-                    <head>
-                        <title>We Connect</title>
-                        <meta name=""_csrf"" content=""" + _finalCsrf + @"""/>
-                    </head>
-                    <body></body>
-                    </html>");
+                        new("Authorization", $"Bearer {_dummyJwtToken}")
+                    })
+                    .Respond("application/json",
+                    $"{_dummyJwtToken}");
 
             return mockHttp;
         }
