@@ -17,7 +17,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddFuelStatus()
-                .ToMockProvider(auth));
+                .ToMockProvider(new MockCookieHttpMessageHandler(false).AddAuthMock().AddFuelStatus(), auth));
 
             await client.GetFuelStatus(MockWeConnectConnection.Vin);
 
@@ -38,7 +38,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             var client = new WeConnectPortalClient(mockedHandler
                 .AddAuthMock(out MockedRequest mockedRequest)
                 .AddFuelStatus()
-                .ToMockProvider(auth));
+                .ToMockProvider(new MockCookieHttpMessageHandler(false).AddAuthMock().AddFuelStatus(), auth));
 
             var result = await client.GetFuelStatus(MockWeConnectConnection.Vin);
 
@@ -55,7 +55,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             var client = new WeConnectPortalClient(new MockCookieHttpMessageHandler()
                 .AddAuthMock()
                 .AddFuelStatus()
-                .ToMockProvider());
+                .ToMockProvider(new MockCookieHttpMessageHandler(false).AddAuthMock().AddFuelStatus()));
 
             var result = await client.GetFuelStatus(MockWeConnectConnection.Vin);
 
