@@ -1,3 +1,4 @@
+using PhilipDaubmeier.WeConnectClient.Model.Auth;
 using PhilipDaubmeier.WeConnectClient.Network;
 using RichardSzalay.MockHttp;
 using System;
@@ -32,7 +33,8 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             // emulate that the token was persisted and is now restored.
             // this should give us access without a username and password
-            await auth.UpdateTokenAsync(MockWeConnectConnection.AccessToken, DateTime.MinValue, null);
+            var expiry = new ReadableJwt(MockWeConnectConnection.AccessToken).Expiration;
+            await auth.UpdateTokenAsync(MockWeConnectConnection.AccessToken, expiry, null);
 
             var mockedHandler = new MockCookieHttpMessageHandler();
             var client = new WeConnectPortalClient(mockedHandler
@@ -59,7 +61,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 
             var result = await client.GetFuelStatus(MockWeConnectConnection.Vin);
 
-            Assert.Equal(DateTime.Parse("2021-01-01T12:00:00Z"), result.First().CarCapturedTimestamp);
+            Assert.Equal(new DateTime(2021, 01, 01, 12, 0, 0, DateTimeKind.Utc), result.First().CarCapturedTimestamp);
             Assert.Equal("primaryEngine", result.First().Id);
             Assert.Equal("electric", result.First().EngineType);
             Assert.Equal(300d, result.First().RemainingRangeKm);
