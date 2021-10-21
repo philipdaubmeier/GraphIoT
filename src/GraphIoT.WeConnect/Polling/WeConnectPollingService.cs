@@ -42,44 +42,41 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
 
         public async Task PollVehicleValues()
         {
-            var vin = (await _weConnectClient.GetVehicleList()).FirstOrDefault()?.Vin?.ToString() ?? string.Empty;
-            var emanager = await _weConnectClient.GetEManager();
-            var status = await _weConnectClient.GetVehicleStatus();
-            var trips = await _weConnectClient.GetLatestTripStatistics();
-            var details = await _weConnectClient.GetVehicleDetails();
+            var vin = (await _weConnectClient.GetVehicleList()).FirstOrDefault()?.Vin;
+            if (vin is null)
+                return;
+
+            var fuelStatus = await _weConnectClient.GetFuelStatus(vin);
+            var trip = await _weConnectClient.GetLastShorttermTrip(vin);
             var time = DateTime.UtcNow;
 
-            var mileageRaw = details.DistanceCovered.Replace(".", "").Replace(",", "");
-            var mileage = int.Parse(mileageRaw);
-
-            static TimeSeries<T> ToTimeSeries<T>(DateTime time, IEnumerable<(DateTime, T)> source) where T : struct
+            static TimeSeries<T> ToTimeSeries<T>(DateTime time, DateTime timestamp, T value) where T : struct
             {
                 var series = new TimeSeries<T>(new TimeSeriesSpan(time.Date, time.Date.AddDays(1), TimeSeriesSpan.Spacing.Spacing5Min));
-                foreach ((var timestamp, var value) in source)
-                    series[timestamp.ToUniversalTime()] = value;
+                series[timestamp.ToUniversalTime()] = value;
                 return series;
             }
 
-            static bool ToBool(string? boolStr) => !string.IsNullOrWhiteSpace(boolStr) && !boolStr.Equals("OFF", StringComparison.InvariantCultureIgnoreCase);
+            var mileage = (int)trip.OverallMileageKm;
+            var batterySoc = (int)(fuelStatus.FirstOrDefault()?.CurrentSocPercent ?? 0d);
 
-            var batterySoc = status.BatteryLevel ?? emanager.Rbc.Status?.BatteryPercentage ?? 0;
+            var length = ToTimeSeries(time, trip.TripEndTimestamp, trip.MileageKm);
+            var duration = ToTimeSeries(time, trip.TripEndTimestamp, trip.TravelTime);
+            var consumedKwh = ToTimeSeries(time, trip.TripEndTimestamp, (trip.AverageElectricConsumption ?? 0d) * trip.MileageKm / 100);
+            var averageConsumption = ToTimeSeries(time, trip.TripEndTimestamp, trip.AverageElectricConsumption ?? 0d);
+            var averageSpeed = ToTimeSeries(time, trip.TripEndTimestamp, trip.AverageSpeedKmph);
 
-            var length = ToTimeSeries(time, trips.AllEntries.Select(x => (x.start + x.duration, x.trip.TripLength)));
-            var duration = ToTimeSeries(time, trips.AllEntries.Select(x => (x.start + x.duration, x.duration.TotalMinutes)));
-            var consumedKwh = ToTimeSeries(time, trips.AllEntries.Select(x => (x.start + x.duration, (x.trip.AverageElectricConsumption ?? 0d) * x.trip.TripLength / 100)));
-            var averageConsumption = ToTimeSeries(time, trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageElectricConsumption ?? 0d)));
-            var averageSpeed = ToTimeSeries(time, trips.AllEntries.Select(x => (x.start + x.duration, x.trip.AverageSpeed)));
+            // fixed values, as they are no longer accessible in new api
+            var climateTemp = 20d;
+            var chargingState = false;
+            var climateState = false;
+            var windowMeltState = false;
+            var remoteHeatingState = false;
 
-            var climateTemp = double.Parse(emanager.Rpc.Settings?.TargetTemperature, CultureInfo.InvariantCulture);
-            var chargingState = ToBool(emanager.Rbc.Status?.ChargingState);
-            var climateState = ToBool(emanager.Rpc.Status?.ClimatisationState);
-            var windowMeltState = ToBool(emanager.Rpc.Status?.WindowHeatingStateFront?.ToString());
-            var remoteHeatingState = emanager.Rdt.AuxHeatingEnabled;
-
-            SaveSolarValues(_dbContext, time, vin, mileage, batterySoc, length, duration, averageSpeed, consumedKwh, averageConsumption, climateTemp, chargingState, climateState, windowMeltState, remoteHeatingState);
+            SaveVehicleValues(_dbContext, time, vin, mileage, batterySoc, length, duration, averageSpeed, consumedKwh, averageConsumption, climateTemp, chargingState, climateState, windowMeltState, remoteHeatingState);
         }
 
-        public static void SaveSolarValues(IWeConnectDbContext dbContext, DateTime time, string vin, int mileage, int batterySoc, TimeSeries<double> length, TimeSeries<double> duration, TimeSeries<double> averageSpeed, TimeSeries<double> consumedKwh, TimeSeries<double> averageConsumption, double climateTemp, bool chargingState, bool climateState, bool windowMeltState, bool remoteHeatingState)
+        public static void SaveVehicleValues(IWeConnectDbContext dbContext, DateTime time, string vin, int mileage, int batterySoc, TimeSeries<double> length, TimeSeries<double> duration, TimeSeries<double> averageSpeed, TimeSeries<double> consumedKwh, TimeSeries<double> averageConsumption, double climateTemp, bool chargingState, bool climateState, bool windowMeltState, bool remoteHeatingState)
         {
             var dbData = TimeSeriesDbEntityBase.LoadOrCreateDay(dbContext.WeConnectDataSet, time.Date, x => x.Vin == vin);
             dbData.Vin = vin;
@@ -102,12 +99,12 @@ namespace PhilipDaubmeier.GraphIoT.WeConnect.Polling
             dbData.SetSeriesValue(10, time, windowMeltState);
             dbData.SetSeriesValue(11, time, remoteHeatingState);
 
-            SaveLowresSolarValues(dbContext, time.Date, vin, dbData);
+            SaveLowresVehicleValues(dbContext, time.Date, vin, dbData);
 
             dbContext.SaveChanges();
         }
 
-        private static void SaveLowresSolarValues(IWeConnectDbContext dbContext, DateTime day, string vin, WeConnectMidresData midRes)
+        private static void SaveLowresVehicleValues(IWeConnectDbContext dbContext, DateTime day, string vin, WeConnectMidresData midRes)
         {
             var dbData = TimeSeriesDbEntityBase.LoadOrCreateMonth(dbContext.WeConnectLowresDataSet, day, x => x.Vin == vin);
             dbData.Vin = vin;
