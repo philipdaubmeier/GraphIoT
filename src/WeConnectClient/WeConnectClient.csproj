@@ -4,12 +4,12 @@
     <AssemblyName>PhilipDaubmeier.WeConnectClient</AssemblyName>
     <RootNamespace>PhilipDaubmeier.WeConnectClient</RootNamespace>
     <PackageId>PhilipDaubmeier.WeConnectClient</PackageId>
-    <Description>This class library provides a way to call the Volkswagen WeConnect Portal interfaces. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
+    <Description>This class library provides a way to call the Volkswagen WeConnect interfaces. It encapsulates all authentication, retry and parsing logic and provides a strongly typed method interface.</Description>
     <PackageTags>vw;volkswagen;car-net;we-connect;httpclient</PackageTags>
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/WeConnectClient</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
     <NuspecFile>WeConnectClient.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
