@@ -1,11 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace PhilipDaubmeier.WeConnectClient.Model.TripStatistics
 {
     public class TripStatisticEntry
     {
         public string Id { get; set; } = string.Empty;
-        public string TripEndTimestamp { get; set; } = string.Empty;
+        public DateTime TripEndTimestamp { get; set; } = DateTime.MinValue;
         public string TripType { get; set; } = string.Empty;
         public string VehicleType { get; set; } = string.Empty;
 
