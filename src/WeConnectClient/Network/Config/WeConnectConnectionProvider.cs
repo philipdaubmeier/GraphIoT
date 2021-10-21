@@ -47,7 +47,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
         /// <summary>
         /// See <see cref="IWeConnectConnectionProvider.CookieContainer"/>
         /// </summary>
-        public CookieContainer CookieContainer => cookieContainer;
+        public virtual CookieContainer CookieContainer => cookieContainer;
 
         public static HttpClientHandler CreateHandler() => new()
         {

@@ -10,7 +10,7 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
 {
     public static class MockWeConnectConnection
     {
-        private const string _dummyJwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdWJpZCIsImF1ZCI6ImF1ZCIsInNjcCI6InNjb3BlcyIsImFhdCI6ImlkZW50aXR5a2l0In0.gVNJi3N8lbJe23s5hcbe4LCpaw0C1-sTpDVUoOPGtpA";
+        private const string _dummyJwtToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdWJpZCIsImF1ZCI6ImF1ZCIsInNjcCI6InNjb3BlcyIsImFhdCI6ImlkZW50aXR5a2l0IiwianR0IjoiYWNjZXNzX3Rva2VuIiwiZXhwIjo0MTAyNDQxMjAwLCJsZWUiOlsiVk9MS1NXQUdFTiJdfQ.g9wFrUNzMK-TISI8dVNdLFbIQaaslL-FJ52CFhUHaKM";
 
         private const string _requestedScopesVw = "profile,address,phone,dealers,carConfigurations,cars,vin,profession";
         private const string _requestedScopesWeConnect = "openid,mbb";
@@ -69,6 +69,9 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                 Client = mockClient;
                 AuthClient = mockAuthClient;
             }
+
+            private readonly CookieContainer _individualCookieContainer = new();
+            public override CookieContainer CookieContainer => _individualCookieContainer;
         }
 
         private static readonly IWeConnectAuth mockAuth = new WeConnectAuth("john@doe.com", "secretpassword");
@@ -86,12 +89,12 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             return connProvider;
         }
 
-        public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp)
+        public static MockHttpMessageHandler AddAuthMock(this MockCookieHttpMessageHandler mockHttp)
         {
             return mockHttp.AddAuthMock(out MockedRequest _);
         }
 
-        public static MockHttpMessageHandler AddAuthMock(this MockHttpMessageHandler mockHttp, out MockedRequest mocketRequest)
+        public static MockHttpMessageHandler AddAuthMock(this MockCookieHttpMessageHandler mockHttp, out MockedRequest mocketRequest)
         {
             mocketRequest = mockHttp.When($"{VwBaseUri}app/authproxy/login")
                     .WithExactQueryString($"fag=vw-de,vwag-weconnect&scope-vw-de={_requestedScopesVw}&scope-vwag-weconnect={_requestedScopesWeConnect}&prompt-vw-de=login&prompt-vwag-weconnect=none&redirectUrl={VwBaseUri}")
@@ -242,7 +245,6 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                         new("Location", $"{VwBaseUri}app/authproxy/login/vwag-weconnect?scope={_requestedScopesWeConnect}&prompt=none"),
                         new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
                         new("Set-Cookie", $"auth_fags={_authFagsVW}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
-                        new("Set-Cookie", $"csrf_token=; Max-Age=0; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
                         new("Set-Cookie", $"csrf_token={_csrfToken3}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/; Secure"),
                         new("Set-Cookie", $"SESSION={_session3}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly; SameSite=Lax")
                     }, "text/plain", "");
@@ -253,8 +255,8 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                     {
                         new("SESSION", _session3),
                         new("salt", _salt),
-                        new("auth_fags", _authFagsVW),
-                        new("csrf_token", _csrfToken3)
+                        new("csrf_token", _csrfToken3),
+                        new("auth_fags", _authFagsVW)
                     })
                     .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
                     {
@@ -300,8 +302,8 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
                     {
                         new("SESSION", _session3),
                         new("salt", _salt),
-                        new("auth_fags", _authFagsVW),
-                        new("csrf_token", _csrfToken3)
+                        new("csrf_token", _csrfToken3),
+                        new("auth_fags", _authFagsVW)
                     })
                     .Respond(HttpStatusCode.Found, new List<KeyValuePair<string, string>>()
                     {
@@ -337,14 +339,14 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             mockHttp.When($"{VwBaseUri}app/authproxy/vw-de/tokens")
                     .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
                     {
-                        new("X-CSRF-TOKEN", _csrfToken1)
+                        new("X-CSRF-TOKEN", _csrfToken4)
                     },
                     new List<KeyValuePair<string, string>>()
                     {
-                        new("SESSION", _session1),
+                        new("SESSION", _session4),
                         new("salt", _salt),
                         new("auth_fags", _authFagsVWAndWeConnect),
-                        new("csrf_token", _csrfToken1)
+                        new("csrf_token", _csrfToken4)
                     })
                     .Respond(new List<KeyValuePair<string, string>>() {
                         new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
@@ -358,14 +360,14 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             mockHttp.When($"{VwBaseUri}app/authproxy/vwag-weconnect/tokens")
                     .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
                     {
-                        new("X-CSRF-TOKEN", _csrfToken1)
+                        new("X-CSRF-TOKEN", _csrfToken4)
                     },
                     new List<KeyValuePair<string, string>>()
                     {
-                        new("SESSION", _session1),
+                        new("SESSION", _session4),
                         new("salt", _salt),
                         new("auth_fags", _authFagsVWAndWeConnect),
-                        new("csrf_token", _csrfToken1)
+                        new("csrf_token", _csrfToken4)
                     })
                     .Respond(new List<KeyValuePair<string, string>>() {
                         new("Set-Cookie", $"salt={_salt}; Max-Age=604800; Expires=Thu, 01-Jan-2100 00:00:00 GMT; Path=/app/authproxy/; Secure; HttpOnly"),
@@ -379,14 +381,14 @@ namespace PhilipDaubmeier.WeConnectClient.Tests
             mockHttp.When($"{VwBaseUri}app/authproxy/vw-de/user")
                     .WithCookiesAndHeaders(new List<KeyValuePair<string, string>>()
                     {
-                        new("X-CSRF-TOKEN", _csrfToken1)
+                        new("X-CSRF-TOKEN", _csrfToken4)
                     },
                     new List<KeyValuePair<string, string>>()
                     {
-                        new("SESSION", _session1),
+                        new("SESSION", _session4),
                         new("salt", _salt),
                         new("auth_fags", _authFagsVWAndWeConnect),
-                        new("csrf_token", _csrfToken1)
+                        new("csrf_token", _csrfToken4)
                     })
                     .Respond("application/json",
                     @"{
