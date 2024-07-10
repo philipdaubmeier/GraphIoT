@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.1.0 - upgraded to target framework net8.0
 2.0.0 - Complete rewrite due to launch of new WeConnect website in april 2021, incompatible to earlier versions
 1.1.0 - upgraded to target framework net5.0
 1.0.0 - Initial version for old WeConnect/Car-Net portal until its shutdown on 2021-04-27
@@ -19,22 +20,13 @@
     <copyright>Copyright 2019-2021 Philip Daubmeier</copyright>
     <tags>$tags$</tags>
     <dependencies>
-      <group targetFramework="net5.0">
+      <group targetFramework="net8.0">
         <dependency id="HtmlAgilityPack" version="1.11.34" />
-      </group>
-      <group targetFramework="netcoreapp3.1">
-        <dependency id="HtmlAgilityPack" version="1.11.34" />
-      </group>
-      <group targetFramework="netstandard2.1">
-        <dependency id="HtmlAgilityPack" version="1.11.34" />
-        <dependency id="System.Text.Json" version="5.0.2" />
       </group>
     </dependencies>
   </metadata>
   <files>
-    <file src="bin\$configuration$\net5.0\$id$.dll" target="lib\net5.0" />
-    <file src="bin\$configuration$\netcoreapp3.1\$id$.dll" target="lib\netcoreapp3.1" />
-    <file src="bin\$configuration$\netstandard2.1\$id$.dll" target="lib\netstandard2.1" />
+    <file src="bin\$configuration$\net8.0\$id$.dll" target="lib\net8.0" />
     <file src="README.md" target="docs\" />
     <file src="..\..\LICENSE" />
   </files>

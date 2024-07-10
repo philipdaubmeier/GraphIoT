@@ -6,12 +6,13 @@
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
     <Version>1.0.0</Version>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
     <PackageReference Include="ProxyKit" Version="2.3.4" />
   </ItemGroup>
 

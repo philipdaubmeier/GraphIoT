@@ -9,8 +9,8 @@
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/CompactTimeSeries</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.7.0</Version>
-    <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <Version>1.8.0</Version>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <NuspecFile>CompactTimeSeries.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>
@@ -32,5 +32,9 @@
       </NuspecProperties>
     </PropertyGroup>
   </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
+  </ItemGroup>
 
 </Project>

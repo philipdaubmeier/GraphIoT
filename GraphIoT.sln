@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.28803.202
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{C7CE2B7C-9302-4960-88B2-8EB380247CB8}"
 EndProject
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MainWebserver", "MainWebser
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "doc", "doc\", "{AB75CF01-6B54-4BB1-A14A-01A26727FEF2}"
 	ProjectSection(WebsiteProperties) = preProject
-		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_51071"
 		Debug.AspNetCompiler.PhysicalPath = "doc\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51071\"

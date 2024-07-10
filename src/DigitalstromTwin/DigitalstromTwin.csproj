@@ -9,14 +9,18 @@
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/DigitalstromTwin</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>1.7.0</Version>
-    <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1</TargetFrameworks>
+    <Version>1.8.0</Version>
+    <TargetFrameworks>net8.0</TargetFrameworks>
     <NuspecFile>DigitalstromTwin.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);PopulateNuspec</GenerateNuspecDependsOn>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalstromClient\DigitalstromClient.csproj" />
