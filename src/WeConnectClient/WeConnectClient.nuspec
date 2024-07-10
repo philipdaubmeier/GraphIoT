@@ -17,7 +17,7 @@
 1.1.0 - upgraded to target framework net5.0
 1.0.0 - Initial version for old WeConnect/Car-Net portal until its shutdown on 2021-04-27
     </releaseNotes>
-    <copyright>Copyright 2019-2021 Philip Daubmeier</copyright>
+    <copyright>Copyright 2019-2024 Philip Daubmeier</copyright>
     <tags>$tags$</tags>
     <dependencies>
       <group targetFramework="net8.0">
