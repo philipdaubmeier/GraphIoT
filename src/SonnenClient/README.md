@@ -50,7 +50,7 @@ Console.WriteLine($"Production power: {string.Join(',', productionWattGraph.Take
 
 ## Platform Support
 
-SonnenClient is targeted for .NET Standard 2.1 or higher.
+SonnenClient is targeted for .NET 8.0 or higher.
 
 ## License
 

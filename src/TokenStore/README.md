@@ -80,7 +80,7 @@ You can also have a look at classes where TokenStore is used in GraphIoT, like [
 
 ## Platform Support
 
-TokenStore is targeted for .NET Standard 2.1 or higher.
+TokenStore is targeted for .NET 8.0 or higher.
 
 ## License
 
