@@ -27,17 +27,6 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 
         public bool IsAccessTokenValid() => !string.IsNullOrEmpty(AccessToken) && AccessTokenExpiry > DateTime.UtcNow;
 
-        public bool MustAuthenticate()
-        {
-            bool expiredButCannotRefresh = AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0 && !MustRefreshToken();
-            return !string.IsNullOrEmpty(AccessToken) || expiredButCannotRefresh;
-        }
-
-        public bool MustRefreshToken()
-        {
-            return !string.IsNullOrEmpty(RefreshToken) && AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0;
-        }
-
         public Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken)
         {
             AccessToken = accessToken;

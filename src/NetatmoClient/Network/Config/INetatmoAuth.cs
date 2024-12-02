@@ -9,14 +9,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
         DateTime AccessTokenExpiry { get; }
         string? RefreshToken { get; }
 
-        string Username { get; }
-        string UserPassword { get; }
-
         bool IsAccessTokenValid();
-
-        bool MustAuthenticate();
-
-        bool MustRefreshToken();
 
         Task UpdateTokenAsync(string? accessToken, DateTime accessTokenExpiry, string? refreshToken);
     }

@@ -14,28 +14,12 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
         public DateTime AccessTokenExpiry => _tokenStore.AccessTokenExpiry;
         public string? RefreshToken => _tokenStore.RefreshToken;
 
-        public string Username { get; private set; }
-        public string UserPassword { get; private set; }
-
-        public NetatmoHostAuth(TokenStore<NetatmoWebClient> tokenStore, string username, string password)
+        public NetatmoHostAuth(TokenStore<NetatmoWebClient> tokenStore)
         {
             _tokenStore = tokenStore;
-            Username = username;
-            UserPassword = password;
         }
 
         public bool IsAccessTokenValid() => _tokenStore.IsAccessTokenValid();
-
-        public bool MustAuthenticate()
-        {
-            bool expiredButCannotRefresh = AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0 && !MustRefreshToken();
-            return !string.IsNullOrEmpty(AccessToken) || expiredButCannotRefresh;
-        }
-
-        public bool MustRefreshToken()
-        {
-            return !string.IsNullOrEmpty(RefreshToken) && AccessTokenExpiry.CompareTo(DateTime.UtcNow) < 0;
-        }
 
         public async Task UpdateTokenAsync(string? sessionToken, DateTime sessionExpiration, string? applicationToken)
         {

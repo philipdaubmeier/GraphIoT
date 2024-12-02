@@ -20,5 +20,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
         string AppSecret { get; }
 
         string Scope { get; }
+
+        string RedirectUri { get; }
     }
 }

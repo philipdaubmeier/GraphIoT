@@ -14,7 +14,9 @@ namespace PhilipDaubmeier.NetatmoClient
 {
     public abstract class NetatmoAuthBase : IDisposable
     {
+        private const string _authUri = "https://api.netatmo.com/oauth2/authorize";
         protected const string _baseUri = @"https://api.netatmo.net";
+        private const string _state = "HwOdqNKAWeKl7";
 
         private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
 
@@ -41,6 +43,43 @@ namespace PhilipDaubmeier.NetatmoClient
             _client = _provider.Client;
 
             _jsonSerializerOptions.Converters.Add(new MeasureConverter());
+        }
+
+        /// <summary>
+        /// Returns the uri of the login form that has to be sent back to the users
+        /// browser or has to be displayed in an embedded browser view respectively.
+        /// </summary>
+        public Uri GetLoginUri()
+        {
+            var queryStringData = new List<(string, string)>()
+            {
+                ("client_id", _provider.AppId),
+                ("redirect_uri", _provider.RedirectUri),
+                ("scope", Uri.EscapeDataString(_provider.Scope)),
+                ("state", _state)
+            };
+            return new Uri($"{_authUri}?{string.Join('&', queryStringData.Select(x => x.Item1 + "=" + x.Item2))}");
+        }
+
+        /// <summary>
+        /// After the user filled out the Netatmo login form and was redirected to
+        /// the configured callback, this method can be called to complete the login
+        /// flow. If this method returns false, an error occured and the user could not
+        /// be logged in. If true is returned, the resulting access and refresh tokens
+        /// are stored in the connection provider and automatically used in all subsequent
+        /// requests. Access tokens are also automatically renewed if expired.
+        /// </summary>
+        public async Task<bool> TryCompleteLogin(string state, string code)
+        {
+            try
+            {
+                await LoadInitialAccessToken(state, code);
+                return _provider.AuthData.IsAccessTokenValid();
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -112,10 +151,7 @@ namespace PhilipDaubmeier.NetatmoClient
                 if (_authData.IsAccessTokenValid())
                     return;
 
-                if (_authData.MustAuthenticate())
-                    await GetInitialAccessToken();
-                else if (_authData.MustRefreshToken())
-                    await RefreshAccessToken();
+                await RefreshAccessToken();
 
                 // check if we have a valid access token now
                 if (_authData.IsAccessTokenValid())
@@ -129,15 +165,18 @@ namespace PhilipDaubmeier.NetatmoClient
             }
         }
 
-        private async Task GetInitialAccessToken()
+        private async Task LoadInitialAccessToken(string state, string code)
         {
+            if (state != _state)
+                throw new IOException("Unexpected error, state nonce was changed.");
+
             await LoadAndStoreAccessToken(new[]
             {
-                ("grant_type", "password"),
+                ("grant_type", "authorization_code"),
                 ("client_id", _provider.AppId),
                 ("client_secret", _provider.AppSecret),
-                ("username", _authData.Username),
-                ("password", _authData.UserPassword),
+                ("code", code),
+                ("redirect_uri", _provider.RedirectUri),
                 ("scope", _provider.Scope)
             });
         }

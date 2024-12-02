@@ -15,7 +15,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Config
     public class NetatmoConfigConnectionProvider : NetatmoConnectionProvider
     {
         public NetatmoConfigConnectionProvider(TokenStore<NetatmoWebClient> tokenStore, IOptions<NetatmoConfig> config, NetatmoHttpClient client)
-            : base(new NetatmoHostAuth(tokenStore, config.Value.Username, config.Value.Password))
-            => (AppId, AppSecret, Scope, Client) = (config.Value.AppId, config.Value.AppSecret, config.Value.Scope, client.Client);
+            : base(new NetatmoHostAuth(tokenStore))
+            => (AppId, AppSecret, Scope, Client, RedirectUri) = (config.Value.AppId, config.Value.AppSecret, config.Value.Scope, client.Client, config.Value.RedirectUri);
     }
 }

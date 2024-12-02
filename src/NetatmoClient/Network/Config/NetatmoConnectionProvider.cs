@@ -32,6 +32,8 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 
         public string Scope { get; set; } = string.Empty;
 
+        public string RedirectUri { get; set; } = string.Empty;
+
         public NetatmoConnectionProvider(INetatmoAuth authData)
             => AuthData = authData;
 
