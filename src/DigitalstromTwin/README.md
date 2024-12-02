@@ -39,7 +39,7 @@ For more usage examples you can also have a look at the [unit tests](../../test/
 
 ## Platform Support
 
-DigitalstromTwin is targeted for .NET 8.0 or higher.
+DigitalstromTwin is targeted for .NET 9.0 or higher.
 
 ## License
 

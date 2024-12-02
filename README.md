@@ -81,7 +81,7 @@ Follow these steps to set up the development environment, publish the applicatio
 
 ## Platform Support
 
-GraphIoT is targeted for .NET 8.0 or higher.
+GraphIoT is targeted for .NET 9.0 or higher.
 
 ## License
 

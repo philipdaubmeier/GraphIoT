@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.5.0 - upgraded to target framework net9.0
 2.4.0 - upgraded to target framework net8.0
 2.3.0 - changed data point naming of burners according to Viessmann Developer Portal changelog
 2.2.0 - upgraded to target framework net5.0

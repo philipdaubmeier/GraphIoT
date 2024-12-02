@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.2.0 - upgraded to target framework net9.0
 2.1.0 - upgraded to target framework net8.0
 2.0.0 - Complete rewrite due to launch of new WeConnect website in april 2021, incompatible to earlier versions
 1.1.0 - upgraded to target framework net5.0

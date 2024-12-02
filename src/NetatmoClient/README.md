@@ -52,7 +52,7 @@ foreach (var measure in measures.First().Value)
 
 ## Platform Support
 
-NetatmoClient is targeted for .NET 8.0 or higher.
+NetatmoClient is targeted for .NET 9.0 or higher.
 
 ## License
 

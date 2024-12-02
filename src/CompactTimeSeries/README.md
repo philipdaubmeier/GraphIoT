@@ -36,7 +36,7 @@ For more usage examples you can also have a look at the unit tests.
 
 ## Platform Support
 
-CompactTimeSeries is targeted for .NET 8.0 or higher.
+CompactTimeSeries is targeted for .NET 9.0 or higher.
 
 ## License
 

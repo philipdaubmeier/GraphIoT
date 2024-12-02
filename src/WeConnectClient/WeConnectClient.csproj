@@ -9,7 +9,7 @@
     <PackageProjectUrl>https://github.com/philipdaubmeier/GraphIoT/tree/master/src/WeConnectClient</PackageProjectUrl>
     <Authors>PhilipDaubmeier</Authors>
     <Company>PhilipDaubmeier</Company>
-    <Version>2.1.0</Version>
+    <Version>2.2.0</Version>
     <TargetFrameworks>net9.0</TargetFrameworks>
     <NuspecFile>WeConnectClient.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

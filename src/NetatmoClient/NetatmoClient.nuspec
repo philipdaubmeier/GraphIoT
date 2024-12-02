@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+1.9.0 - upgraded to target framework net9.0
 1.8.0 - upgraded to target framework net8.0
 1.7.0 - upgraded to target framework net5.0
 1.6.1 - improved exception messages

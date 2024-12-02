@@ -69,7 +69,7 @@ A full list of status and sensor values of devices can be found in the [`DeviceF
 
 ## Platform Support
 
-ViessmannClient is targeted for .NET 8.0 or higher.
+ViessmannClient is targeted for .NET 9.0 or higher.
 
 ## License
 
