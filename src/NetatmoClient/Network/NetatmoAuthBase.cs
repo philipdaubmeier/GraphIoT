@@ -1,6 +1,5 @@
 ﻿using PhilipDaubmeier.NetatmoClient.Model;
 using PhilipDaubmeier.NetatmoClient.Model.Auth;
-using PhilipDaubmeier.NetatmoClient.Network;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,7 +9,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace PhilipDaubmeier.NetatmoClient
+namespace PhilipDaubmeier.NetatmoClient.Network
 {
     public abstract class NetatmoAuthBase : IDisposable
     {

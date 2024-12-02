@@ -163,7 +163,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Polling
             var dbModuleMeasure = _dbContext.NetatmoModuleMeasures.Where(x => x.ModuleId == moduleId && x.Measure == measureKey).FirstOrDefault();
             if (dbModuleMeasure == null)
             {
-                var deviceId = _netatmoStructure.Modules.Where(x => x.Item2 == module).FirstOrDefault().Item1;
+                var deviceId = _netatmoStructure.Modules.Where(x => x.Item2 == module)?.FirstOrDefault()?.Item1;
                 dbModuleMeasure = new NetatmoModuleMeasure()
                 {
                     DeviceId = deviceId,

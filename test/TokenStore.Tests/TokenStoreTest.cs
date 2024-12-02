@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.TokenStore.Tests
     public class TokenStoreTest
     {
         [Fact]
-        public async void TestTokenStoreSave()
+        public async Task TestTokenStoreSave()
         {
             var db = GetMockDbContext();
             var tokenStore = new TokenStore<TokenStoreTest>(db, GetOptions());
@@ -37,9 +37,9 @@ namespace PhilipDaubmeier.TokenStore.Tests
         {
             var db = GetMockDbContext(new List<AuthData>()
             {
-                new AuthData() { AuthDataId = "unittest.access_token", DataContent = "accessToken" },
-                new AuthData() { AuthDataId = "unittest.access_token_expiry", DataContent = "636819408000000000" },
-                new AuthData() { AuthDataId = "unittest.refresh_token", DataContent = "refreshToken" }
+                new() { AuthDataId = "unittest.access_token", DataContent = "accessToken" },
+                new() { AuthDataId = "unittest.access_token_expiry", DataContent = "636819408000000000" },
+                new() { AuthDataId = "unittest.refresh_token", DataContent = "refreshToken" }
             });
             var tokenStore = new TokenStore<TokenStoreTest>(db, GetOptions());
 
@@ -49,7 +49,7 @@ namespace PhilipDaubmeier.TokenStore.Tests
         }
 
         [Fact]
-        public async void TestTokenStoreSaveLoad()
+        public async Task TestTokenStoreSaveLoad()
         {
             var db = GetMockDbContext();
             var tokenStore = new TokenStore<TokenStoreTest>(db, GetOptions());
@@ -68,7 +68,7 @@ namespace PhilipDaubmeier.TokenStore.Tests
         }
 
         [Fact]
-        public async void TestIsAccessTokenValid()
+        public async Task TestIsAccessTokenValid()
         {
             var db = GetMockDbContext();
             var tokenStore = new TokenStore<TokenStoreTest>(db, GetOptions());

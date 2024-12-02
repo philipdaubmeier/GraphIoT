@@ -27,8 +27,7 @@ namespace PhilipDaubmeier.DigitalstromClientConsole
 
         static async Task MainAsync(string[] args)
         {
-            if (args == null)
-                throw new ArgumentNullException(nameof(args));
+            ArgumentNullException.ThrowIfNull(args);
 
             Uri uri = ConsoleUtil.ReadUri("Enter DSS uri: (e.g. 'https://dss.local:8080')");
 

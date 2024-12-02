@@ -44,7 +44,7 @@ namespace PhilipDaubmeier.GraphIoT.Sonnen.Polling
             if (string.IsNullOrEmpty(_chargerId))
             {
                 var siteId = (await _sonnenClient.GetUserSites()).DefaultSiteId;
-                _chargerId = (await _sonnenClient.GetSiteChargers(siteId)).FirstOrDefault().Id;
+                _chargerId = (await _sonnenClient.GetSiteChargers(siteId))?.FirstOrDefault()?.Id;
                 if (string.IsNullOrEmpty(_chargerId))
                     return;
             }

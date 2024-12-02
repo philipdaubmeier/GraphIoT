@@ -26,8 +26,7 @@ namespace PhilipDaubmeier.DigitalstromTimeSeriesApi
 
         public virtual void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers();
 
             var connectionString = Configuration.GetConnectionString("DigitalstromTimeSeriesDB");
             services.AddOptions()

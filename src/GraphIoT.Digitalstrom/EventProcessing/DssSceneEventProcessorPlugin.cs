@@ -122,7 +122,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.EventProcessing
         /// </summary>
         public bool HasDuplicate(DssEvent dsEvent, int milliseconds)
         {
-            var lastEvent = _eventStream.LastOrDefault();
+            var lastEvent = _eventStream?.LastOrDefault();
             if (lastEvent == null)
                 return false;
 

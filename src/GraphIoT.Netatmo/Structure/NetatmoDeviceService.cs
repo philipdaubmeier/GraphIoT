@@ -58,7 +58,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
         {
             LazyLoad();
 
-            foreach (var measure in _modules.Where(x => x.Key.Item2 == module).FirstOrDefault().Value ?? new List<Measure>())
+            foreach (var measure in _modules?.Where(x => x.Key.Item2 == module).FirstOrDefault().Value ?? new List<Measure>())
                 yield return measure;
         }
 
@@ -67,7 +67,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             LazyLoad();
 
             var dbId = _moduleDbIds?.Where(x => x.Key.Item1 == module && x.Key.Item2 == measure);
-            if (dbId == null || !dbId.Any())
+            if (dbId is null || !dbId.Any())
                 return null;
             return dbId.First().Value;
         }
@@ -80,8 +80,8 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             if (moduleId is null)
                 return null;
 
-            var db = _modules.Where(x => x.Key.Item2 == moduleId);
-            if (!db.Any())
+            var db = _modules?.Where(x => x.Key.Item2 == moduleId);
+            if (db is null || !db.Any())
                 return null;
             return db.First().Key.Item1;
         }
@@ -91,7 +91,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             LazyLoad();
 
             var db = _moduleDbIds?.Where(x => x.Value == dbId);
-            if (dbId == null || !db.Any())
+            if (db is null || !db.Any())
                 return null;
             return db.First().Key.Item1;
         }
@@ -101,7 +101,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             LazyLoad();
 
             var db = _moduleDbIds?.Where(x => x.Value == dbId);
-            if (dbId == null || !db.Any())
+            if (db is null || !db.Any())
                 return null;
             return db.First().Key.Item2;
         }
@@ -112,7 +112,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 
             if (_deviceNames is null || !_deviceNames.TryGetValue(module, out string? name))
                 return string.Empty;
-            return (crop < 0 ? name : name?.Substring(0, Math.Min(name.Length, crop))) ?? string.Empty;
+            return (crop < 0 ? name : name?[..Math.Min(name.Length, crop)]) ?? string.Empty;
         }
 
         public string GetModuleName(ModuleId module, int crop = -1)
@@ -121,7 +121,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
 
             if (_moduleNames is null || !_moduleNames.TryGetValue(module, out string? name))
                 return string.Empty;
-            return (crop < 0 ? name : name?.Substring(0, Math.Min(name.Length, crop))) ?? string.Empty;
+            return (crop < 0 ? name : name?[..Math.Min(name.Length, crop)]) ?? string.Empty;
         }
 
         public void ReloadFromNetatmoApi()
@@ -161,7 +161,7 @@ namespace PhilipDaubmeier.GraphIoT.Netatmo.Structure
             catch (Exception ex)
             {
                 ex = ex.Demystify();
-                _logger.LogInformation($"{DateTime.Now} Exception occurred in Netatmo Device Service: {ex}");
+                _logger.LogInformation("{timestamp} Exception occurred in Netatmo Device Service: {ex}", DateTime.Now, ex);
                 throw;
             }
             finally { _loadSemaphore.Release(); }

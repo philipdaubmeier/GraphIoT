@@ -8,7 +8,7 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database.Util
     {
         internal static TEntity AddOrUpdate<TDbContext, TEntity>(this DbSet<TEntity> dbSet, TDbContext context, TEntity entity) where TDbContext : DbContext where TEntity : class
         {
-            var primaryKeyName = context.Model.FindEntityType(typeof(TEntity)).FindPrimaryKey().Properties
+            var primaryKeyName = context.Model.FindEntityType(typeof(TEntity))?.FindPrimaryKey()?.Properties
                 .Select(x => x.Name).Single();
 
             var primaryKeyField = entity.GetType().GetProperty(primaryKeyName);

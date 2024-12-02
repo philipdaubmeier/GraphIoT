@@ -42,7 +42,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
                 LongPollingHttpClient = innerLongPollingClient;
         }
 
-        private static IDigitalstromAuth AuthFromConfig(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
+        private static PersistingDigitalstromAuth AuthFromConfig(TokenStore<PersistingDigitalstromAuth> tokenStore, IOptions<DigitalstromConfig> config)
         {
             return new PersistingDigitalstromAuth(tokenStore, config.Value.TokenAppId, config.Value.DssUsername, config.Value.DssPassword);
         }
@@ -54,7 +54,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
                 if (string.IsNullOrWhiteSpace(config.Value.DssCertificate))
                     return null;
 
-                return new X509Certificate2(Convert.FromBase64String(config.Value.DssCertificate));
+                return X509CertificateLoader.LoadCertificate(Convert.FromBase64String(config.Value.DssCertificate));
             }
             catch
             {

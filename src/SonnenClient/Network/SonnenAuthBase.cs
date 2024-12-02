@@ -1,4 +1,5 @@
 ﻿using PhilipDaubmeier.SonnenClient.Model;
+using PhilipDaubmeier.SonnenClient.Network.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;

@@ -52,7 +52,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
                 ("response_type", "code"),
                 ("code_challenge", _connectionProvider.CodeChallenge),
                 ("code_challenge_method", _connectionProvider.CodeChallengeMethod),
-                ("scope", Uri.EscapeUriString(string.Join(' ', _scopes)))
+                ("scope", Uri.EscapeDataString(string.Join(' ', _scopes)))
             };
             return new Uri($"{_authUri}?{string.Join('&', queryStringData.Select(x => x.Item1 + "=" + x.Item2))}");
         }
@@ -117,7 +117,7 @@ namespace PhilipDaubmeier.ViessmannClient.Network
             return result.Data;
         }
 
-        private Exception ExtractErrorMessage(string payload)
+        private IOException ExtractErrorMessage(string payload)
         {
             var errorResponse = JsonSerializer.Deserialize<ErrorPayload>(payload, _jsonSerializerOptions);
 

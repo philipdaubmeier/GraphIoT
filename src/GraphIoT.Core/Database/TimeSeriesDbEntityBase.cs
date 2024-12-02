@@ -68,13 +68,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         public TimeSeries<T> GetSeries<T>(int index) where T : struct
         {
-            var method = CurveProperty(index)?.GetGetMethod();
-            if (method is null)
-                throw new Exception($"There is no readable curve property at index {index}");
+            var method = (CurveProperty(index)?.GetGetMethod())
+                ?? throw new Exception($"There is no readable curve property at index {index}");
 
-            var attribute = CurveProperty(index).GetCustomAttribute<TimeSeriesAttribute>();
-            if (attribute is null)
-                throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+            var attribute = (CurveProperty(index)?.GetCustomAttribute<TimeSeriesAttribute>())
+                ?? throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
 
             if (typeof(T) != attribute.Type)
                 throw new Exception($"Can not read property at index {index} as time series of type {typeof(T)}, it is defined to be {attribute.Type}");
@@ -84,13 +82,11 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
 
         public void SetSeries<T>(int index, TimeSeries<T> series) where T : struct
         {
-            var property = CurveProperty(index);
-            if (property is null)
-                throw new Exception($"There is no curve property at index {index}");
+            var property = CurveProperty(index)
+                ?? throw new Exception($"There is no curve property at index {index}");
 
-            var attribute = property.GetCustomAttribute<TimeSeriesAttribute>();
-            if (attribute is null)
-                throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+            var attribute = property.GetCustomAttribute<TimeSeriesAttribute>()
+                ?? throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
 
             if (typeof(T) != attribute.Type)
                 throw new Exception($"Can not set property at index {index} with time series of type {typeof(T)}, it is defined to be {attribute.Type}");
@@ -118,9 +114,8 @@ namespace PhilipDaubmeier.GraphIoT.Core.Database
                 if (exceptIndices.Contains(index))
                     continue;
 
-                var attribute = CurveProperty(index).GetCustomAttribute<TimeSeriesAttribute>();
-                if (attribute is null)
-                    throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
+                var attribute = (CurveProperty(index)?.GetCustomAttribute<TimeSeriesAttribute>())
+                    ?? throw new Exception($"Curve property not annotated with TimeSeries attribute at index {index}");
 
                 switch (attribute.Type)
                 {

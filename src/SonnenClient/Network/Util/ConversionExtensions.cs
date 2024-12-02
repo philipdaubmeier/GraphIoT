@@ -7,7 +7,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PhilipDaubmeier.SonnenClient.Network
+namespace PhilipDaubmeier.SonnenClient.Network.Util
 {
     public static class ConversionExtensions
     {
@@ -23,7 +23,7 @@ namespace PhilipDaubmeier.SonnenClient.Network
 
         public static string ToSHA256Base64UrlSafe(this string str)
         {
-            return new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(str)).ToBase64UrlSafe();
+            return SHA256.HashData(Encoding.UTF8.GetBytes(str)).ToBase64UrlSafe();
         }
 
         public static Dictionary<string, string> ParseQueryString(this Uri uri)

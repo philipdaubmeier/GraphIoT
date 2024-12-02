@@ -212,9 +212,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             // read the client id and relay state from these redirect urls
             while (loginFormLocationResponse.StatusCode == HttpStatusCode.Found)
             {
-                Uri? redirectLocation = loginFormLocationResponse.Headers.Location;
-                if (redirectLocation is null)
-                    throw new IOException("Failed to get sign-in page, no redirect url given.");
+                Uri? redirectLocation = loginFormLocationResponse.Headers.Location ?? throw new IOException("Failed to get sign-in page, no redirect url given.");
 
                 if (redirectLocation.TryExtractUriParameter("client_id", out string clientId))
                     state.ClientId = clientId;
@@ -381,10 +379,7 @@ namespace PhilipDaubmeier.WeConnectClient.Network
             if (!tokenExchangeResponse.IsSuccessStatusCode)
                 throw new IOException("Failed to exchange token.");
 
-            var token = await tokenExchangeResponse.Content.ReadAsStringAsync();
-
-            if (token is null)
-                throw new IOException("Token could not be exchanged.");
+            var token = await tokenExchangeResponse.Content.ReadAsStringAsync() ?? throw new IOException("Token could not be exchanged.");
 
             state.AccessToken = token;
 

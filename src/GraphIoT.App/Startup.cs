@@ -31,8 +31,7 @@ namespace PhilipDaubmeier.GraphIoT.App
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
+            services.AddControllers();
 
             void smarthomeSqlServer(DbContextOptionsBuilder options) =>
                 options.UseSqlServer(Configuration.GetConnectionString("SmarthomeDB"));

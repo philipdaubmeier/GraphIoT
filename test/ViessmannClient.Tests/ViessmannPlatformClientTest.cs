@@ -297,6 +297,9 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal("idle", feature5?.UpdateStatus?.Value);
         }
 
+        private static readonly double[] sourceArray = new[] { 9.914d, 11.543d };
+        private static readonly string[] sourceArray0 = new[] { "0", "1" };
+
         [Fact]
         public async Task TestGetDeviceFeatures()
         {
@@ -556,7 +559,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(47.6, feature1?.Value?.Value);
 
             Assert.Equal("array", feature2?.Enabled?.Type);
-            Assert.Equal(new[] { "0", "1" }.ToList<string?>(), feature2?.Enabled?.Value);
+            Assert.Equal(sourceArray0.ToList<string?>(), feature2?.Enabled?.Value);
 
             Assert.Equal("string", feature3?.Status?.Type);
             Assert.Equal("on", feature3?.Status?.Value);
@@ -586,7 +589,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.True(feature8?.Active?.Value);
 
             Assert.Equal("array", feature9?.Day?.Type);
-            Assert.Equal(new[] { 9.914d, 11.543d }.ToList(), feature9?.Day?.Value?.ToList());
+            Assert.Equal(sourceArray.ToList(), feature9?.Day?.Value?.ToList());
             Assert.Equal(new List<double>(), feature9?.Week?.Value?.ToList());
             Assert.Equal(new List<double>(), feature9?.Month?.Value?.ToList());
             Assert.Equal(new List<double>(), feature9?.Year?.Value?.ToList());
@@ -634,7 +637,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(5, result.GetHeatingCircuitsHeatingCurveShift(FeatureName.Circuit.Circuit0));
             Assert.Equal(0.9m, result.GetHeatingCircuitsHeatingCurveSlope(FeatureName.Circuit.Circuit0));
             Assert.True(result.IsHeatingCircuitsHeatingScheduleActive(FeatureName.Circuit.Circuit0));
-            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit0).Mon);
+            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit0)?.Mon ?? new());
             Assert.Equal("dhwAndHeating", result.GetHeatingCircuitsOperatingModesActive(FeatureName.Circuit.Circuit0));
             Assert.False(result.IsHeatingCircuitsOperatingModesDhwActive(FeatureName.Circuit.Circuit0));
             Assert.True(result.IsHeatingCircuitsOperatingModesDhwAndHeatingActive(FeatureName.Circuit.Circuit0));
@@ -671,7 +674,7 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.Equal(0, result.GetHeatingCircuitsHeatingCurveShift(FeatureName.Circuit.Circuit1));
             Assert.Equal(0.5m, result.GetHeatingCircuitsHeatingCurveSlope(FeatureName.Circuit.Circuit1));
             Assert.True(result.IsHeatingCircuitsHeatingScheduleActive(FeatureName.Circuit.Circuit1));
-            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit1).Mon);
+            Assert.NotEmpty(result.GetHeatingCircuitsHeatingSchedule(FeatureName.Circuit.Circuit1)?.Mon ?? new());
             Assert.Equal("dhwAndHeating", result.GetHeatingCircuitsOperatingModesActive(FeatureName.Circuit.Circuit1));
             Assert.False(result.IsHeatingCircuitsOperatingModesDhwActive(FeatureName.Circuit.Circuit1));
             Assert.True(result.IsHeatingCircuitsOperatingModesDhwAndHeatingActive(FeatureName.Circuit.Circuit1));
@@ -750,10 +753,10 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
             Assert.False(result.IsHeatingDhwChargingActive());
             Assert.False(result.IsHeatingDhwPumpsCirculationOn());
             Assert.True(result.IsHeatingDhwPumpsCirculationScheduleActive());
-            Assert.NotEmpty(result.GetHeatingDhwPumpsCirculationSchedule().Mon);
+            Assert.NotEmpty(result.GetHeatingDhwPumpsCirculationSchedule()?.Mon ?? new());
             Assert.False(result.IsHeatingDhwPumpsPrimaryOn());
             Assert.True(result.IsHeatingDhwScheduleActive());
-            Assert.NotEmpty(result.GetHeatingDhwSchedule().Mon);
+            Assert.NotEmpty(result.GetHeatingDhwSchedule()?.Mon ?? new());
             Assert.True(result.IsHeatingDhwSensorsTemperatureHotWaterStorageConnected());
             Assert.Equal(55.4, result.GetHeatingDhwSensorsTemperatureHotWaterStorage());
             Assert.False(result.IsHeatingDhwSensorsTemperatureOutletConnected());
