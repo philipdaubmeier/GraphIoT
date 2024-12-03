@@ -134,6 +134,10 @@ namespace PhilipDaubmeier.DigitalstromClient.Network
 
                 throw new IOException("Could not authenticate");
             }
+            catch (Exception ex)
+            {
+                throw new IOException("Could not authenticate", ex);
+            }
             finally
             {
                 _renewTokenSemaphore.Release();
