@@ -11,15 +11,10 @@ namespace PhilipDaubmeier.NetatmoClient.Network
 
         public string NetatmoAppId { get; set; } = string.Empty;
         public string NetatmoAppSecret { get; set; } = string.Empty;
-        public string Username { get; private set; }
-        public string UserPassword { get; private set; }
         public static string Scope { get { return "read_station read_presence access_presence"; } }
 
-        public NetatmoAuth(string user, string password)
+        public NetatmoAuth()
         {
-            Username = user;
-            UserPassword = password;
-
             AccessToken = null;
             AccessTokenExpiry = DateTime.MinValue;
             RefreshToken = null;
