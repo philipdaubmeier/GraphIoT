@@ -54,7 +54,7 @@ namespace PhilipDaubmeier.GraphIoT.Digitalstrom.Config
                 if (string.IsNullOrWhiteSpace(config.Value.DssCertificate))
                     return null;
 
-                return X509CertificateLoader.LoadCertificate(Convert.FromBase64String(config.Value.DssCertificate));
+                return X509CertificateLoader.LoadPkcs12(Convert.FromBase64String(config.Value.DssCertificate), null);
             }
             catch
             {
