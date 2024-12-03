@@ -6,7 +6,7 @@
 
 # GraphIoT
 
-GraphIoT is a .NET 5 project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
+GraphIoT is a .NET 9 project for polling and storing historical IoT and smart home sensor data and providing it for visualization as time series graphs.
 
 The main server application consists of these two major parts for this purpose:
 
