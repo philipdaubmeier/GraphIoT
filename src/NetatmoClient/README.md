@@ -18,22 +18,39 @@ You have to implement the interface `INetatmoConnectionProvider` to provide the 
 The minimal viable example for playing around with the client would be as follows:
 
 ```csharp
-var netatmoAuth = new NetatmoAuth("<username>", "<password>");
+var netatmoAuth = new NetatmoAuth();
 var netatmoConnProvider = new NetatmoConnectionProvider(netatmoAuth)
 {
     AppId = "<your_netatmo_connect_app_id>",
     AppSecret = "<your_netatmo_connect_app_secret>",
-    Scope = "read_station read_presence access_presence"
+    Scope = "read_station read_presence access_presence",
+    RedirectUri = "http://localhost:4000"
 };
+
+var netatmoClient = new NetatmoWebClient(netatmoConnProvider);
+var uri = netatmoClient.GetLoginUri();
+
+Console.WriteLine($"Login here: {uri.AbsoluteUri}");
 ```
 
-> **Caution:** in a productive use you may want to implement your own `INetatmoConnectionProvider` and load your app id and secret from a suitable vault and the user credentials should be entered by the user in some way and immediatelly discarded again. The `INetatmoAuth` object will contain a refresh token that can be used to re-authenticate at any time, which can be persisted by implementing a custom `INetatmoAuth` class. You can have a look at the respective classes in [`GraphIoT.Netatmo`](../GraphIoT.Netatmo/Config) as an example.
-
-If you have the connection provider in place, you can create a `NetatmoWebClient` and query station data and measurements:
+For playing around you can now copy the uri that was written to the console into a browser and log in there. The browser will then redirect to a page that does not exist and will show a _"page not found"_ message. Just use the part after `?code=` in the browser address bar and input it into the program, which is shown in the following.
 
 ```csharp
-var netatmoClient = new NetatmoWebClient(netatmoConnProvider);
+Console.WriteLine("After logging in you should be redirected to a non-existent page.");
+Console.WriteLine("Enter the code you see in the browsers address bar behind '?code=':");
+var code = Console.ReadLine();
+await netatmoClient.TryCompleteLogin(code);
+```
 
+After this step, the `auth` object will contain a valid access token and also a refresh token. The refresh token can be permanently persisted and loaded after each startup and will automatically be used for refreshing the access token if expired.
+
+> **Note:** in a productive use you will want to launch the login uri in an embedded browser view or redirect to this uri in case of a web application. After sucessful login either capture the resulting uri from the embedded browser or use a productive callback API on your server side.
+>
+> **Note:** also, you may want to implement your own `INetatmoConnectionProvider` and load your client id and redirect uri from a configuration file and store and load refresh tokens across program restarts. You can have a look at the respective classes in [`GraphIoT.Netatmo`](../GraphIoT.Netatmo/Config) as an example for `INetatmoAuth` and `INetatmoConnectionProvider` implemenations with storing/loading of configuration, access tokens and refresh tokens.
+
+With being logged in sucessfully and having a valid refresh token in the `auth` object, you can now go ahead and use the library to actually query station data and measurements:
+
+```csharp
 // Find the id of the first base station of the logged in user
 var weatherStation = await netatmoClient.GetWeatherStationData();
 var baseStationId = weatherStation.Devices.First().Id;
