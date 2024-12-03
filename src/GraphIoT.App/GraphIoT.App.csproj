@@ -43,9 +43,6 @@
 
   <ItemGroup>
     <PackageReference Include="Ben.Demystifier" Version="0.4.1" />
-    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.11.0" PrivateAssets="All">
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" PrivateAssets="All">
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
@@ -54,9 +51,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\GraphIoT.Digitalstrom\GraphIoT.Digitalstrom.csproj" />
     <ProjectReference Include="..\GraphIoT.Grafana\GraphIoT.Grafana.csproj" />

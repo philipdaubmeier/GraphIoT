@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +13,7 @@ using PhilipDaubmeier.GraphIoT.Netatmo.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Sonnen.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.Viessmann.DependencyInjection;
 using PhilipDaubmeier.GraphIoT.WeConnect.DependencyInjection;
+using Serilog;
 using System;
 
 namespace PhilipDaubmeier.GraphIoT.App
@@ -45,12 +45,12 @@ namespace PhilipDaubmeier.GraphIoT.App
             {
                 config.ClearProviders();
 
-                var logConfig = Configuration.GetSection("Logging");
-                config.AddFile(logConfig);
+                config.AddSerilog(new LoggerConfiguration()
+                    .ReadFrom.Configuration(Configuration)
+                    .CreateLogger());
 
                 if (Environment.IsDevelopment())
                 {
-                    config.AddConfiguration(logConfig);
                     config.AddConsole();
                     config.AddDebug();
                     config.AddEventSourceLogger();
