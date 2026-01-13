@@ -19,8 +19,8 @@ namespace PhilipDaubmeier.ViessmannClient.Network
 
         private readonly HttpClient _client;
 
-        private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
-        private const string _tokenUri = "https://iam.viessmann.com/idp/v2/token";
+        private const string _authUri = "https://iam.viessmann-climatesolutions.com/idp/v2/authorize";
+        private const string _tokenUri = "https://iam.viessmann-climatesolutions.com/idp/v2/token";
         private static readonly List<string> _scopes = new() { "IoT", "User", "offline_access" };
 
         private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
