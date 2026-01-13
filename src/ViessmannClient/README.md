@@ -13,7 +13,7 @@ PM> Install-Package PhilipDaubmeier.ViessmannClient
 
 ## Usage
 
-For getting access to Viessmann APIs, first register on the [Viessmann Developer Portal](https://developer.viessmann.com/) and create a client via ["API Keys"](https://developer.viessmann.com/de/clients), which will generate a client id for you and lets you set one or more redirect URIs.
+For getting access to Viessmann APIs, first register on the [Viessmann Developer Portal](https://developer.viessmann-climatesolutions.com/) and create a client via ["API Keys"](https://developer.viessmann-climatesolutions.com/de/clients), which will generate a client id for you and lets you set one or more redirect URIs.
 
 To then use this library, you have to implement the interfaces `IViessmannAuth` and `IViessmannConnectionProvider<T>` to provide the Viessmann webservice clients with all information necessary to authenticate and establish a connection.
 
