@@ -11,7 +11,7 @@ namespace PhilipDaubmeier.ViessmannClient
 {
     public class ViessmannPlatformClient : ViessmannAuthBase
     {
-        private const string _baseUri = "https://api.viessmann.com/";
+        private const string _baseUri = "https://api.viessmann-climatesolutions.com/";
 
         public ViessmannPlatformClient(IViessmannConnectionProvider<ViessmannPlatformClient> connectionProvider)
             : base(connectionProvider) { }

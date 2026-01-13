@@ -12,6 +12,7 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>$description$</description>
     <releaseNotes>
+2.6.0 - updated all uris to new domain name (https://community.viessmann.de/t5/Announcements/Domain-Change-for-the-Viessmann-API/td-p/551560)
 2.5.0 - upgraded to target framework net9.0
 2.4.0 - upgraded to target framework net8.0
 2.3.0 - changed data point naming of burners according to Viessmann Developer Portal changelog

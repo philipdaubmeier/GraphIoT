@@ -9,14 +9,14 @@ namespace PhilipDaubmeier.ViessmannClient.Tests
 {
     public static class MockViessmannConnection
     {
-        private const string _authUri = "https://iam.viessmann.com/idp/v2/authorize";
-        private const string _tokenUri = "https://iam.viessmann.com/idp/v2/token";
+        private const string _authUri = "https://iam.viessmann-climatesolutions.com/idp/v2/authorize";
+        private const string _tokenUri = "https://iam.viessmann-climatesolutions.com/idp/v2/token";
         private const string _redirectUri = "http://localhost:4000";
 
         private const string _clientId = "1234561unittestidf91d15ff4caceee";
         private const string _authorizationCode = "123_unittest_authorization_code_456";
         
-        public static string BaseUri => "https://api.viessmann.com/";
+        public static string BaseUri => "https://api.viessmann-climatesolutions.com/";
         public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";
         public static string RefreshToken => "9b22aceff_dummy_unittest_token_173cba864cbae45f34efa22bc47544111";
         public static string CodeChallenge => "SlvCf8TdHPDGMs-dummy-nHjgX-nRICB-fRtQ0Uhy7g";
