@@ -212,7 +212,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
             Assert.Equal("78:90:ab:cd:ef:01", result.Homes[0].Cameras[0].Id);
             Assert.Equal("NOC", result.Homes[0].Cameras[0].Type);
             Assert.Equal("on", result.Homes[0].Cameras[0].Status);
-            Assert.Equal("https://prodvpn-eu-123.netatmo.net/restricted/10.0.0.1/abcabc123412341234123412341234ab/MTABCDEFG1234ABCDEF1234BACDEF1234ABCDEF123,,", result.Homes[0].Cameras[0].VpnUrl);
+            Assert.Equal("https://prodvpn-eu-123.netatmo.com/restricted/10.0.0.1/abcabc123412341234123412341234ab/MTABCDEFG1234ABCDEF1234BACDEF1234ABCDEF123,,", result.Homes[0].Cameras[0].VpnUrl);
             Assert.False(result.Homes[0].Cameras[0].IsLocal);
             Assert.Equal("on", result.Homes[0].Cameras[0].SdStatus);
             Assert.Equal("on", result.Homes[0].Cameras[0].AlimStatus);

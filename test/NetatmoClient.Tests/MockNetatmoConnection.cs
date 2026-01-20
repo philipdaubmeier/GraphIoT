@@ -13,7 +13,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
         private const string _scope = "read_station read_presence access_presence";
         private const string _redirectUri = "http://localhost:4000";
 
-        public static string BaseUri => "https://api.netatmo.net";
+        public static string BaseUri => "https://api.netatmo.com";
         public static string AppToken => "5f4d6babc_dummy_unittest_token_83025a07162890c80a8b587bea589b8e2";
         public static string RefreshToken => "716289babc_dummy_unittest_refresh_token_83025a07162890587bea58987be";
 

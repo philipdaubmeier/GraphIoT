@@ -24,7 +24,7 @@ namespace PhilipDaubmeier.NetatmoClient.Tests
                                             ""id"": ""78:90:ab:cd:ef:01"",
                                             ""type"": ""NOC"",
                                             ""status"": ""on"",
-                                            ""vpn_url"": ""https://prodvpn-eu-123.netatmo.net/restricted/10.0.0.1/abcabc123412341234123412341234ab/MTABCDEFG1234ABCDEF1234BACDEF1234ABCDEF123,,"",
+                                            ""vpn_url"": ""https://prodvpn-eu-123.netatmo.com/restricted/10.0.0.1/abcabc123412341234123412341234ab/MTABCDEFG1234ABCDEF1234BACDEF1234ABCDEF123,,"",
                                             ""is_local"": false,
                                             ""sd_status"": ""on"",
                                             ""alim_status"": ""on"",

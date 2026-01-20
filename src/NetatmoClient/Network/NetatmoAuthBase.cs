@@ -14,7 +14,7 @@ namespace PhilipDaubmeier.NetatmoClient.Network
     public abstract class NetatmoAuthBase : IDisposable
     {
         private const string _authUri = "https://api.netatmo.com/oauth2/authorize";
-        protected const string _baseUri = @"https://api.netatmo.net";
+        protected const string _baseUri = @"https://api.netatmo.com";
         private const string _state = "HwOdqNKAWeKl7";
 
         private static readonly Semaphore _renewTokenSemaphore = new(1, 1);
